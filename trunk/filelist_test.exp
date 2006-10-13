@@ -1,0 +1,131 @@
+iterate_directory
+List 24 elements:
+ test/cvs
+ test/cvs/CVS
+ test/cvs/CVS/Entries
+ test/cvs/dirbad
+ test/cvs/dirbad/fileoth
+ test/cvs/dirbad/fileutd
+ test/cvs/diroth
+ test/cvs/dirutd
+ test/cvs/dirutd/CVS
+ test/cvs/dirutd/CVS/Entries
+ test/cvs/dirutd/fileoth
+ test/cvs/dirutd/fileutd
+ test/cvs/filemod.o
+ test/cvs/filenew.c
+ test/cvs/fileoth
+ test/cvs/fileutd.h
+ test/subdir
+ test/subdir/testfile
+ test/subdir/testfile1
+ test/subdir/testfile2
+ test/testdir
+ test/testfile
+ test/testfile~
+ test/testlink
+file_list_build
+List 24 elements:
+ test/cvs
+ test/cvs/CVS
+ test/cvs/CVS/Entries
+ test/cvs/dirbad
+ test/cvs/dirbad/fileoth
+ test/cvs/dirbad/fileutd
+ test/cvs/diroth
+ test/cvs/dirutd
+ test/cvs/dirutd/CVS
+ test/cvs/dirutd/CVS/Entries
+ test/cvs/dirutd/fileoth
+ test/cvs/dirutd/fileutd
+ test/cvs/filemod.o
+ test/cvs/filenew.c
+ test/cvs/fileoth
+ test/cvs/fileutd.h
+ test/subdir
+ test/subdir/testfile
+ test/subdir/testfile1
+ test/subdir/testfile2
+ test/testdir
+ test/testfile
+ test/testfile~
+ test/testlink
+as previous with test/subdir in notdir list
+List 20 elements:
+ test/cvs
+ test/cvs/CVS
+ test/cvs/CVS/Entries
+ test/cvs/dirbad
+ test/cvs/dirbad/fileoth
+ test/cvs/dirbad/fileutd
+ test/cvs/diroth
+ test/cvs/dirutd
+ test/cvs/dirutd/CVS
+ test/cvs/dirutd/CVS/Entries
+ test/cvs/dirutd/fileoth
+ test/cvs/dirutd/fileutd
+ test/cvs/filemod.o
+ test/cvs/filenew.c
+ test/cvs/fileoth
+ test/cvs/fileutd.h
+ test/testdir
+ test/testfile
+ test/testfile~
+ test/testlink
+as previous with test/testlink in notdir list
+List 19 elements:
+ test/cvs
+ test/cvs/CVS
+ test/cvs/CVS/Entries
+ test/cvs/dirbad
+ test/cvs/dirbad/fileoth
+ test/cvs/dirbad/fileutd
+ test/cvs/diroth
+ test/cvs/dirutd
+ test/cvs/dirutd/CVS
+ test/cvs/dirutd/CVS/Entries
+ test/cvs/dirutd/fileoth
+ test/cvs/dirutd/fileutd
+ test/cvs/filemod.o
+ test/cvs/filenew.c
+ test/cvs/fileoth
+ test/cvs/fileutd.h
+ test/testdir
+ test/testfile
+ test/testfile~
+as previous with CVS parser
+List 10 elements:
+ test/cvs
+ test/cvs/dirbad
+ test/cvs/dirutd
+ test/cvs/dirutd/fileutd
+ test/cvs/filemod.o
+ test/cvs/filenew.c
+ test/cvs/fileutd.h
+ test/testdir
+ test/testfile
+ test/testfile~
+file_list_new, as previous
+List 10 elements:
+ test/cvs
+ test/cvs/dirbad
+ test/cvs/dirutd
+ test/cvs/dirutd/fileutd
+ test/cvs/filemod.o
+ test/cvs/filenew.c
+ test/cvs/fileutd.h
+ test/testdir
+ test/testfile
+ test/testfile~
+file_list_new, as previous with ending slash
+List 10 elements:
+ test/cvs
+ test/cvs/dirbad
+ test/cvs/dirutd
+ test/cvs/dirutd/fileutd
+ test/cvs/filemod.o
+ test/cvs/filenew.c
+ test/cvs/fileutd.h
+ test/testdir
+ test/testfile
+ test/testfile~
