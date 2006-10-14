@@ -7,6 +7,7 @@
 #include "filters.h"
 #include "filelist.h"
 #include "cvs_parser.h"
+#include "db.h"
 
 /* List of files */
 list_t file_list;
@@ -30,10 +31,14 @@ int main(int argc, char **argv) {
   filters_add(handle, "test/subdir", filter_path_start);
   filters_add(handle, "~", filter_end);
   filters_add(handle, "\\.o$", filter_file_regexp);
+  filters_add(handle, ".svn", filter_file_start);
 
   file_list_new("test////", handle);
-
   list_show(file_list_get(), NULL, file_data_show);
+
+  db_open("test_db");
+  db_parse("file://host/share", "test", file_list_get());
+  db_close();
 
   file_list_free();
   filters_free(handle);
