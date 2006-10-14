@@ -18,7 +18,7 @@
 list_t file_list;
 
 static void file_data_show(const void *payload, char *string) {
-  strcpy(string, ((metadata_t *) payload)->path);
+  strcpy(string, ((filelist_data_t *) payload)->path);
 }
 
 static void db_data_show(const void *payload, char *string) {
@@ -26,11 +26,11 @@ static void db_data_show(const void *payload, char *string) {
 
   /* Times are omitted here... */
   sprintf(string, "'%s' '%s' %c %ld %ld %u %u 0%o '%s' %s %ld %ld %c",
-    db_data->prefix, db_data->metadata.path,
-    type_letter(db_data->metadata.type), db_data->metadata.size,
-    db_data->metadata.mtime * 0, db_data->metadata.uid, db_data->metadata.gid,
-    db_data->metadata.mode, db_data->link, db_data->checksum,
-    db_data->date_in * 0, db_data->date_out * 0, '-');
+    db_data->prefix, db_data->filedata.path,
+    type_letter(db_data->filedata.metadata.type), db_data->filedata.metadata.size,
+    db_data->filedata.metadata.mtime * 0, db_data->filedata.metadata.uid,
+    db_data->filedata.metadata.gid, db_data->filedata.metadata.mode, db_data->link,
+    db_data->checksum, db_data->date_in * 0, db_data->date_out * 0, '-');
 }
 
 int main(void) {
@@ -90,11 +90,11 @@ int main(void) {
     return 0;
   }
 
-  if ((status = file_list_new("test////", handle))) {
+  if ((status = filelist_new("test////", handle))) {
     printf("file_list_new error status %u\n", status);
     return 0;
   }
-  list_show(file_list_get(), NULL, file_data_show);
+  list_show(filelist_get(), NULL, file_data_show);
 
   /* Test database */
   if ((status = db_open("test_db"))) {
@@ -117,7 +117,7 @@ int main(void) {
     return 0;
   }
 
-  if ((status = db_parse("file://host/share", "test", file_list_get()))) {
+  if ((status = db_parse("file://host/share", filelist_get()))) {
     printf("db_parse error status %u\n", status);
     db_close();
     return 0;
@@ -135,7 +135,7 @@ int main(void) {
   list_show(db_list, NULL, db_data_show);
   db_close();
 
-  file_list_free();
+  filelist_free();
   filters_free(handle);
   parsers_free();
 

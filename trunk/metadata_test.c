@@ -6,17 +6,16 @@
 #include "metadata.c"
 
 int main(void) {
-  metadata_t file_data;
+  metadata_t metadata;
 
   printf("metadata_get\n");
-  metadata_get("test/testfile", &file_data);
-  printf(" * path: %s\n", file_data.path);
-  printf(" * type: 0x%08x\n", file_data.type);
-  printf(" * size: %u\n", (unsigned int) file_data.size);
-  printf(" * mtime: %u\n", (unsigned int) file_data.mtime);
-  printf(" * uid: %u\n", file_data.uid);
-  printf(" * gid: %u\n", file_data.gid);
-  printf(" * mode: 0x%08x\n", file_data.mode);
+  metadata_get("test/testfile", &metadata);
+  printf(" * type: 0x%08x\n", metadata.type);
+  printf(" * size: %u\n", (unsigned int) metadata.size);
+  printf(" * mtime: %u\n", (unsigned int) metadata.mtime);
+  printf(" * uid: %u\n", metadata.uid);
+  printf(" * gid: %u\n", metadata.gid);
+  printf(" * mode: 0x%08x\n", metadata.mode);
 
   return 0;
 }

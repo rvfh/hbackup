@@ -1,14 +1,145 @@
 iterate_directory
-List 24 elements:
+List 176 elements:
+ test/.svn
+ test/.svn/README.txt
+ test/.svn/dir-wcprops
+ test/.svn/empty-file
+ test/.svn/entries
+ test/.svn/format
+ test/.svn/prop-base
+ test/.svn/prop-base/testlink.svn-base
+ test/.svn/props
+ test/.svn/props/testlink.svn-work
+ test/.svn/text-base
+ test/.svn/text-base/testdir.svn-base
+ test/.svn/text-base/testfile.svn-base
+ test/.svn/text-base/testlink.svn-base
+ test/.svn/tmp
+ test/.svn/tmp/prop-base
+ test/.svn/tmp/props
+ test/.svn/tmp/text-base
+ test/.svn/tmp/wcprops
+ test/.svn/wcprops
+ test/.svn/wcprops/testdir.svn-work
+ test/.svn/wcprops/testfile.svn-work
+ test/.svn/wcprops/testlink.svn-work
  test/cvs
+ test/cvs/.svn
+ test/cvs/.svn/README.txt
+ test/cvs/.svn/dir-wcprops
+ test/cvs/.svn/empty-file
+ test/cvs/.svn/entries
+ test/cvs/.svn/format
+ test/cvs/.svn/prop-base
+ test/cvs/.svn/props
+ test/cvs/.svn/text-base
+ test/cvs/.svn/text-base/filenew.c.svn-base
+ test/cvs/.svn/text-base/fileoth.svn-base
+ test/cvs/.svn/text-base/fileutd.h.svn-base
+ test/cvs/.svn/tmp
+ test/cvs/.svn/tmp/prop-base
+ test/cvs/.svn/tmp/props
+ test/cvs/.svn/tmp/text-base
+ test/cvs/.svn/tmp/wcprops
+ test/cvs/.svn/wcprops
+ test/cvs/.svn/wcprops/filenew.c.svn-work
+ test/cvs/.svn/wcprops/fileoth.svn-work
+ test/cvs/.svn/wcprops/fileutd.h.svn-work
  test/cvs/CVS
+ test/cvs/CVS/.svn
+ test/cvs/CVS/.svn/README.txt
+ test/cvs/CVS/.svn/dir-wcprops
+ test/cvs/CVS/.svn/empty-file
+ test/cvs/CVS/.svn/entries
+ test/cvs/CVS/.svn/format
+ test/cvs/CVS/.svn/prop-base
+ test/cvs/CVS/.svn/props
+ test/cvs/CVS/.svn/text-base
+ test/cvs/CVS/.svn/text-base/Entries.svn-base
+ test/cvs/CVS/.svn/tmp
+ test/cvs/CVS/.svn/tmp/prop-base
+ test/cvs/CVS/.svn/tmp/props
+ test/cvs/CVS/.svn/tmp/text-base
+ test/cvs/CVS/.svn/tmp/wcprops
+ test/cvs/CVS/.svn/wcprops
+ test/cvs/CVS/.svn/wcprops/Entries.svn-work
  test/cvs/CVS/Entries
  test/cvs/dirbad
+ test/cvs/dirbad/.svn
+ test/cvs/dirbad/.svn/README.txt
+ test/cvs/dirbad/.svn/dir-wcprops
+ test/cvs/dirbad/.svn/empty-file
+ test/cvs/dirbad/.svn/entries
+ test/cvs/dirbad/.svn/format
+ test/cvs/dirbad/.svn/prop-base
+ test/cvs/dirbad/.svn/props
+ test/cvs/dirbad/.svn/text-base
+ test/cvs/dirbad/.svn/text-base/fileoth.svn-base
+ test/cvs/dirbad/.svn/text-base/fileutd.svn-base
+ test/cvs/dirbad/.svn/tmp
+ test/cvs/dirbad/.svn/tmp/prop-base
+ test/cvs/dirbad/.svn/tmp/props
+ test/cvs/dirbad/.svn/tmp/text-base
+ test/cvs/dirbad/.svn/tmp/wcprops
+ test/cvs/dirbad/.svn/wcprops
+ test/cvs/dirbad/.svn/wcprops/fileoth.svn-work
+ test/cvs/dirbad/.svn/wcprops/fileutd.svn-work
  test/cvs/dirbad/fileoth
  test/cvs/dirbad/fileutd
  test/cvs/diroth
+ test/cvs/diroth/.svn
+ test/cvs/diroth/.svn/README.txt
+ test/cvs/diroth/.svn/dir-wcprops
+ test/cvs/diroth/.svn/empty-file
+ test/cvs/diroth/.svn/entries
+ test/cvs/diroth/.svn/format
+ test/cvs/diroth/.svn/prop-base
+ test/cvs/diroth/.svn/props
+ test/cvs/diroth/.svn/text-base
+ test/cvs/diroth/.svn/tmp
+ test/cvs/diroth/.svn/tmp/prop-base
+ test/cvs/diroth/.svn/tmp/props
+ test/cvs/diroth/.svn/tmp/text-base
+ test/cvs/diroth/.svn/tmp/wcprops
+ test/cvs/diroth/.svn/wcprops
  test/cvs/dirutd
+ test/cvs/dirutd/.svn
+ test/cvs/dirutd/.svn/README.txt
+ test/cvs/dirutd/.svn/dir-wcprops
+ test/cvs/dirutd/.svn/empty-file
+ test/cvs/dirutd/.svn/entries
+ test/cvs/dirutd/.svn/format
+ test/cvs/dirutd/.svn/prop-base
+ test/cvs/dirutd/.svn/props
+ test/cvs/dirutd/.svn/text-base
+ test/cvs/dirutd/.svn/text-base/fileoth.svn-base
+ test/cvs/dirutd/.svn/text-base/fileutd.svn-base
+ test/cvs/dirutd/.svn/tmp
+ test/cvs/dirutd/.svn/tmp/prop-base
+ test/cvs/dirutd/.svn/tmp/props
+ test/cvs/dirutd/.svn/tmp/text-base
+ test/cvs/dirutd/.svn/tmp/wcprops
+ test/cvs/dirutd/.svn/wcprops
+ test/cvs/dirutd/.svn/wcprops/fileoth.svn-work
+ test/cvs/dirutd/.svn/wcprops/fileutd.svn-work
  test/cvs/dirutd/CVS
+ test/cvs/dirutd/CVS/.svn
+ test/cvs/dirutd/CVS/.svn/README.txt
+ test/cvs/dirutd/CVS/.svn/dir-wcprops
+ test/cvs/dirutd/CVS/.svn/empty-file
+ test/cvs/dirutd/CVS/.svn/entries
+ test/cvs/dirutd/CVS/.svn/format
+ test/cvs/dirutd/CVS/.svn/prop-base
+ test/cvs/dirutd/CVS/.svn/props
+ test/cvs/dirutd/CVS/.svn/text-base
+ test/cvs/dirutd/CVS/.svn/text-base/Entries.svn-base
+ test/cvs/dirutd/CVS/.svn/tmp
+ test/cvs/dirutd/CVS/.svn/tmp/prop-base
+ test/cvs/dirutd/CVS/.svn/tmp/props
+ test/cvs/dirutd/CVS/.svn/tmp/text-base
+ test/cvs/dirutd/CVS/.svn/tmp/wcprops
+ test/cvs/dirutd/CVS/.svn/wcprops
+ test/cvs/dirutd/CVS/.svn/wcprops/Entries.svn-work
  test/cvs/dirutd/CVS/Entries
  test/cvs/dirutd/fileoth
  test/cvs/dirutd/fileutd
@@ -17,32 +148,27 @@ List 24 elements:
  test/cvs/fileoth
  test/cvs/fileutd.h
  test/subdir
- test/subdir/testfile
- test/subdir/testfile1
- test/subdir/testfile2
- test/testdir
- test/testfile
- test/testfile~
- test/testlink
-file_list_build
-List 24 elements:
- test/cvs
- test/cvs/CVS
- test/cvs/CVS/Entries
- test/cvs/dirbad
- test/cvs/dirbad/fileoth
- test/cvs/dirbad/fileutd
- test/cvs/diroth
- test/cvs/dirutd
- test/cvs/dirutd/CVS
- test/cvs/dirutd/CVS/Entries
- test/cvs/dirutd/fileoth
- test/cvs/dirutd/fileutd
- test/cvs/filemod.o
- test/cvs/filenew.c
- test/cvs/fileoth
- test/cvs/fileutd.h
- test/subdir
+ test/subdir/.svn
+ test/subdir/.svn/README.txt
+ test/subdir/.svn/dir-wcprops
+ test/subdir/.svn/empty-file
+ test/subdir/.svn/entries
+ test/subdir/.svn/format
+ test/subdir/.svn/prop-base
+ test/subdir/.svn/props
+ test/subdir/.svn/text-base
+ test/subdir/.svn/text-base/testfile.svn-base
+ test/subdir/.svn/text-base/testfile1.svn-base
+ test/subdir/.svn/text-base/testfile2.svn-base
+ test/subdir/.svn/tmp
+ test/subdir/.svn/tmp/prop-base
+ test/subdir/.svn/tmp/props
+ test/subdir/.svn/tmp/text-base
+ test/subdir/.svn/tmp/wcprops
+ test/subdir/.svn/wcprops
+ test/subdir/.svn/wcprops/testfile.svn-work
+ test/subdir/.svn/wcprops/testfile1.svn-work
+ test/subdir/.svn/wcprops/testfile2.svn-work
  test/subdir/testfile
  test/subdir/testfile1
  test/subdir/testfile2
@@ -51,16 +177,147 @@ List 24 elements:
  test/testfile~
  test/testlink
 as previous with test/subdir in notdir list
-List 20 elements:
+List 151 elements:
+ test/.svn
+ test/.svn/README.txt
+ test/.svn/dir-wcprops
+ test/.svn/empty-file
+ test/.svn/entries
+ test/.svn/format
+ test/.svn/prop-base
+ test/.svn/prop-base/testlink.svn-base
+ test/.svn/props
+ test/.svn/props/testlink.svn-work
+ test/.svn/text-base
+ test/.svn/text-base/testdir.svn-base
+ test/.svn/text-base/testfile.svn-base
+ test/.svn/text-base/testlink.svn-base
+ test/.svn/tmp
+ test/.svn/tmp/prop-base
+ test/.svn/tmp/props
+ test/.svn/tmp/text-base
+ test/.svn/tmp/wcprops
+ test/.svn/wcprops
+ test/.svn/wcprops/testdir.svn-work
+ test/.svn/wcprops/testfile.svn-work
+ test/.svn/wcprops/testlink.svn-work
  test/cvs
+ test/cvs/.svn
+ test/cvs/.svn/README.txt
+ test/cvs/.svn/dir-wcprops
+ test/cvs/.svn/empty-file
+ test/cvs/.svn/entries
+ test/cvs/.svn/format
+ test/cvs/.svn/prop-base
+ test/cvs/.svn/props
+ test/cvs/.svn/text-base
+ test/cvs/.svn/text-base/filenew.c.svn-base
+ test/cvs/.svn/text-base/fileoth.svn-base
+ test/cvs/.svn/text-base/fileutd.h.svn-base
+ test/cvs/.svn/tmp
+ test/cvs/.svn/tmp/prop-base
+ test/cvs/.svn/tmp/props
+ test/cvs/.svn/tmp/text-base
+ test/cvs/.svn/tmp/wcprops
+ test/cvs/.svn/wcprops
+ test/cvs/.svn/wcprops/filenew.c.svn-work
+ test/cvs/.svn/wcprops/fileoth.svn-work
+ test/cvs/.svn/wcprops/fileutd.h.svn-work
  test/cvs/CVS
+ test/cvs/CVS/.svn
+ test/cvs/CVS/.svn/README.txt
+ test/cvs/CVS/.svn/dir-wcprops
+ test/cvs/CVS/.svn/empty-file
+ test/cvs/CVS/.svn/entries
+ test/cvs/CVS/.svn/format
+ test/cvs/CVS/.svn/prop-base
+ test/cvs/CVS/.svn/props
+ test/cvs/CVS/.svn/text-base
+ test/cvs/CVS/.svn/text-base/Entries.svn-base
+ test/cvs/CVS/.svn/tmp
+ test/cvs/CVS/.svn/tmp/prop-base
+ test/cvs/CVS/.svn/tmp/props
+ test/cvs/CVS/.svn/tmp/text-base
+ test/cvs/CVS/.svn/tmp/wcprops
+ test/cvs/CVS/.svn/wcprops
+ test/cvs/CVS/.svn/wcprops/Entries.svn-work
  test/cvs/CVS/Entries
  test/cvs/dirbad
+ test/cvs/dirbad/.svn
+ test/cvs/dirbad/.svn/README.txt
+ test/cvs/dirbad/.svn/dir-wcprops
+ test/cvs/dirbad/.svn/empty-file
+ test/cvs/dirbad/.svn/entries
+ test/cvs/dirbad/.svn/format
+ test/cvs/dirbad/.svn/prop-base
+ test/cvs/dirbad/.svn/props
+ test/cvs/dirbad/.svn/text-base
+ test/cvs/dirbad/.svn/text-base/fileoth.svn-base
+ test/cvs/dirbad/.svn/text-base/fileutd.svn-base
+ test/cvs/dirbad/.svn/tmp
+ test/cvs/dirbad/.svn/tmp/prop-base
+ test/cvs/dirbad/.svn/tmp/props
+ test/cvs/dirbad/.svn/tmp/text-base
+ test/cvs/dirbad/.svn/tmp/wcprops
+ test/cvs/dirbad/.svn/wcprops
+ test/cvs/dirbad/.svn/wcprops/fileoth.svn-work
+ test/cvs/dirbad/.svn/wcprops/fileutd.svn-work
  test/cvs/dirbad/fileoth
  test/cvs/dirbad/fileutd
  test/cvs/diroth
+ test/cvs/diroth/.svn
+ test/cvs/diroth/.svn/README.txt
+ test/cvs/diroth/.svn/dir-wcprops
+ test/cvs/diroth/.svn/empty-file
+ test/cvs/diroth/.svn/entries
+ test/cvs/diroth/.svn/format
+ test/cvs/diroth/.svn/prop-base
+ test/cvs/diroth/.svn/props
+ test/cvs/diroth/.svn/text-base
+ test/cvs/diroth/.svn/tmp
+ test/cvs/diroth/.svn/tmp/prop-base
+ test/cvs/diroth/.svn/tmp/props
+ test/cvs/diroth/.svn/tmp/text-base
+ test/cvs/diroth/.svn/tmp/wcprops
+ test/cvs/diroth/.svn/wcprops
  test/cvs/dirutd
+ test/cvs/dirutd/.svn
+ test/cvs/dirutd/.svn/README.txt
+ test/cvs/dirutd/.svn/dir-wcprops
+ test/cvs/dirutd/.svn/empty-file
+ test/cvs/dirutd/.svn/entries
+ test/cvs/dirutd/.svn/format
+ test/cvs/dirutd/.svn/prop-base
+ test/cvs/dirutd/.svn/props
+ test/cvs/dirutd/.svn/text-base
+ test/cvs/dirutd/.svn/text-base/fileoth.svn-base
+ test/cvs/dirutd/.svn/text-base/fileutd.svn-base
+ test/cvs/dirutd/.svn/tmp
+ test/cvs/dirutd/.svn/tmp/prop-base
+ test/cvs/dirutd/.svn/tmp/props
+ test/cvs/dirutd/.svn/tmp/text-base
+ test/cvs/dirutd/.svn/tmp/wcprops
+ test/cvs/dirutd/.svn/wcprops
+ test/cvs/dirutd/.svn/wcprops/fileoth.svn-work
+ test/cvs/dirutd/.svn/wcprops/fileutd.svn-work
  test/cvs/dirutd/CVS
+ test/cvs/dirutd/CVS/.svn
+ test/cvs/dirutd/CVS/.svn/README.txt
+ test/cvs/dirutd/CVS/.svn/dir-wcprops
+ test/cvs/dirutd/CVS/.svn/empty-file
+ test/cvs/dirutd/CVS/.svn/entries
+ test/cvs/dirutd/CVS/.svn/format
+ test/cvs/dirutd/CVS/.svn/prop-base
+ test/cvs/dirutd/CVS/.svn/props
+ test/cvs/dirutd/CVS/.svn/text-base
+ test/cvs/dirutd/CVS/.svn/text-base/Entries.svn-base
+ test/cvs/dirutd/CVS/.svn/tmp
+ test/cvs/dirutd/CVS/.svn/tmp/prop-base
+ test/cvs/dirutd/CVS/.svn/tmp/props
+ test/cvs/dirutd/CVS/.svn/tmp/text-base
+ test/cvs/dirutd/CVS/.svn/tmp/wcprops
+ test/cvs/dirutd/CVS/.svn/wcprops
+ test/cvs/dirutd/CVS/.svn/wcprops/Entries.svn-work
  test/cvs/dirutd/CVS/Entries
  test/cvs/dirutd/fileoth
  test/cvs/dirutd/fileutd
@@ -73,16 +330,147 @@ List 20 elements:
  test/testfile~
  test/testlink
 as previous with test/testlink in notdir list
-List 19 elements:
+List 150 elements:
+ test/.svn
+ test/.svn/README.txt
+ test/.svn/dir-wcprops
+ test/.svn/empty-file
+ test/.svn/entries
+ test/.svn/format
+ test/.svn/prop-base
+ test/.svn/prop-base/testlink.svn-base
+ test/.svn/props
+ test/.svn/props/testlink.svn-work
+ test/.svn/text-base
+ test/.svn/text-base/testdir.svn-base
+ test/.svn/text-base/testfile.svn-base
+ test/.svn/text-base/testlink.svn-base
+ test/.svn/tmp
+ test/.svn/tmp/prop-base
+ test/.svn/tmp/props
+ test/.svn/tmp/text-base
+ test/.svn/tmp/wcprops
+ test/.svn/wcprops
+ test/.svn/wcprops/testdir.svn-work
+ test/.svn/wcprops/testfile.svn-work
+ test/.svn/wcprops/testlink.svn-work
  test/cvs
+ test/cvs/.svn
+ test/cvs/.svn/README.txt
+ test/cvs/.svn/dir-wcprops
+ test/cvs/.svn/empty-file
+ test/cvs/.svn/entries
+ test/cvs/.svn/format
+ test/cvs/.svn/prop-base
+ test/cvs/.svn/props
+ test/cvs/.svn/text-base
+ test/cvs/.svn/text-base/filenew.c.svn-base
+ test/cvs/.svn/text-base/fileoth.svn-base
+ test/cvs/.svn/text-base/fileutd.h.svn-base
+ test/cvs/.svn/tmp
+ test/cvs/.svn/tmp/prop-base
+ test/cvs/.svn/tmp/props
+ test/cvs/.svn/tmp/text-base
+ test/cvs/.svn/tmp/wcprops
+ test/cvs/.svn/wcprops
+ test/cvs/.svn/wcprops/filenew.c.svn-work
+ test/cvs/.svn/wcprops/fileoth.svn-work
+ test/cvs/.svn/wcprops/fileutd.h.svn-work
  test/cvs/CVS
+ test/cvs/CVS/.svn
+ test/cvs/CVS/.svn/README.txt
+ test/cvs/CVS/.svn/dir-wcprops
+ test/cvs/CVS/.svn/empty-file
+ test/cvs/CVS/.svn/entries
+ test/cvs/CVS/.svn/format
+ test/cvs/CVS/.svn/prop-base
+ test/cvs/CVS/.svn/props
+ test/cvs/CVS/.svn/text-base
+ test/cvs/CVS/.svn/text-base/Entries.svn-base
+ test/cvs/CVS/.svn/tmp
+ test/cvs/CVS/.svn/tmp/prop-base
+ test/cvs/CVS/.svn/tmp/props
+ test/cvs/CVS/.svn/tmp/text-base
+ test/cvs/CVS/.svn/tmp/wcprops
+ test/cvs/CVS/.svn/wcprops
+ test/cvs/CVS/.svn/wcprops/Entries.svn-work
  test/cvs/CVS/Entries
  test/cvs/dirbad
+ test/cvs/dirbad/.svn
+ test/cvs/dirbad/.svn/README.txt
+ test/cvs/dirbad/.svn/dir-wcprops
+ test/cvs/dirbad/.svn/empty-file
+ test/cvs/dirbad/.svn/entries
+ test/cvs/dirbad/.svn/format
+ test/cvs/dirbad/.svn/prop-base
+ test/cvs/dirbad/.svn/props
+ test/cvs/dirbad/.svn/text-base
+ test/cvs/dirbad/.svn/text-base/fileoth.svn-base
+ test/cvs/dirbad/.svn/text-base/fileutd.svn-base
+ test/cvs/dirbad/.svn/tmp
+ test/cvs/dirbad/.svn/tmp/prop-base
+ test/cvs/dirbad/.svn/tmp/props
+ test/cvs/dirbad/.svn/tmp/text-base
+ test/cvs/dirbad/.svn/tmp/wcprops
+ test/cvs/dirbad/.svn/wcprops
+ test/cvs/dirbad/.svn/wcprops/fileoth.svn-work
+ test/cvs/dirbad/.svn/wcprops/fileutd.svn-work
  test/cvs/dirbad/fileoth
  test/cvs/dirbad/fileutd
  test/cvs/diroth
+ test/cvs/diroth/.svn
+ test/cvs/diroth/.svn/README.txt
+ test/cvs/diroth/.svn/dir-wcprops
+ test/cvs/diroth/.svn/empty-file
+ test/cvs/diroth/.svn/entries
+ test/cvs/diroth/.svn/format
+ test/cvs/diroth/.svn/prop-base
+ test/cvs/diroth/.svn/props
+ test/cvs/diroth/.svn/text-base
+ test/cvs/diroth/.svn/tmp
+ test/cvs/diroth/.svn/tmp/prop-base
+ test/cvs/diroth/.svn/tmp/props
+ test/cvs/diroth/.svn/tmp/text-base
+ test/cvs/diroth/.svn/tmp/wcprops
+ test/cvs/diroth/.svn/wcprops
  test/cvs/dirutd
+ test/cvs/dirutd/.svn
+ test/cvs/dirutd/.svn/README.txt
+ test/cvs/dirutd/.svn/dir-wcprops
+ test/cvs/dirutd/.svn/empty-file
+ test/cvs/dirutd/.svn/entries
+ test/cvs/dirutd/.svn/format
+ test/cvs/dirutd/.svn/prop-base
+ test/cvs/dirutd/.svn/props
+ test/cvs/dirutd/.svn/text-base
+ test/cvs/dirutd/.svn/text-base/fileoth.svn-base
+ test/cvs/dirutd/.svn/text-base/fileutd.svn-base
+ test/cvs/dirutd/.svn/tmp
+ test/cvs/dirutd/.svn/tmp/prop-base
+ test/cvs/dirutd/.svn/tmp/props
+ test/cvs/dirutd/.svn/tmp/text-base
+ test/cvs/dirutd/.svn/tmp/wcprops
+ test/cvs/dirutd/.svn/wcprops
+ test/cvs/dirutd/.svn/wcprops/fileoth.svn-work
+ test/cvs/dirutd/.svn/wcprops/fileutd.svn-work
  test/cvs/dirutd/CVS
+ test/cvs/dirutd/CVS/.svn
+ test/cvs/dirutd/CVS/.svn/README.txt
+ test/cvs/dirutd/CVS/.svn/dir-wcprops
+ test/cvs/dirutd/CVS/.svn/empty-file
+ test/cvs/dirutd/CVS/.svn/entries
+ test/cvs/dirutd/CVS/.svn/format
+ test/cvs/dirutd/CVS/.svn/prop-base
+ test/cvs/dirutd/CVS/.svn/props
+ test/cvs/dirutd/CVS/.svn/text-base
+ test/cvs/dirutd/CVS/.svn/text-base/Entries.svn-base
+ test/cvs/dirutd/CVS/.svn/tmp
+ test/cvs/dirutd/CVS/.svn/tmp/prop-base
+ test/cvs/dirutd/CVS/.svn/tmp/props
+ test/cvs/dirutd/CVS/.svn/tmp/text-base
+ test/cvs/dirutd/CVS/.svn/tmp/wcprops
+ test/cvs/dirutd/CVS/.svn/wcprops
+ test/cvs/dirutd/CVS/.svn/wcprops/Entries.svn-work
  test/cvs/dirutd/CVS/Entries
  test/cvs/dirutd/fileoth
  test/cvs/dirutd/fileutd
@@ -94,7 +482,30 @@ List 19 elements:
  test/testfile
  test/testfile~
 as previous with CVS parser
-List 10 elements:
+List 33 elements:
+ test/.svn
+ test/.svn/README.txt
+ test/.svn/dir-wcprops
+ test/.svn/empty-file
+ test/.svn/entries
+ test/.svn/format
+ test/.svn/prop-base
+ test/.svn/prop-base/testlink.svn-base
+ test/.svn/props
+ test/.svn/props/testlink.svn-work
+ test/.svn/text-base
+ test/.svn/text-base/testdir.svn-base
+ test/.svn/text-base/testfile.svn-base
+ test/.svn/text-base/testlink.svn-base
+ test/.svn/tmp
+ test/.svn/tmp/prop-base
+ test/.svn/tmp/props
+ test/.svn/tmp/text-base
+ test/.svn/tmp/wcprops
+ test/.svn/wcprops
+ test/.svn/wcprops/testdir.svn-work
+ test/.svn/wcprops/testfile.svn-work
+ test/.svn/wcprops/testlink.svn-work
  test/cvs
  test/cvs/dirbad
  test/cvs/dirutd
@@ -106,7 +517,30 @@ List 10 elements:
  test/testfile
  test/testfile~
 file_list_new, as previous
-List 10 elements:
+List 33 elements:
+ test/.svn
+ test/.svn/README.txt
+ test/.svn/dir-wcprops
+ test/.svn/empty-file
+ test/.svn/entries
+ test/.svn/format
+ test/.svn/prop-base
+ test/.svn/prop-base/testlink.svn-base
+ test/.svn/props
+ test/.svn/props/testlink.svn-work
+ test/.svn/text-base
+ test/.svn/text-base/testdir.svn-base
+ test/.svn/text-base/testfile.svn-base
+ test/.svn/text-base/testlink.svn-base
+ test/.svn/tmp
+ test/.svn/tmp/prop-base
+ test/.svn/tmp/props
+ test/.svn/tmp/text-base
+ test/.svn/tmp/wcprops
+ test/.svn/wcprops
+ test/.svn/wcprops/testdir.svn-work
+ test/.svn/wcprops/testfile.svn-work
+ test/.svn/wcprops/testlink.svn-work
  test/cvs
  test/cvs/dirbad
  test/cvs/dirutd
@@ -118,7 +552,30 @@ List 10 elements:
  test/testfile
  test/testfile~
 file_list_new, as previous with ending slash
-List 10 elements:
+List 33 elements:
+ test/.svn
+ test/.svn/README.txt
+ test/.svn/dir-wcprops
+ test/.svn/empty-file
+ test/.svn/entries
+ test/.svn/format
+ test/.svn/prop-base
+ test/.svn/prop-base/testlink.svn-base
+ test/.svn/props
+ test/.svn/props/testlink.svn-work
+ test/.svn/text-base
+ test/.svn/text-base/testdir.svn-base
+ test/.svn/text-base/testfile.svn-base
+ test/.svn/text-base/testlink.svn-base
+ test/.svn/tmp
+ test/.svn/tmp/prop-base
+ test/.svn/tmp/props
+ test/.svn/tmp/text-base
+ test/.svn/tmp/wcprops
+ test/.svn/wcprops
+ test/.svn/wcprops/testdir.svn-work
+ test/.svn/wcprops/testfile.svn-work
+ test/.svn/wcprops/testlink.svn-work
  test/cvs
  test/cvs/dirbad
  test/cvs/dirutd

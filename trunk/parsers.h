@@ -6,7 +6,7 @@
 #ifndef PARSERS_H
 #define PARSERS_H
 
-#include "metadata.h"
+#include "filelist.h"
 
 /* Type for function to check if a directory is under control and enter it */
 typedef int (parsers_dir_check_f) (void **handle, const char *dir_path);
@@ -15,7 +15,7 @@ typedef int (parsers_dir_check_f) (void **handle, const char *dir_path);
 typedef void (parsers_dir_leave_f) (void *handle);
 
 /* Type for function to check whether a file is under control */
-typedef int (parsers_file_check_f) (void *handle, const metadata_t *file_data);
+typedef int (parsers_file_check_f) (void *handle, const filelist_data_t *file_data);
 
 /* Function to destroy the parser */
 typedef void (parsers_destroy_f) (void);

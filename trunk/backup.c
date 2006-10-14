@@ -12,10 +12,10 @@
 /* List of files */
 list_t file_list;
 
-void file_data_show(const void *payload_p, char *string) {
-  const metadata_t *metadata = payload_p;
+void file_data_show(const void *payload, char *string) {
+  const filelist_data_t *filedata = payload;
 
-  sprintf(string, "%s", metadata->path);
+  sprintf(string, "%s", filedata->path);
 }
 
 int main(int argc, char **argv) {
@@ -33,14 +33,14 @@ int main(int argc, char **argv) {
   filters_add(handle, "\\.o$", filter_file_regexp);
   filters_add(handle, ".svn", filter_file_start);
 
-  file_list_new("test////", handle);
-  list_show(file_list_get(), NULL, file_data_show);
+  filelist_new("test////", handle);
+  list_show(filelist_get(), NULL, file_data_show);
 
   db_open("test_db");
-  db_parse("file://host/share", file_list_get());
+  db_parse("file://host/share", filelist_get());
   db_close();
 
-  file_list_free();
+  filelist_free();
   filters_free(handle);
   parsers_free();
   return 0;

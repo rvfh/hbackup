@@ -17,7 +17,7 @@ int main(void) {
   void *handle2;
   void *handle3;
   void *handle4;
-  metadata_t file_data;
+  filelist_data_t file_data;
   void *parsers_handle = NULL;
   parser_t *cvs_parser;
 

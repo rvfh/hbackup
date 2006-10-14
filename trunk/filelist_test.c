@@ -21,16 +21,9 @@ int main(int argc, char *argv[]) {
   }
 
   printf("iterate_directory\n");
-  file_list = list_new(file_data_get);
+  file_list = list_new(filelist_data_get);
   if (! iterate_directory("test", NULL)) {
-    list_show(file_list, NULL, file_data_get);
-  }
-  list_free(file_list);
-
-  printf("file_list_build\n");
-  file_list = list_new(file_data_get);
-  if (! file_list_build("test")) {
-    list_show(file_list, NULL, file_data_get);
+    list_show(file_list, NULL, NULL);
   }
   list_free(file_list);
 
@@ -38,9 +31,9 @@ int main(int argc, char *argv[]) {
   if ((status = filters_add(handle, "test/subdir", filter_path_start))) {
     printf("ignore_add error status %u\n", status);
   }
-  file_list = list_new(file_data_get);
-  if (! file_list_build("test")) {
-    list_show(file_list, NULL, file_data_get);
+  file_list = list_new(filelist_data_get);
+  if (! iterate_directory("test", NULL)) {
+    list_show(file_list, NULL, NULL);
   }
   list_free(file_list);
 
@@ -48,28 +41,28 @@ int main(int argc, char *argv[]) {
   if ((status = filters_add(handle, "test/testlink", filter_path_start))) {
     printf("ignore_add error status %u\n", status);
   }
-  file_list = list_new(file_data_get);
-  if (! file_list_build("test")) {
-    list_show(file_list, NULL, file_data_get);
+  file_list = list_new(filelist_data_get);
+  if (! iterate_directory("test", NULL)) {
+    list_show(file_list, NULL, NULL);
   }
   list_free(file_list);
 
   printf("as previous with CVS parser\n");
   parsers_add(cvs_parser_new());
-  file_list = list_new(file_data_get);
-  if (! file_list_build("test")) {
-    list_show(file_list, NULL, file_data_get);
+  file_list = list_new(filelist_data_get);
+  if (! iterate_directory("test", NULL)) {
+    list_show(file_list, NULL, NULL);
   }
   list_free(file_list);
 
   printf("file_list_new, as previous\n");
-  if (! file_list_new("test", handle)) {
-    list_show(file_list, NULL, file_data_get);
+  if (! filelist_new("test", handle)) {
+    list_show(file_list, NULL, NULL);
   }
 
   printf("file_list_new, as previous with ending slash\n");
-  if (! file_list_new("test/", handle)) {
-    list_show(file_list, NULL, file_data_get);
+  if (! filelist_new("test/", handle)) {
+    list_show(file_list, NULL, NULL);
   }
 
   filters_free(handle);
