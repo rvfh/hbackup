@@ -483,17 +483,17 @@ static int parse_compare(const void *db_data_p, const void *metadata_p) {
 
   /* Removed files should be ignored */
   if (db_data->date_out != 0) {
-    return 2;
+    return -2;
   }
   /* If paths differ, that's all we want to check */
   if ((result = strcmp(db_data->metadata.path, metadata->path))) {
     return result;
   }
   /* If the file has been modified, just return 1 or -1 and that should do */
-  return memcmp(&db_data->metadata, metadata, sizeof(metadata_t));
+  return memcmp(&db_data->metadata, metadata, sizeof(metadata_t) - FILENAME_MAX);
 }
 
-int db_parse(const char *prefix, const char *mount_point, list_t file_list) {
+int db_parse(const char *prefix, list_t file_list) {
   list_t        added_files_list;
   list_t        removed_files_list;
   list_entry_t  entry  = NULL;
@@ -505,18 +505,13 @@ int db_parse(const char *prefix, const char *mount_point, list_t file_list) {
 
   /* Deal with new/modified data first */
   if (added_files_list != NULL) {
-    int mount_point_length = strlen(mount_point);
-
-    if (mount_point[mount_point_length] != '/') {
-      mount_point_length++;
-    }
     while ((entry = list_next(added_files_list, entry)) != NULL) {
       metadata_t *metadata = list_entry_payload(entry);
       db_data_t  *db_data  = malloc(sizeof(db_data_t));
 
       strcpy(db_data->prefix, prefix);
       db_data->metadata = *metadata;
-      strcpy(db_data->metadata.path, &metadata->path[mount_point_length]);
+      strcpy(db_data->metadata.path, metadata->path);
       strcpy(db_data->link, "");
       db_data->date_in = time(NULL);
       db_data->date_out = 0;
