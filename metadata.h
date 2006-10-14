@@ -25,10 +25,8 @@ typedef struct {
   uid_t  uid;     /* user ID of owner */
   gid_t  gid;     /* group ID of owner */
   mode_t mode;    /* permissions */
-  /* Leave path at the end for metadata comparisons */
-  char   path[FILENAME_MAX];
 } metadata_t;
 
-extern int metadata_get(const char *path, metadata_t *file_data_p);
+extern int metadata_get(const char *path, metadata_t *metadata);
 
 #endif

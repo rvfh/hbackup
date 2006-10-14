@@ -15,14 +15,20 @@
 #endif
 #include <sys/stat.h>
 #include <unistd.h>
+#include "metadata.h"
+
+typedef struct {
+  char        path[FILENAME_MAX];
+  metadata_t  metadata;
+} filelist_data_t;
 
 /* Create list of files from path, using filters */
-extern int file_list_new(const char *path, void *filters);
+extern int filelist_new(const char *path, list_t filters);
 
 /* Destroy list of files */
-extern void file_list_free(void);
+extern void filelist_free(void);
 
 /* Obtain list of files */
-extern void *file_list_get(void);
+extern list_t filelist_get(void);
 
 #endif

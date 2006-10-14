@@ -29,17 +29,17 @@
 #include <errno.h>
 #include <openssl/md5.h>
 #include <openssl/evp.h>
-#include "metadata.h"
+#include "filelist.h"
 #include "list.h"
 #include "db.h"
 
 typedef struct {
-  char        prefix[FILENAME_MAX];
-  metadata_t  metadata;
-  char        link[FILENAME_MAX];
-  char        checksum[256];
-  time_t      date_in;
-  time_t      date_out;
+  char            prefix[FILENAME_MAX];
+  filelist_data_t filedata;
+  char            link[FILENAME_MAX];
+  char            checksum[256];
+  time_t          date_in;
+  time_t          date_out;
 } db_data_t;
 
 static list_t *db_list = NULL;
@@ -225,17 +225,20 @@ static int db_load(const char *filename, list_t list) {
         fprintf(stderr, "db: failed to read list file: wrong format (4)\n");
         continue;
       }
-      strncpy(db_data.metadata.path, start, delim - start);
-      db_data.metadata.path[delim - start] = '\0';
+      strncpy(db_data.filedata.path, start, delim - start);
+      db_data.filedata.path[delim - start] = '\0';
       /* Type, size, mtime, uid, gid, mode */
       start = delim;
       start++;
-      size = sscanf(start, " %c %ld %ld %u %u %o", &letter, &db_data.metadata.size, &db_data.metadata.mtime, &db_data.metadata.uid, &db_data.metadata.gid, &db_data.metadata.mode);
+      size = sscanf(start, " %c %ld %ld %u %u %o", &letter,
+        &db_data.filedata.metadata.size, &db_data.filedata.metadata.mtime,
+        &db_data.filedata.metadata.uid, &db_data.filedata.metadata.gid,
+        &db_data.filedata.metadata.mode);
       if (size != 6) {
         fprintf(stderr, "db: failed to read list file: wrong format (5)\n");
         continue;
       }
-      db_data.metadata.type = type_mode(letter);
+      db_data.filedata.metadata.type = type_mode(letter);
       /* Link */
       delim = strchr(start, '\'');
       if (delim == NULL) {
@@ -290,10 +293,11 @@ static int db_save(const char *filename, list_t list) {
 
       /* The link could also be stored as data... */
       fprintf(writefile, "'%s' '%s' %c %ld %ld %u %u 0%o '%s' %s %ld %ld %c\n",
-        db_data->prefix, db_data->metadata.path,
-        type_letter(db_data->metadata.type), db_data->metadata.size,
-        db_data->metadata.mtime, db_data->metadata.uid, db_data->metadata.gid,
-        db_data->metadata.mode, db_data->link, db_data->checksum,
+        db_data->prefix, db_data->filedata.path,
+        type_letter(db_data->filedata.metadata.type),
+        db_data->filedata.metadata.size, db_data->filedata.metadata.mtime,
+        db_data->filedata.metadata.uid, db_data->filedata.metadata.gid,
+        db_data->filedata.metadata.mode, db_data->link, db_data->checksum,
         db_data->date_in, db_data->date_out, '-');
     }
     fclose(writefile);
@@ -313,10 +317,10 @@ static void db_data_get(const void *payload, char *string) {
 
   if (date_out == 0) {
     /* '@' > '9' */
-    sprintf(string, "%s/%s %c", db_data->prefix, db_data->metadata.path, '@');
+    sprintf(string, "%s/%s %c", db_data->prefix, db_data->filedata.path, '@');
   } else {
     /* ' ' > '0' */
-    sprintf(string, "%s/%s %11ld", db_data->prefix, db_data->metadata.path, date_out);
+    sprintf(string, "%s/%s %11ld", db_data->prefix, db_data->filedata.path, date_out);
   }
 }
 
@@ -476,21 +480,22 @@ void db_close(void) {
   remove(temp_path);
 }
 
-static int parse_compare(const void *db_data_p, const void *metadata_p) {
-  const db_data_t   *db_data  = db_data_p;
-  const metadata_t  *metadata = metadata_p;
-  int               result;
+static int parse_compare(const void *db_data_p, const void *filedata_p) {
+  const db_data_t       *db_data  = db_data_p;
+  const filelist_data_t *filedata = filedata_p;
+  int                   result;
 
   /* Removed files should be ignored */
   if (db_data->date_out != 0) {
     return -2;
   }
   /* If paths differ, that's all we want to check */
-  if ((result = strcmp(db_data->metadata.path, metadata->path))) {
+  if ((result = strcmp(db_data->filedata.path, filedata->path))) {
     return result;
   }
   /* If the file has been modified, just return 1 or -1 and that should do */
-  return memcmp(&db_data->metadata, metadata, sizeof(metadata_t) - FILENAME_MAX);
+  return memcmp(&db_data->filedata.metadata, &filedata->metadata,
+      sizeof(metadata_t));
 }
 
 int db_parse(const char *prefix, list_t file_list) {
@@ -506,34 +511,34 @@ int db_parse(const char *prefix, list_t file_list) {
   /* Deal with new/modified data first */
   if (added_files_list != NULL) {
     while ((entry = list_next(added_files_list, entry)) != NULL) {
-      metadata_t *metadata = list_entry_payload(entry);
-      db_data_t  *db_data  = malloc(sizeof(db_data_t));
+      filelist_data_t *filedata = list_entry_payload(entry);
+      db_data_t       *db_data  = malloc(sizeof(db_data_t));
 
       strcpy(db_data->prefix, prefix);
-      db_data->metadata = *metadata;
-      strcpy(db_data->metadata.path, metadata->path);
+      db_data->filedata.metadata = filedata->metadata;
+      strcpy(db_data->filedata.path, filedata->path);
       strcpy(db_data->link, "");
       db_data->date_in = time(NULL);
       db_data->date_out = 0;
       /* Save new data */
-      if (S_ISREG(metadata->type)) {
-        if (db_write(metadata->path, db_data->checksum)) {
+      if (S_ISREG(filedata->metadata.type)) {
+        if (db_write(db_data->filedata.path, db_data->checksum)) {
           /* Write failed, need to go on */
           failed = 1;
           fprintf(stderr, "db: parse: %s: %s, ignoring\n",
-              strerror(errno), metadata->path);
+              strerror(errno), db_data->filedata.path);
           strcpy(db_data->checksum, "N");
         }
       } else {
         strcpy(db_data->checksum, "N");
       }
-      if (S_ISLNK(metadata->type)) {
-        int size = readlink(metadata->path, db_data->link, FILENAME_MAX);
+      if (S_ISLNK(filedata->metadata.type)) {
+        int size = readlink(db_data->filedata.path, db_data->link, FILENAME_MAX);
 
         if (size < 0) {
           failed = 1;
           fprintf(stderr, "db: parse: %s: %s, ignoring\n",
-              strerror(errno), metadata->path);
+              strerror(errno), db_data->filedata.path);
           strcpy(db_data->link, "");
         }
       } else {

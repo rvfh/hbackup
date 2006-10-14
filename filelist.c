@@ -32,21 +32,21 @@ Algorithm for temporary list creation:
 static list_t file_list = NULL;
 static void *filters_handle = NULL;
 
-static void file_data_get(const void *payload_p, char *string) {
-  const metadata_t *metadata = payload_p;
+static void filelist_data_get(const void *payload, char *string) {
+  const filelist_data_t *filelist_data = payload;
 
-  sprintf(string, "%s", metadata->path);
+  sprintf(string, "%s", filelist_data->path);
 }
 
-static metadata_t * file_list_entry_new(const metadata_t *file_data) {
-  metadata_t *file_data_p = malloc(sizeof(metadata_t));
-  *file_data_p = *file_data;
-  return file_data_p;
+static filelist_data_t * filelist_entry_new(const filelist_data_t *filelist_data) {
+  filelist_data_t *filelist_data_p = malloc(sizeof(filelist_data_t));
+  *filelist_data_p = *filelist_data;
+  return filelist_data_p;
 }
 
 static int iterate_directory(const char *path, parser_t *parser) {
   void *handle;
-  metadata_t file_data;
+  filelist_data_t filelist_data;
   DIR *directory;
   struct dirent *dir_entry;
 
@@ -78,56 +78,54 @@ static int iterate_directory(const char *path, parser_t *parser) {
     return 2;
   }
   while ((dir_entry = readdir(directory)) != NULL) {
-    char d_path[FILENAME_MAX];
-
     /* Ignore . and .. */
     if (! strcmp(dir_entry->d_name, ".") || ! strcmp(dir_entry->d_name, "..")) {
       continue;
     }
-    strcpy(d_path, path);
-    strcat(d_path, "/");
-    strcat(d_path, dir_entry->d_name);
-    if (metadata_get(d_path, &file_data)) {
-      fprintf(stderr, "filelist: cannot get metadata: %s\n", d_path);
+    strcpy(filelist_data.path, path);
+    strcat(filelist_data.path, "/");
+    strcat(filelist_data.path, dir_entry->d_name);
+    if (metadata_get(filelist_data.path, &filelist_data.metadata)) {
+      fprintf(stderr, "filelist: cannot get metadata: %s\n", filelist_data.path);
       return 2;
     }
     /* Let the parser analyse the file data to know whether to back it up */
-    if ((parser != NULL) && parser->file_check(handle, &file_data)) {
+    if ((parser != NULL) && parser->file_check(handle, &filelist_data)) {
       continue;
     }
     /* Now pass it through the filters */
-    if ((filters_handle != NULL) && ! filters_match(filters_handle, file_data.path)) {
+    if ((filters_handle != NULL) && ! filters_match(filters_handle, filelist_data.path)) {
       continue;
     }
-    if (S_ISDIR(file_data.type)) {
-      if (iterate_directory(d_path, parser)) {
+    if (S_ISDIR(filelist_data.metadata.type)) {
+      if (iterate_directory(filelist_data.path, parser)) {
         fprintf(stderr, "filelist: cannot iterate into directory: %s\n", dir_entry->d_name);
         return 2;
       }
     }
-    list_add(file_list, file_list_entry_new(&file_data));
+    list_add(file_list, filelist_entry_new(&filelist_data));
   }
   closedir(directory);
   return 0;
 }
 
-static int file_list_build(const char *path) {
-/*  metadata_t file_data;
+/*static int filelist_build(const char *path) {
+  metadata_t filelist_data;
 
-  if (metadata_get(path, &file_data)) {
+  if (metadata_get(path, &filelist_data)) {
     fprintf(stderr, "filelist: build: cannot get metadata: %s\n", path);
     return 2;
   }
-  list_add(file_list, file_list_entry_new(&file_data));*/
+  list_add(file_list, filelist_entry_new(&filelist_data));
   return iterate_directory(path, NULL);
 }
-
-int file_list_new(const char *path, void *filters) {
+*/
+int filelist_new(const char *path, void *filters) {
   char dir_path[FILENAME_MAX];
   char *path_end = dir_path;
 
   filters_handle = filters;
-  file_list = list_new(file_data_get);
+  file_list = list_new(filelist_data_get);
   if (file_list == NULL) {
     fprintf(stderr, "filelist: new: cannot initialise\n");
     return 2;
@@ -139,13 +137,13 @@ int file_list_new(const char *path, void *filters) {
     *path_end = '\0';
     path_end--;
   }
-  return file_list_build(dir_path);
+  return iterate_directory(dir_path, NULL);
 }
 
-void file_list_free(void) {
+void filelist_free(void) {
   list_free(file_list);
 }
 
-void *file_list_get(void) {
+void *filelist_get(void) {
   return file_list;
 }
