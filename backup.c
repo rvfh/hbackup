@@ -37,7 +37,7 @@ int main(int argc, char **argv) {
   list_show(file_list_get(), NULL, file_data_show);
 
   db_open("test_db");
-  db_parse("file://host/share", "test", file_list_get());
+  db_parse("file://host/share", file_list_get());
   db_close();
 
   file_list_free();

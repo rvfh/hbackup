@@ -19,13 +19,14 @@
 
 /* Our data */
 typedef struct {
-  char   path[FILENAME_MAX];
   mode_t type;    /* type */
   time_t mtime;   /* time of last modification */
   off_t  size;    /* total size, in bytes */
   uid_t  uid;     /* user ID of owner */
   gid_t  gid;     /* group ID of owner */
   mode_t mode;    /* permissions */
+  /* Leave path at the end for metadata comparisons */
+  char   path[FILENAME_MAX];
 } metadata_t;
 
 extern int metadata_get(const char *path, metadata_t *file_data_p);
