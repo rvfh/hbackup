@@ -73,6 +73,10 @@ int main(void) {
     printf("parsers_new error status %u\n", status);
     return 0;
   }
+  if ((status = filters_add(handle, ".svn", filter_file_start))) {
+    printf("ignore_add error status %u\n", status);
+    return 0;
+  }
   if ((status = filters_add(handle, "test/subdir", filter_path_start))) {
     printf("ignore_add error status %u\n", status);
     return 0;

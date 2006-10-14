@@ -192,17 +192,12 @@ static int db_load(const char *filename, list_t list) {
 
     while (getline(&buffer, &size, readfile) >= 0) {
       db_data_t db_data;
+      db_data_t *db_data_p = NULL;
       char      *start = buffer;
       char      *delim;
-/* This does not work...
-{
-char string[FILENAME_MAX];
-char string2[FILENAME_MAX];
+      char      letter;
 
-size = sscanf(buffer, "'%s' '%s'", string, string2);
-printf("Size read: %u - %s\n", size, string);
-}
-*/
+      /* Prefix*/
       if (buffer[0] != '\'') {
         fprintf(stderr, "db: failed to read list file: wrong format (1)\n");
         continue;
@@ -214,19 +209,67 @@ printf("Size read: %u - %s\n", size, string);
         continue;
       }
       strncpy(db_data.prefix, start, delim - start);
-printf("Read: %s\n", db_data.prefix);
+      db_data.prefix[delim - start] = '\0';
+      /* Path */
       start = delim;
       start++;
       delim = strchr(start, '\'');
+      if (delim == NULL) {
+        fprintf(stderr, "db: failed to read list file: wrong format (3)\n");
+        continue;
+      }
       start = delim;
       start++;
-/*      strncpy(db_data.metadata.path, start, delim - start);
-printf("Read: %s\n", db_data.metadata.path);*/
+      delim = strchr(start, '\'');
+      if (delim == NULL) {
+        fprintf(stderr, "db: failed to read list file: wrong format (4)\n");
+        continue;
+      }
+      strncpy(db_data.metadata.path, start, delim - start);
+      db_data.metadata.path[delim - start] = '\0';
+      /* Type, size, mtime, uid, gid, mode */
+      start = delim;
+      start++;
+      size = sscanf(start, " %c %ld %ld %u %u %o", &letter, &db_data.metadata.size, &db_data.metadata.mtime, &db_data.metadata.uid, &db_data.metadata.gid, &db_data.metadata.mode);
+      if (size != 6) {
+        fprintf(stderr, "db: failed to read list file: wrong format (5)\n");
+        continue;
+      }
+      db_data.metadata.type = type_mode(letter);
+      /* Link */
+      delim = strchr(start, '\'');
+      if (delim == NULL) {
+        fprintf(stderr, "db: failed to read list file: wrong format (6)\n");
+        continue;
+      }
+      start = delim;
+      start++;
+      delim = strchr(start, '\'');
+      if (delim == NULL) {
+        fprintf(stderr, "db: failed to read list file: wrong format (7)\n");
+        continue;
+      }
+      strncpy(db_data.link, start, delim - start);
+      db_data.link[delim - start] = '\0';
+      start = delim;
+      start++;
+      /* Checksum, date in and date out */
+      size = sscanf(start, " %s %ld %ld %c", db_data.checksum, &db_data.date_in, &db_data.date_out, &letter);
+      if (size != 4) {
+        fprintf(stderr, "db: failed to read list file: wrong format (8)\n");
+        continue;
+      }
+      if (letter != '-') {
+        fprintf(stderr, "db: failed to read list file: wrong format (9)\n");
+        continue;
+      }
+      db_data_p = malloc(sizeof(db_data_t));
+      *db_data_p = db_data;
+      list_add(db_list, db_data_p);
     }
     fclose(readfile);
     return 0;
   }
-fprintf(stderr, "db: failed to read list file: not implemented\n");
   return 1;
 }
 
