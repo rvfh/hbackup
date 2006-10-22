@@ -1,0 +1,49 @@
+DESCRIPTION
+
+This is a backup program. The name hbackup has been chosen because of the way
+data is stored: based on the file hash (a la git).
+
+Why yet another backup program? Because I wanted something geared towards what
+I do: software development. This system can easily be made to recognise
+version-controlled directories to optimise backup choices: why backup files
+that are on a server somewhere, itself with its own backup system?
+
+SERVER CONFIGURATION
+
+The default configuration file is /etc/hbackup.conf, and can be overriden using
+the -c option. Only two keywords are acceptable there: 'db' and 'client'.
+* db gives the backup database path. The default is '/backup'. Syntax:
+  db "<path to backup database>"
+* client gives the necessary information for all clients to backup. Syntax:
+  client <protocol>://[<username>[:<password>]@]<hostname> "<path to list>"
+
+CLIENT CONFIGURATION
+
+Each client must provide its own configuration file. Four keywords may be used:
+* path: start of a new backup list, gives the path information. Syntax:
+  path "<path to backup>"
+* compress: files to compress (for filter types, see FILTERS below). Syntax:
+  compress <filter type> "<string>"
+* ignore: files to ignore (for filter types, see FILTERS below). Syntax:
+  ignore <filter type> "<string>"
+* parser: detection of directories under version control (for existing
+parsers, see PARSERS below). Syntax:
+  parser "<parser name>"
+
+COMPRESSION
+
+Not implemented.
+
+FILTERS
+
+There are five types of filters:
+* filter_end: match end of path/file name
+* filter_path_start: match start of path
+* filter_path_regexp: match regular expression on path
+* filter_file_start: match start of file name
+* filter_file_regexp: match regular expression on file name
+
+PARSERS
+
+Only one parser is implemented at the moment:
+* cvs: only backup files under version control.
