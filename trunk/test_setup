@@ -1,3 +1,50 @@
 #!/bin/sh
 
-rm -rf test_db/*
+# Database
+TESTDBDIR="test_db"
+rm -rf "$TESTDBDIR"
+mkdir "$TESTDBDIR"
+
+# Test bench
+TESTDIR="test"
+rm -rf "$TESTDIR"
+mkdir "$TESTDIR"
+mkdir "$TESTDIR/testdir"
+echo "Hello world!" > "$TESTDIR/testfile"
+touch -d 20061022 "$TESTDIR/testfile"
+touch "$TESTDIR/testfile~"
+ln -s "testfile" "$TESTDIR/testlink"
+
+# Filters test
+mkdir "$TESTDIR/subdir"
+echo "Hello Moon!" > "$TESTDIR/subdir/testfile"
+touch "$TESTDIR/subdir/testfile1"
+echo "Hello Moon!" > "$TESTDIR/subdir/testfile2"
+
+# CVS test
+CVSDIR="$TESTDIR/cvs"
+mkdir "$CVSDIR"
+touch "$CVSDIR/filemod.o"
+touch "$CVSDIR/filenew.c"
+touch "$CVSDIR/fileoth"
+touch "$CVSDIR/fileutd.h"
+mkdir "$CVSDIR/dirbad"
+touch "$CVSDIR/dirbad/fileoth"
+touch "$CVSDIR/dirbad/fileutd"
+mkdir "$CVSDIR/diroth"
+mkdir "$CVSDIR/dirutd"
+touch "$CVSDIR/dirutd/fileoth"
+touch "$CVSDIR/dirutd/fileutd"
+mkdir "$CVSDIR/dirutd/CVS"
+cat << EOF > "$CVSDIR/dirutd/CVS/Entries"
+/fileutd/1.2/Wed Oct  4 18:04:40 2006//
+D
+EOF
+mkdir "$CVSDIR/CVS"
+cat << EOF > "$CVSDIR/CVS/Entries"
+/filenew.c/0/dummy timestamp//
+/filemod.o/1.1/Mon Oct  2 16:27:11 2006//
+/fileutd.h/1.2/Wed Oct  4 18:04:40 2006//
+D/dirbad////
+D/dirutd////
+EOF

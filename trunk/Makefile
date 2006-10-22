@@ -19,6 +19,7 @@ test:	setup \
 
 clean:
 	rm -f *.[oa] *~ *.out *.out.failed *.dif *_test backup
+	@./test_clean
 
 setup:
 	@./test_setup

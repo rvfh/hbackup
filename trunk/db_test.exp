@@ -29,22 +29,22 @@ List 9 elements:
 db_open error status 1
 59ca0efa9f5633cb0371bbc0355478d8-0  test/testfile
 List 9 elements:
- 'file://host/share' 'cvs' d 128 0 1000 1000 0755 '' N 0 0 -
- 'file://host/share' 'cvs/dirbad' d 45 0 1000 1000 0755 '' N 0 0 -
- 'file://host/share' 'cvs/dirutd' d 55 0 1000 1000 0755 '' N 0 0 -
+ 'file://host/share' 'cvs' d 117 0 1000 1000 0755 '' N 0 0 -
+ 'file://host/share' 'cvs/dirbad' d 34 0 1000 1000 0755 '' N 0 0 -
+ 'file://host/share' 'cvs/dirutd' d 44 0 1000 1000 0755 '' N 0 0 -
  'file://host/share' 'cvs/dirutd/fileutd' f 0 0 1000 1000 0644 '' d41d8cd98f00b204e9800998ecf8427e-0 0 0 -
  'file://host/share' 'cvs/filenew.c' f 0 0 1000 1000 0644 '' d41d8cd98f00b204e9800998ecf8427e-0 0 0 -
  'file://host/share' 'cvs/fileutd.h' f 0 0 1000 1000 0644 '' d41d8cd98f00b204e9800998ecf8427e-0 0 0 -
- 'file://host/share' 'testdir' f 0 0 1000 1000 0644 '' d41d8cd98f00b204e9800998ecf8427e-0 0 0 -
+ 'file://host/share' 'testdir' d 6 0 1000 1000 0755 '' N 0 0 -
  'file://host/share' 'testfile' f 13 0 1000 1000 0644 '' 59ca0efa9f5633cb0371bbc0355478d8-0 0 0 -
  'file://host/share' 'testlink' l 8 0 1000 1000 0777 'testfile' N 0 0 -
 List 9 elements:
- 'file://host/share' 'cvs' d 128 0 1000 1000 0755 '' N 0 0 -
- 'file://host/share' 'cvs/dirbad' d 45 0 1000 1000 0755 '' N 0 0 -
- 'file://host/share' 'cvs/dirutd' d 55 0 1000 1000 0755 '' N 0 0 -
+ 'file://host/share' 'cvs' d 117 0 1000 1000 0755 '' N 0 0 -
+ 'file://host/share' 'cvs/dirbad' d 34 0 1000 1000 0755 '' N 0 0 -
+ 'file://host/share' 'cvs/dirutd' d 44 0 1000 1000 0755 '' N 0 0 -
  'file://host/share' 'cvs/dirutd/fileutd' f 0 0 1000 1000 0644 '' d41d8cd98f00b204e9800998ecf8427e-0 0 0 -
  'file://host/share' 'cvs/filenew.c' f 0 0 1000 1000 0644 '' d41d8cd98f00b204e9800998ecf8427e-0 0 0 -
  'file://host/share' 'cvs/fileutd.h' f 0 0 1000 1000 0644 '' d41d8cd98f00b204e9800998ecf8427e-0 0 0 -
- 'file://host/share' 'testdir' f 0 0 1000 1000 0644 '' d41d8cd98f00b204e9800998ecf8427e-0 0 0 -
+ 'file://host/share' 'testdir' d 6 0 1000 1000 0755 '' N 0 0 -
  'file://host/share' 'testfile' f 13 0 1000 1000 0644 '' 59ca0efa9f5633cb0371bbc0355478d8-0 0 0 -
  'file://host/share' 'testlink' l 8 0 1000 1000 0777 'testfile' N 0 0 -
