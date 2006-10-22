@@ -22,19 +22,27 @@ static void parsers_show(const void *payload, char *string) {
 
 int main(void) {
   parser_t *parser_p = malloc(sizeof(parser_t));
-  void *handle = NULL;
+  void *handle1 = NULL;
+  void *handle2 = NULL;
+  void *parser_handle = NULL;
 
-  if (parsers_new()) {
+  if (parsers_new(&handle1)) {
     printf("Failed to create\n");
   }
   *parser_p = parser;
-  if (parsers_add(parser_p)) {
+  if (parsers_add(handle1, parser_p)) {
     printf("Failed to add\n");
   }
-  list_show(parsers_list, NULL, parsers_show);
-  if (parser_p != parsers_next(&handle)) {
+  list_show(handle1, NULL, parsers_show);
+  if (parser_p != parsers_next(handle1, &parser_handle)) {
     printf("Parsers differ\n");
   }
-  parsers_free();
+  if (parsers_new(&handle2)) {
+    printf("Failed to create\n");
+  }
+  list_show(handle2, NULL, parsers_show);
+  list_show(handle1, NULL, parsers_show);
+  parsers_free(handle2);
+  parsers_free(handle1);
   return 0;
 }

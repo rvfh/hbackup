@@ -28,8 +28,7 @@ static void payload2_get(const void *payload_p, char *string) {
   sprintf(string, "%s/%s", payload->dir, payload->filename);
 }
 
-static int payloads_compare(const void *payload_left,
-    const void *payload_right) {
+static int payloads_compare(void *payload_left, void *payload_right) {
   static int counter = 0;
 
   if (++counter > 2) counter = -2;

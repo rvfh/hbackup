@@ -29,40 +29,37 @@ Algorithm for temporary list creation:
 #include "parsers.h"
 #include "filelist.h"
 
+/* Mount point */
+static char mount_path[FILENAME_MAX] = "";
+static int mount_path_length = 0;
+
 static list_t file_list = NULL;
 static void *filters_handle = NULL;
+static void *parsers_handle = NULL;
 
-static void filelist_data_get(const void *payload, char *string) {
-  const filelist_data_t *filelist_data = payload;
+static void filedata_get(const void *payload, char *string) {
+  const filedata_t *filedata = payload;
 
-  sprintf(string, "%s", filelist_data->path);
+  sprintf(string, "%s", filedata->path);
 }
 
-static filelist_data_t * filelist_entry_new(const filelist_data_t *filelist_data) {
-  filelist_data_t *filelist_data_p = malloc(sizeof(filelist_data_t));
-  *filelist_data_p = *filelist_data;
-  return filelist_data_p;
+static filedata_t * filelist_entry_new(const filedata_t *filedata) {
+  filedata_t *filedata_p = malloc(sizeof(filedata_t));
+  *filedata_p = *filedata;
+  return filedata_p;
 }
 
 static int iterate_directory(const char *path, parser_t *parser) {
   void *handle;
-  filelist_data_t filelist_data;
+  filedata_t filedata;
   DIR *directory;
   struct dirent *dir_entry;
 
   /* Check whether directory is under SCM control */
   if (parser == NULL) {
-/*    list_entry_t *entry = NULL;
-
-    while ((entry = list_next(parsers_list, entry)) != NULL) {
-      if (! ((parser_t *) entry->payload)->dir_check(&handle, path)) {
-        parser = (parser_t *) entry->payload;
-        break;
-      }
-    }*/
     void *parser_handle = NULL;
 
-    while ((parser = parsers_next(&parser_handle)) != NULL) {
+    while ((parser = parsers_next(parsers_handle, &parser_handle)) != NULL) {
       if (! parser->dir_check(&handle, path)) {
         break;
       }
@@ -78,72 +75,72 @@ static int iterate_directory(const char *path, parser_t *parser) {
     return 2;
   }
   while ((dir_entry = readdir(directory)) != NULL) {
+    char file_path[FILENAME_MAX];
+
     /* Ignore . and .. */
     if (! strcmp(dir_entry->d_name, ".") || ! strcmp(dir_entry->d_name, "..")) {
       continue;
     }
-    strcpy(filelist_data.path, path);
-    strcat(filelist_data.path, "/");
-    strcat(filelist_data.path, dir_entry->d_name);
-    if (metadata_get(filelist_data.path, &filelist_data.metadata)) {
-      fprintf(stderr, "filelist: cannot get metadata: %s\n", filelist_data.path);
+    strcpy(file_path, path);
+    strcat(file_path, dir_entry->d_name);
+    /* Remove mount path from records */
+    strcpy(filedata.path, &file_path[mount_path_length]);
+    strcpy(filedata.checksum, "");
+    if (metadata_get(file_path, &filedata.metadata)) {
+      fprintf(stderr, "filelist: cannot get metadata: %s\n", file_path);
       return 2;
     }
     /* Let the parser analyse the file data to know whether to back it up */
-    if ((parser != NULL) && parser->file_check(handle, &filelist_data)) {
+    if ((parser != NULL) && parser->file_check(handle, &filedata)) {
       continue;
     }
     /* Now pass it through the filters */
-    if ((filters_handle != NULL) && ! filters_match(filters_handle, filelist_data.path)) {
+    if ((filters_handle != NULL) && ! filters_match(filters_handle, file_path)) {
       continue;
     }
-    if (S_ISDIR(filelist_data.metadata.type)) {
-      if (iterate_directory(filelist_data.path, parser)) {
+    if (S_ISDIR(filedata.metadata.type)) {
+      strcat(file_path, "/");
+      if (iterate_directory(file_path, parser)) {
         fprintf(stderr, "filelist: cannot iterate into directory: %s\n", dir_entry->d_name);
         return 2;
       }
     }
-    list_add(file_list, filelist_entry_new(&filelist_data));
+    list_add(file_list, filelist_entry_new(&filedata));
   }
   closedir(directory);
   return 0;
 }
 
-/*static int filelist_build(const char *path) {
-  metadata_t filelist_data;
-
-  if (metadata_get(path, &filelist_data)) {
-    fprintf(stderr, "filelist: build: cannot get metadata: %s\n", path);
-    return 2;
-  }
-  list_add(file_list, filelist_entry_new(&filelist_data));
-  return iterate_directory(path, NULL);
-}
-*/
-int filelist_new(const char *path, void *filters) {
+int filelist_new(const char *path, list_t filters, list_t parsers) {
   char dir_path[FILENAME_MAX];
   char *path_end = dir_path;
 
   filters_handle = filters;
-  file_list = list_new(filelist_data_get);
+  parsers_handle = parsers;
+  file_list = list_new(filedata_get);
   if (file_list == NULL) {
     fprintf(stderr, "filelist: new: cannot initialise\n");
     return 2;
   }
   /* Remove trailing slashes */
-  strcpy(dir_path, path);
-  path_end += strlen(dir_path) - 1;
-  while ((path_end >= dir_path) && (*path_end == '/')) {
+  strcpy(mount_path, path);
+  path_end = strchr(mount_path, '/');
+  if (path_end != NULL) {
     *path_end = '\0';
-    path_end--;
   }
-  return iterate_directory(dir_path, NULL);
+  strcat(mount_path, "/");
+  mount_path_length = strlen(mount_path);
+  return iterate_directory(mount_path, NULL);
 }
 
 void filelist_free(void) {
   list_free(file_list);
 }
 
-void *filelist_get(void) {
+list_t filelist_getlist(void) {
   return file_list;
+}
+
+const char *filelist_getpath(void) {
+  return mount_path;
 }

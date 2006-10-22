@@ -8,65 +8,71 @@
 #include "cvs_parser.h"
 
 int main(int argc, char *argv[]) {
-  void *handle;
+  void *test_filters_handle = NULL;
+  void *test_parsers_handle = NULL;
   int status;
 
-  if ((status = filters_new(&handle))) {
-    printf("parsers_new error status %u\n", status);
+  if ((status = filters_new(&test_filters_handle))) {
+    printf("filters_new error status %u\n", status);
   }
   /* Make sure file_list uses the filters */
-  filters_handle = handle;
-  if ((status = parsers_new())) {
+  filters_handle = test_filters_handle;
+  if ((status = parsers_new(&test_parsers_handle))) {
     printf("parsers_new error status %u\n", status);
   }
+  parsers_handle = test_parsers_handle;
 
   printf("iterate_directory\n");
-  file_list = list_new(filelist_data_get);
-  if (! iterate_directory("test", NULL)) {
+  file_list = list_new(filedata_get);
+  if (! iterate_directory("test/", NULL)) {
     list_show(file_list, NULL, NULL);
   }
   list_free(file_list);
 
   printf("as previous with test/subdir in notdir list\n");
-  if ((status = filters_add(handle, "test/subdir", filter_path_start))) {
+  if ((status = filters_add(test_filters_handle, "test/subdir", filter_path_start))) {
     printf("ignore_add error status %u\n", status);
   }
-  file_list = list_new(filelist_data_get);
-  if (! iterate_directory("test", NULL)) {
+  file_list = list_new(filedata_get);
+  if (! iterate_directory("test/", NULL)) {
     list_show(file_list, NULL, NULL);
   }
   list_free(file_list);
 
   printf("as previous with test/testlink in notdir list\n");
-  if ((status = filters_add(handle, "test/testlink", filter_path_start))) {
+  if ((status = filters_add(test_filters_handle, "test/testlink", filter_path_start))) {
     printf("ignore_add error status %u\n", status);
   }
-  file_list = list_new(filelist_data_get);
-  if (! iterate_directory("test", NULL)) {
+  file_list = list_new(filedata_get);
+  if (! iterate_directory("test/", NULL)) {
     list_show(file_list, NULL, NULL);
   }
   list_free(file_list);
 
   printf("as previous with CVS parser\n");
-  parsers_add(cvs_parser_new());
-  file_list = list_new(filelist_data_get);
-  if (! iterate_directory("test", NULL)) {
+  parsers_add(test_parsers_handle, cvs_parser_new());
+  file_list = list_new(filedata_get);
+  if (! iterate_directory("test/", NULL)) {
     list_show(file_list, NULL, NULL);
   }
   list_free(file_list);
 
+  /* Now make sure we don't mess with private data */
+  filters_handle = NULL;
+  parsers_handle = NULL;
+
   printf("file_list_new, as previous\n");
-  if (! filelist_new("test", handle)) {
+  if (! filelist_new("test", test_filters_handle, test_parsers_handle)) {
     list_show(file_list, NULL, NULL);
   }
 
   printf("file_list_new, as previous with ending slash\n");
-  if (! filelist_new("test/", handle)) {
+  if (! filelist_new("test/", test_filters_handle, test_parsers_handle)) {
     list_show(file_list, NULL, NULL);
   }
 
-  filters_free(handle);
-  parsers_free();
+  filters_free(test_filters_handle);
+  parsers_free(test_parsers_handle);
 
   return 0;
 }

@@ -17,8 +17,9 @@ int main(void) {
   void *handle2;
   void *handle3;
   void *handle4;
-  filelist_data_t file_data;
+  filedata_t file_data;
   void *parsers_handle = NULL;
+  void *parser_handle = NULL;
   parser_t *cvs_parser;
 
   /* Creation */
@@ -102,9 +103,9 @@ int main(void) {
   cvs_file_check(NULL, &file_data);
   cvs_dir_leave(NULL);
 
-  parsers_new();
-  parsers_add(cvs_parser_new());
-  cvs_parser = parsers_next(&parsers_handle);
+  parsers_new(&parsers_handle);
+  parsers_add(parsers_handle, cvs_parser_new());
+  cvs_parser = parsers_next(parsers_handle, &parser_handle);
 
   if (cvs_parser->dir_check(&handle, "test/cvs")) {
     printf("test/cvs is not under CVS control\n");
@@ -128,7 +129,7 @@ int main(void) {
     }
     cvs_parser->dir_leave(handle);
   }
-  parsers_free();
+  parsers_free(parsers_handle);
 
   return 0;
 }

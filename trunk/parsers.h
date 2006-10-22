@@ -15,7 +15,7 @@ typedef int (parsers_dir_check_f) (void **handle, const char *dir_path);
 typedef void (parsers_dir_leave_f) (void *handle);
 
 /* Type for function to check whether a file is under control */
-typedef int (parsers_file_check_f) (void *handle, const filelist_data_t *file_data);
+typedef int (parsers_file_check_f) (void *handle, const filedata_t *file_data);
 
 /* Function to destroy the parser */
 typedef void (parsers_destroy_f) (void);
@@ -29,15 +29,15 @@ typedef struct {
 } parser_t;
 
 /* Create parsers list */
-extern int parsers_new(void);
+extern int parsers_new(void **handle);
 
 /* Add to list of parsers */
-extern int parsers_add(parser_t *parser);
+extern int parsers_add(void *handle, parser_t *parser);
 
 /* Destroy parsers list and all parsers */
-extern void parsers_free(void);
+extern void parsers_free(void *handle);
 
 /* Get next parser (first if handle is NULL) */
-extern parser_t *parsers_next(void **handle);
+extern parser_t *parsers_next(void *handle, void **parser_handle);
 
 #endif

@@ -12,13 +12,13 @@ extern int db_open(const char *db_path);
 /* Close database */
 extern void db_close(void);
 
-/* TODO Check what needs to be done for given prefix (protocol://host/share) */
-extern int db_parse(const char *prefix, list_t list);
+/* Check what needs to be done for given prefix (protocol://host/share) */
+extern int db_parse(const char *prefix, const char *mount_path, list_t list);
 
 /* Read file with given checksum, extract it to path */
 extern int db_read(const char *path, const char *checksum);
 
-/* TODO Check that data for given checksum exists (scan all if NULL) */
+/* Check that data for given checksum exists (TODO scan all if NULL) */
 extern int db_scan(const char *checksum);
 
 /* TODO Check that data for given checksum is not corrupted (check all if NULL) */
