@@ -1,0 +1,15 @@
+DEPENDENCIES
+
+* openssl: for MD5 sum calculation
+
+COMPILATION/INSTALLATION
+
+Just type: 'make install'
+
+LANGUAGE
+
+This is all written in C.
+
+TESTING
+
+Just type: 'make test'
