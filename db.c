@@ -34,12 +34,11 @@
 #include "db.h"
 
 typedef struct {
-  char            prefix[FILENAME_MAX];
-  filelist_data_t filedata;
-  char            link[FILENAME_MAX];
-  char            checksum[256];
-  time_t          date_in;
-  time_t          date_out;
+  char        prefix[FILENAME_MAX];
+  filedata_t  filedata;
+  char        link[FILENAME_MAX];
+  time_t      date_in;
+  time_t      date_out;
 } db_data_t;
 
 static list_t *db_list = NULL;
@@ -108,31 +107,32 @@ static void md5sum(char *checksum, int bytes) {
   free(copy);
 }
 
-static int copy(const char *source_path, const char *dest_path, char *checksum) {
+static size_t copy(const char *source_path, const char *dest_path, char *checksum) {
   FILE        *writefile;
   FILE        *readfile;
   char        buffer[10240];
   EVP_MD_CTX  ctx;
   size_t      length;
-
+  size_t      size = 0;
 
   /* Open file to read from */
   if ((readfile = fopen(source_path, "r")) == NULL) {
     fprintf(stderr, "db: failed to open source file: %s\n", source_path);
-    return 2;
+    return -1;
   }
 
   /* Open file to write to */
   if ((writefile = fopen(dest_path, "w")) == NULL) {
     fclose(readfile);
     fprintf(stderr, "db: failed to open destination file: %s\n", dest_path);
-    return 2;
+    return -1;
   }
 
   /* We shall copy and compute the checksum in one go */
   EVP_DigestInit(&ctx, EVP_md5());
   while (! feof(readfile)) {
     length = fread(buffer, 1, 10240, readfile);
+    size += length;
     EVP_DigestUpdate(&ctx, buffer, length);
     do {
       length -= fwrite(buffer, 1, length, writefile);
@@ -140,9 +140,10 @@ static int copy(const char *source_path, const char *dest_path, char *checksum) 
   }
   fclose(readfile);
   fclose(writefile);
+  /* Re-use length */
   EVP_DigestFinal(&ctx, (unsigned char *) checksum, &length);
   md5sum(checksum, length);
-  return 0;
+  return size;
 }
 
 static int getdir(const char *checksum, char *path) {
@@ -257,7 +258,8 @@ static int db_load(const char *filename, list_t list) {
       start = delim;
       start++;
       /* Checksum, date in and date out */
-      size = sscanf(start, " %s %ld %ld %c", db_data.checksum, &db_data.date_in, &db_data.date_out, &letter);
+      size = sscanf(start, " %s %ld %ld %c", db_data.filedata.checksum,
+        &db_data.date_in, &db_data.date_out, &letter);
       if (size != 4) {
         fprintf(stderr, "db: failed to read list file: wrong format (8)\n");
         continue;
@@ -297,7 +299,7 @@ static int db_save(const char *filename, list_t list) {
         type_letter(db_data->filedata.metadata.type),
         db_data->filedata.metadata.size, db_data->filedata.metadata.mtime,
         db_data->filedata.metadata.uid, db_data->filedata.metadata.gid,
-        db_data->filedata.metadata.mode, db_data->link, db_data->checksum,
+        db_data->filedata.metadata.mode, db_data->link, db_data->filedata.checksum,
         db_data->date_in, db_data->date_out, '-');
     }
     fclose(writefile);
@@ -324,7 +326,7 @@ static void db_data_get(const void *payload, char *string) {
   }
 }
 
-static int db_write(const char *path, char *checksum) {
+static int db_write(const char *mount_path, const char *path, size_t size, char *checksum) {
   char  temp_path[FILENAME_MAX];
   char  dest_path[FILENAME_MAX];
   char  temp_checksum[256];
@@ -334,12 +336,16 @@ static int db_write(const char *path, char *checksum) {
   int   delete = 0;
   int   failed = 0;
 
-  /* Open temporary file to write to */
+  /* File to read from (dest_path is used here temporarily) */
+  strcpy(dest_path, mount_path);
+  strcat(dest_path, path);
+
+  /* Temporary file to write to */
   strcpy(temp_path, db_path);
   strcat(temp_path, "filedata");
 
-  /* Get file final location */
-  if (copy(path, temp_path, temp_checksum) || (getdir(temp_checksum, dest_path) == 2)) {
+  /* Get file final location (dest_path gets overwritten here by getdir) */
+  if ((copy(dest_path, temp_path, temp_checksum) != size) || (getdir(temp_checksum, dest_path) == 2)) {
     fprintf(stderr, "failed to copy or get dir for: %s\n", path);
     failed = 1;
   }
@@ -360,34 +366,42 @@ static int db_write(const char *path, char *checksum) {
       strcat(try_path, "data");
       if (! testfile(try_path)) {
         /* A file already exists, let's compare */
-        /* TODO checking sizes first sounds like a good idea */
+        metadata_t try_md;
+        metadata_t temp_md;
+
         differ = 1;
 
-        /* Compare try_path to temp_path */
-        if ((readfile = fopen(try_path, "r")) != NULL) {
-          if ((writefile = fopen(temp_path, "r")) != NULL) {
-            char    buffer1[10240];
-            char    buffer2[10240];
-            differ = 0;
+        /* Compare sizes first */
+        if (! metadata_get(try_path, &try_md)
+         && ! metadata_get(temp_path, &temp_md)
+         && (try_md.size == temp_md.size)) {
+          /* Compare try_path to temp_path */
+          if ((readfile = fopen(try_path, "r")) != NULL) {
+            if ((writefile = fopen(temp_path, "r")) != NULL) {
+              char    buffer1[10240];
+              char    buffer2[10240];
+              differ = 0;
 
-            do {
-              size_t length = fread(buffer1, 1, 10240, readfile);
-              /* Does fread read as much as possible? */
-              if ((fread(buffer2, 1, length, writefile) != length) || strncmp(buffer1, buffer2, length)) {
-                differ = 1;
-                break;
+              do {
+                size_t length = fread(buffer1, 1, 10240, readfile);
+                /* Does fread read as much as possible? */
+                if ((fread(buffer2, 1, length, writefile) != length) || strncmp(buffer1, buffer2, length)) {
+                  differ = 1;
+                  break;
+                }
+              } while (! feof(readfile) && ! feof(writefile));
+              /* Is there more data in one of the files? */
+              if (!differ) {
+                differ = fread(buffer1, 1, 1, readfile)
+                      || fread(buffer2, 1, 1, writefile);
               }
-            } while (! feof(readfile) && ! feof(writefile));
-            /* Is there more data in one of the files? */
-            if (!differ) {
-              differ = fread(buffer1, 1, 1, readfile) || fread(buffer2, 1, 1, writefile);
+              if (! differ) {
+                delete = 1;
+              }
+              fclose(writefile);
             }
-            if (! differ) {
-              delete = 1;
-            }
-            fclose(writefile);
+            fclose(readfile);
           }
-          fclose(readfile);
         }
       }
     }
@@ -480,10 +494,10 @@ void db_close(void) {
   remove(temp_path);
 }
 
-static int parse_compare(const void *db_data_p, const void *filedata_p) {
-  const db_data_t       *db_data  = db_data_p;
-  const filelist_data_t *filedata = filedata_p;
-  int                   result;
+static int parse_compare(void *db_data_p, void *filedata_p) {
+  const db_data_t *db_data  = db_data_p;
+  filedata_t      *filedata = filedata_p;
+  int             result;
 
   /* Removed files should be ignored */
   if (db_data->date_out != 0) {
@@ -494,11 +508,20 @@ static int parse_compare(const void *db_data_p, const void *filedata_p) {
     return result;
   }
   /* If the file has been modified, just return 1 or -1 and that should do */
-  return memcmp(&db_data->filedata.metadata, &filedata->metadata,
-      sizeof(metadata_t));
+  result = memcmp(&db_data->filedata.metadata, &filedata->metadata,
+    sizeof(metadata_t));
+
+  /* If it's a file and size and mtime are the same, copy checksum accross */
+  if (S_ISREG(db_data->filedata.metadata.type)) {
+    if ((db_data->filedata.metadata.size == filedata->metadata.size)
+     || (db_data->filedata.metadata.mtime == filedata->metadata.mtime)) {
+      strcpy(filedata->checksum, db_data->filedata.checksum);
+    }
+  }
+  return result;
 }
 
-int db_parse(const char *prefix, list_t file_list) {
+int db_parse(const char *prefix, const char *mount_path, list_t file_list) {
   list_t        added_files_list;
   list_t        removed_files_list;
   list_entry_t  entry  = NULL;
@@ -511,7 +534,7 @@ int db_parse(const char *prefix, list_t file_list) {
   /* Deal with new/modified data first */
   if (added_files_list != NULL) {
     while ((entry = list_next(added_files_list, entry)) != NULL) {
-      filelist_data_t *filedata = list_entry_payload(entry);
+      filedata_t *filedata = list_entry_payload(entry);
       db_data_t       *db_data  = malloc(sizeof(db_data_t));
 
       strcpy(db_data->prefix, prefix);
@@ -522,18 +545,27 @@ int db_parse(const char *prefix, list_t file_list) {
       db_data->date_out = 0;
       /* Save new data */
       if (S_ISREG(filedata->metadata.type)) {
-        if (db_write(db_data->filedata.path, db_data->checksum)) {
+        if (filedata->checksum[0] != '\0') {
+          /* We need the old checksum here! */
+          strcpy(db_data->filedata.checksum, filedata->checksum);
+        } else if (db_write(mount_path, db_data->filedata.path,
+            db_data->filedata.metadata.size, db_data->filedata.checksum)) {
           /* Write failed, need to go on */
           failed = 1;
           fprintf(stderr, "db: parse: %s: %s, ignoring\n",
               strerror(errno), db_data->filedata.path);
-          strcpy(db_data->checksum, "N");
+          strcpy(db_data->filedata.checksum, "N");
         }
       } else {
-        strcpy(db_data->checksum, "N");
+        strcpy(db_data->filedata.checksum, "N");
       }
       if (S_ISLNK(filedata->metadata.type)) {
-        int size = readlink(db_data->filedata.path, db_data->link, FILENAME_MAX);
+        char full_path[FILENAME_MAX];
+        int size;
+
+        strcpy(full_path, mount_path);
+        strcat(full_path, db_data->filedata.path);
+        size = readlink(full_path, db_data->link, FILENAME_MAX);
 
         if (size < 0) {
           failed = 1;
@@ -595,8 +627,8 @@ int db_read(const char *path, const char *checksum) {
   strcpy(temp_path, path);
   strcat(temp_path, ".part");
 
-  /* Copy file to temporary name */
-  if (copy(source_path, temp_path, temp_checksum)) {
+  /* Copy file to temporary name (size not checked: checksum suffices) */
+  if (copy(source_path, temp_path, temp_checksum) < 0) {
     fprintf(stderr, "db: read: failed to copy file: %s\n", source_path);
     remove(temp_path);
     return 2;
@@ -619,9 +651,24 @@ int db_read(const char *path, const char *checksum) {
 }
 
 int db_scan(const char *checksum) {
-  return 1;
+  char path[FILENAME_MAX];
+
+  if (getdir(checksum, path)) {
+    return 1;
+  }
+  strcat(path, "/data");
+  return testfile(path);
 }
 
 int db_check(const char *checksum) {
-  return 1;
+  char path[FILENAME_MAX];
+
+  if (getdir(checksum, path)) {
+    return 1;
+  }
+  strcat(path, "/data");
+  if (testfile(path)) {
+    return 2;
+  }
+  return 3;
 }

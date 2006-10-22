@@ -94,7 +94,7 @@ static void cvs_dir_leave(void *list) {
 
 /* Ideally, this function should return 0 when the file is added or modified */
 /* For now, it returns 0 for any file under CVS control */
-static int cvs_file_check(void *list, const filelist_data_t *file_data) {
+static int cvs_file_check(void *list, const filedata_t *file_data) {
   if (list == NULL) {
     fprintf(stderr, "cvs parser: file check: not initialised\n");
     return 2;

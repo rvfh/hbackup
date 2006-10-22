@@ -18,9 +18,9 @@ typedef void (list_payload_get_f) (const void *payload, char *string);
  *  0 left data is same as right data
  *  1 left data is more than right data
  *  2 right data should be ignored
+ * The pointed is not const, so the function can actually alter it if needed.
  */
-typedef int (list_payloads_compare_f) (const void *payload_left,
-  const void *payload_right);
+typedef int (list_payloads_compare_f) (void *payload_left, void *payload_right);
 
 typedef void *list_t;
 typedef void *list_entry_t;
