@@ -1,0 +1,9 @@
+#!/bin/sh
+
+# Database
+TESTDBDIR="test_db"
+rm -rf "$TESTDBDIR"
+
+# Test bench
+TESTDIR="test"
+rm -rf "$TESTDIR"
