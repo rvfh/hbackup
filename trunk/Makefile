@@ -3,9 +3,9 @@ RANLIB := ranlib
 CFLAGS := -Wall -O2 -ansi -pedantic
 LDFLAGS := -lssl
 
-all: backup db.a
+all: hbackup
 
-install: backup
+install: hbackup
 	strip $^
 
 test:	setup \
@@ -19,7 +19,7 @@ test:	setup \
 	db_test.dif
 
 clean:
-	rm -f *.[oa] *~ *.out *.out.failed *.dif *_test backup
+	rm -f *.[oa] *~ *.out *.out.failed *.dif *_test hbackup
 	@./test_clean
 	@echo "Cleaning tests"
 
@@ -36,7 +36,7 @@ parsers_test: parsers.a list.a
 cvs_parser_test: cvs_parser.a parsers.a list.a
 filelist_test: filelist.a cvs_parser.a parsers.a filters.a list.a metadata.a
 db_test: db.a filelist.a cvs_parser.a parsers.a filters.a list.a metadata.a
-backup: db.a filelist.a cvs_parser.a parsers.a filters.a list.a metadata.a \
+hbackup: db.a filelist.a cvs_parser.a parsers.a filters.a list.a metadata.a \
 	params.a
 
 metadata.a: metadata.h
