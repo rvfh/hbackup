@@ -26,6 +26,7 @@ typedef struct {
   parsers_dir_leave_f   *dir_leave;
   parsers_file_check_f  *file_check;
   parsers_destroy_f     *destroy;
+  char                  name[256];
 } parser_t;
 
 /* Create parsers list */

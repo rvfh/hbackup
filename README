@@ -37,11 +37,11 @@ Not implemented.
 FILTERS
 
 There are five types of filters:
-* filter_end: match end of path/file name
-* filter_path_start: match start of path
-* filter_path_regexp: match regular expression on path
-* filter_file_start: match start of file name
-* filter_file_regexp: match regular expression on file name
+* end: match end of path/file name
+* path_start: match start of path
+* path_regexp: match regular expression on path
+* file_start: match start of file name
+* file_regexp: match regular expression on file name
 
 PARSERS
 

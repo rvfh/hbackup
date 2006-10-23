@@ -59,3 +59,12 @@ client file://cbers11 "$TESTDIR"
 client Smb://Myself:flesyM@myClient "C:\Backup\Backup.LST"
 client sSh://otherClient /home/backup/Backup.list
 EOF
+cat << EOF > "$CONFIGDIR/localhost.list"
+# Share test
+path "test" # should work
+compress end .c
+ignore path_start subdir
+ignore end ~
+ignore end ".o"
+parser cvs
+EOF

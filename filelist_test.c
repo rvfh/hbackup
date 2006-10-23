@@ -21,6 +21,7 @@ int main(int argc, char *argv[]) {
     printf("parsers_new error status %u\n", status);
   }
   parsers_handle = test_parsers_handle;
+  mount_path_length = 5;
 
   printf("iterate_directory\n");
   file_list = list_new(filedata_get);
@@ -29,8 +30,8 @@ int main(int argc, char *argv[]) {
   }
   list_free(file_list);
 
-  printf("as previous with test/subdir in notdir list\n");
-  if ((status = filters_add(test_filters_handle, "test/subdir", filter_path_start))) {
+  printf("as previous with subdir in ignore list\n");
+  if ((status = filters_add(test_filters_handle, "subdir", filter_path_start))) {
     printf("ignore_add error status %u\n", status);
   }
   file_list = list_new(filedata_get);
@@ -39,8 +40,8 @@ int main(int argc, char *argv[]) {
   }
   list_free(file_list);
 
-  printf("as previous with test/testlink in notdir list\n");
-  if ((status = filters_add(test_filters_handle, "test/testlink", filter_path_start))) {
+  printf("as previous with testlink in ignore list\n");
+  if ((status = filters_add(test_filters_handle, "testlink", filter_path_start))) {
     printf("ignore_add error status %u\n", status);
   }
   file_list = list_new(filedata_get);
@@ -60,6 +61,7 @@ int main(int argc, char *argv[]) {
   /* Now make sure we don't mess with private data */
   filters_handle = NULL;
   parsers_handle = NULL;
+  mount_path_length = 0;
 
   printf("file_list_new, as previous\n");
   if (! filelist_new("test", test_filters_handle, test_parsers_handle)) {

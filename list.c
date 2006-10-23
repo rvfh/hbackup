@@ -117,6 +117,7 @@ void list_free(list_t list_handle) {
     }
     free(list);
   }
+  list_handle = NULL;
 }
 
 int list_append(void *list_handle, void *payload) {

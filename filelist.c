@@ -78,7 +78,7 @@ static int iterate_directory(const char *path, parser_t *parser) {
     char file_path[FILENAME_MAX];
 
     /* Ignore . and .. */
-    if (! strcmp(dir_entry->d_name, ".") || ! strcmp(dir_entry->d_name, "..")) {
+    if (! strcmp(dir_entry->d_name, ".") || ! strcmp(dir_entry->d_name, "..")){
       continue;
     }
     strcpy(file_path, path);
@@ -95,14 +95,16 @@ static int iterate_directory(const char *path, parser_t *parser) {
       continue;
     }
     /* Now pass it through the filters */
-    if ((filters_handle != NULL) && ! filters_match(filters_handle, file_path)) {
+    if ((filters_handle != NULL) && ! filters_match(filters_handle,
+      filedata.path)) {
       continue;
     }
     if (S_ISDIR(filedata.metadata.type)) {
       filedata.metadata.size = 0;
       strcat(file_path, "/");
       if (iterate_directory(file_path, parser)) {
-        fprintf(stderr, "filelist: cannot iterate into directory: %s\n", dir_entry->d_name);
+        fprintf(stderr, "filelist: cannot iterate into directory: %s\n",
+          dir_entry->d_name);
         return 2;
       }
     }

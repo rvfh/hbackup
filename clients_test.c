@@ -25,12 +25,28 @@ static void client_show(const void *payload, char *string) {
 int main(void) {
   if (clients_new()) {
     printf("Failed to create\n");
+    return 1;
   }
+  list_show(clients, NULL, client_show);
+  clients_add("file://localhost", "etc/doesnotexist");
+  list_show(clients, NULL, client_show);
+  clients_backup();
+  clients_free();
+
+  if (clients_new()) {
+    printf("Failed to create\n");
+    return 1;
+  }
+  list_show(clients, NULL, client_show);
+  clients_add("file://localhost", "etc/localhost.list");
   list_show(clients, NULL, client_show);
   clients_add("Smb://Myself:flesyM@myClient", "C:\\Backup\\Backup.LST");
   list_show(clients, NULL, client_show);
   clients_add("sSh://otherClient", "/home/backup/Backup.list");
   list_show(clients, NULL, client_show);
+  db_open("test_db");
+  clients_backup();
+  db_close();
   clients_free();
   return 0;
 }
