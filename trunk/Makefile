@@ -16,16 +16,17 @@ test:	setup \
 	parsers_test.dif \
 	cvs_parser_test.dif \
 	filelist_test.dif \
-	db_test.dif
+	db_test.dif \
+	clients_test.dif
 
 clean:
 	rm -f *.[oa] *~ *.out *.out.failed *.dif *_test hbackup
 	@./test_clean
-	@echo "Cleaning tests"
+	@echo "Cleaning test environment"
 
 setup:
 	@./test_setup
-	@echo "Setting up tests"
+	@echo "Setting up test environment"
 
 # Dependencies
 metadata_test: metadata.a
@@ -36,8 +37,9 @@ parsers_test: parsers.a list.a
 cvs_parser_test: cvs_parser.a parsers.a list.a
 filelist_test: filelist.a cvs_parser.a parsers.a filters.a list.a metadata.a
 db_test: db.a filelist.a cvs_parser.a parsers.a filters.a list.a metadata.a
+clients_test: clients.a params.a list.a
 hbackup: db.a filelist.a cvs_parser.a parsers.a filters.a list.a metadata.a \
-	params.a
+	params.a clients.a
 
 metadata.a: metadata.h
 list.a: list.h
@@ -46,6 +48,7 @@ filters.a: filters.h list.h
 parsers.a: parsers.h list.h
 cvs_parser.a: cvs_parser.h parsers.h list.h metadata.h
 filelist.a: filelist.h parsers.h list.h metadata.h
+clients.a: clients.h list.h
 
 # Rules
 %.a: %.o

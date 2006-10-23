@@ -12,7 +12,7 @@ SERVER CONFIGURATION
 
 The default configuration file is /etc/hbackup.conf, and can be overriden using
 the -c option. Only two keywords are acceptable there: 'db' and 'client'.
-* db gives the backup database path. The default is '/backup'. Syntax:
+* db gives the backup database path. The default is '/hbackup'. Syntax:
   db "<path to backup database>"
 * client gives the necessary information for all clients to backup. Syntax:
   client <protocol>://[<username>[:<password>]@]<hostname> "<path to list>"

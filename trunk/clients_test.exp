@@ -1,0 +1,6 @@
+List 0 elements:
+List 1 elements:
+ smb://Myself:flesyM@myclient c$/backup/backup.lst
+List 2 elements:
+ smb://Myself:flesyM@myclient c$/backup/backup.lst
+ ssh://otherclient /home/backup/Backup.list

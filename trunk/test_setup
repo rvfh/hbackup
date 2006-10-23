@@ -48,3 +48,14 @@ cat << EOF > "$CVSDIR/CVS/Entries"
 D/dirbad////
 D/dirutd////
 EOF
+
+# Config
+CONFIGDIR="etc"
+rm -rf "$CONFIGDIR"
+mkdir "$CONFIGDIR"
+cat << EOF > "$CONFIGDIR/hbackup.conf"
+db "$TESTDBDIR"
+client file://cbers11 "$TESTDIR"
+client Smb://Myself:flesyM@myClient "C:\Backup\Backup.LST"
+client sSh://otherClient /home/backup/Backup.list
+EOF
