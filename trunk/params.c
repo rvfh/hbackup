@@ -6,6 +6,7 @@
 #define _GNU_SOURCE
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
 #include "params.h"
 
 static void remove_starting_blanks(char **string) {
@@ -17,7 +18,9 @@ static void remove_starting_blanks(char **string) {
 static void remove_trailing_blanks(char *string) {
   char *last = &string[strlen(string) - 1];
 
-  while ((last >= string) && ((*last == ' ') || (*last == '\t'))) {
+  while ((last >= string)
+      && ((*last == ' ') || (*last == '\t')
+       || (*last == '\n') || (*last == '\r'))) {
     *last-- = '\0';
   }
 }
@@ -34,6 +37,28 @@ static char *find_blank(const char *string) {
     return space;
   } else {
     return tab;
+  }
+}
+
+void strtolower(char *string) {
+  char *letter = string;
+  while (*letter != '\0') {
+    *letter = tolower(*letter);
+    letter++;
+  }
+}
+
+void pathtolinux(char *path) {
+  char *letter = path;
+
+  if (path[1] == ':') {
+    path[1] = '$';
+  }
+  while (*letter != '\0') {
+    if (*letter == '\\') {
+      *letter = '/';
+    }
+    letter++;
   }
 }
 
@@ -77,8 +102,17 @@ int params_readline(const char *line, char *keyword, char *type,
   start = delim;
   remove_starting_blanks(&start);
 
-  /* Find next blank */
-  if ((delim = find_blank(start)) == NULL) {
+  /* Find next blank or double quote */
+  if (*start == '"') {
+    start++;
+    if ((delim = strchr(start, '"')) == NULL) {
+      /* No matching double quote */
+      return -1;
+    } else {
+      /* Make that a space so it gets ignored */
+      *delim = ' ';
+    }
+  } else if ((delim = find_blank(start)) == NULL) {
     delim = &start[strlen(start)];
   }
 
@@ -102,8 +136,17 @@ int params_readline(const char *line, char *keyword, char *type,
     strcpy(type, string);
   }
 
-  /* Find next blank */
-  if ((delim = find_blank(start)) == NULL) {
+  /* Find next blank or double quote */
+  if (*start == '"') {
+    start++;
+    if ((delim = strchr(start, '"')) == NULL) {
+      /* No matching double quote */
+      return -1;
+    } else {
+      /* Make that a space so it gets ignored */
+      *delim = ' ';
+    }
+  } else if ((delim = find_blank(start)) == NULL) {
     delim = &start[strlen(start)];
   }
 
