@@ -113,7 +113,7 @@ static int cvs_file_check(void *list, const filedata_t *file_data) {
 }
 
 /* That's the parser */
-static parser_t cvs_parser = { cvs_dir_check, cvs_dir_leave, cvs_file_check, NULL };
+static parser_t cvs_parser = { cvs_dir_check, cvs_dir_leave, cvs_file_check, NULL, "cvs" };
 
 parser_t *cvs_parser_new(void) {
   /* This needs to be dynamic memory */

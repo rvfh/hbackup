@@ -10,6 +10,7 @@
 #include "params.h"
 #include "list.h"
 #include "filters.h"
+#include "parsers.h"
 #include "filelist.h"
 #include "cvs_parser.h"
 #include "db.h"

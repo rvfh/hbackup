@@ -1,6 +1,19 @@
+List file not found etc/doesnotexist
+Keyword not implemented in list file etc/localhost.list, line 3
+Unsupported protocol: smb
+Unsupported protocol: ssh
 List 0 elements:
 List 1 elements:
- smb://Myself:flesyM@myclient c$/backup/backup.lst
+ file://localhost etc/doesnotexist
+List 0 elements:
+List 1 elements:
+ file://localhost etc/localhost.list
 List 2 elements:
+ file://localhost etc/localhost.list
+ smb://Myself:flesyM@myclient c$/backup/backup.lst
+List 3 elements:
+ file://localhost etc/localhost.list
  smb://Myself:flesyM@myclient c$/backup/backup.lst
  ssh://otherclient /home/backup/Backup.list
+Backup client 'localhost' using protocol 'file'
+Backup path 'test'

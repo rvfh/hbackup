@@ -37,7 +37,8 @@ parsers_test: parsers.a list.a
 cvs_parser_test: cvs_parser.a parsers.a list.a
 filelist_test: filelist.a cvs_parser.a parsers.a filters.a list.a metadata.a
 db_test: db.a filelist.a cvs_parser.a parsers.a filters.a list.a metadata.a
-clients_test: clients.a params.a list.a
+clients_test: db.a filelist.a cvs_parser.a parsers.a filters.a list.a metadata.a\
+	params.a clients.a
 hbackup: db.a filelist.a cvs_parser.a parsers.a filters.a list.a metadata.a \
 	params.a clients.a
 

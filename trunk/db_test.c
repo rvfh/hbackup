@@ -78,7 +78,7 @@ int main(void) {
     printf("ignore_add error status %u\n", status);
     return 0;
   }
-  if ((status = filters_add(filters_handle, "test/subdir", filter_path_start))) {
+  if ((status = filters_add(filters_handle, "subdir", filter_path_start))) {
     printf("ignore_add error status %u\n", status);
     return 0;
   }
