@@ -99,6 +99,7 @@ static int iterate_directory(const char *path, parser_t *parser) {
       continue;
     }
     if (S_ISDIR(filedata.metadata.type)) {
+      filedata.metadata.size = 0;
       strcat(file_path, "/");
       if (iterate_directory(file_path, parser)) {
         fprintf(stderr, "filelist: cannot iterate into directory: %s\n", dir_entry->d_name);
