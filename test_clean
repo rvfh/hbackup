@@ -7,3 +7,7 @@ rm -rf "$TESTDBDIR"
 # Test bench
 TESTDIR="test"
 rm -rf "$TESTDIR"
+
+# Config
+CONFIGDIR="etc"
+rm -rf "$CONFIGDIR"
