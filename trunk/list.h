@@ -13,11 +13,13 @@ typedef void (list_payload_get_f) (const void *payload, char *string);
 
 /* Type for function to compare payloads from two lists
  * Return codes:
+ * -3 left data out of bounds (no need to check anymore)
  * -2 left data should be ignored
  * -1 left data is less than right data
  *  0 left data is same as right data
  *  1 left data is more than right data
  *  2 right data should be ignored
+ *  3 right data out of bounds (no need to check anymore)
  * The pointed is not const, so the function can actually alter it if needed.
  */
 typedef int (list_payloads_compare_f) (void *payload_left, void *payload_right);

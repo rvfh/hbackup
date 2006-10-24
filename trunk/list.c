@@ -352,6 +352,14 @@ int list_compare(
       result = strcmp(string_left, string_right);
     }
     switch (result) {
+    case -3:
+      /* left data is no more relevant */
+      entry_left = NULL;
+      break;
+    case 3:
+      /* right data is no more relevant */
+      entry_right = NULL;
+      break;
     case -2:
       /* left data irrelevant */
       entry_left = list_next(list_left_handle, entry_left);

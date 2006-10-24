@@ -136,15 +136,28 @@ int main(void) {
   }
   list_show(db_list, NULL, db_data_show);
 
-/* TODO fix this test */
-/*  if ((status = db_parse("file://host", "/home/user/", filelist_getpath(),
+  if ((status = db_parse("file://host", "/home/user/", filelist_getpath(),
       filelist_getlist()))) {
     printf("db_parse error status %u\n", status);
     db_close();
     return 0;
   }
   list_show(db_list, NULL, db_data_show);
-*/
+
+  if ((status = filelist_new("test2", filters_handle, parsers_handle))) {
+    printf("file_list_new error status %u\n", status);
+    return 0;
+  }
+  list_show(filelist_getlist(), NULL, file_data_show);
+
+  if ((status = db_parse("file://host", "/home/user2/", filelist_getpath(),
+      filelist_getlist()))) {
+    printf("db_parse error status %u\n", status);
+    db_close();
+    return 0;
+  }
+  list_show(db_list, NULL, db_data_show);
+
   if ((status = db_scan("d41d8cd98f00b204e9800998ecf8427e-0"))) {
     printf("db_scan error status %u\n", status);
     if (status == 2) {
