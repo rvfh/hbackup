@@ -1,7 +1,7 @@
-List file not found etc/doesnotexist
-Keyword not implemented in list file etc/localhost.list, line 3
-Unsupported protocol: smb
-Unsupported protocol: ssh
+clients: backup: list file not found etc/doesnotexist
+clients: backup: keyword not implemented in list file etc/localhost.list, line 3
+clients: backup: unsupported protocol: smb, ignored
+clients: backup: unsupported protocol: ssh, ignored
 List 0 elements:
 List 1 elements:
  file://localhost etc/doesnotexist
