@@ -13,9 +13,8 @@
 
 /* Our data */
 typedef struct {
-  char    name[FILENAME_MAX]; /* Name */
-  mode_t  type;               /* Directory? */
-/*  char    mtime[32];*/          /* File modified time */
+  char    *name;  /* File name */
+  mode_t  type;   /* File type */
 } cvs_entry_t;
 
 static void cvs_payload_get(const void *payload, char *string) {
@@ -23,71 +22,71 @@ static void cvs_payload_get(const void *payload, char *string) {
 }
 
 static int cvs_dir_check(void **handle, const char *dir_path) {
-  list_t list;
-  char d_path[FILENAME_MAX];
-  char *buffer = malloc(256);
-  size_t size;
-  FILE *entries;
+  char    *d_path = malloc(strlen(dir_path) + strlen("/CVS/Entries") + 1);
+  FILE    *entries;
+  int     failed = 0;
 
   strcpy(d_path, dir_path);
   strcat(d_path, "/CVS/Entries");
+
   /* Check that file exists */
   if ((entries = fopen(d_path, "r")) == NULL) {
     /* Directory is not under CVS control */
     *handle = NULL;
-    return 1;
-  }
-  /* Create new list */
-  *handle = list = list_new(cvs_payload_get);
+    failed = 1;
+  } else {
+    list_t  list = list_new(cvs_payload_get);
+    char    *buffer = malloc(256);
+    size_t  size;
 
-  /* Fill in list of controlled files */
-  while (getline(&buffer, &size, entries) >= 0) {
-    cvs_entry_t cvs_entry;
-    cvs_entry_t *payload;
-    char *line = buffer;
-    char *delim;
+    /* Return list */
+    *handle = list;
 
-    if (line[0] == 'D') {
-      cvs_entry.type = S_IFDIR;
-      line++;
-    } else {
-      cvs_entry.type = S_IFREG;
-    }
-    if (line[0] != '/') {
-      continue;
-    }
-    line++;
-    strncpy(cvs_entry.name, line, FILENAME_MAX);
-    if ((delim = strchr(cvs_entry.name, '/')) == NULL) {
-      continue;
-    }
-    *delim = '\0';
-/*    if (S_ISREG(cvs_entry.type)) {
-      line = strchr(line, '/');
-      line++;
-      line = strchr(line, '/');
-      line++;
-      if ((delim = strchr(line, '/')) == NULL) {
+    /* Fill in list of controlled files */
+    while (getline(&buffer, &size, entries) >= 0) {
+      cvs_entry_t cvs_entry;
+      cvs_entry_t *payload;
+      char *start = buffer;
+      char *delim;
+
+      if (start[0] == 'D') {
+        cvs_entry.type = S_IFDIR;
+        start++;
+      } else {
+        cvs_entry.type = S_IFREG;
+      }
+      if (start[0] != '/') {
         continue;
       }
-      *delim = '\0';
-      strncpy(cvs_entry.mtime, line, 32);
-      fprintf(stderr, "%u\n", strlen(cvs_entry.mtime));
-      cvs_entry.mtime[1] = '\0';
-    } else {
-      cvs_entry.mtime[0] = '\0';
-    }*/
-    payload = malloc(sizeof(cvs_entry_t));
-    *payload = cvs_entry;
-    list_add(list, payload);
+      start++;
+      if ((delim = strchr(start, '/')) == NULL) {
+        continue;
+      }
+
+      cvs_entry.name = malloc(delim - start + 1);
+      strncpy(cvs_entry.name, start, delim - start);
+      cvs_entry.name[delim - start] = '\0';
+
+      payload = malloc(sizeof(cvs_entry_t));
+      *payload = cvs_entry;
+      list_add(list, payload);
+    }
+    /* Close file */
+    fclose(entries);
+    free(buffer);
   }
-  /* Close file */
-  fclose(entries);
-  free(buffer);
-  return 0;
+  free(d_path);
+  return failed;
 }
 
 static void cvs_dir_leave(void *list) {
+  list_entry_t entry = NULL;
+
+  while ((entry = list_next(list, entry)) != NULL) {
+    cvs_entry_t *cvs_entry = list_entry_payload(entry);
+
+    free(cvs_entry->name);
+  }
   list_free(list);
 }
 
