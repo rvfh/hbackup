@@ -35,9 +35,9 @@
 #include "db.h"
 
 typedef struct {
-  char        host[FILENAME_MAX];
+  char        *host;
   filedata_t  filedata;
-  char        link[FILENAME_MAX];
+  char        *link;
   time_t      date_in;
   time_t      date_out;
 } db_data_t;
@@ -213,6 +213,7 @@ static int db_load(const char *filename, list_t list) {
         failed = 0;
         switch (++field) {
           case 1:   /* Prefix */
+            db_data.host = malloc(strlen(string) + 1);
             strcpy(db_data.host, string);
             break;
           case 2:   /* Path */
@@ -250,6 +251,7 @@ static int db_load(const char *filename, list_t list) {
             }
             break;
           case 9:   /* Link */
+            db_data.link = malloc(strlen(string) + 1);
             strcpy(db_data.link, string);
             break;
           case 10:  /* Checksum */
@@ -275,6 +277,12 @@ static int db_load(const char *filename, list_t list) {
         }
         start = delim + 1;
         if (failed) {
+          if (field >= 1) {
+            free(db_data.host);
+          }
+          if (field >= 9) {
+            free(db_data.link);
+          }
           break;
         }
       }
@@ -313,15 +321,19 @@ static int db_save(const char *filename, list_t list) {
     }
     while ((entry = list_next(list, entry)) != NULL) {
       db_data_t *db_data = list_entry_payload(entry);
+      char *link = "";
 
       /* The link could also be stored as data... */
+      if (db_data->link != NULL) {
+        link = db_data->link;
+      }
       fprintf(writefile,
         "%s\t%s\t%c\t%ld\t%ld\t%u\t%u\t0%o\t%s\t%s\t%ld\t%ld\t%c\n",
         db_data->host, db_data->filedata.path,
         type_letter(db_data->filedata.metadata.type),
         db_data->filedata.metadata.size, db_data->filedata.metadata.mtime,
         db_data->filedata.metadata.uid, db_data->filedata.metadata.gid,
-        db_data->filedata.metadata.mode, db_data->link, db_data->filedata.checksum,
+        db_data->filedata.metadata.mode, link, db_data->filedata.checksum,
         db_data->date_in, db_data->date_out, '-');
     }
     fclose(writefile);
@@ -502,12 +514,24 @@ int db_open(const char *path) {
   return status;
 }
 
+static void db_list_free(list_t list) {
+  list_entry_t entry = NULL;
+
+  while ((entry = list_next(list, entry)) != NULL) {
+    db_data_t *db_data = list_entry_payload(entry);
+
+    free(db_data->host);
+    free(db_data->link);
+  }
+  list_free(list);
+}
+
 void db_close(void) {
   char temp_path[FILENAME_MAX];
 
   /* Save list */
   db_save("list", db_list);
-  list_free(db_list);
+  db_list_free(db_list);
 
   /* Release lock */
   strcpy(temp_path, db_path);
@@ -582,11 +606,12 @@ int db_parse(const char *host, const char *real_path,
       filedata_t *filedata = list_entry_payload(entry);
       db_data_t  *db_data  = malloc(sizeof(db_data_t));
 
+      db_data->host = malloc(strlen(host) + 1);
       strcpy(db_data->host, host);
       db_data->filedata.metadata = filedata->metadata;
       strcpy(db_data->filedata.path, real_path);
       strcat(db_data->filedata.path, filedata->path);
-      strcpy(db_data->link, "");
+      db_data->link = NULL;
       db_data->date_in = time(NULL);
       db_data->date_out = 0;
       /* Save new data */
@@ -607,20 +632,20 @@ int db_parse(const char *host, const char *real_path,
       }
       if (S_ISLNK(filedata->metadata.type)) {
         char full_path[FILENAME_MAX];
+        char string[FILENAME_MAX];
         int size;
 
         strcpy(full_path, mount_path);
         strcat(full_path, filedata->path);
-        size = readlink(full_path, db_data->link, FILENAME_MAX);
-
-        if (size < 0) {
+        if ((size = readlink(full_path, string, FILENAME_MAX)) < 0) {
           failed = 1;
           fprintf(stderr, "db: parse: %s: %s, ignoring\n",
-              strerror(errno), db_data->filedata.path);
-          strcpy(db_data->link, "");
+            strerror(errno), db_data->filedata.path);
+        } else {
+          db_data->link = malloc(size + 1);
+          strncpy(db_data->link, string, size);
+          db_data->link[size] = '\0';
         }
-      } else {
-        strcpy(db_data->link, "");
       }
       list_add(db_list, db_data);
       /* This only unlists the data */

@@ -19,7 +19,7 @@
 
 typedef struct {
   char        path[FILENAME_MAX];
-  char        checksum[256];
+  char        checksum[36];
   metadata_t  metadata;
 } filedata_t;
 
