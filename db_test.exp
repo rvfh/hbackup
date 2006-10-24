@@ -48,3 +48,30 @@ List 9 elements:
  'file://host' '/home/user/testdir' d 0 0 1000 1000 0755 '' N 0 0 -
  'file://host' '/home/user/testfile' f 13 0 1000 1000 0644 '' 59ca0efa9f5633cb0371bbc0355478d8-0 0 0 -
  'file://host' '/home/user/testlink' l 8 0 1000 1000 0777 'testfile' N 0 0 -
+List 9 elements:
+ 'file://host' '/home/user/cvs' d 0 0 1000 1000 0755 '' N 0 0 -
+ 'file://host' '/home/user/cvs/dirbad' d 0 0 1000 1000 0755 '' N 0 0 -
+ 'file://host' '/home/user/cvs/dirutd' d 0 0 1000 1000 0755 '' N 0 0 -
+ 'file://host' '/home/user/cvs/dirutd/fileutd' f 0 0 1000 1000 0644 '' d41d8cd98f00b204e9800998ecf8427e-0 0 0 -
+ 'file://host' '/home/user/cvs/filenew.c' f 0 0 1000 1000 0644 '' d41d8cd98f00b204e9800998ecf8427e-0 0 0 -
+ 'file://host' '/home/user/cvs/fileutd.h' f 0 0 1000 1000 0644 '' d41d8cd98f00b204e9800998ecf8427e-0 0 0 -
+ 'file://host' '/home/user/testdir' d 0 0 1000 1000 0755 '' N 0 0 -
+ 'file://host' '/home/user/testfile' f 13 0 1000 1000 0644 '' 59ca0efa9f5633cb0371bbc0355478d8-0 0 0 -
+ 'file://host' '/home/user/testlink' l 8 0 1000 1000 0777 'testfile' N 0 0 -
+List 3 elements:
+ testdir
+ testfile
+ testlink
+List 12 elements:
+ 'file://host' '/home/user/cvs' d 0 0 1000 1000 0755 '' N 0 0 -
+ 'file://host' '/home/user/cvs/dirbad' d 0 0 1000 1000 0755 '' N 0 0 -
+ 'file://host' '/home/user/cvs/dirutd' d 0 0 1000 1000 0755 '' N 0 0 -
+ 'file://host' '/home/user/cvs/dirutd/fileutd' f 0 0 1000 1000 0644 '' d41d8cd98f00b204e9800998ecf8427e-0 0 0 -
+ 'file://host' '/home/user/cvs/filenew.c' f 0 0 1000 1000 0644 '' d41d8cd98f00b204e9800998ecf8427e-0 0 0 -
+ 'file://host' '/home/user/cvs/fileutd.h' f 0 0 1000 1000 0644 '' d41d8cd98f00b204e9800998ecf8427e-0 0 0 -
+ 'file://host' '/home/user/testdir' d 0 0 1000 1000 0755 '' N 0 0 -
+ 'file://host' '/home/user/testfile' f 13 0 1000 1000 0644 '' 59ca0efa9f5633cb0371bbc0355478d8-0 0 0 -
+ 'file://host' '/home/user/testlink' l 8 0 1000 1000 0777 'testfile' N 0 0 -
+ 'file://host' '/home/user2/testdir' d 0 0 1000 1000 0755 '' N 0 0 -
+ 'file://host' '/home/user2/testfile' f 15 0 1000 1000 0644 '' fcacc0dea4134dc0b9da49c1a9603196-0 0 0 -
+ 'file://host' '/home/user2/testlink' l 8 0 1000 1000 0777 'testfile' N 0 0 -

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Dir names
 TESTDBDIR="test_db"

@@ -224,7 +224,6 @@ int clients_backup(void) {
         char prefix[FILENAME_MAX];
         backup_t *backup = list_entry_payload(entry);
 
-        /* TODO Prefix must include the path to backup */
         sprintf(prefix, "%s://%s", client->protocol, client->hostname);
         if (! failed) {
           printf("Backup path '%s'", backup->path);

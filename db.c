@@ -42,7 +42,11 @@ typedef struct {
 } db_data_t;
 
 static list_t *db_list = NULL;
-static char db_path[FILENAME_MAX];
+static char   db_path[FILENAME_MAX];
+
+/* Current path being backed up */
+static char   backup_path[FILENAME_MAX] = "";
+static int    backup_path_length = 0;
 
 static int testdir(const char *path, int create) {
   DIR  *directory;
@@ -495,7 +499,7 @@ void db_close(void) {
   remove(temp_path);
 }
 
-/* TODO Need to compare only for matching paths */
+/* Need to compare only for matching paths */
 static int parse_compare(void *db_data_p, void *filedata_p) {
   const db_data_t *db_data  = db_data_p;
   filedata_t      *filedata = filedata_p;
@@ -505,8 +509,19 @@ static int parse_compare(void *db_data_p, void *filedata_p) {
   if (db_data->date_out != 0) {
     return -2;
   }
+  /* Paths not matching must be ignored too */
+  result = strncmp(backup_path, db_data->filedata.path, backup_path_length);
+  if (result < 0) {
+    /* Not reached yet */
+    return -2;
+  } else if (result > 0) {
+    /* Passed it */
+    return -3;
+  }
+
   /* If paths differ, that's all we want to check */
-  if ((result = strcmp(db_data->filedata.path, filedata->path))) {
+  if ((result = strcmp(&db_data->filedata.path[backup_path_length],
+      filedata->path))) {
     return result;
   }
   /* If the file has been modified, just return 1 or -1 and that should do */
@@ -531,6 +546,8 @@ int db_parse(const char *host, const char *real_path,
   int           failed = 0;
 
   /* Compare list with db list for matching host */
+  strcpy(backup_path, real_path);
+  backup_path_length = strlen(backup_path);
   list_compare(db_list, file_list, &added_files_list, &removed_files_list,
     parse_compare);
 
