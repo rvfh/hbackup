@@ -11,6 +11,22 @@ int main(void) {
   char type[256];
   char string[FILENAME_MAX];
 
+  strcpy(line, "/this/is/a/line");
+  printf("Check slashes to '%s': ", line);
+  one_trailing_slash(line);
+  printf("'%s'\n", line);
+
+  strcpy(line, "/this/is/a/line/");
+  printf("Check slashes to '%s': ", line);
+  one_trailing_slash(line);
+  printf("'%s'\n", line);
+
+  strcpy(line, "/this/is/a/line/////////////");
+  printf("Check slashes to '%s': ", line);
+  one_trailing_slash(line);
+  printf("'%s'\n", line);
+
+  strcpy(line, "");
   printf("Read %u parameters from %s: '%s' '%s' '%s'\n",
     params_readline(line, keyword, type, string), line, keyword, type, string);
 

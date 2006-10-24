@@ -1,3 +1,6 @@
+Check slashes to '/this/is/a/line': '/this/is/a/line/'
+Check slashes to '/this/is/a/line/': '/this/is/a/line/'
+Check slashes to '/this/is/a/line/////////////': '/this/is/a/line/'
 Read 0 parameters from : '' '' ''
 Read 0 parameters from # Normal comment: '' '' ''
 Read 0 parameters from  	# Displaced comment: '' '' ''

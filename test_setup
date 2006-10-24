@@ -1,13 +1,25 @@
 #!/bin/sh
 
-# Database
+# Dir names
 TESTDBDIR="test_db"
+TESTDIR="test"
+TESTDIR2="test2"
+CONFIGDIR="etc"
+
+# Clean
 rm -rf "$TESTDBDIR"
+rm -rf "$TESTDIR"
+rm -rf "$TESTDIR2"
+rm -rf "$CONFIGDIR"
+
+if [ "$1" == "clean" ]; then
+  exit 0
+fi
+
+# Database
 mkdir "$TESTDBDIR"
 
 # Test bench
-TESTDIR="test"
-rm -rf "$TESTDIR"
 mkdir "$TESTDIR"
 mkdir "$TESTDIR/testdir"
 echo "Hello world!" > "$TESTDIR/testfile"
@@ -49,9 +61,16 @@ D/dirbad////
 D/dirutd////
 EOF
 
+# Multiple backup
+mkdir "$TESTDIR2"
+mkdir "$TESTDIR2/testdir"
+echo "Bye bye world!" > "$TESTDIR2/testfile"
+touch -d 20061024 "$TESTDIR2/testfile"
+touch "$TESTDIR2/testfile~"
+ln -s "testfile" "$TESTDIR2/testlink"
+
+
 # Config
-CONFIGDIR="etc"
-rm -rf "$CONFIGDIR"
 mkdir "$CONFIGDIR"
 cat << EOF > "$CONFIGDIR/hbackup.conf"
 db "$TESTDBDIR"
