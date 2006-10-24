@@ -217,6 +217,7 @@ static int db_load(const char *filename, list_t list) {
             strcpy(db_data.host, string);
             break;
           case 2:   /* Path */
+            db_data.filedata.path = malloc(strlen(string) + 1);
             strcpy(db_data.filedata.path, string);
             break;
           case 3:   /* Type */
@@ -522,6 +523,7 @@ static void db_list_free(list_t list) {
 
     free(db_data->host);
     free(db_data->link);
+    free(db_data->filedata.path);
   }
   list_free(list);
 }
@@ -609,6 +611,8 @@ int db_parse(const char *host, const char *real_path,
       db_data->host = malloc(strlen(host) + 1);
       strcpy(db_data->host, host);
       db_data->filedata.metadata = filedata->metadata;
+      db_data->filedata.path =
+        malloc(strlen(real_path) + strlen(filedata->path) + 1);
       strcpy(db_data->filedata.path, real_path);
       strcat(db_data->filedata.path, filedata->path);
       db_data->link = NULL;

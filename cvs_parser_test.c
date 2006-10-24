@@ -22,6 +22,9 @@ int main(void) {
   void *parser_handle = NULL;
   parser_t *cvs_parser;
 
+  /* Need to give this some room */
+  file_data.path = malloc(256);
+
   /* Creation */
   cvs_parser_new();
 
@@ -130,6 +133,7 @@ int main(void) {
     cvs_parser->dir_leave(handle);
   }
   parsers_free(parsers_handle);
+  free(file_data.path);
 
   return 0;
 }
