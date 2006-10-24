@@ -179,12 +179,6 @@ static int getdir(const char *checksum, char *path) {
   return 0;
 }
 
-/* Read file in path, [compress and] store it, return checksum */
-/*static int db_organize(void) {
-  return 1;
-}
-*/
-/* TODO tab-separated fields for db list file */
 static int db_load(const char *filename, list_t list) {
   char source_path[FILENAME_MAX];
   FILE *readfile;
@@ -202,80 +196,92 @@ static int db_load(const char *filename, list_t list) {
       char      *start = buffer;
       char      *delim;
       char      letter;
+      int       field = 0;
+      int       failed = 1;
 
-      /* Prefix*/
-      if (buffer[0] != '\'') {
-        fprintf(stderr, "db: failed to read list file: wrong format (1)\n");
-        continue;
+      while ((delim = strchr(start, '\t')) != NULL) {
+        char string[FILENAME_MAX];
+
+        /* Get string portion */
+        strncpy(string, start, delim - start);
+        string[delim - start] = '\0';
+        /* Extract data */
+        failed = 0;
+        switch (++field) {
+          case 1:   /* Prefix */
+            strcpy(db_data.host, string);
+            break;
+          case 2:   /* Path */
+            strcpy(db_data.filedata.path, string);
+            break;
+          case 3:   /* Type */
+            if (sscanf(string, "%c", &letter) != 1) {
+              failed = field;
+            }
+            db_data.filedata.metadata.type = type_mode(letter);
+            break;
+          case 4:   /* Size */
+            if (sscanf(string, "%ld", &db_data.filedata.metadata.size) != 1) {
+              failed = field;
+            }
+            break;
+          case 5:   /* Modification time */
+            if (sscanf(string, "%ld", &db_data.filedata.metadata.mtime) != 1) {
+              failed = field;
+            }
+            break;
+          case 6:   /* User */
+            if (sscanf(string, "%u", &db_data.filedata.metadata.uid) != 1) {
+              failed = field;
+            }
+            break;
+          case 7:   /* Group */
+            if (sscanf(string, "%u", &db_data.filedata.metadata.gid) != 1) {
+              failed = field;
+            }
+            break;
+          case 8:   /* Permissions */
+            if (sscanf(string, "%o", &db_data.filedata.metadata.mode) != 1) {
+              failed = field;
+            }
+            break;
+          case 9:   /* Link */
+            strcpy(db_data.link, string);
+            break;
+          case 10:  /* Checksum */
+            strcpy(db_data.filedata.checksum, string);
+            break;
+          case 11:  /* Date in */
+            if (sscanf(string, "%ld", &db_data.date_in) != 1) {
+              failed = field;
+            }
+            break;
+          case 12:  /* Date out */
+            if (sscanf(string, "%ld", &db_data.date_out) != 1) {
+              failed = field;
+            }
+            break;
+          case 13:  /* Mark */
+            if (strcmp(string, "-")) {
+              failed = field;
+            }
+            break;
+          default:
+            failed = field;
+        }
+        start = delim + 1;
+        if (failed) {
+          break;
+        }
       }
-      start = &buffer[1];
-      delim = strchr(start, '\'');
-      if (delim == NULL) {
-        fprintf(stderr, "db: failed to read list file: wrong format (2)\n");
-        continue;
+      if (failed) {
+        fprintf(stderr, "db: failed to read list file: wrong format (%d)\n",
+          field);
+      } else {
+        db_data_p = malloc(sizeof(db_data_t));
+        *db_data_p = db_data;
+        list_add(db_list, db_data_p);
       }
-      strncpy(db_data.host, start, delim - start);
-      db_data.host[delim - start] = '\0';
-      /* Path */
-      start = delim;
-      start++;
-      delim = strchr(start, '\'');
-      if (delim == NULL) {
-        fprintf(stderr, "db: failed to read list file: wrong format (3)\n");
-        continue;
-      }
-      start = delim;
-      start++;
-      delim = strchr(start, '\'');
-      if (delim == NULL) {
-        fprintf(stderr, "db: failed to read list file: wrong format (4)\n");
-        continue;
-      }
-      strncpy(db_data.filedata.path, start, delim - start);
-      db_data.filedata.path[delim - start] = '\0';
-      /* Type, size, mtime, uid, gid, mode */
-      start = delim;
-      start++;
-      size = sscanf(start, " %c %ld %ld %u %u %o", &letter,
-        &db_data.filedata.metadata.size, &db_data.filedata.metadata.mtime,
-        &db_data.filedata.metadata.uid, &db_data.filedata.metadata.gid,
-        &db_data.filedata.metadata.mode);
-      if (size != 6) {
-        fprintf(stderr, "db: failed to read list file: wrong format (5)\n");
-        continue;
-      }
-      db_data.filedata.metadata.type = type_mode(letter);
-      /* Link */
-      delim = strchr(start, '\'');
-      if (delim == NULL) {
-        fprintf(stderr, "db: failed to read list file: wrong format (6)\n");
-        continue;
-      }
-      start = delim;
-      start++;
-      delim = strchr(start, '\'');
-      if (delim == NULL) {
-        fprintf(stderr, "db: failed to read list file: wrong format (7)\n");
-        continue;
-      }
-      strncpy(db_data.link, start, delim - start);
-      db_data.link[delim - start] = '\0';
-      start = delim;
-      start++;
-      /* Checksum, date in and date out */
-      size = sscanf(start, " %s %ld %ld %c", db_data.filedata.checksum,
-        &db_data.date_in, &db_data.date_out, &letter);
-      if (size != 4) {
-        fprintf(stderr, "db: failed to read list file: wrong format (8)\n");
-        continue;
-      }
-      if (letter != '-') {
-        fprintf(stderr, "db: failed to read list file: wrong format (9)\n");
-        continue;
-      }
-      db_data_p = malloc(sizeof(db_data_t));
-      *db_data_p = db_data;
-      list_add(db_list, db_data_p);
     }
     fclose(readfile);
     return 0;
@@ -299,7 +305,8 @@ static int db_save(const char *filename, list_t list) {
       db_data_t *db_data = list_entry_payload(entry);
 
       /* The link could also be stored as data... */
-      fprintf(writefile, "'%s' '%s' %c %ld %ld %u %u 0%o '%s' %s %ld %ld %c\n",
+      fprintf(writefile,
+        "%s\t%s\t%c\t%ld\t%ld\t%u\t%u\t0%o\t%s\t%s\t%ld\t%ld\t%c\n",
         db_data->host, db_data->filedata.path,
         type_letter(db_data->filedata.metadata.type),
         db_data->filedata.metadata.size, db_data->filedata.metadata.mtime,
