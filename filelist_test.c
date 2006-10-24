@@ -8,7 +8,7 @@
 #include "cvs_parser.h"
 
 int verbosity(void) {
-  return 3;
+  return 0;
 }
 
 int main(int argc, char *argv[]) {

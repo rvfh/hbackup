@@ -19,35 +19,17 @@ List 3 elements:
 Backup client 'localhost' using protocol 'file'
 Backup path 'test/'
  -> Building list of files
- --> Dir: 
- --> Dir: cvs/
- --> Dir: cvs/dirbad/
- --> Dir: cvs/dirutd/
- --> Dir: testdir/
  -> Parsing list of files
- --> Files to add: 9
 Backup path 'test2/'
  -> Building list of files
- --> Dir: 
- --> Dir: testdir/
  -> Parsing list of files
- --> Files to add: 4
- -> Saving database list
- --> Files to date: 13
+ -> Saving database list: 13 file(s)
  -> Loading database list
 Backup client 'localhost' using protocol 'file'
 Backup path 'test/'
  -> Building list of files
- --> Dir: 
- --> Dir: cvs/
- --> Dir: cvs/dirbad/
- --> Dir: cvs/dirutd/
- --> Dir: testdir/
  -> Parsing list of files
 Backup path 'test2/'
  -> Building list of files
- --> Dir: 
- --> Dir: testdir/
  -> Parsing list of files
- -> Saving database list
- --> Files to date: 13
+ -> Saving database list: 13 file(s)
