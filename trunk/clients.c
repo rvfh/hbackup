@@ -17,6 +17,14 @@
 #include "clients.h"
 
 typedef struct {
+  char protocol[256];
+  char username[256];
+  char password[256];
+  char hostname[256];
+  char listfile[FILENAME_MAX];
+} client_t;
+
+typedef struct {
   char path[FILENAME_MAX];
   list_t compress_handle;
   list_t ignore_handle;
@@ -193,6 +201,7 @@ int clients_backup(void) {
         filters_new(&backup->ignore_handle);
         parsers_new(&backup->parsers_handle);
         strcpy(backup->path, string);
+        one_trailing_slash(backup->path);
         list_append(backups, backup);
       } else {
         fprintf(stderr, "Syntax error in list file %s, line %u\n",
@@ -222,7 +231,8 @@ int clients_backup(void) {
           printf("\n");
           filelist_new(backup->path, backup->ignore_handle,
             backup->parsers_handle);
-          db_parse(prefix, filelist_getpath(), filelist_getlist());
+          db_parse(prefix, backup->path, filelist_getpath(),
+            filelist_getlist());
           filelist_free();
         }
 

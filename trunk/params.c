@@ -40,6 +40,16 @@ static char *find_blank(const char *string) {
   }
 }
 
+void one_trailing_slash(char *string) {
+  char *last = &string[strlen(string) - 1];
+
+  while ((last >= string) && (*last == '/')) {
+    *last-- = '\0';
+  }
+  *++last = '/';
+  *++last = '\0';
+}
+
 void strtolower(char *string) {
   char *letter = string;
   while (*letter != '\0') {

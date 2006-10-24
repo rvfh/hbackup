@@ -16,4 +16,4 @@ List 3 elements:
  smb://Myself:flesyM@myclient c$/backup/backup.lst
  ssh://otherclient /home/backup/Backup.list
 Backup client 'localhost' using protocol 'file'
-Backup path 'test'
+Backup path 'test/'

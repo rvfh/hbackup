@@ -26,7 +26,7 @@ static void db_data_show(const void *payload, char *string) {
 
   /* Times are omitted here... */
   sprintf(string, "'%s' '%s' %c %ld %ld %u %u 0%o '%s' %s %ld %ld %c",
-    db_data->prefix, db_data->filedata.path,
+    db_data->host, db_data->filedata.path,
     type_letter(db_data->filedata.metadata.type), db_data->filedata.metadata.size,
     db_data->filedata.metadata.mtime * 0, db_data->filedata.metadata.uid,
     db_data->filedata.metadata.gid, db_data->filedata.metadata.mode, db_data->link,
@@ -118,7 +118,7 @@ int main(void) {
     return 0;
   }
 
-  if ((status = db_parse("file://host/share", filelist_getpath(),
+  if ((status = db_parse("file://host", "/home/user/", filelist_getpath(),
       filelist_getlist()))) {
     printf("db_parse error status %u\n", status);
     db_close();
@@ -136,6 +136,15 @@ int main(void) {
   }
   list_show(db_list, NULL, db_data_show);
 
+/* TODO fix this test */
+/*  if ((status = db_parse("file://host", "/home/user/", filelist_getpath(),
+      filelist_getlist()))) {
+    printf("db_parse error status %u\n", status);
+    db_close();
+    return 0;
+  }
+  list_show(db_list, NULL, db_data_show);
+*/
   if ((status = db_scan("d41d8cd98f00b204e9800998ecf8427e-0"))) {
     printf("db_scan error status %u\n", status);
     if (status == 2) {

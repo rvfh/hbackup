@@ -4,7 +4,7 @@
 */
 
 /* List file contents:
- *  prefix        (given in the format: 'protocol://host/share')
+ *  host          (given in the format: 'protocol://host')
  *  path          (metadata)
  *  type          (metadata)
  *  size          (metadata)
@@ -34,7 +34,7 @@
 #include "db.h"
 
 typedef struct {
-  char        prefix[FILENAME_MAX];
+  char        host[FILENAME_MAX];
   filedata_t  filedata;
   char        link[FILENAME_MAX];
   time_t      date_in;
@@ -210,8 +210,8 @@ static int db_load(const char *filename, list_t list) {
         fprintf(stderr, "db: failed to read list file: wrong format (2)\n");
         continue;
       }
-      strncpy(db_data.prefix, start, delim - start);
-      db_data.prefix[delim - start] = '\0';
+      strncpy(db_data.host, start, delim - start);
+      db_data.host[delim - start] = '\0';
       /* Path */
       start = delim;
       start++;
@@ -296,7 +296,7 @@ static int db_save(const char *filename, list_t list) {
 
       /* The link could also be stored as data... */
       fprintf(writefile, "'%s' '%s' %c %ld %ld %u %u 0%o '%s' %s %ld %ld %c\n",
-        db_data->prefix, db_data->filedata.path,
+        db_data->host, db_data->filedata.path,
         type_letter(db_data->filedata.metadata.type),
         db_data->filedata.metadata.size, db_data->filedata.metadata.mtime,
         db_data->filedata.metadata.uid, db_data->filedata.metadata.gid,
@@ -320,10 +320,10 @@ static void db_data_get(const void *payload, char *string) {
 
   if (date_out == 0) {
     /* '@' > '9' */
-    sprintf(string, "%s/%s %c", db_data->prefix, db_data->filedata.path, '@');
+    sprintf(string, "%s/%s %c", db_data->host, db_data->filedata.path, '@');
   } else {
     /* ' ' > '0' */
-    sprintf(string, "%s/%s %11ld", db_data->prefix, db_data->filedata.path, date_out);
+    sprintf(string, "%s/%s %11ld", db_data->host, db_data->filedata.path, date_out);
   }
 }
 
@@ -523,13 +523,14 @@ static int parse_compare(void *db_data_p, void *filedata_p) {
   return result;
 }
 
-int db_parse(const char *prefix, const char *mount_path, list_t file_list) {
+int db_parse(const char *host, const char *real_path,
+    const char *mount_path, list_t file_list) {
   list_t        added_files_list;
   list_t        removed_files_list;
   list_entry_t  entry  = NULL;
   int           failed = 0;
 
-  /* Compare list with db list for matching prefix */
+  /* Compare list with db list for matching host */
   list_compare(db_list, file_list, &added_files_list, &removed_files_list,
     parse_compare);
 
@@ -537,11 +538,12 @@ int db_parse(const char *prefix, const char *mount_path, list_t file_list) {
   if (added_files_list != NULL) {
     while ((entry = list_next(added_files_list, entry)) != NULL) {
       filedata_t *filedata = list_entry_payload(entry);
-      db_data_t       *db_data  = malloc(sizeof(db_data_t));
+      db_data_t  *db_data  = malloc(sizeof(db_data_t));
 
-      strcpy(db_data->prefix, prefix);
+      strcpy(db_data->host, host);
       db_data->filedata.metadata = filedata->metadata;
-      strcpy(db_data->filedata.path, filedata->path);
+      strcpy(db_data->filedata.path, real_path);
+      strcat(db_data->filedata.path, filedata->path);
       strcpy(db_data->link, "");
       db_data->date_in = time(NULL);
       db_data->date_out = 0;
@@ -550,7 +552,7 @@ int db_parse(const char *prefix, const char *mount_path, list_t file_list) {
         if (filedata->checksum[0] != '\0') {
           /* We need the old checksum here! */
           strcpy(db_data->filedata.checksum, filedata->checksum);
-        } else if (db_write(mount_path, db_data->filedata.path,
+        } else if (db_write(mount_path, filedata->path,
             db_data->filedata.metadata.size, db_data->filedata.checksum)) {
           /* Write failed, need to go on */
           failed = 1;
@@ -566,7 +568,7 @@ int db_parse(const char *prefix, const char *mount_path, list_t file_list) {
         int size;
 
         strcpy(full_path, mount_path);
-        strcat(full_path, db_data->filedata.path);
+        strcat(full_path, filedata->path);
         size = readlink(full_path, db_data->link, FILENAME_MAX);
 
         if (size < 0) {

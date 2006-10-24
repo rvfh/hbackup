@@ -6,6 +6,9 @@
 #ifndef PARAMS_H
 #define PARAMS_H
 
+/* Make sure string finish by one slash and only one */
+extern void one_trailing_slash(char *string);
+
 /* Convert string to lower case */
 extern void strtolower(char *string);
 

@@ -21,7 +21,7 @@ test:	setup \
 
 clean:
 	rm -f *.[oa] *~ *.out *.out.failed *.dif *_test hbackup
-	@./test_clean
+	@./test_setup clean
 	@echo "Cleaning test environment"
 
 setup:

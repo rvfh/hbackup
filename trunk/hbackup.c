@@ -141,7 +141,8 @@ int main(int argc, char **argv) {
   list_show(filelist_getlist(), NULL, file_data_show);
 
   db_open("test_db");
-  db_parse("file://host/share", filelist_getpath(), filelist_getlist());
+  db_parse("file://host/share", "/home/user/", filelist_getpath(),
+    filelist_getlist());
   db_close();
 
   filelist_free();
