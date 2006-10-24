@@ -37,7 +37,7 @@ int clients_new(void) {
   /* Create new list */
   clients = list_new(NULL);
   if (clients == NULL) {
-    fprintf(stderr, "client: new: cannot intialise\n");
+    fprintf(stderr, "clients: new: cannot intialise\n");
     return 2;
   }
   return 0;
@@ -147,14 +147,16 @@ int clients_backup(void) {
       listfilename = client->listfile;
     } else {
       /* TODO mount share */
-      fprintf(stderr, "Unsupported protocol: %s\n", client->protocol);
-      failed = 2;
+      fprintf(stderr, "clients: backup: unsupported protocol: %s, ignored\n",
+        client->protocol);
+      failed = 1;
       continue;
     }
 
     /* Open list file */
     if ((listfile = fopen(listfilename, "r")) == NULL) {
-      fprintf(stderr, "List file not found %s\n", listfilename);
+      fprintf(stderr, "clients: backup: list file not found %s\n",
+        listfilename);
       failed = 2;
       continue;
     }
@@ -168,22 +170,26 @@ int clients_backup(void) {
       line++;
       if (params <= 0) {
         if (params < 0) {
-          fprintf(stderr, "Syntax error in list file %s, line %u\n",
+          fprintf(stderr,
+            "clients: backup: syntax error in list file %s, line %u\n",
             client->listfile, line);
           failed = 1;
         }
         continue;
       }
       if (! strcmp(keyword, "compress")) {
-        fprintf(stderr, "Keyword not implemented in list file %s, line %u\n",
+        fprintf(stderr,
+          "clients: backup: keyword not implemented in list file %s, line %u\n",
           client->listfile, line);
         if (add_filter(backup->compress_handle, type, string)) {
-          fprintf(stderr, "Unsupported filter type in list file %s, line %u\n",
+          fprintf(stderr,
+            "clients: backup: unsupported filter type in list file %s, line %u\n",
             client->listfile, line);
         }
       } else if (! strcmp(keyword, "ignore")) {
         if (add_filter(backup->ignore_handle, type, string)) {
-          fprintf(stderr, "Unsupported filter type in list file %s, line %u\n",
+          fprintf(stderr,
+            "clients: backup: unsupported filter type in list file %s, line %u\n",
             client->listfile, line);
         }
       } else if (! strcmp(keyword, "parser")) {
@@ -191,7 +197,8 @@ int clients_backup(void) {
         if (! strcmp(string, "cvs")) {
           parsers_add(backup->parsers_handle, cvs_parser_new());
         } else {
-          fprintf(stderr, "Unsupported parser in list file %s, line %u\n",
+          fprintf(stderr,
+            "clients: backup: unsupported parser in list file %s, line %u\n",
             client->listfile, line);
         }
       } else if (! strcmp(keyword, "path")) {
@@ -204,7 +211,8 @@ int clients_backup(void) {
         one_trailing_slash(backup->path);
         list_append(backups, backup);
       } else {
-        fprintf(stderr, "Syntax error in list file %s, line %u\n",
+        fprintf(stderr,
+          "clients: backup: syntax error in list file %s, line %u\n",
           client->listfile, line);
         failed = 1;
         continue;
@@ -218,8 +226,12 @@ int clients_backup(void) {
     printf(" using protocol '%s'", client->protocol);
     printf("\n");
 
-    {
+    if (list_size(backups) == 0) {
+      fprintf(stderr, "clients: backup: empty list!\n");
+      failed = 1;
+    } else {
       list_entry_t entry = NULL;
+
       while ((entry = list_next(backups, entry)) != NULL) {
         char prefix[FILENAME_MAX];
         backup_t *backup = list_entry_payload(entry);
@@ -240,8 +252,8 @@ int clients_backup(void) {
         filters_free(backup->ignore_handle);
         parsers_free(backup->parsers_handle);
       }
-      /* Free backups list */
     }
+    /* Free backups list */
     list_free(backups);
   }
 

@@ -32,18 +32,11 @@ static void show_help(void) {
 /etc/hbackup.conf\n");
 }
 
-static void file_data_show(const void *payload, char *string) {
-  const filedata_t *filedata = payload;
-
-  sprintf(string, "%s", filedata->path);
-}
-
 int main(int argc, char **argv) {
   char config_path[FILENAME_MAX] = "/etc/hbackup.conf";
-  char db_path[FILENAME_MAX] = "/h  backup";
+  char db_path[FILENAME_MAX] = "/hbackup";
   FILE *config;
-  void *filters_handle = NULL;
-  void *parsers_handle = NULL;
+  int failed = 0;
 
   /* Analyse arguments */
   if (argc > 1) {
@@ -95,58 +88,51 @@ int main(int argc, char **argv) {
     char *buffer = malloc(FILENAME_MAX);
     size_t size;
     int line = 0;
-    int failed = 0;
 
-    clients_new();
-    while (getline(&buffer, &size, config) >= 0) {
-      char keyword[256];
-      char type[256];
-      char string[FILENAME_MAX];
-      int params = params_readline(buffer, keyword, type, string);
+    if (clients_new()) {
+      fprintf(stderr, "Failed to create clients list\n");
+    } else {
+      while (getline(&buffer, &size, config) >= 0) {
+        char keyword[256];
+        char type[256];
+        char string[FILENAME_MAX];
+        int params = params_readline(buffer, keyword, type, string);
 
-      line++;
-      if (params > 1) {
-        if (! strcmp(keyword, "db")) {
-          strcpy(db_path, string);
-        } else if (! strcmp(keyword, "client")) {
-          if (clients_add(type, string)) {
-            fprintf(stderr, "Syntax error in configuration file %s, line %u\n",
+        line++;
+        if (params > 1) {
+          if (! strcmp(keyword, "db")) {
+            strcpy(db_path, string);
+          } else if (! strcmp(keyword, "client")) {
+            if (clients_add(type, string)) {
+              fprintf(stderr,
+                "Syntax error in configuration file %s, line %u\n",
+                config_path, line);
+              failed = 2;
+            }
+          } else {
+            fprintf(stderr,
+              "Unrecognised keyword in configuration file %s, line %u\n",
               config_path, line);
             failed = 2;
           }
-        } else {
-          fprintf(stderr,
-            "Unrecognised keyword in configuration file %s, line %u\n",
-            config_path, line);
-          failed = 2;
         }
       }
-    }
-    fclose(config);
-    if (failed) {
-      return failed;
+      fclose(config);
+
+      /* Open backup database */
+      if (db_open(db_path) == 2) {
+        fprintf(stderr, "Failed to open database in '%s'\n", db_path);
+        failed = 2;
+      }
+
+      /* Backup */
+      if (! failed && clients_backup()) {
+        fprintf(stderr, "Failed to backup\n");
+      }
+      db_close();
+      clients_free();
     }
   }
 
-  parsers_new(&parsers_handle);
-  parsers_add(parsers_handle, cvs_parser_new());
-
-  filters_new(&filters_handle);
-  filters_add(filters_handle, "test/subdir", filter_path_start);
-  filters_add(filters_handle, "~", filter_end);
-  filters_add(filters_handle, "\\.o$", filter_file_regexp);
-  filters_add(filters_handle, ".svn", filter_file_start);
-
-  filelist_new("test////", filters_handle, parsers_handle);
-  list_show(filelist_getlist(), NULL, file_data_show);
-
-  db_open("test_db");
-  db_parse("file://host/share", "/home/user/", filelist_getpath(),
-    filelist_getlist());
-  db_close();
-
-  filelist_free();
-  filters_free(filters_handle);
-  parsers_free(parsers_handle);
-  return 0;
+  return failed;
 }
