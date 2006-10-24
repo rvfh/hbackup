@@ -70,11 +70,13 @@ int main(int argc, char *argv[]) {
   printf("file_list_new, as previous\n");
   if (! filelist_new("test", test_filters_handle, test_parsers_handle)) {
     list_show(file_list, NULL, NULL);
+    filelist_free();
   }
 
   printf("file_list_new, as previous with ending slash\n");
   if (! filelist_new("test/", test_filters_handle, test_parsers_handle)) {
     list_show(file_list, NULL, NULL);
+    filelist_free();
   }
 
   filters_free(test_filters_handle);

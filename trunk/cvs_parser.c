@@ -99,14 +99,12 @@ static int cvs_file_check(void *list, const filedata_t *file_data) {
     fprintf(stderr, "cvs parser: file check: not initialised\n");
     return 2;
   } else {
-    char path[FILENAME_MAX];
-    char *file;
+    const char *file = strrchr(file_data->path, '/');
 
-    strcpy(path, file_data->path);
-    if ((file = strrchr(path, '/')) != NULL) {
+    if (file != NULL) {
       file++;
     } else {
-      file = path;
+      file = file_data->path;
     }
     return list_find(list, file, NULL, NULL);
   }
