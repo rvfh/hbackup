@@ -138,6 +138,7 @@ int clients_backup(void) {
       /* Nothing to mount, file name is whatever was given */
       listfilename = client->listfile;
     } else {
+      /* TODO mount share */
       fprintf(stderr, "Unsupported protocol: %s\n", client->protocol);
       failed = 2;
       continue;
@@ -178,6 +179,7 @@ int clients_backup(void) {
             client->listfile, line);
         }
       } else if (! strcmp(keyword, "parser")) {
+        strtolower(string);
         if (! strcmp(string, "cvs")) {
           parsers_add(backup->parsers_handle, cvs_parser_new());
         } else {
@@ -213,6 +215,7 @@ int clients_backup(void) {
         char prefix[FILENAME_MAX];
         backup_t *backup = list_entry_payload(entry);
 
+        /* TODO Prefix must include the path to backup */
         sprintf(prefix, "%s://%s", client->protocol, client->hostname);
         if (! failed) {
           printf("Backup path '%s'", backup->path);

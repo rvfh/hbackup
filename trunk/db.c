@@ -180,6 +180,7 @@ static int getdir(const char *checksum, char *path) {
   return 1;
 }
 */
+/* TODO tab-separated fields for db list file */
 static int db_load(const char *filename, list_t list) {
   char source_path[FILENAME_MAX];
   FILE *readfile;
@@ -494,6 +495,7 @@ void db_close(void) {
   remove(temp_path);
 }
 
+/* TODO Need to compare only for matching paths */
 static int parse_compare(void *db_data_p, void *filedata_p) {
   const db_data_t *db_data  = db_data_p;
   filedata_t      *filedata = filedata_p;
