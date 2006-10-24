@@ -2,6 +2,7 @@ clients: backup: list file not found etc/doesnotexist
 clients: backup: keyword not implemented in list file etc/localhost.list, line 3
 clients: backup: unsupported protocol: smb, ignored
 clients: backup: unsupported protocol: ssh, ignored
+clients: backup: keyword not implemented in list file etc/localhost.list, line 3
 List 0 elements:
 List 1 elements:
  file://localhost etc/doesnotexist
@@ -17,3 +18,36 @@ List 3 elements:
  ssh://otherclient /home/backup/Backup.list
 Backup client 'localhost' using protocol 'file'
 Backup path 'test/'
+ -> Building list of files
+ --> Dir: 
+ --> Dir: cvs/
+ --> Dir: cvs/dirbad/
+ --> Dir: cvs/dirutd/
+ --> Dir: testdir/
+ -> Parsing list of files
+ --> Files to add: 9
+Backup path 'test2/'
+ -> Building list of files
+ --> Dir: 
+ --> Dir: testdir/
+ -> Parsing list of files
+ --> Files to add: 4
+ -> Saving database list
+ --> Files to date: 13
+ -> Loading database list
+Backup client 'localhost' using protocol 'file'
+Backup path 'test/'
+ -> Building list of files
+ --> Dir: 
+ --> Dir: cvs/
+ --> Dir: cvs/dirbad/
+ --> Dir: cvs/dirutd/
+ --> Dir: testdir/
+ -> Parsing list of files
+Backup path 'test2/'
+ -> Building list of files
+ --> Dir: 
+ --> Dir: testdir/
+ -> Parsing list of files
+ -> Saving database list
+ --> Files to date: 13

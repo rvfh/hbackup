@@ -7,6 +7,10 @@
 #include "filelist.c"
 #include "cvs_parser.h"
 
+int verbosity(void) {
+  return 3;
+}
+
 int main(int argc, char *argv[]) {
   void *test_filters_handle = NULL;
   void *test_parsers_handle = NULL;

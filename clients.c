@@ -14,6 +14,7 @@
 #include "filelist.h"
 #include "cvs_parser.h"
 #include "db.h"
+#include "hbackup.h"
 #include "clients.h"
 
 typedef struct {
@@ -222,9 +223,10 @@ int clients_backup(void) {
     fclose(listfile);
 
     /* Backup */
-    printf("Backup client '%s'", client->hostname);
-    printf(" using protocol '%s'", client->protocol);
-    printf("\n");
+    if (verbosity() > 0) {
+      printf("Backup client '%s' using protocol '%s'\n", client->hostname,
+        client->protocol);
+    }
 
     if (list_size(backups) == 0) {
       fprintf(stderr, "clients: backup: empty list!\n");
@@ -238,10 +240,17 @@ int clients_backup(void) {
 
         sprintf(prefix, "%s://%s", client->protocol, client->hostname);
         if (! failed) {
-          printf("Backup path '%s'", backup->path);
-          printf("\n");
+          if (verbosity() > 0) {
+            printf("Backup path '%s'\n", backup->path);
+            if (verbosity() > 1) {
+              printf(" -> Building list of files\n");
+            }
+          }
           filelist_new(backup->path, backup->ignore_handle,
             backup->parsers_handle);
+          if (verbosity() > 1) {
+            printf(" -> Parsing list of files\n");
+          }
           db_parse(prefix, backup->path, filelist_getpath(),
             filelist_getlist());
           filelist_free();

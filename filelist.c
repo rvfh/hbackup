@@ -23,10 +23,12 @@ Algorithm for temporary list creation:
 #include <string.h>
 #include <sys/types.h>
 #include <dirent.h>
+#include "hbackup.h"
 #include "list.h"
 #include "metadata.h"
 #include "filters.h"
 #include "parsers.h"
+#include "params.h"
 #include "filelist.h"
 
 /* Mount point */
@@ -55,6 +57,9 @@ static int iterate_directory(const char *path, parser_t *parser) {
   DIR *directory;
   struct dirent *dir_entry;
 
+  if (verbosity() > 2) {
+    printf(" --> Dir: %s\n", &path[mount_path_length]);
+  }
   /* Check whether directory is under SCM control */
   if (parser == NULL) {
     void *parser_handle = NULL;
@@ -115,9 +120,6 @@ static int iterate_directory(const char *path, parser_t *parser) {
 }
 
 int filelist_new(const char *path, list_t filters, list_t parsers) {
-  char dir_path[FILENAME_MAX];
-  char *path_end = dir_path;
-
   filters_handle = filters;
   parsers_handle = parsers;
   file_list = list_new(filedata_get);
@@ -127,11 +129,7 @@ int filelist_new(const char *path, list_t filters, list_t parsers) {
   }
   /* Remove trailing slashes */
   strcpy(mount_path, path);
-  path_end = strchr(mount_path, '/');
-  if (path_end != NULL) {
-    *path_end = '\0';
-  }
-  strcat(mount_path, "/");
+  one_trailing_slash(mount_path);
   mount_path_length = strlen(mount_path);
   return iterate_directory(mount_path, NULL);
 }
