@@ -45,16 +45,11 @@ static void filedata_get(const void *payload, char *string) {
   sprintf(string, "%s", filedata->path);
 }
 
-static filedata_t * filelist_entry_new(const filedata_t *filedata) {
-  filedata_t *filedata_p = malloc(sizeof(filedata_t));
-  *filedata_p = *filedata;
-  return filedata_p;
-}
-
 static int iterate_directory(const char *path, parser_t *parser) {
-  void *handle;
-  filedata_t filedata;
-  DIR *directory;
+  void          *handle;
+  filedata_t    filedata;
+  filedata_t    *filedata_p;
+  DIR           *directory;
   struct dirent *dir_entry;
 
   if (verbosity() > 2) {
@@ -81,6 +76,7 @@ static int iterate_directory(const char *path, parser_t *parser) {
   }
   while ((dir_entry = readdir(directory)) != NULL) {
     char file_path[FILENAME_MAX];
+    int  failed = 0;
 
     /* Ignore . and .. */
     if (! strcmp(dir_entry->d_name, ".") || ! strcmp(dir_entry->d_name, "..")){
@@ -89,31 +85,38 @@ static int iterate_directory(const char *path, parser_t *parser) {
     strcpy(file_path, path);
     strcat(file_path, dir_entry->d_name);
     /* Remove mount path from records */
+    filedata.path = malloc(strlen(file_path) - mount_path_length + 1);
     strcpy(filedata.path, &file_path[mount_path_length]);
     strcpy(filedata.checksum, "");
     if (metadata_get(file_path, &filedata.metadata)) {
       fprintf(stderr, "filelist: cannot get metadata: %s\n", file_path);
-      return 2;
-    }
+      failed = 2;
+    } else
     /* Let the parser analyse the file data to know whether to back it up */
     if ((parser != NULL) && parser->file_check(handle, &filedata)) {
-      continue;
-    }
+      failed = 1;
+    } else
     /* Now pass it through the filters */
     if ((filters_handle != NULL) && ! filters_match(filters_handle,
       filedata.path)) {
-      continue;
-    }
+      failed = 1;
+    } else
     if (S_ISDIR(filedata.metadata.type)) {
       filedata.metadata.size = 0;
       strcat(file_path, "/");
       if (iterate_directory(file_path, parser)) {
         fprintf(stderr, "filelist: cannot iterate into directory: %s\n",
           dir_entry->d_name);
-        return 2;
+        failed = 2;
       }
     }
-    list_add(file_list, filelist_entry_new(&filedata));
+    if (failed) {
+      free(filedata.path);
+    } else {
+      filedata_p = malloc(sizeof(filedata_t));
+      *filedata_p = filedata;
+      list_add(file_list, filedata_p);
+    }
   }
   closedir(directory);
   return 0;
@@ -135,6 +138,13 @@ int filelist_new(const char *path, list_t filters, list_t parsers) {
 }
 
 void filelist_free(void) {
+  list_entry_t entry = NULL;
+
+  while ((entry = list_next(file_list, entry)) != NULL) {
+    filedata_t *filedata = list_entry_payload(entry);
+
+    free(filedata->path);
+  }
   list_free(file_list);
 }
 
