@@ -86,4 +86,6 @@ ignore path_start subdir
 ignore end ~
 ignore end ".o"
 parser cvs
+
+path test2
 EOF

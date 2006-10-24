@@ -31,6 +31,7 @@
 #include <openssl/evp.h>
 #include "filelist.h"
 #include "list.h"
+#include "hbackup.h"
 #include "db.h"
 
 typedef struct {
@@ -190,6 +191,9 @@ static int db_load(const char *filename, list_t list) {
     char *buffer = malloc(FILENAME_MAX);
     size_t size;
 
+    if (verbosity() > 1) {
+      printf(" -> Loading database list\n");
+    }
     while (getline(&buffer, &size, readfile) >= 0) {
       db_data_t db_data;
       db_data_t *db_data_p = NULL;
@@ -301,6 +305,12 @@ static int db_save(const char *filename, list_t list) {
   if ((writefile = fopen(temp_path, "w")) != NULL) {
     list_entry_t entry = NULL;
 
+    if (verbosity() > 1) {
+      printf(" -> Saving database list\n");
+      if (verbosity() > 2) {
+        printf(" --> Files to date: %u\n", list_size(list));
+      }
+    }
     while ((entry = list_next(list, entry)) != NULL) {
       db_data_t *db_data = list_entry_payload(entry);
 
@@ -331,10 +341,10 @@ static void db_data_get(const void *payload, char *string) {
 
   if (date_out == 0) {
     /* '@' > '9' */
-    sprintf(string, "%s/%s %c", db_data->host, db_data->filedata.path, '@');
+    sprintf(string, "%s %s %c", db_data->host, db_data->filedata.path, '@');
   } else {
     /* ' ' > '0' */
-    sprintf(string, "%s/%s %11ld", db_data->host, db_data->filedata.path, date_out);
+    sprintf(string, "%s %s %11ld", db_data->host, db_data->filedata.path, date_out);
   }
 }
 
@@ -454,7 +464,6 @@ int db_open(const char *path) {
   strcpy(temp_path, db_path);
   strcat(temp_path, "data");
   if (testdir(temp_path, 1) == 2) {
-    fprintf(stderr, "db: open: cannot create directory: %s\n", temp_path);
     return 2;
   }
 
@@ -512,18 +521,24 @@ static int parse_compare(void *db_data_p, void *filedata_p) {
   filedata_t      *filedata = filedata_p;
   int             result;
 
-  /* Removed files should be ignored */
+  /* No more data in database list: add to added list */
+  if (db_data_p == NULL) {
+    return 1;
+  }
+
+  /* Ignore removed files */
   if (db_data->date_out != 0) {
     return -2;
   }
-  /* Paths not matching must be ignored too */
-  result = strncmp(backup_path, db_data->filedata.path, backup_path_length);
-  if (result < 0) {
-    /* Not reached yet */
+
+  /* Ignore when paths do not match */
+  if (strncmp(db_data->filedata.path, backup_path, backup_path_length)) {
     return -2;
-  } else if (result > 0) {
-    /* Passed it */
-    return -3;
+  }
+
+  /* No more data in file list: add to missing list */
+  if (filedata_p == NULL) {
+    return -1;
   }
 
   /* If paths differ, that's all we want to check */
@@ -560,6 +575,9 @@ int db_parse(const char *host, const char *real_path,
 
   /* Deal with new/modified data first */
   if (added_files_list != NULL) {
+    if (verbosity() > 2) {
+      printf(" --> Files to add: %u\n", list_size(added_files_list));
+    }
     while ((entry = list_next(added_files_list, entry)) != NULL) {
       filedata_t *filedata = list_entry_payload(entry);
       db_data_t  *db_data  = malloc(sizeof(db_data_t));
@@ -618,6 +636,9 @@ int db_parse(const char *host, const char *real_path,
 
   /* Deal with removed/modified data */
   if (removed_files_list != NULL) {
+    if (verbosity() > 2) {
+      printf(" --> Files to remove: %u\n", list_size(removed_files_list));
+    }
     while ((entry = list_next(removed_files_list, entry)) != NULL) {
       db_data_t *db_data = list_entry_payload(entry);
 

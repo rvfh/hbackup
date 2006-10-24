@@ -22,7 +22,12 @@ static void client_show(const void *payload, char *string) {
   strcat(string, client_t->listfile);
 }
 
+int verbosity(void) {
+  return 3;
+}
+
 int main(void) {
+  remove("test_db/list");
   if (clients_new()) {
     printf("Failed to create\n");
     return 1;
@@ -48,5 +53,16 @@ int main(void) {
   clients_backup();
   db_close();
   clients_free();
+
+  if (clients_new()) {
+    printf("Failed to create\n");
+    return 1;
+  }
+  clients_add("file://localhost", "etc/localhost.list");
+  db_open("test_db");
+  clients_backup();
+  db_close();
+  clients_free();
+
   return 0;
 }

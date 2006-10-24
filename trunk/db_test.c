@@ -25,12 +25,18 @@ static void db_data_show(const void *payload, char *string) {
   const db_data_t *db_data = payload;
 
   /* Times are omitted here... */
-  sprintf(string, "'%s' '%s' %c %ld %ld %u %u 0%o '%s' %s %ld %ld %c",
+  sprintf(string, "'%s' '%s' %c %ld %d %u %u 0%o '%s' %s %d %d %c",
     db_data->host, db_data->filedata.path,
-    type_letter(db_data->filedata.metadata.type), db_data->filedata.metadata.size,
-    db_data->filedata.metadata.mtime * 0, db_data->filedata.metadata.uid,
-    db_data->filedata.metadata.gid, db_data->filedata.metadata.mode, db_data->link,
-    db_data->filedata.checksum, db_data->date_in * 0, db_data->date_out * 0, '-');
+    type_letter(db_data->filedata.metadata.type),
+    db_data->filedata.metadata.size,
+    db_data->filedata.metadata.mtime || 0, db_data->filedata.metadata.uid,
+    db_data->filedata.metadata.gid, db_data->filedata.metadata.mode,
+    db_data->link, db_data->filedata.checksum, db_data->date_in || 0,
+    db_data->date_out || 0, '-');
+}
+
+int verbosity(void) {
+  return 3;
 }
 
 int main(void) {
@@ -172,6 +178,44 @@ int main(void) {
     }
   }
 */
+  db_close();
+
+  if ((status = db_open("test_db"))) {
+    printf("db_open error status %u\n", status);
+    if (status == 2) {
+      return 0;
+    }
+  }
+  list_show(db_list, NULL, db_data_show);
+
+  if ((status = filelist_new("test////", filters_handle, parsers_handle))) {
+    printf("file_list_new error status %u\n", status);
+    return 0;
+  }
+  list_show(filelist_getlist(), NULL, file_data_show);
+
+  if ((status = db_parse("file://host", "/home/user/", filelist_getpath(),
+      filelist_getlist()))) {
+    printf("db_parse error status %u\n", status);
+    db_close();
+    return 0;
+  }
+  list_show(db_list, NULL, db_data_show);
+
+  if ((status = filelist_new("test2", filters_handle, parsers_handle))) {
+    printf("file_list_new error status %u\n", status);
+    return 0;
+  }
+  list_show(filelist_getlist(), NULL, file_data_show);
+
+  if ((status = db_parse("file://host", "/home/user2/", filelist_getpath(),
+      filelist_getlist()))) {
+    printf("db_parse error status %u\n", status);
+    db_close();
+    return 0;
+  }
+  list_show(db_list, NULL, db_data_show);
+
   db_close();
 
   filelist_free();

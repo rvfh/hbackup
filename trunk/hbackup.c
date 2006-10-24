@@ -15,9 +15,10 @@
 #include "cvs_parser.h"
 #include "db.h"
 #include "clients.h"
+#include "hbackup.h"
 
-/* List of files */
-list_t file_list;
+/* Verbosity */
+static int verbose = 0;
 
 static void show_version(void) {
   printf("(c) 2006 Hervé Fache, version 0.1.\n");
@@ -32,11 +33,16 @@ static void show_help(void) {
 /etc/hbackup.conf\n");
 }
 
+int verbosity(void) {
+  return verbose;
+}
+
 int main(int argc, char **argv) {
   char config_path[FILENAME_MAX] = "/etc/hbackup.conf";
   char db_path[FILENAME_MAX] = "/hbackup";
   FILE *config;
   int failed = 0;
+  int expect_configpath = 0;
 
   /* Analyse arguments */
   if (argc > 1) {
@@ -46,25 +52,47 @@ int main(int argc, char **argv) {
     if (argv[1][0] == '-') {
       /* --* */
       if (argv[1][1] == '-') {
-        if (! strcmp(&argv[1][2], "help")) {
-          letter = 'h';
-        } else if (! strcmp(&argv[1][2], "version")) {
-          letter = 'v';
-        } else if (! strcmp(&argv[1][2], "config")) {
+        if (! strcmp(&argv[1][2], "config")) {
           letter = 'c';
+        } else if (! strcmp(&argv[1][2], "help")) {
+          letter = 'h';
+        } else if (! strcmp(&argv[1][2], "verbose")) {
+          letter = 'v';
+        } else if (! strcmp(&argv[1][2], "version")) {
+          letter = 'V';
+        }
+      } else if (argv[1][1] == 'v') {
+        letter = argv[1][1];
+        if (argv[1][2] == 'v') {
+          verbose++;
+          if (argv[1][3] == 'v') {
+            verbose++;
+            if (argv[1][4] != '\0') {
+              letter = ' ';
+            }
+          } else if (argv[1][3] != '\0') {
+            letter = ' ';
+          }
+        } else if (argv[1][2] != '\0') {
+          letter = ' ';
         }
       } else if (argv[1][2] == '\0') {
         letter = argv[1][1];
       }
+
       switch (letter) {
+        case 'c':
+          expect_configpath = 1;
+          break;
         case 'h':
           show_help();
           return 0;
         case 'v':
+          verbose++;
+          break;
+        case 'V':
           show_version();
           return 0;
-        case 'c':
-          break;
         default:
           fprintf(stderr, "Unrecognised option: %s\n", argv[1]);
           return 2;
@@ -72,11 +100,17 @@ int main(int argc, char **argv) {
     }
 
     /* Get config path */
-    if (argc < 3) {
-      fprintf(stderr, "Need a config path after %s\n", argv[1]);
-      return 2;
+    if (expect_configpath) {
+      if (argc < 3) {
+        fprintf(stderr, "Need a config path after %s\n", argv[1]);
+        return 2;
+      }
+      strcpy(config_path, argv[2]);
     }
-    strcpy(config_path, argv[2]);
+  }
+
+  if (verbosity() > 2) {
+    printf("Verbosity level: %u\n", verbosity());
   }
 
   /* Open configuration file */
@@ -118,18 +152,20 @@ int main(int argc, char **argv) {
         }
       }
       fclose(config);
+      free(buffer);
 
       /* Open backup database */
       if (db_open(db_path) == 2) {
         fprintf(stderr, "Failed to open database in '%s'\n", db_path);
         failed = 2;
-      }
+      } else {
+        /* Backup */
+        if (! failed && clients_backup()) {
+          fprintf(stderr, "Failed to backup\n");
+        }
 
-      /* Backup */
-      if (! failed && clients_backup()) {
-        fprintf(stderr, "Failed to backup\n");
+        db_close();
       }
-      db_close();
       clients_free();
     }
   }
