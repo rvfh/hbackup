@@ -1,13 +1,4 @@
 iterate_directory
- --> Dir: 
- --> Dir: cvs/
- --> Dir: cvs/CVS/
- --> Dir: cvs/dirbad/
- --> Dir: cvs/diroth/
- --> Dir: cvs/dirutd/
- --> Dir: cvs/dirutd/CVS/
- --> Dir: testdir/
- --> Dir: subdir/
 List 24 elements:
  cvs
  cvs/CVS
@@ -34,14 +25,6 @@ List 24 elements:
  testfile~
  testlink
 as previous with subdir in ignore list
- --> Dir: 
- --> Dir: cvs/
- --> Dir: cvs/CVS/
- --> Dir: cvs/dirbad/
- --> Dir: cvs/diroth/
- --> Dir: cvs/dirutd/
- --> Dir: cvs/dirutd/CVS/
- --> Dir: testdir/
 List 20 elements:
  cvs
  cvs/CVS
@@ -64,14 +47,6 @@ List 20 elements:
  testfile~
  testlink
 as previous with testlink in ignore list
- --> Dir: 
- --> Dir: cvs/
- --> Dir: cvs/CVS/
- --> Dir: cvs/dirbad/
- --> Dir: cvs/diroth/
- --> Dir: cvs/dirutd/
- --> Dir: cvs/dirutd/CVS/
- --> Dir: testdir/
 List 19 elements:
  cvs
  cvs/CVS
@@ -93,11 +68,6 @@ List 19 elements:
  testfile
  testfile~
 as previous with CVS parser
- --> Dir: 
- --> Dir: cvs/
- --> Dir: cvs/dirbad/
- --> Dir: cvs/dirutd/
- --> Dir: testdir/
 List 10 elements:
  cvs
  cvs/dirbad
@@ -110,11 +80,6 @@ List 10 elements:
  testfile
  testfile~
 file_list_new, as previous
- --> Dir: 
- --> Dir: cvs/
- --> Dir: cvs/dirbad/
- --> Dir: cvs/dirutd/
- --> Dir: testdir/
 List 10 elements:
  cvs
  cvs/dirbad
@@ -127,11 +92,6 @@ List 10 elements:
  testfile
  testfile~
 file_list_new, as previous with ending slash
- --> Dir: 
- --> Dir: cvs/
- --> Dir: cvs/dirbad/
- --> Dir: cvs/dirutd/
- --> Dir: testdir/
 List 10 elements:
  cvs
  cvs/dirbad

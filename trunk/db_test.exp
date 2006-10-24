@@ -16,11 +16,6 @@ FIFO   : 0010000
 Link   : 0120000
 Socket : 0140000
 Unknown: 0000000
- --> Dir: 
- --> Dir: cvs/
- --> Dir: cvs/dirbad/
- --> Dir: cvs/dirutd/
- --> Dir: testdir/
 List 9 elements:
  cvs
  cvs/dirbad
@@ -33,7 +28,6 @@ List 9 elements:
  testlink
 db_open error status 1
 59ca0efa9f5633cb0371bbc0355478d8-0  test/testfile
- --> Files to add: 9
 List 9 elements:
  'file://host' '/home/user/cvs' d 0 1 1000 1000 0755 '' N 1 0 -
  'file://host' '/home/user/cvs/dirbad' d 0 1 1000 1000 0755 '' N 1 0 -
@@ -44,8 +38,7 @@ List 9 elements:
  'file://host' '/home/user/testdir' d 0 1 1000 1000 0755 '' N 1 0 -
  'file://host' '/home/user/testfile' f 13 1 1000 1000 0644 '' 59ca0efa9f5633cb0371bbc0355478d8-0 1 0 -
  'file://host' '/home/user/testlink' l 8 1 1000 1000 0777 'testfile' N 1 0 -
- -> Saving database list
- --> Files to date: 9
+ -> Saving database list: 9 file(s)
  -> Loading database list
 List 9 elements:
  'file://host' '/home/user/cvs' d 0 1 1000 1000 0755 '' N 1 0 -
@@ -67,13 +60,10 @@ List 9 elements:
  'file://host' '/home/user/testdir' d 0 1 1000 1000 0755 '' N 1 0 -
  'file://host' '/home/user/testfile' f 13 1 1000 1000 0644 '' 59ca0efa9f5633cb0371bbc0355478d8-0 1 0 -
  'file://host' '/home/user/testlink' l 8 1 1000 1000 0777 'testfile' N 1 0 -
- --> Dir: 
- --> Dir: testdir/
 List 3 elements:
  testdir
  testfile
  testlink
- --> Files to add: 3
 List 12 elements:
  'file://host' '/home/user/cvs' d 0 1 1000 1000 0755 '' N 1 0 -
  'file://host' '/home/user/cvs/dirbad' d 0 1 1000 1000 0755 '' N 1 0 -
@@ -87,8 +77,7 @@ List 12 elements:
  'file://host' '/home/user2/testdir' d 0 1 1000 1000 0755 '' N 1 0 -
  'file://host' '/home/user2/testfile' f 15 1 1000 1000 0644 '' fcacc0dea4134dc0b9da49c1a9603196-0 1 0 -
  'file://host' '/home/user2/testlink' l 8 1 1000 1000 0777 'testfile' N 1 0 -
- -> Saving database list
- --> Files to date: 12
+ -> Saving database list: 12 file(s)
  -> Loading database list
 List 12 elements:
  'file://host' '/home/user/cvs' d 0 1 1000 1000 0755 '' N 1 0 -
@@ -103,11 +92,6 @@ List 12 elements:
  'file://host' '/home/user2/testdir' d 0 1 1000 1000 0755 '' N 1 0 -
  'file://host' '/home/user2/testfile' f 15 1 1000 1000 0644 '' fcacc0dea4134dc0b9da49c1a9603196-0 1 0 -
  'file://host' '/home/user2/testlink' l 8 1 1000 1000 0777 'testfile' N 1 0 -
- --> Dir: 
- --> Dir: cvs/
- --> Dir: cvs/dirbad/
- --> Dir: cvs/dirutd/
- --> Dir: testdir/
 List 9 elements:
  cvs
  cvs/dirbad
@@ -131,8 +115,6 @@ List 12 elements:
  'file://host' '/home/user2/testdir' d 0 1 1000 1000 0755 '' N 1 0 -
  'file://host' '/home/user2/testfile' f 15 1 1000 1000 0644 '' fcacc0dea4134dc0b9da49c1a9603196-0 1 0 -
  'file://host' '/home/user2/testlink' l 8 1 1000 1000 0777 'testfile' N 1 0 -
- --> Dir: 
- --> Dir: testdir/
 List 3 elements:
  testdir
  testfile
@@ -150,5 +132,4 @@ List 12 elements:
  'file://host' '/home/user2/testdir' d 0 1 1000 1000 0755 '' N 1 0 -
  'file://host' '/home/user2/testfile' f 15 1 1000 1000 0644 '' fcacc0dea4134dc0b9da49c1a9603196-0 1 0 -
  'file://host' '/home/user2/testlink' l 8 1 1000 1000 0777 'testfile' N 1 0 -
- -> Saving database list
- --> Files to date: 12
+ -> Saving database list: 12 file(s)

@@ -315,10 +315,7 @@ static int db_save(const char *filename, list_t list) {
     list_entry_t entry = NULL;
 
     if (verbosity() > 1) {
-      printf(" -> Saving database list\n");
-      if (verbosity() > 2) {
-        printf(" --> Files to date: %u\n", list_size(list));
-      }
+      printf(" -> Saving database list: %u file(s)\n", list_size(list));
     }
     while ((entry = list_next(list, entry)) != NULL) {
       db_data_t *db_data = list_entry_payload(entry);

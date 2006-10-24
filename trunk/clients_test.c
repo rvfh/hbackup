@@ -23,7 +23,7 @@ static void client_show(const void *payload, char *string) {
 }
 
 int verbosity(void) {
-  return 3;
+  return 2;
 }
 
 int main(void) {
