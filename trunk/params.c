@@ -5,6 +5,7 @@
 
 #define _GNU_SOURCE
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 #include "params.h"
@@ -74,7 +75,7 @@ void pathtolinux(char *path) {
 
 int params_readline(const char *line, char *keyword, char *type,
     char *string) {
-  char linecopy[FILENAME_MAX];
+  char *linecopy = malloc(strlen(line) + 1);
   char *start = linecopy;
   char *delim;
   int param_count = 0;
@@ -105,6 +106,7 @@ int params_readline(const char *line, char *keyword, char *type,
   if (keyword[0] != '\0') {
     param_count++;
   } else {
+    free(linecopy);
     return param_count;
   }
 
@@ -117,6 +119,7 @@ int params_readline(const char *line, char *keyword, char *type,
     start++;
     if ((delim = strchr(start, '"')) == NULL) {
       /* No matching double quote */
+      free(linecopy);
       return -1;
     } else {
       /* Make that a space so it gets ignored */
@@ -132,6 +135,7 @@ int params_readline(const char *line, char *keyword, char *type,
   if (string[0] != '\0') {
     param_count++;
   } else {
+    free(linecopy);
     return param_count;
   }
 
@@ -141,6 +145,7 @@ int params_readline(const char *line, char *keyword, char *type,
 
   /* Do we have more? */
   if (start[0] == '\0') {
+    free(linecopy);
     return param_count;
   } else {
     strcpy(type, string);
@@ -151,6 +156,7 @@ int params_readline(const char *line, char *keyword, char *type,
     start++;
     if ((delim = strchr(start, '"')) == NULL) {
       /* No matching double quote */
+      free(linecopy);
       return -1;
     } else {
       /* Make that a space so it gets ignored */
@@ -166,8 +172,10 @@ int params_readline(const char *line, char *keyword, char *type,
   if (string[0] != '\0') {
     param_count++;
   } else {
+    free(linecopy);
     return param_count;
   }
 
+  free(linecopy);
   return param_count;
 }

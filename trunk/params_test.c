@@ -6,10 +6,10 @@
 #include "params.c"
 
 int main(void) {
-  char line[FILENAME_MAX] = "";
+  char line[256] = "";
   char keyword[256];
   char type[256];
-  char string[FILENAME_MAX];
+  char string[256];
 
   strcpy(line, "/this/is/a/line");
   printf("Check slashes to '%s': ", line);

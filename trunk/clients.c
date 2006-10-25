@@ -18,18 +18,18 @@
 #include "clients.h"
 
 typedef struct {
-  char protocol[256];
-  char username[256];
-  char password[256];
-  char hostname[256];
-  char listfile[FILENAME_MAX];
+  char    *protocol;
+  char    *username;
+  char    *password;
+  char    *hostname;
+  char    *listfile;
 } client_t;
 
 typedef struct {
-  char path[FILENAME_MAX];
-  list_t compress_handle;
-  list_t ignore_handle;
-  list_t parsers_handle;
+  char    *path;
+  list_t  compress_handle;
+  list_t  ignore_handle;
+  list_t  parsers_handle;
 } backup_t;
 
 static list_t clients = NULL;
@@ -45,6 +45,17 @@ int clients_new(void) {
 }
 
 void clients_free(void) {
+  list_entry_t entry = NULL;
+
+  while ((entry = list_next(clients, entry)) != NULL) {
+    client_t *client = list_entry_payload(entry);
+
+    free(client->protocol);
+    free(client->username);
+    free(client->password);
+    free(client->hostname);
+    free(client->listfile);
+  }
   list_free(clients);
 }
 
@@ -57,6 +68,7 @@ int clients_add(const char *info, const char *listfile) {
     return 1;
   }
   /* Protocol */
+  client->protocol = malloc(delim - start + 1);
   strncpy(client->protocol, start, delim - start);
   client->protocol[delim - start] = '\0';
   /* Lower case */
@@ -75,30 +87,37 @@ int clients_add(const char *info, const char *listfile) {
   delim = strchr(start, '@');
   if (delim == NULL) {
     /* No username/password */
-    strcpy(client->username, "");
-    strcpy(client->password, "");
+    client->username = NULL;
+    client->password = NULL;
+    client->hostname = malloc(strlen(start) + 1);
     strcpy(client->hostname, start);
     /* Lower case */
     strtolower(client->hostname);
   } else {
     char *colon = strchr(start, ':');
 
+    client->hostname = malloc(strlen(delim + 1) + 1);
     strcpy(client->hostname, delim + 1);
     /* Lower case */
     strtolower(client->hostname);
     if (colon == NULL) {
       /* No password */
+      client->username = malloc(delim - start + 1);
       strncpy(client->username, start, delim - start);
-      strcpy(client->password, "");
+      client->username[delim - start] = '\0';
+      client->password = NULL;
     } else {
+      client->username = malloc(colon - start + 1);
       strncpy(client->username, start, colon - start);
       client->username[colon - start] = '\0';
+      client->password = malloc(delim - colon - 1 + 1);
       strncpy(client->password, colon + 1, delim - colon - 1);
       client->password[delim - colon - 1] = '\0';
     }
   }
 
   /* List file */
+  client->listfile = malloc(strlen(listfile) + 1);
   strcpy(client->listfile, listfile);
   if (! strcmp(client->protocol, "smb")) {
     /* Lower case */
@@ -173,7 +192,7 @@ int clients_backup(void) {
         if (params < 0) {
           fprintf(stderr,
             "clients: backup: syntax error in list file %s, line %u\n",
-            client->listfile, line);
+            listfilename, line);
           failed = 1;
         }
         continue;
@@ -181,17 +200,17 @@ int clients_backup(void) {
       if (! strcmp(keyword, "compress")) {
         fprintf(stderr,
           "clients: backup: keyword not implemented in list file %s, line %u\n",
-          client->listfile, line);
+          listfilename, line);
         if (add_filter(backup->compress_handle, type, string)) {
           fprintf(stderr,
             "clients: backup: unsupported filter type in list file %s, line %u\n",
-            client->listfile, line);
+            listfilename, line);
         }
       } else if (! strcmp(keyword, "ignore")) {
         if (add_filter(backup->ignore_handle, type, string)) {
           fprintf(stderr,
             "clients: backup: unsupported filter type in list file %s, line %u\n",
-            client->listfile, line);
+            listfilename, line);
         }
       } else if (! strcmp(keyword, "parser")) {
         strtolower(string);
@@ -200,7 +219,7 @@ int clients_backup(void) {
         } else {
           fprintf(stderr,
             "clients: backup: unsupported parser in list file %s, line %u\n",
-            client->listfile, line);
+            listfilename, line);
         }
       } else if (! strcmp(keyword, "path")) {
         /* New backup entry */
@@ -208,13 +227,14 @@ int clients_backup(void) {
         filters_new(&backup->compress_handle);
         filters_new(&backup->ignore_handle);
         parsers_new(&backup->parsers_handle);
+        backup->path = malloc(strlen(string) + 2);
         strcpy(backup->path, string);
         one_trailing_slash(backup->path);
         list_append(backups, backup);
       } else {
         fprintf(stderr,
           "clients: backup: syntax error in list file %s, line %u\n",
-          client->listfile, line);
+          listfilename, line);
         failed = 1;
         continue;
       }
@@ -256,7 +276,8 @@ int clients_backup(void) {
           filelist_free();
         }
 
-        /* Free encapsulated lists */
+        /* Free encapsulated data */
+        free(backup->path);
         filters_free(backup->compress_handle);
         filters_free(backup->ignore_handle);
         parsers_free(backup->parsers_handle);

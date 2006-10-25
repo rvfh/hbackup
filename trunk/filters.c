@@ -40,30 +40,24 @@ static int filter_path_regexp_check(const char *path, const char *string) {
 }
 
 static int filter_file_start_check(const char *path, const char *string) {
-  char dup_path[FILENAME_MAX];
-  char *file;
+  const char *file = strrchr(path, '/');
 
-  strcpy(dup_path, path);
-  if ((file = strrchr(dup_path, '/')) != NULL) {
+  if (file != NULL) {
     file++;
   } else {
-    file = dup_path;
+    file = path;
   }
-
   return strncmp(file, string, strlen(string));
 }
 
 static int filter_file_regexp_check(const char *path, const char *string) {
-  char dup_path[FILENAME_MAX];
-  char *file;
+  const char *file;
 
-  strcpy(dup_path, path);
-  if ((file = strrchr(dup_path, '/')) != NULL) {
+  if ((file = strrchr(path, '/')) != NULL) {
     file++;
   } else {
-    file = dup_path;
+    file = path;
   }
-
   return filter_path_regexp_check(file, string);
 }
 
