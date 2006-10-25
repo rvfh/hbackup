@@ -9,9 +9,9 @@ static void client_show(const void *payload, char *string) {
   const client_t *client_t = payload;
 
   sprintf(string, "%s://", client_t->protocol);
-  if (strlen(client_t->username) != 0) {
+  if (client_t->username != NULL) {
     strcat(string, client_t->username);
-    if (strlen(client_t->password) != 0) {
+    if (client_t->password != NULL) {
       strcat(string, ":");
       strcat(string, client_t->password);
     }
