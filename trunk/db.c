@@ -414,13 +414,16 @@ static int db_organize(char *path, int number) {
         strcpy(dest_path, path);
         strcat(dest_path, "/");
         strncat(dest_path, dir_entry->d_name, 2);
-        testdir(dest_path, 1);
-        /* Create destination path */
-        strcat(dest_path, "/");
-        strcat(dest_path, &dir_entry->d_name[2]);
-        /* Move directory accross, changing its name */
-        if (rename(source_path, dest_path)) {
-          failed = 1;
+        if (testdir(dest_path, 1) == 2) {
+          failed = 2;
+        } else {
+          /* Create destination path */
+          strcat(dest_path, "/");
+          strcat(dest_path, &dir_entry->d_name[2]);
+          /* Move directory accross, changing its name */
+          if (rename(source_path, dest_path)) {
+            failed = 1;
+          }
         }
       }
       free(source_path);
