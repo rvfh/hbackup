@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <signal.h>
 #include "params.h"
 #include "list.h"
 #include "filters.h"
@@ -19,6 +20,9 @@
 
 /* Verbosity */
 static int verbose = 0;
+
+/* Signal received? */
+static int killed = 0;
 
 static void show_version(void) {
   printf("(c) 2006 Hervé Fache, version 0.1.\n");
@@ -37,12 +41,30 @@ int verbosity(void) {
   return verbose;
 }
 
+int terminating(void) {
+  return killed;
+}
+
+void sighandler(int signal) {
+  fprintf(stderr, "Received signal, aborting...\n");
+  killed = signal;
+}
+
 int main(int argc, char **argv) {
   char config_path[FILENAME_MAX] = "/etc/hbackup.conf";
   char db_path[FILENAME_MAX] = "/hbackup";
   FILE *config;
   int failed = 0;
   int expect_configpath = 0;
+  struct sigaction action;
+
+  /* Set signal catcher */
+  action.sa_handler = sighandler;
+  sigemptyset (&action.sa_mask);
+  action.sa_flags = 0;
+  sigaction (SIGINT, &action, NULL);
+  sigaction (SIGHUP, &action, NULL);
+  sigaction (SIGTERM, &action, NULL);
 
   /* Analyse arguments */
   if (argc > 1) {

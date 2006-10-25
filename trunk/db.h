@@ -6,7 +6,7 @@
 #ifndef DB_H
 #define DB_H
 
-/* Open database, TODO recover from previous failure */
+/* Open database */
 extern int db_open(const char *db_path);
 
 /* Close database */

@@ -9,4 +9,6 @@
 /* Get verbosity level */
 extern int verbosity(void);
 
+extern int terminating(void);
+
 #endif

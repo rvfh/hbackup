@@ -28,6 +28,7 @@ List 9 elements:
  testlink
 db_open error status 1
 59ca0efa9f5633cb0371bbc0355478d8-0  test/testfile
+ --> Files to add: 9
 List 9 elements:
  'file://host' '/home/user/cvs' d 0 1 1000 1000 0755 '' N 1 0 -
  'file://host' '/home/user/cvs/dirbad' d 0 1 1000 1000 0755 '' N 1 0 -
@@ -64,6 +65,7 @@ List 3 elements:
  testdir
  testfile
  testlink
+ --> Files to add: 3
 List 12 elements:
  'file://host' '/home/user/cvs' d 0 1 1000 1000 0755 '' N 1 0 -
  'file://host' '/home/user/cvs/dirbad' d 0 1 1000 1000 0755 '' N 1 0 -
@@ -132,4 +134,5 @@ List 12 elements:
  'file://host' '/home/user2/testdir' d 0 1 1000 1000 0755 '' N 1 0 -
  'file://host' '/home/user2/testfile' f 15 1 1000 1000 0644 '' fcacc0dea4134dc0b9da49c1a9603196-0 1 0 -
  'file://host' '/home/user2/testlink' l 8 1 1000 1000 0777 'testfile' N 1 0 -
+ --> Reorganizing db in: 'test_db/data' ... done
  -> Saving database list: 12 file(s)

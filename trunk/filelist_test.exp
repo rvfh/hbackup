@@ -79,7 +79,7 @@ List 10 elements:
  testdir
  testfile
  testfile~
-file_list_new, as previous
+filelist_new, as previous
 List 10 elements:
  cvs
  cvs/dirbad
@@ -91,7 +91,7 @@ List 10 elements:
  testdir
  testfile
  testfile~
-file_list_new, as previous with ending slash
+filelist_new, as previous with ending slash
 List 10 elements:
  cvs
  cvs/dirbad

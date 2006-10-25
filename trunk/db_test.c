@@ -15,7 +15,7 @@
 #include "db.c"
 
 /* List of files */
-list_t file_list;
+static int verbose = 3;
 
 static void file_data_show(const void *payload, char *string) {
   strcpy(string, ((filedata_t *) payload)->path);
@@ -40,7 +40,11 @@ static void db_data_show(const void *payload, char *string) {
 }
 
 int verbosity(void) {
-  return 2;
+  return verbose;
+}
+
+int terminating(void) {
+  return 0;
 }
 
 int main(void) {
@@ -101,10 +105,12 @@ int main(void) {
     return 0;
   }
 
+  verbose = 2;
   if ((status = filelist_new("test////", filters_handle, parsers_handle))) {
     printf("file_list_new error status %u\n", status);
     return 0;
   }
+  verbose = 3;
   list_show(filelist_getlist(), NULL, file_data_show);
 
   /* Test database */
@@ -155,10 +161,12 @@ int main(void) {
   list_show(db_list, NULL, db_data_show);
   filelist_free();
 
+  verbose = 2;
   if ((status = filelist_new("test2", filters_handle, parsers_handle))) {
     printf("file_list_new error status %u\n", status);
     return 0;
   }
+  verbose = 3;
   list_show(filelist_getlist(), NULL, file_data_show);
 
   if ((status = db_parse("file://host", "/home/user2/", filelist_getpath(),
@@ -194,10 +202,12 @@ int main(void) {
   }
   list_show(db_list, NULL, db_data_show);
 
+  verbose = 2;
   if ((status = filelist_new("test////", filters_handle, parsers_handle))) {
     printf("file_list_new error status %u\n", status);
     return 0;
   }
+  verbose = 3;
   list_show(filelist_getlist(), NULL, file_data_show);
 
   if ((status = db_parse("file://host", "/home/user/", filelist_getpath(),
@@ -209,10 +219,12 @@ int main(void) {
   list_show(db_list, NULL, db_data_show);
   filelist_free();
 
+  verbose = 2;
   if ((status = filelist_new("test2", filters_handle, parsers_handle))) {
     printf("file_list_new error status %u\n", status);
     return 0;
   }
+  verbose = 3;
   list_show(filelist_getlist(), NULL, file_data_show);
 
   if ((status = db_parse("file://host", "/home/user2/", filelist_getpath(),

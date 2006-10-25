@@ -266,14 +266,25 @@ int clients_backup(void) {
               printf(" -> Building list of files\n");
             }
           }
-          filelist_new(backup->path, backup->ignore_handle,
-            backup->parsers_handle);
-          if (verbosity() > 1) {
-            printf(" -> Parsing list of files\n");
+          if (! filelist_new(backup->path, backup->ignore_handle,
+            backup->parsers_handle)) {
+            if (verbosity() > 1) {
+              printf(" -> Parsing list of files\n");
+            }
+            if (db_parse(prefix, backup->path, filelist_getpath(),
+              filelist_getlist())) {
+              if (! terminating()) {
+                fprintf(stderr, "clients: backup: parsing failed\n");
+              }
+              failed = 1;
+            }
+            filelist_free();
+          } else {
+            if (! terminating()) {
+              fprintf(stderr, "clients: backup: list creation failed\n");
+            }
+            failed = 1;
           }
-          db_parse(prefix, backup->path, filelist_getpath(),
-            filelist_getlist());
-          filelist_free();
         }
 
         /* Free encapsulated data */
