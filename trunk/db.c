@@ -486,9 +486,17 @@ int db_open(const char *path) {
     /* Lock already taken */
     fscanf(file, "%d", &pid);
     fclose(file);
-    fprintf(stderr, "db: open: lock taken by process with pid %d\n", pid);
     if (pid != 0) {
-      /* TODO Find out whether process is still running, if not, reset lock */
+      /* Find out whether process is still running, if not, reset lock */
+      char proc[32];
+
+      /* This is not portable at all! Any better way? */
+      sprintf(proc, "/proc/%u", pid);
+      if (testdir(proc, 0)) {
+        remove(temp_path);
+      } else {
+        fprintf(stderr, "db: open: lock taken by process with pid %d\n", pid);
+      }
     }
     return 2;
   }
