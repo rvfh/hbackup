@@ -711,6 +711,9 @@ int db_parse(const char *host, const char *real_path,
 
   /* Deal with new/modified data first */
   if (added_files_list != NULL) {
+    static int   copied = 0;
+    static off_t volume = 0;
+
     if (verbosity() > 2) {
       printf(" --> Files to add: %u\n", list_size(added_files_list));
     }
@@ -766,12 +769,14 @@ int db_parse(const char *host, const char *real_path,
           }
         }
         list_add(db_list, db_data);
-        if ((list_size(added_files_list) & 0x3FF) == 0) {
+        if ((++copied >= 1000)
+         || ((volume += db_data->filedata.metadata.size) >= 10000000)) {
+          copied = 0;
+          volume = 0;
           if (verbosity() > 2) {
-            printf(" --> Files to left to add: %u\n",
+            printf(" --> Files left to add: %u\n",
               list_size(added_files_list));
           }
-          db_save("list", db_list);
         }
       }
       /* This only unlists the data */
