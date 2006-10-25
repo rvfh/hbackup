@@ -23,6 +23,7 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <signal.h>
 #include <time.h>
 #include <dirent.h>
 #include <unistd.h>
@@ -124,7 +125,8 @@ static size_t copy(const char *source_path, const char *dest_path, char *checksu
   FILE        *readfile;
   char        buffer[10240];
   EVP_MD_CTX  ctx;
-  size_t      length;
+  size_t      rlength;
+  size_t      wlength;
   size_t      size = 0;
 
   /* Open file to read from */
@@ -142,19 +144,20 @@ static size_t copy(const char *source_path, const char *dest_path, char *checksu
 
   /* We shall copy and compute the checksum in one go */
   EVP_DigestInit(&ctx, EVP_md5());
-  while (! feof(readfile)) {
-    length = fread(buffer, 1, 10240, readfile);
-    size += length;
-    EVP_DigestUpdate(&ctx, buffer, length);
+  while (! feof(readfile) && ! terminating()) {
+    rlength = fread(buffer, 1, 10240, readfile);
+    size += rlength;
+    EVP_DigestUpdate(&ctx, buffer, rlength);
     do {
-      length -= fwrite(buffer, 1, length, writefile);
-    } while (length != 0);
+      wlength = fwrite(buffer, 1, rlength, writefile);
+      rlength -= wlength;
+    } while ((rlength != 0) && (wlength != 0));
   }
   fclose(readfile);
   fclose(writefile);
   /* Re-use length */
-  EVP_DigestFinal(&ctx, (unsigned char *) checksum, &length);
-  md5sum(checksum, length);
+  EVP_DigestFinal(&ctx, (unsigned char *) checksum, &rlength);
+  md5sum(checksum, rlength);
   return size;
 }
 
@@ -388,7 +391,7 @@ static int db_organize(char *path, int number) {
   /* Decide what to do */
   if (number == 0) {
     if (verbosity() > 2) {
-      printf(" --> Reorganizing db in: '%s'\n", path);
+      printf(" --> Reorganizing db in: '%s' ...", path);
     }
     rewinddir(directory);
     while ((dir_entry = readdir(directory)) != NULL) {
@@ -431,6 +434,9 @@ static int db_organize(char *path, int number) {
     if (! failed) {
       testfile(nofiles, 1);
     }
+    if (verbosity() > 2) {
+      printf(" done\n");
+    }
   }
   closedir(directory);
   free(nofiles);
@@ -457,12 +463,15 @@ static int db_write(const char *mount_path, const char *path, size_t size, char 
 
   /* Get file final location (dest_path gets overwritten here by getdir) */
   if ((copy(dest_path, temp_path, temp_checksum) != size) || (getdir(temp_checksum, dest_path) == 2)) {
-    fprintf(stderr, "db: write: failed to copy or get dir for: %s\n", path);
+    if (! terminating()) {
+      /* Don't signal errors on termination */
+      fprintf(stderr, "db: write: failed to copy or get dir for: %s\n", path);
+    }
     failed = 1;
   }
 
   /* Make sure our checksum is unique */
-  if (!failed) do {
+  if (! failed) do {
     char  final_path[FILENAME_MAX];
     int   differ = 0;
 
@@ -525,7 +534,7 @@ static int db_write(const char *mount_path, const char *path, size_t size, char 
 
   /* Now move the file in its place */
   strcat(dest_path, "data");
-  if (!failed && rename(temp_path, dest_path)) {
+  if (! failed && rename(temp_path, dest_path)) {
     fprintf(stderr, "db: write: failed to move file %s to %s: %s\n",
       strerror(errno), temp_path, dest_path);
     failed = 1;
@@ -580,18 +589,15 @@ int db_open(const char *path) {
     fclose(file);
     if (pid != 0) {
       /* Find out whether process is still running, if not, reset lock */
-      char proc[32];
-
-      /* This is not portable at all! Any better way? */
-      sprintf(proc, "/proc/%u", pid);
-      if (testdir(proc, 0)) {
+      if (kill(pid, 0) == 0) {
+        fprintf(stderr, "db: open: lock reset\n");
         remove(temp_path);
       } else {
         fprintf(stderr, "db: open: lock taken by process with pid %d\n", pid);
         return 2;
       }
     } else {
-      fprintf(stderr, "db: open: lock taken by unidentified process!\n");
+      fprintf(stderr, "db: open: lock taken by an unidentified process!\n");
       return 2;
     }
   }
@@ -678,6 +684,10 @@ static int parse_compare(void *db_data_p, void *filedata_p) {
 
   /* If it's a file and size and mtime are the same, copy checksum accross */
   if (S_ISREG(db_data->filedata.metadata.type)) {
+    if (! strcmp(db_data->filedata.checksum, "N")) {
+      /* Checksum missing, add to missing list */
+      return -1;
+    } else
     if ((db_data->filedata.metadata.size == filedata->metadata.size)
      || (db_data->filedata.metadata.mtime == filedata->metadata.mtime)) {
       strcpy(filedata->checksum, db_data->filedata.checksum);
@@ -705,53 +715,65 @@ int db_parse(const char *host, const char *real_path,
       printf(" --> Files to add: %u\n", list_size(added_files_list));
     }
     while ((entry = list_next(added_files_list, entry)) != NULL) {
-      filedata_t *filedata = list_entry_payload(entry);
-      db_data_t  *db_data  = malloc(sizeof(db_data_t));
+      if (! terminating()) {
+        filedata_t *filedata = list_entry_payload(entry);
+        db_data_t  *db_data  = malloc(sizeof(db_data_t));
 
-      db_data->host = malloc(strlen(host) + 1);
-      strcpy(db_data->host, host);
-      db_data->filedata.metadata = filedata->metadata;
-      db_data->filedata.path =
-        malloc(strlen(real_path) + strlen(filedata->path) + 1);
-      strcpy(db_data->filedata.path, real_path);
-      strcat(db_data->filedata.path, filedata->path);
-      db_data->link = NULL;
-      db_data->date_in = time(NULL);
-      db_data->date_out = 0;
-      /* Save new data */
-      if (S_ISREG(filedata->metadata.type)) {
-        if (filedata->checksum[0] != '\0') {
-          /* We need the old checksum here! */
-          strcpy(db_data->filedata.checksum, filedata->checksum);
-        } else if (db_write(mount_path, filedata->path,
-            db_data->filedata.metadata.size, db_data->filedata.checksum)) {
-          /* Write failed, need to go on */
-          failed = 1;
-          fprintf(stderr, "db: parse: %s: %s, ignoring\n",
-              strerror(errno), db_data->filedata.path);
+        db_data->host = malloc(strlen(host) + 1);
+        strcpy(db_data->host, host);
+        db_data->filedata.metadata = filedata->metadata;
+        db_data->filedata.path =
+          malloc(strlen(real_path) + strlen(filedata->path) + 1);
+        strcpy(db_data->filedata.path, real_path);
+        strcat(db_data->filedata.path, filedata->path);
+        db_data->link = NULL;
+        db_data->date_in = time(NULL);
+        db_data->date_out = 0;
+        /* Save new data */
+        if (S_ISREG(filedata->metadata.type)) {
+          if (filedata->checksum[0] != '\0') {
+            /* We need the old checksum here! */
+            strcpy(db_data->filedata.checksum, filedata->checksum);
+          } else if (db_write(mount_path, filedata->path,
+              db_data->filedata.metadata.size, db_data->filedata.checksum)) {
+            /* Write failed, need to go on */
+            failed = 1;
+            if (! terminating()) {
+              /* Don't signal errors on termination */
+              fprintf(stderr, "db: parse: %s: %s, ignoring\n",
+                  strerror(errno), db_data->filedata.path);
+            }
+            strcpy(db_data->filedata.checksum, "N");
+          }
+        } else {
           strcpy(db_data->filedata.checksum, "N");
         }
-      } else {
-        strcpy(db_data->filedata.checksum, "N");
-      }
-      if (S_ISLNK(filedata->metadata.type)) {
-        char full_path[FILENAME_MAX];
-        char string[FILENAME_MAX];
-        int size;
+        if (S_ISLNK(filedata->metadata.type)) {
+          char full_path[FILENAME_MAX];
+          char string[FILENAME_MAX];
+          int size;
 
-        strcpy(full_path, mount_path);
-        strcat(full_path, filedata->path);
-        if ((size = readlink(full_path, string, FILENAME_MAX)) < 0) {
-          failed = 1;
-          fprintf(stderr, "db: parse: %s: %s, ignoring\n",
-            strerror(errno), db_data->filedata.path);
-        } else {
-          db_data->link = malloc(size + 1);
-          strncpy(db_data->link, string, size);
-          db_data->link[size] = '\0';
+          strcpy(full_path, mount_path);
+          strcat(full_path, filedata->path);
+          if ((size = readlink(full_path, string, FILENAME_MAX)) < 0) {
+            failed = 1;
+            fprintf(stderr, "db: parse: %s: %s, ignoring\n",
+              strerror(errno), db_data->filedata.path);
+          } else {
+            db_data->link = malloc(size + 1);
+            strncpy(db_data->link, string, size);
+            db_data->link[size] = '\0';
+          }
+        }
+        list_add(db_list, db_data);
+        if ((list_size(added_files_list) & 0x3FF) == 0) {
+          if (verbosity() > 2) {
+            printf(" --> Files to left to add: %u\n",
+              list_size(added_files_list));
+          }
+          db_save("list", db_list);
         }
       }
-      list_add(db_list, db_data);
       /* This only unlists the data */
       list_remove(added_files_list, entry);
     }

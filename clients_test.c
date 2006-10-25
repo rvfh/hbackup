@@ -26,6 +26,10 @@ int verbosity(void) {
   return 2;
 }
 
+int terminating(void) {
+  return 0;
+}
+
 int main(void) {
   remove("test_db/list");
   if (clients_new()) {
