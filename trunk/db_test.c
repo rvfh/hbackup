@@ -224,6 +224,8 @@ int main(void) {
   list_show(db_list, NULL, db_data_show);
   filelist_free();
 
+  db_organize("test_db/data", 2);
+
   db_close();
 
   filters_free(filters_handle);

@@ -63,10 +63,17 @@ static int testdir(const char *path, int create) {
   return 0;
 }
 
-static int testfile(const char *path) {
+static int testfile(const char *path, int create) {
   FILE  *file;
 
   if ((file = fopen(path, "r")) == NULL) {
+    if (create) {
+      if ((file = fopen(path, "w")) == NULL) {
+        fprintf(stderr, "db: failed to create file: %s\n", path);
+        return 2;
+      }
+      fclose(file);
+    }
     return 1;
   }
   fclose(file);
@@ -165,7 +172,7 @@ static int getdir(const char *checksum, char *path) {
     /* If we can find a .nofiles file, then go down one more directory */
     strcpy(temp_path, dir_path);
     strcat(temp_path, ".nofiles");
-    if (! (status = testfile(temp_path))) {
+    if (! (status = testfile(temp_path, 0))) {
       strncat(dir_path, (char *) checksumpart, 2);
       strcat(dir_path, "/");
       checksumpart += 2;
@@ -358,6 +365,75 @@ static void db_data_get(const void *payload, char *string) {
   }
 }
 
+static int db_organize(char *path, int number) {
+  DIR           *directory;
+  struct dirent *dir_entry;
+  char          *nofiles = malloc(strlen(path) + strlen("/.nofiles") + 1);
+  int           failed   = 0;
+
+  /* Already organized? */
+  sprintf(nofiles, "%s/.nofiles", path);
+  if (! testfile(nofiles, 0)) {
+    free(nofiles);
+    return 0;
+  }
+  /* Find out how many entries */
+  if ((directory = opendir(path)) == NULL) {
+    free(nofiles);
+    return 1;
+  }
+  while (((dir_entry = readdir(directory)) != NULL) && (number > 0)) {
+    number--;
+  }
+  /* Decide what to do */
+  if (number == 0) {
+    if (verbosity() > 2) {
+      printf(" --> Reorganizing db in: '%s'\n", path);
+    }
+    rewinddir(directory);
+    while ((dir_entry = readdir(directory)) != NULL) {
+      metadata_t  metadata;
+      char        *source_path;
+
+      /* Ignore . and .. */
+      if (! strcmp(dir_entry->d_name, ".")
+       || ! strcmp(dir_entry->d_name, "..")) {
+        continue;
+      }
+      /* Add 2: '\0' and '/' */
+      source_path = malloc(strlen(path) + strlen(dir_entry->d_name) + 2);
+      sprintf(source_path, "%s/%s", path, dir_entry->d_name);
+      if (metadata_get(source_path, &metadata)) {
+        fprintf(stderr, "db: organize: cannot get metadata: %s\n", source_path);
+        failed = 2;
+      } else if (S_ISDIR(metadata.type) && (dir_entry->d_name[2] != '-')) {
+        /* Add 2: '\0' and '/' */
+        char *dest_path = malloc(strlen(source_path) + 2);
+
+        /* Create two-letter directory */
+        strcpy(dest_path, path);
+        strcat(dest_path, "/");
+        strncat(dest_path, dir_entry->d_name, 2);
+        testdir(dest_path, 1);
+        /* Create destination path */
+        strcat(dest_path, "/");
+        strcat(dest_path, &dir_entry->d_name[2]);
+        /* Move directory accross, changing its name */
+        if (rename(source_path, dest_path)) {
+          failed = 1;
+        }
+      }
+      free(source_path);
+    }
+    if (! failed) {
+      testfile(nofiles, 1);
+    }
+  }
+  closedir(directory);
+  free(nofiles);
+  return failed;
+}
+
 static int db_write(const char *mount_path, const char *path, size_t size, char *checksum) {
   char  temp_path[FILENAME_MAX];
   char  dest_path[FILENAME_MAX];
@@ -378,7 +454,7 @@ static int db_write(const char *mount_path, const char *path, size_t size, char 
 
   /* Get file final location (dest_path gets overwritten here by getdir) */
   if ((copy(dest_path, temp_path, temp_checksum) != size) || (getdir(temp_checksum, dest_path) == 2)) {
-    fprintf(stderr, "failed to copy or get dir for: %s\n", path);
+    fprintf(stderr, "db: write: failed to copy or get dir for: %s\n", path);
     failed = 1;
   }
 
@@ -396,7 +472,7 @@ static int db_write(const char *mount_path, const char *path, size_t size, char 
 
       strcpy(try_path, final_path);
       strcat(try_path, "data");
-      if (! testfile(try_path)) {
+      if (! testfile(try_path, 0)) {
         /* A file already exists, let's compare */
         metadata_t try_md;
         metadata_t temp_md;
@@ -447,7 +523,8 @@ static int db_write(const char *mount_path, const char *path, size_t size, char 
   /* Now move the file in its place */
   strcat(dest_path, "data");
   if (!failed && rename(temp_path, dest_path)) {
-    fprintf(stderr, "failed to move file %s to %s: %s\n", strerror(errno), temp_path, dest_path);
+    fprintf(stderr, "db: write: failed to move file %s to %s: %s\n",
+      strerror(errno), temp_path, dest_path);
     failed = 1;
   }
 
@@ -456,8 +533,20 @@ static int db_write(const char *mount_path, const char *path, size_t size, char 
     remove(temp_path);
   }
   if (failed) {
-    fprintf(stderr, "db: failed to backup contents for: %s\n", path);
     return 2;
+  } else {
+    /* dest_path is /path/to/checksum/data */
+    char *delim = strrchr(dest_path, '/');
+
+    if (delim != NULL) {
+      *delim = '\0';
+      /* Now dest_path is /path/to/checksum */
+      if ((delim = strrchr(dest_path, '/')) != NULL) {
+        *delim = '\0';
+        /* Now dest_path is /path/to */
+        db_organize(dest_path, 256);
+      }
+    }
   }
   return 0;
 }
@@ -496,9 +585,12 @@ int db_open(const char *path) {
         remove(temp_path);
       } else {
         fprintf(stderr, "db: open: lock taken by process with pid %d\n", pid);
+        return 2;
       }
+    } else {
+      fprintf(stderr, "db: open: lock taken by unidentified process!\n");
+      return 2;
     }
-    return 2;
   }
   if ((file = fopen(temp_path, "w")) != NULL) {
     /* Lock taken */
@@ -740,7 +832,7 @@ int db_scan(const char *checksum) {
     return 1;
   }
   strcat(path, "/data");
-  return testfile(path);
+  return testfile(path, 0);
 }
 
 int db_check(const char *checksum) {
@@ -750,7 +842,7 @@ int db_check(const char *checksum) {
     return 1;
   }
   strcat(path, "/data");
-  if (testfile(path)) {
+  if (testfile(path, 0)) {
     return 2;
   }
   return 3;
