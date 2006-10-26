@@ -10,6 +10,7 @@
 #include <signal.h>
 #include "params.h"
 #include "list.h"
+#include "tools.h"
 #include "filters.h"
 #include "parsers.h"
 #include "filelist.h"
@@ -52,7 +53,8 @@ void sighandler(int signal) {
 
 int main(int argc, char **argv) {
   char config_path[FILENAME_MAX] = "/etc/hbackup.conf";
-  char db_path[FILENAME_MAX] = "/hbackup";
+  char db_path[FILENAME_MAX]     = "/hbackup";
+  char *mount_path;
   FILE *config;
   int failed = 0;
   int expect_configpath = 0;
@@ -176,17 +178,29 @@ int main(int argc, char **argv) {
       fclose(config);
       free(buffer);
 
-      /* Open backup database */
-      if (db_open(db_path) == 2) {
-        fprintf(stderr, "Failed to open database in '%s'\n", db_path);
-        failed = 2;
-      } else {
-        /* Backup */
-        if (! failed && clients_backup()) {
-          fprintf(stderr, "Failed to backup\n");
-        }
+      if (! failed) {
+        /* Open backup database */
+        if (db_open(db_path) == 2) {
+          fprintf(stderr, "Failed to open database in '%s'\n", db_path);
+          failed = 2;
+        } else {
+          /* Make sure we have a mount path */
+          one_trailing_slash(db_path);
+          mount_path = malloc(strlen(db_path) + strlen("mount/") + 1);
+          sprintf(mount_path, "%s%s", db_path, "mount/");
+          if (testdir(mount_path, 1) == 2) {
+            fprintf(stderr, "Failed to create mount point\n");
+            failed = 2;
+          } else
 
-        db_close();
+          /* Backup */
+          if (clients_backup(mount_path)) {
+            fprintf(stderr, "Failed to backup\n");
+            failed = 1;
+          }
+
+          db_close();
+        }
       }
       clients_free();
     }
