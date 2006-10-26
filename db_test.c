@@ -178,16 +178,30 @@ int main(void) {
   list_show(db_list, NULL, db_data_show);
   filelist_free();
 
-  if ((status = db_scan("d41d8cd98f00b204e9800998ecf8427e-0"))) {
+  if ((status = db_scan("59ca0efa9f5633cb0371bbc0355478d8-0"))) {
     printf("db_scan error status %u\n", status);
-    if (status == 2) {
+    if (status) {
       return 0;
     }
   }
 
-/*  if ((status = db_check("d41d8cd98f00b204e9800998ecf8427e-0"))) {
+  if ((status = db_scan(NULL))) {
+    printf("db_scan (full) error status %u\n", status);
+    if (status) {
+      return 0;
+    }
+  }
+
+/*  if ((status = db_check("59ca0efa9f5633cb0371bbc0355478d8-0"))) {
     printf("db_check error status %u\n", status);
-    if (status == 2) {
+    if (status) {
+      return 0;
+    }
+  }
+
+  if ((status = db_check(NULL))) {
+    printf("db_check (full) error status %u\n", status);
+    if (status) {
       return 0;
     }
   }

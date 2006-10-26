@@ -1,5 +1,6 @@
 clients: backup: list file not found etc/doesnotexist
 clients: backup: keyword not implemented in list file etc/localhost.list, line 3
+mount: only root can do that
 clients: backup: could not mount smb share
 clients: backup: ssh protocol not supported
 clients: backup: keyword not implemented in list file etc/localhost.list, line 3

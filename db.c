@@ -827,24 +827,107 @@ int db_read(const char *path, const char *checksum) {
 }
 
 int db_scan(const char *checksum) {
-  char path[FILENAME_MAX];
+  if (checksum == NULL) {
+    list_entry_t entry = NULL;
+    int failed = 0;
+    int files = list_size(db_list);
 
-  if (getdir(checksum, path)) {
-    return 1;
+    if (verbosity() > 1) {
+      printf(" -> Scanning database list: %u file(s)\n", list_size(db_list));
+    }
+    while ((entry = list_next(db_list, entry)) != NULL) {
+      db_data_t *db_data = list_entry_payload(entry);
+
+      if ((verbosity() > 2) && ((files & 0x3FF) == 0)) {
+        printf(" --> Files left to go: %u\n", files);
+      }
+      files--;
+      if (db_scan(db_data->filedata.checksum)) {
+        failed = 1;
+        fprintf(stderr, "File data missing for checksum %s\n",
+          db_data->filedata.checksum);
+      }
+      if (terminating()) {
+        return 3;
+      }
+    }
+    return failed;
+  } else if (strcmp(checksum, "N")) {
+    char path[FILENAME_MAX];
+
+    if (getdir(checksum, path)) {
+      return 1;
+    }
+    strcat(path, "/data");
+    if (testfile(path, 0)) {
+      return 2;
+    }
   }
-  strcat(path, "/data");
-  return testfile(path, 0);
+  return 0;
 }
 
 int db_check(const char *checksum) {
-  char path[FILENAME_MAX];
+  if (checksum == NULL) {
+    list_entry_t entry = NULL;
+    int failed = 0;
+    int files = list_size(db_list);
 
-  if (getdir(checksum, path)) {
-    return 1;
+    if (verbosity() > 1) {
+      printf(" -> Checking database list: %u file(s)\n", list_size(db_list));
+    }
+    while ((entry = list_next(db_list, entry)) != NULL) {
+      db_data_t *db_data = list_entry_payload(entry);
+
+      if ((verbosity() > 2) && ((files & 0xFF) == 0)) {
+        printf(" --> Files left to go: %u\n", files);
+      }
+      files--;
+      switch (db_check(db_data->filedata.checksum)) {
+        case 1:
+          failed = 1;
+          fprintf(stderr, "File data missing for checksum %s\n",
+            db_data->filedata.checksum);
+          break;
+        case 2:
+          failed = 1;
+          fprintf(stderr, "File data corrupted for checksum %s\n",
+            db_data->filedata.checksum);
+          break;
+      }
+      if (terminating()) {
+        return 3;
+      }
+    }
+    return failed;
+  } else if (strcmp(checksum, "N")) {
+    char        path[FILENAME_MAX];
+    FILE        *readfile;
+    char        buffer[10240];
+    char        check[36];
+    EVP_MD_CTX  ctx;
+    size_t      rlength;
+
+    if (getdir(checksum, path)) {
+      return 1;
+    }
+    strcat(path, "/data");
+    /* Read file to compute checksum, compare with expected */
+    if ((readfile = fopen(path, "r")) == NULL) {
+      return 1;
+    }
+
+    EVP_DigestInit(&ctx, EVP_md5());
+    while (! feof(readfile) && ! terminating()) {
+      rlength = fread(buffer, 1, 10240, readfile);
+      EVP_DigestUpdate(&ctx, buffer, rlength);
+    }
+    fclose(readfile);
+    /* Re-use length */
+    EVP_DigestFinal(&ctx, (unsigned char *) check, &rlength);
+    md5sum(check, rlength);
+    if (strcmp(check, checksum)) {
+      return 2;
+    }
   }
-  strcat(path, "/data");
-  if (testfile(path, 0)) {
-    return 2;
-  }
-  return 3;
+  return 0;
 }

@@ -62,27 +62,34 @@ static char *mount_share(const char *mount_point, const client_t *client) {
       free(share);
     } else {
       /* No share mounted */
-      char *data;
-      int  data_length = 1;
+      char *command;
+      int  command_length = strlen("mount -t smbfs") + 1  /* Ending '\0' */
+                          + strlen(mount_point) + 1       /* Space before */
+                          + strlen(share) + 1;            /* Space before */
 
       if (client->username != NULL) {
-        data_length += strlen("username=") + strlen(client->username);
+        command_length += strlen(" -o username=") + strlen(client->username);
         if (client->password != NULL) {
-          data_length += strlen(",password=") + strlen(client->username);
+          command_length += strlen(",password=") + strlen(client->username);
         }
-      }
-      data = malloc(data_length);
-      if (client->username != NULL) {
-        sprintf(data, "username=%s", client->username);
-        if (client->password != NULL) {
-          strcat(data, ",password=");
-          strcat(data, client->username);
-        }
-      } else {
-        data[0] = '\0';
       }
 
-      if (mount(share, mount_point, "smbfs", MS_RDONLY, data)) {
+      command = malloc(command_length);
+      strcpy(command, "mount -t smbfs");
+      if (client->username != NULL) {
+        strcat(command, " -o username=");
+        strcat(command, client->username);
+        if (client->password != NULL) {
+          strcat(command, ",password=");
+          strcat(command, client->username);
+        }
+      }
+      strcat(command, " ");
+      strcat(command, share);
+      strcat(command, " ");
+      strcat(command, mount_point);
+
+      if (system(command)) {
         fprintf(stderr, "clients: backup: could not mount %s share\n",
           client->protocol);
         free(share);
@@ -90,7 +97,7 @@ static char *mount_share(const char *mount_point, const client_t *client) {
       } else {
         mounted = share;
       }
-      free(data);
+      free(command);
     }
     if (result == 0) {
       return &client->listfile[3];

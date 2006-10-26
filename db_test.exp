@@ -79,6 +79,7 @@ List 12 elements:
  'file://host' '/home/user2/testdir' d 0 1 1000 1000 0755 '' N 1 0 -
  'file://host' '/home/user2/testfile' f 15 1 1000 1000 0644 '' fcacc0dea4134dc0b9da49c1a9603196-0 1 0 -
  'file://host' '/home/user2/testlink' l 8 1 1000 1000 0777 'testfile' N 1 0 -
+ -> Scanning database list: 12 file(s)
  -> Saving database list: 12 file(s)
  -> Loading database list
 List 12 elements:
