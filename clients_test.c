@@ -39,7 +39,7 @@ int main(void) {
   list_show(clients, NULL, client_show);
   clients_add("file://localhost", "etc/doesnotexist");
   list_show(clients, NULL, client_show);
-  clients_backup();
+  clients_backup("test_db/mount");
   clients_free();
 
   if (clients_new()) {
@@ -54,7 +54,7 @@ int main(void) {
   clients_add("sSh://otherClient", "/home/backup/Backup.list");
   list_show(clients, NULL, client_show);
   db_open("test_db");
-  clients_backup();
+  clients_backup("test_db/mount");
   db_close();
   clients_free();
 
@@ -64,7 +64,7 @@ int main(void) {
   }
   clients_add("file://localhost", "etc/localhost.list");
   db_open("test_db");
-  clients_backup();
+  clients_backup("test_db/mount");
   db_close();
   clients_free();
 

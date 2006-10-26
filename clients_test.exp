@@ -1,7 +1,7 @@
 clients: backup: list file not found etc/doesnotexist
 clients: backup: keyword not implemented in list file etc/localhost.list, line 3
-clients: backup: unsupported protocol: smb, ignored
-clients: backup: unsupported protocol: ssh, ignored
+clients: backup: could not mount smb share
+clients: backup: ssh protocol not supported
 clients: backup: keyword not implemented in list file etc/localhost.list, line 3
 List 0 elements:
 List 1 elements:

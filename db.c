@@ -32,6 +32,7 @@
 #include <openssl/evp.h>
 #include "filelist.h"
 #include "list.h"
+#include "tools.h"
 #include "hbackup.h"
 #include "db.h"
 
@@ -49,37 +50,6 @@ static char   db_path[FILENAME_MAX];
 /* Current path being backed up */
 static char   backup_path[FILENAME_MAX] = "";
 static int    backup_path_length = 0;
-
-static int testdir(const char *path, int create) {
-  DIR  *directory;
-
-  if ((directory = opendir(path)) == NULL) {
-    if (create && mkdir(path, 0777)) {
-      fprintf(stderr, "db: failed to create directory: %s\n", path);
-      return 2;
-    }
-    return 1;
-  }
-  closedir(directory);
-  return 0;
-}
-
-static int testfile(const char *path, int create) {
-  FILE  *file;
-
-  if ((file = fopen(path, "r")) == NULL) {
-    if (create) {
-      if ((file = fopen(path, "w")) == NULL) {
-        fprintf(stderr, "db: failed to create file: %s\n", path);
-        return 2;
-      }
-      fclose(file);
-    }
-    return 1;
-  }
-  fclose(file);
-  return 0;
-}
 
 static char type_letter(mode_t mode) {
   if (S_ISREG(mode))  return 'f';
@@ -589,7 +559,8 @@ int db_open(const char *path) {
     fclose(file);
     if (pid != 0) {
       /* Find out whether process is still running, if not, reset lock */
-      if (kill(pid, 0) == 0) {
+      kill(pid, 0);
+      if (errno == ESRCH) {
         fprintf(stderr, "db: open: lock reset\n");
         remove(temp_path);
       } else {

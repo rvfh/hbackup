@@ -11,6 +11,7 @@ install: hbackup
 test:	setup \
 	params_test.dif \
 	list_test.dif \
+	tools_test.dif \
 	metadata_test.dif \
 	filters_test.dif \
 	parsers_test.dif \
@@ -32,17 +33,18 @@ setup:
 metadata_test: metadata.a
 params_test: params.a
 list_test: list.a
+tools_test: tools.a
 filters_test: filters.a list.a
 parsers_test: parsers.a list.a
 cvs_parser_test: cvs_parser.a parsers.a list.a
 filelist_test: filelist.a cvs_parser.a parsers.a filters.a list.a metadata.a \
 	params.a
 db_test: db.a filelist.a cvs_parser.a parsers.a filters.a list.a metadata.a \
-	params.a
+	params.a tools.a
 clients_test: clients.a db.a filelist.a cvs_parser.a parsers.a filters.a list.a \
-	metadata.a params.a
+	metadata.a params.a tools.a
 hbackup: clients.a db.a filelist.a cvs_parser.a parsers.a filters.a list.a \
-	metadata.a params.a
+	metadata.a params.a tools.a
 
 metadata.a: metadata.h
 list.a: list.h

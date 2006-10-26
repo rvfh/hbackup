@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/mount.h>
 #include "params.h"
 #include "list.h"
 #include "filters.h"
@@ -32,7 +33,74 @@ typedef struct {
   list_t  parsers_handle;
 } backup_t;
 
-static list_t clients = NULL;
+static list_t clients  = NULL;
+static char   *mounted = NULL;
+
+static int unmount_share(const char *mount_point) {
+  if (mounted != NULL) {
+    free(mounted);
+    mounted = NULL;
+    return umount(mount_point);
+  }
+  return 0;
+}
+
+static char *mount_share(const char *mount_point, const client_t *client) {
+  int result = 0;
+
+  if (! strcmp(client->protocol, "smb")) {
+    /* Mount SaMBa share (//hostname/?$) */
+    char *share = malloc(strlen(client->hostname) + 6);
+
+    sprintf(share, "//%s/%c$", client->hostname, client->listfile[0]);
+    if ((mounted != NULL) && strcmp(mounted, share)) {
+      /* Different share mounted: unmount */
+      unmount_share(mount_point);
+    }
+    if (mounted != NULL) {
+      /* Same share mounted */
+      free(share);
+    } else {
+      /* No share mounted */
+      char *data;
+      int  data_length = 1;
+
+      if (client->username != NULL) {
+        data_length += strlen("username=") + strlen(client->username);
+        if (client->password != NULL) {
+          data_length += strlen(",password=") + strlen(client->username);
+        }
+      }
+      data = malloc(data_length);
+      if (client->username != NULL) {
+        sprintf(data, "username=%s", client->username);
+        if (client->password != NULL) {
+          strcat(data, ",password=");
+          strcat(data, client->username);
+        }
+      } else {
+        data[0] = '\0';
+      }
+
+      if (mount(share, mount_point, "smbfs", MS_RDONLY, data)) {
+        fprintf(stderr, "clients: backup: could not mount %s share\n",
+          client->protocol);
+        free(share);
+        result = 1;
+      } else {
+        mounted = share;
+      }
+      free(data);
+    }
+    if (result == 0) {
+      return &client->listfile[3];
+    }
+  } else {
+    fprintf(stderr, "clients: backup: %s protocol not supported\n",
+      client->protocol);
+  }
+  return NULL;
+}
 
 int clients_new(void) {
   /* Create new list */
@@ -146,7 +214,7 @@ static int add_filter(list_t handle, const char *type, const char *string) {
   return 0;
 }
 
-int clients_backup(void) {
+int clients_backup(const char *mount_point) {
   list_entry_t *entry = NULL;
   int failed = 0;
 
@@ -165,10 +233,7 @@ int clients_backup(void) {
     if (! strcmp(client->protocol, "file")) {
       /* Nothing to mount, file name is whatever was given */
       listfilename = client->listfile;
-    } else {
-      /* TODO mount share */
-      fprintf(stderr, "clients: backup: unsupported protocol: %s, ignored\n",
-        client->protocol);
+    } else if ((listfilename = mount_share(mount_point, client)) == NULL) {
       failed = 1;
       continue;
     }
@@ -297,6 +362,6 @@ int clients_backup(void) {
     /* Free backups list */
     list_free(backups);
   }
-
+  unmount_share(mount_point);
   return failed;
 }
