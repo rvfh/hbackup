@@ -2,11 +2,14 @@ AR := ar
 RANLIB := ranlib
 CFLAGS := -Wall -O2 -ansi -pedantic
 LDFLAGS := -lssl
+PREFIX := /usr/local/bin
 
-all: hbackup
+all: test hbackup
 
 install: hbackup
-	strip $^
+	@strip $^
+	@mkdir -p ${PREFIX}
+	@cp $^ ${PREFIX}
 
 test:	setup \
 	params_test.dif \

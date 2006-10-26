@@ -32,10 +32,12 @@ static void show_version(void) {
 static void show_help(void) {
   show_version();
   printf("Options are:\n");
-  printf(" -h or --help to print this help and exit\n");
-  printf(" -v or --version to print version and exit\n");
-  printf(" -c or --config to specify a configuration file other than \
+  printf(" -h or --help     to print this help and exit\n");
+  printf(" -v or --version  to print version and exit\n");
+  printf(" -c or --config   to specify a configuration file other than \
 /etc/hbackup.conf\n");
+  printf(" -s or --scan     to scan the database for missing data\n");
+  printf(" -t or --check    to check the database for corrupted data\n");
 }
 
 int verbosity(void) {
@@ -58,6 +60,9 @@ int main(int argc, char **argv) {
   FILE *config;
   int failed = 0;
   int expect_configpath = 0;
+  int argn = 0;
+  int check = 0;
+  int scan = 0;
   struct sigaction action;
 
   /* Set signal catcher */
@@ -69,39 +74,45 @@ int main(int argc, char **argv) {
   sigaction (SIGTERM, &action, NULL);
 
   /* Analyse arguments */
-  if (argc > 1) {
+  while (++argn < argc) {
     char letter = ' ';
 
+    /* Get config path if request */
+    if (expect_configpath) {
+      strcpy(config_path, argv[argn]);
+      expect_configpath = 0;
+    }
+
     /* -* */
-    if (argv[1][0] == '-') {
+    if (argv[argn][0] == '-') {
       /* --* */
-      if (argv[1][1] == '-') {
-        if (! strcmp(&argv[1][2], "config")) {
+      if (argv[argn][1] == '-') {
+        if (! strcmp(&argv[argn][2], "config")) {
           letter = 'c';
-        } else if (! strcmp(&argv[1][2], "help")) {
+        } else if (! strcmp(&argv[argn][2], "help")) {
           letter = 'h';
-        } else if (! strcmp(&argv[1][2], "verbose")) {
+        } else if (! strcmp(&argv[argn][2], "verbose")) {
           letter = 'v';
-        } else if (! strcmp(&argv[1][2], "version")) {
+        } else if (! strcmp(&argv[argn][2], "version")) {
           letter = 'V';
         }
-      } else if (argv[1][1] == 'v') {
-        letter = argv[1][1];
-        if (argv[1][2] == 'v') {
+      } else if (argv[argn][1] == 'v') {
+        letter = argv[argn][1];
+        if (argv[argn][2] == 'v') {
           verbose++;
-          if (argv[1][3] == 'v') {
+          if (argv[argn][3] == 'v') {
             verbose++;
-            if (argv[1][4] != '\0') {
+            if (argv[argn][4] != '\0') {
               letter = ' ';
             }
-          } else if (argv[1][3] != '\0') {
+          } else if (argv[argn][3] != '\0') {
             letter = ' ';
           }
-        } else if (argv[1][2] != '\0') {
+        } else if (argv[argn][2] != '\0') {
           letter = ' ';
         }
-      } else if (argv[1][2] == '\0') {
-        letter = argv[1][1];
+      } else if (argv[argn][2] == '\0') {
+        letter = argv[argn][1];
       }
 
       switch (letter) {
@@ -111,6 +122,12 @@ int main(int argc, char **argv) {
         case 'h':
           show_help();
           return 0;
+        case 's':
+          scan = 1;
+          break;
+        case 't':
+          check = 1;
+          break;
         case 'v':
           verbose++;
           break;
@@ -122,15 +139,11 @@ int main(int argc, char **argv) {
           return 2;
       }
     }
+  }
 
-    /* Get config path */
-    if (expect_configpath) {
-      if (argc < 3) {
-        fprintf(stderr, "Need a config path after %s\n", argv[1]);
-        return 2;
-      }
-      strcpy(config_path, argv[2]);
-    }
+  if (expect_configpath) {
+    fprintf(stderr, "Missing config path\n");
+    return 2;
   }
 
   if (verbosity() > 2) {
@@ -184,19 +197,25 @@ int main(int argc, char **argv) {
           fprintf(stderr, "Failed to open database in '%s'\n", db_path);
           failed = 2;
         } else {
-          /* Make sure we have a mount path */
-          one_trailing_slash(db_path);
-          mount_path = malloc(strlen(db_path) + strlen("mount/") + 1);
-          sprintf(mount_path, "%s%s", db_path, "mount/");
-          if (testdir(mount_path, 1) == 2) {
-            fprintf(stderr, "Failed to create mount point\n");
-            failed = 2;
-          } else
+          if (check) {
+            db_check(NULL);
+          } else if (scan) {
+            db_scan(NULL);
+          } else {
+            /* Make sure we have a mount path */
+            one_trailing_slash(db_path);
+            mount_path = malloc(strlen(db_path) + strlen("mount/") + 1);
+            sprintf(mount_path, "%s%s", db_path, "mount/");
+            if (testdir(mount_path, 1) == 2) {
+              fprintf(stderr, "Failed to create mount point\n");
+              failed = 2;
+            } else
 
-          /* Backup */
-          if (clients_backup(mount_path)) {
-            fprintf(stderr, "Failed to backup\n");
-            failed = 1;
+            /* Backup */
+            if (clients_backup(mount_path)) {
+              fprintf(stderr, "Failed to backup\n");
+              failed = 1;
+            }
           }
 
           db_close();
