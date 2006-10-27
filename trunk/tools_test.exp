@@ -1,0 +1,9 @@
+Check slashes to '/this/is/a/line': '/this/is/a/line/'
+Check slashes to '/this/is/a/line/': '/this/is/a/line/'
+Check slashes to '/this/is/a/line/////////////': '/this/is/a/line/'
+Converting 'This is a text which I like' to lower case
+-> gives 'this is a text which i like'
+Converting 'C:\Program Files\HBackup\hbackup.EXE' to linux style
+-> gives 'C$/Program Files/HBackup/hbackup.EXE'
+Then to lower case
+-> gives 'c$/program files/hbackup/hbackup.exe'

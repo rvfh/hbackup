@@ -1,15 +1,6 @@
-Check slashes to '/this/is/a/line': '/this/is/a/line/'
-Check slashes to '/this/is/a/line/': '/this/is/a/line/'
-Check slashes to '/this/is/a/line/////////////': '/this/is/a/line/'
 Read 0 parameters from : '' '' ''
 Read 0 parameters from # Normal comment: '' '' ''
 Read 0 parameters from  	# Displaced comment: '' '' ''
 Read 1 parameters from 	key # Comment: 'key' '' ''
 Read 2 parameters from key	 "string" # Comment: 'key' '' 'string'
 Read 3 parameters from key 	type	 "string" # Comment: 'key' 'type' 'string'
-Converting 'This is a text which I like' to lower case
--> gives 'this is a text which i like'
-Converting 'C:\Program Files\HBackup\hbackup.EXE' to linux style
--> gives 'C$/Program Files/HBackup/hbackup.EXE'
-Then to lower case
--> gives 'c$/program files/hbackup/hbackup.exe'

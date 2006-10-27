@@ -7,7 +7,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
 #include "params.h"
 
 static void remove_starting_blanks(char **string) {
@@ -38,38 +37,6 @@ static char *find_blank(const char *string) {
     return space;
   } else {
     return tab;
-  }
-}
-
-void one_trailing_slash(char *string) {
-  char *last = &string[strlen(string) - 1];
-
-  while ((last >= string) && (*last == '/')) {
-    *last-- = '\0';
-  }
-  *++last = '/';
-  *++last = '\0';
-}
-
-void strtolower(char *string) {
-  char *letter = string;
-  while (*letter != '\0') {
-    *letter = tolower(*letter);
-    letter++;
-  }
-}
-
-void pathtolinux(char *path) {
-  char *letter = path;
-
-  if (path[1] == ':') {
-    path[1] = '$';
-  }
-  while (*letter != '\0') {
-    if (*letter == '\\') {
-      *letter = '/';
-    }
-    letter++;
   }
 }
 
