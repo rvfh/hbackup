@@ -277,6 +277,9 @@ static int db_load(const char *filename, list_t list) {
       }
     }
     fclose(readfile);
+    if (verbosity() > 2) {
+      printf(" --> Loaded %u files\n", list_size(list));
+    }
     return 0;
   }
   return 1;
@@ -676,6 +679,7 @@ int db_parse(const char *host, const char *real_path,
 
   /* Compare list with db list for matching host */
   strcpy(backup_path, real_path);
+  one_trailing_slash(backup_path);
   backup_path_length = strlen(backup_path);
   list_compare(db_list, file_list, &added_files_list, &removed_files_list,
     parse_compare);
@@ -697,8 +701,8 @@ int db_parse(const char *host, const char *real_path,
         strcpy(db_data->host, host);
         db_data->filedata.metadata = filedata->metadata;
         db_data->filedata.path =
-          malloc(strlen(real_path) + strlen(filedata->path) + 1);
-        strcpy(db_data->filedata.path, real_path);
+          malloc(backup_path_length + strlen(filedata->path) + 1);
+        strcpy(db_data->filedata.path, backup_path);
         strcat(db_data->filedata.path, filedata->path);
         db_data->link = NULL;
         db_data->date_in = time(NULL);
@@ -744,6 +748,7 @@ int db_parse(const char *host, const char *real_path,
          || ((volume += db_data->filedata.metadata.size) >= 10000000)) {
           copied = 0;
           volume = 0;
+          db_save("list", db_list);
           if (verbosity() > 2) {
             printf(" --> Files left to add: %u\n",
               list_size(added_files_list));

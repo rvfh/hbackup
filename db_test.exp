@@ -41,6 +41,7 @@ List 9 elements:
  'file://host' '/home/user/testlink' l 8 1 1000 1000 0777 'testfile' N 1 0 -
  -> Saving database list: 9 file(s)
  -> Loading database list
+ --> Loaded 9 files
 List 9 elements:
  'file://host' '/home/user/cvs' d 0 1 1000 1000 0755 '' N 1 0 -
  'file://host' '/home/user/cvs/dirbad' d 0 1 1000 1000 0755 '' N 1 0 -
@@ -82,6 +83,7 @@ List 12 elements:
  -> Scanning database list: 12 file(s)
  -> Saving database list: 12 file(s)
  -> Loading database list
+ --> Loaded 12 files
 List 12 elements:
  'file://host' '/home/user/cvs' d 0 1 1000 1000 0755 '' N 1 0 -
  'file://host' '/home/user/cvs/dirbad' d 0 1 1000 1000 0755 '' N 1 0 -

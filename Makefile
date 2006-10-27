@@ -41,7 +41,7 @@ filters_test: filters.a list.a
 parsers_test: parsers.a list.a
 cvs_parser_test: cvs_parser.a parsers.a list.a
 filelist_test: filelist.a cvs_parser.a parsers.a filters.a list.a metadata.a \
-	params.a
+	params.a tools.a
 db_test: db.a filelist.a cvs_parser.a parsers.a filters.a list.a metadata.a \
 	params.a tools.a
 clients_test: clients.a db.a filelist.a cvs_parser.a parsers.a filters.a list.a \

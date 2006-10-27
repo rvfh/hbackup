@@ -8,7 +8,41 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <dirent.h>
+#include <string.h>
+#include <ctype.h>
 #include "tools.h"
+
+void one_trailing_slash(char *string) {
+  char *last = &string[strlen(string) - 1];
+
+  while ((last >= string) && (*last == '/')) {
+    *last-- = '\0';
+  }
+  *++last = '/';
+  *++last = '\0';
+}
+
+void strtolower(char *string) {
+  char *letter = string;
+  while (*letter != '\0') {
+    *letter = tolower(*letter);
+    letter++;
+  }
+}
+
+void pathtolinux(char *path) {
+  char *letter = path;
+
+  if (path[1] == ':') {
+    path[1] = '$';
+  }
+  while (*letter != '\0') {
+    if (*letter == '\\') {
+      *letter = '/';
+    }
+    letter++;
+  }
+}
 
 int testdir(const char *path, int create) {
   DIR  *directory;
