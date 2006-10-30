@@ -3,14 +3,15 @@
 20061008 Creation
 */
 
+#define _GNU_SOURCE
 #include <stdio.h>
 #include "filters.c"
 
 /* Use payload as argument name, cast once and for all */
-static void filters_show(const void *payload, char *string) {
+static void filters_show(const void *payload, char **string_p) {
   const filter_t *filter = payload;
 
-  sprintf(string, "%s %u", filter->string, filter->type);
+  asprintf(string_p, "%s %u", filter->string, filter->type);
 }
 
 int main(void) {

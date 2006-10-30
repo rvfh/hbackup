@@ -3,6 +3,7 @@
 20061003 Creation
 */
 
+#define _GNU_SOURCE
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -17,15 +18,15 @@ typedef struct {
   char filename[256];
 } payload2_t;
 
-static void payload_get(const void *payload_p, char *string) {
+static void payload_get(const void *payload_p, char **string_p) {
   const payload_t *payload = payload_p;
-  sprintf(string, "%s", payload->name);
+  asprintf(string_p, "%s", payload->name);
 }
 
-static void payload2_get(const void *payload_p, char *string) {
+static void payload2_get(const void *payload_p, char **string_p) {
   const payload2_t  *payload = payload_p;
 
-  sprintf(string, "%s/%s", payload->dir, payload->filename);
+  asprintf(string_p, "%s/%s", payload->dir, payload->filename);
 }
 
 static int payloads_compare(void *payload_left, void *payload_right) {
@@ -51,14 +52,14 @@ static payload2_t *list2_test_new(payload2_t payload2) {
 }
 
 int main() {
-  list_entry_t *entry = NULL;
-  payload_t payload;
-  payload2_t payload2;
-  list_t list = list_new(payload_get);
-  list_t list2 = list_new(payload2_get);
-  list_t added = NULL;
-  list_t missing = NULL;
-  char   string[FILENAME_MAX];
+  list_entry_t *entry  = NULL;
+  payload_t    payload;
+  payload2_t   payload2;
+  list_t       list    = list_new(payload_get);
+  list_t       list2   = list_new(payload2_get);
+  list_t       added   = NULL;
+  list_t       missing = NULL;
+  char         *string = NULL;
 
   printf("Fill in list\n");
   strcpy(payload.name, "test");
@@ -69,10 +70,11 @@ int main() {
   list_add(list, list_test_new(payload));
   list_show(list, NULL, payload_get);
   list_find(list, "test", NULL, &entry);
-  payload_get(list_entry_payload(entry), string);
+  payload_get(list_entry_payload(entry), &string);
   if (strcmp(string, "test")) {
     printf("test not found???\n");
   }
+  free(string);
 
   strcpy(payload.name, "test/subdir/testfile1");
   list_add(list, list_test_new(payload));

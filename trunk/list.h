@@ -7,9 +7,9 @@
 #define LIST_H
 
 /* Type for function to convert payload into usable data
- * string can be at most FILENAME_MAX long
+ * *string_p must be allocated by the function, but is freed by this module
  */
-typedef void (list_payload_get_f) (const void *payload, char *string);
+typedef void (list_payload_get_f) (const void *payload, char **string_p);
 
 /* Type for function to compare payloads from two lists
  * Return codes:

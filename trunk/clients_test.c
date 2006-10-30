@@ -5,21 +5,28 @@
 
 #include "clients.c"
 
-static void client_show(const void *payload, char *string) {
-  const client_t *client_t = payload;
+static void client_show(const void *payload, char **string_p) {
+  const client_t *client_t     = payload;
+  char           *credentials  = NULL;
+  /* No to warn about null string */
+  char           null_string[] = "";
 
-  sprintf(string, "%s://", client_t->protocol);
   if (client_t->username != NULL) {
-    strcat(string, client_t->username);
+    char *password = NULL;
+
     if (client_t->password != NULL) {
-      strcat(string, ":");
-      strcat(string, client_t->password);
+      asprintf(&password, ":%s", client_t->password);
+    } else {
+      asprintf(&password, null_string);
     }
-    strcat(string, "@");
+    asprintf(&credentials, "%s%s@", client_t->username, password);
+    free(password);
+  } else {
+    asprintf(&credentials, null_string);
   }
-  strcat(string, client_t->hostname);
-  strcat(string, " ");
-  strcat(string, client_t->listfile);
+  asprintf(string_p, "%s://%s%s %s", client_t->protocol, credentials,
+    client_t->hostname, client_t->listfile);
+  free(credentials);
 }
 
 int verbosity(void) {

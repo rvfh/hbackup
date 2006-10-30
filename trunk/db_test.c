@@ -3,13 +3,7 @@
 20061009 Creation
 */
 
-#define _GNU_SOURCE
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include "list.h"
 #include "filters.h"
-#include "filelist.h"
 #include "cvs_parser.h"
 /* Yes, include C file */
 #include "db.c"
@@ -17,11 +11,11 @@
 /* List of files */
 static int verbose = 3;
 
-static void file_data_show(const void *payload, char *string) {
-  strcpy(string, ((filedata_t *) payload)->path);
+static void file_data_show(const void *payload, char **string_p) {
+  asprintf(string_p, ((filedata_t *) payload)->path);
 }
 
-static void db_data_show(const void *payload, char *string) {
+static void db_data_show(const void *payload, char **string_p) {
   const db_data_t *db_data = payload;
   char  *link = "";
 
@@ -29,7 +23,7 @@ static void db_data_show(const void *payload, char *string) {
     link = db_data->link;
   }
   /* Times are omitted here... */
-  sprintf(string, "'%s' '%s' %c %ld %d %u %u 0%o '%s' %s %d %d %c",
+  asprintf(string_p, "'%s' '%s' %c %ld %d %u %u 0%o '%s' %s %d %d %c",
     db_data->host, db_data->filedata.path,
     type_letter(db_data->filedata.metadata.type),
     db_data->filedata.metadata.size,

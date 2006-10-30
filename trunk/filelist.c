@@ -18,6 +18,7 @@ Algorithm for temporary list creation:
      no: add to temporary list of files to be backed up
 */
 
+#define _GNU_SOURCE
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -39,10 +40,10 @@ static list_t files = NULL;
 static void *filters_handle = NULL;
 static void *parsers_handle = NULL;
 
-static void filedata_get(const void *payload, char *string) {
+static void filedata_get(const void *payload, char **string_p) {
   const filedata_t *filedata = payload;
 
-  sprintf(string, "%s", filedata->path);
+  asprintf(string_p, filedata->path);
 }
 
 static int iterate_directory(const char *path, parser_t *parser) {
