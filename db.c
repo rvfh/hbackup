@@ -329,16 +329,16 @@ static int db_save(const char *filename, list_t list) {
   return failed;
 }
 
-static void db_data_get(const void *payload, char *string) {
+static void db_data_get(const void *payload, char **string_p) {
   const db_data_t *db_data = payload;
-  time_t          date_out = db_data->date_out;
 
-  if (date_out == 0) {
+  if (db_data->date_out == 0) {
     /* '@' > '9' */
-    sprintf(string, "%s %s %c", db_data->host, db_data->filedata.path, '@');
+    asprintf(string_p, "%s %s %c", db_data->host, db_data->filedata.path, '@');
   } else {
     /* ' ' > '0' */
-    sprintf(string, "%s %s %11ld", db_data->host, db_data->filedata.path, date_out);
+    asprintf(string_p, "%s %s %11ld", db_data->host, db_data->filedata.path,
+      db_data->date_out);
   }
 }
 

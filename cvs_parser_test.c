@@ -6,9 +6,9 @@
 /* Yes, include C file */
 #include "cvs_parser.c"
 
-static void cvs_show(const void *payload, char *string) {
+static void cvs_show(const void *payload, char **string_p) {
 /*  sprintf(string, "%s 0x%08x %s", ((cvs_entry_t *) payload_p)->path, ((cvs_entry_t *) payload_p)->type, ((cvs_entry_t *) payload_p)->mtime);*/
-  sprintf(string, "%s", ((cvs_entry_t *) payload)->name);
+  asprintf(string_p, "%s", ((cvs_entry_t *) payload)->name);
 }
 
 int main(void) {
