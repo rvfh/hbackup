@@ -133,59 +133,56 @@ static size_t copy(const char *source_path, const char *dest_path, char *checksu
 
 static int getdir(const char *checksum, char *path) {
   const char  *checksumpart = checksum;
-  char        dir_path[FILENAME_MAX];
+  char        *dir_path;
   int         status;
+  int         failed = 0;
 
-  strcpy(dir_path, db_path);
-  strcat(dir_path, "data/");
+  asprintf(&dir_path, "%sdata/", db_path);
   /* Two cases: either there are files, or a .nofiles file and directories */
   do {
-    char temp_path[FILENAME_MAX];
+    char *temp_path;
 
     /* If we can find a .nofiles file, then go down one more directory */
-    strcpy(temp_path, dir_path);
-    strcat(temp_path, ".nofiles");
+    asprintf(&temp_path, "%s.nofiles", dir_path);
     if (! (status = testfile(temp_path, 0))) {
       strncat(dir_path, (char *) checksumpart, 2);
       strcat(dir_path, "/");
       checksumpart += 2;
     }
+    free(temp_path);
   } while (! status);
   /* Return path */
   strcpy(path, dir_path);
   strcat(path, (char *) checksumpart);
   if (testdir(dir_path, 1)) {
-    return 1;
+    failed = 1;
   }
-  return 0;
+  free(dir_path);
+  return failed;
 }
 
 static int db_load(const char *filename, list_t list) {
-  char source_path[FILENAME_MAX];
+  char *source_path;
   FILE *readfile;
+  int  failed = 0;
 
-  strcpy(source_path, db_path);
-  strcat(source_path, filename);
+  asprintf(&source_path, "%s%s", db_path, filename);
   if ((readfile = fopen(source_path, "r")) != NULL) {
     /* Read the file into memory */
-    char *buffer = malloc(FILENAME_MAX);
-    size_t size;
+    char *buffer = NULL;
+    size_t size  = 0;
 
-    if (verbosity() > 1) {
-      printf(" -> Loading database list\n");
-    }
     while (getline(&buffer, &size, readfile) >= 0) {
       db_data_t db_data;
       db_data_t *db_data_p = NULL;
       char      *start = buffer;
       char      *delim;
+      char      *string = malloc(size);
       char      letter;
       int       field = 0;
       int       failed = 1;
 
       while ((delim = strchr(start, '\t')) != NULL) {
-        char string[FILENAME_MAX];
-
         /* Get string portion */
         strncpy(string, start, delim - start);
         string[delim - start] = '\0';
@@ -267,6 +264,7 @@ static int db_load(const char *filename, list_t list) {
           break;
         }
       }
+      free(string);
       if (failed) {
         fprintf(stderr, "db: failed to read list file: wrong format (%d)\n",
           field);
@@ -276,30 +274,25 @@ static int db_load(const char *filename, list_t list) {
         list_add(db_list, db_data_p);
       }
     }
+    free(buffer);
     fclose(readfile);
-    if (verbosity() > 2) {
-      printf(" --> Loaded %u files\n", list_size(list));
-    }
-    return 0;
+  } else {
+    failed = 1;
   }
-  return 1;
+  free(source_path);
+  return failed;
 }
 
 static int db_save(const char *filename, list_t list) {
-  char temp_path[FILENAME_MAX];
-  char dest_path[FILENAME_MAX];
+  char *temp_path;
   FILE *writefile;
+  int  failed = 0;
 
-  strcpy(dest_path, db_path);
-  strcat(dest_path, filename);
-  strcpy(temp_path, dest_path);
-  strcat(temp_path, ".part");
+  asprintf(&temp_path, "%s%s.part", db_path, filename);
   if ((writefile = fopen(temp_path, "w")) != NULL) {
+    char *dest_path = NULL;
     list_entry_t entry = NULL;
 
-    if (verbosity() > 1) {
-      printf(" -> Saving database list: %u file(s)\n", list_size(list));
-    }
     while ((entry = list_next(list, entry)) != NULL) {
       db_data_t *db_data = list_entry_payload(entry);
       char *link = "";
@@ -320,12 +313,15 @@ static int db_save(const char *filename, list_t list) {
     fclose(writefile);
 
     /* All done */
-    if (! rename(temp_path, dest_path)) {
-      return 0;
-    }
+    asprintf(&dest_path, "%s%s", db_path, filename);
+    failed = rename(temp_path, dest_path);
+    free(dest_path);
+  } else {
+    fprintf(stderr, "db: failed to write list file: %s\n", filename);
+    failed = 2;
   }
-  fprintf(stderr, "db: failed to write list file: %s\n", filename);
-  return 2;
+  free(temp_path);
+  return failed;
 }
 
 static void db_data_get(const void *payload, char *string) {
@@ -539,7 +535,6 @@ static int db_write(const char *mount_path, const char *path, size_t size, char 
 int db_open(const char *path) {
   char temp_path[FILENAME_MAX];
   FILE *file;
-  int status = 0;
 
   strcpy(db_path, path);
   strcat(db_path, "/");
@@ -587,12 +582,22 @@ int db_open(const char *path) {
 
   /* Read database list */
   db_list = list_new(db_data_get);
-  status = db_load("list", db_list);
-  if (status == 2) {
-    remove(temp_path);
-    return 2;
+  switch (db_load("list", db_list)) {
+    case 0:
+      if (verbosity() > 1) {
+        printf(" -> Loaded database list: %u file(s)\n", list_size(db_list));
+      }
+      break;
+    case 1:
+      if (verbosity() > 1) {
+        printf(" -> Initialized database list\n");
+      }
+      break;
+    case 2:
+      remove(temp_path);
+      return 2;
   }
-  return status;
+  return 0;
 }
 
 static void db_list_free(list_t list) {
@@ -609,16 +614,30 @@ static void db_list_free(list_t list) {
 }
 
 void db_close(void) {
-  char temp_path[FILENAME_MAX];
+  char      *temp_path  = NULL;
+  time_t    gmt;
+  struct tm gmt_brokendown;
 
-  /* Save list */
+  /* Save list for month day */
+  if (verbosity() > 1) {
+    printf(" -> Saving database list: %u file(s)\n", list_size(db_list));
+  }
+  if ((time(&gmt) != -1) && (gmtime_r(&gmt, &gmt_brokendown) != NULL)) {
+    char *daily_list = NULL;
+
+    asprintf(&daily_list, "list_%2u", gmt_brokendown.tm_mday);
+    db_save(daily_list, db_list);
+    free(daily_list);
+  }
+
+  /* Save list as main */
   db_save("list", db_list);
   db_list_free(db_list);
 
   /* Release lock */
-  strcpy(temp_path, db_path);
-  strcat(temp_path, "lock");
+  asprintf(&temp_path, "%slock", db_path);
   remove(temp_path);
+  free(temp_path);
 }
 
 /* Need to compare only for matching paths */
@@ -748,11 +767,13 @@ int db_parse(const char *host, const char *real_path,
          || ((volume += db_data->filedata.metadata.size) >= 10000000)) {
           copied = 0;
           volume = 0;
-          db_save("list", db_list);
           if (verbosity() > 2) {
             printf(" --> Files left to add: %u\n",
               list_size(added_files_list));
+            printf(" --> Saving database list: %u file(s)\n",
+              list_size(db_list));
           }
+          db_save("list", db_list);
         }
       }
       /* This only unlists the data */
