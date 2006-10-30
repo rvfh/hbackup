@@ -32,6 +32,9 @@ mkdir "$TESTDIR/subdir"
 echo "Hello Moon!" > "$TESTDIR/subdir/testfile"
 touch "$TESTDIR/subdir/testfile1"
 echo "Hello Moon!" > "$TESTDIR/subdir/testfile2"
+touch "$TESTDIR/test space"
+mkdir "$TESTDIR/dir space"
+touch "$TESTDIR/dir space/file space"
 
 # CVS test
 CVSDIR="$TESTDIR/cvs"

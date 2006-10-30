@@ -16,124 +16,151 @@ FIFO   : 0010000
 Link   : 0120000
 Socket : 0140000
 Unknown: 0000000
-List 9 elements:
+List 12 elements:
  cvs
  cvs/dirbad
  cvs/dirutd
  cvs/dirutd/fileutd
  cvs/filenew.c
  cvs/fileutd.h
+ dir space
+ dir space/file space
+ test space
  testdir
  testfile
  testlink
  -> Initialized database list
 59ca0efa9f5633cb0371bbc0355478d8-0  test/testfile
- --> Files to add: 9
-List 9 elements:
- 'file://host' '/home/user/cvs' d 0 1 1000 1000 0755 '' N 1 0 -
- 'file://host' '/home/user/cvs/dirbad' d 0 1 1000 1000 0755 '' N 1 0 -
- 'file://host' '/home/user/cvs/dirutd' d 0 1 1000 1000 0755 '' N 1 0 -
+ --> Files to add: 12
+List 12 elements:
+ 'file://host' '/home/user/cvs' d 0 1 1000 1000 0755 ''  1 0 -
+ 'file://host' '/home/user/cvs/dirbad' d 0 1 1000 1000 0755 ''  1 0 -
+ 'file://host' '/home/user/cvs/dirutd' d 0 1 1000 1000 0755 ''  1 0 -
  'file://host' '/home/user/cvs/dirutd/fileutd' f 0 1 1000 1000 0644 '' d41d8cd98f00b204e9800998ecf8427e-0 1 0 -
  'file://host' '/home/user/cvs/filenew.c' f 0 1 1000 1000 0644 '' d41d8cd98f00b204e9800998ecf8427e-0 1 0 -
  'file://host' '/home/user/cvs/fileutd.h' f 0 1 1000 1000 0644 '' d41d8cd98f00b204e9800998ecf8427e-0 1 0 -
- 'file://host' '/home/user/testdir' d 0 1 1000 1000 0755 '' N 1 0 -
+ 'file://host' '/home/user/dir space' d 0 1 1000 1000 0755 ''  1 0 -
+ 'file://host' '/home/user/dir space/file space' f 0 1 1000 1000 0644 '' d41d8cd98f00b204e9800998ecf8427e-0 1 0 -
+ 'file://host' '/home/user/test space' f 0 1 1000 1000 0644 '' d41d8cd98f00b204e9800998ecf8427e-0 1 0 -
+ 'file://host' '/home/user/testdir' d 0 1 1000 1000 0755 ''  1 0 -
  'file://host' '/home/user/testfile' f 13 1 1000 1000 0644 '' 59ca0efa9f5633cb0371bbc0355478d8-0 1 0 -
- 'file://host' '/home/user/testlink' l 8 1 1000 1000 0777 'testfile' N 1 0 -
- -> Saving database list: 9 file(s)
- -> Loaded database list: 9 file(s)
-List 9 elements:
- 'file://host' '/home/user/cvs' d 0 1 1000 1000 0755 '' N 1 0 -
- 'file://host' '/home/user/cvs/dirbad' d 0 1 1000 1000 0755 '' N 1 0 -
- 'file://host' '/home/user/cvs/dirutd' d 0 1 1000 1000 0755 '' N 1 0 -
+ 'file://host' '/home/user/testlink' l 8 1 1000 1000 0777 'testfile'  1 0 -
+ -> Saving database list: 12 file(s)
+ -> Loaded database list: 12 file(s)
+List 12 elements:
+ 'file://host' '/home/user/cvs' d 0 1 1000 1000 0755 ''  1 0 -
+ 'file://host' '/home/user/cvs/dirbad' d 0 1 1000 1000 0755 ''  1 0 -
+ 'file://host' '/home/user/cvs/dirutd' d 0 1 1000 1000 0755 ''  1 0 -
  'file://host' '/home/user/cvs/dirutd/fileutd' f 0 1 1000 1000 0644 '' d41d8cd98f00b204e9800998ecf8427e-0 1 0 -
  'file://host' '/home/user/cvs/filenew.c' f 0 1 1000 1000 0644 '' d41d8cd98f00b204e9800998ecf8427e-0 1 0 -
  'file://host' '/home/user/cvs/fileutd.h' f 0 1 1000 1000 0644 '' d41d8cd98f00b204e9800998ecf8427e-0 1 0 -
- 'file://host' '/home/user/testdir' d 0 1 1000 1000 0755 '' N 1 0 -
+ 'file://host' '/home/user/dir space' d 0 1 1000 1000 0755 ''  1 0 -
+ 'file://host' '/home/user/dir space/file space' f 0 1 1000 1000 0644 '' d41d8cd98f00b204e9800998ecf8427e-0 1 0 -
+ 'file://host' '/home/user/test space' f 0 1 1000 1000 0644 '' d41d8cd98f00b204e9800998ecf8427e-0 1 0 -
+ 'file://host' '/home/user/testdir' d 0 1 1000 1000 0755 ''  1 0 -
  'file://host' '/home/user/testfile' f 13 1 1000 1000 0644 '' 59ca0efa9f5633cb0371bbc0355478d8-0 1 0 -
- 'file://host' '/home/user/testlink' l 8 1 1000 1000 0777 'testfile' N 1 0 -
-List 9 elements:
- 'file://host' '/home/user/cvs' d 0 1 1000 1000 0755 '' N 1 0 -
- 'file://host' '/home/user/cvs/dirbad' d 0 1 1000 1000 0755 '' N 1 0 -
- 'file://host' '/home/user/cvs/dirutd' d 0 1 1000 1000 0755 '' N 1 0 -
+ 'file://host' '/home/user/testlink' l 8 1 1000 1000 0777 'testfile'  1 0 -
+List 12 elements:
+ 'file://host' '/home/user/cvs' d 0 1 1000 1000 0755 ''  1 0 -
+ 'file://host' '/home/user/cvs/dirbad' d 0 1 1000 1000 0755 ''  1 0 -
+ 'file://host' '/home/user/cvs/dirutd' d 0 1 1000 1000 0755 ''  1 0 -
  'file://host' '/home/user/cvs/dirutd/fileutd' f 0 1 1000 1000 0644 '' d41d8cd98f00b204e9800998ecf8427e-0 1 0 -
  'file://host' '/home/user/cvs/filenew.c' f 0 1 1000 1000 0644 '' d41d8cd98f00b204e9800998ecf8427e-0 1 0 -
  'file://host' '/home/user/cvs/fileutd.h' f 0 1 1000 1000 0644 '' d41d8cd98f00b204e9800998ecf8427e-0 1 0 -
- 'file://host' '/home/user/testdir' d 0 1 1000 1000 0755 '' N 1 0 -
+ 'file://host' '/home/user/dir space' d 0 1 1000 1000 0755 ''  1 0 -
+ 'file://host' '/home/user/dir space/file space' f 0 1 1000 1000 0644 '' d41d8cd98f00b204e9800998ecf8427e-0 1 0 -
+ 'file://host' '/home/user/test space' f 0 1 1000 1000 0644 '' d41d8cd98f00b204e9800998ecf8427e-0 1 0 -
+ 'file://host' '/home/user/testdir' d 0 1 1000 1000 0755 ''  1 0 -
  'file://host' '/home/user/testfile' f 13 1 1000 1000 0644 '' 59ca0efa9f5633cb0371bbc0355478d8-0 1 0 -
- 'file://host' '/home/user/testlink' l 8 1 1000 1000 0777 'testfile' N 1 0 -
+ 'file://host' '/home/user/testlink' l 8 1 1000 1000 0777 'testfile'  1 0 -
 List 3 elements:
  testdir
  testfile
  testlink
  --> Files to add: 3
-List 12 elements:
- 'file://host' '/home/user/cvs' d 0 1 1000 1000 0755 '' N 1 0 -
- 'file://host' '/home/user/cvs/dirbad' d 0 1 1000 1000 0755 '' N 1 0 -
- 'file://host' '/home/user/cvs/dirutd' d 0 1 1000 1000 0755 '' N 1 0 -
+List 15 elements:
+ 'file://host' '/home/user/cvs' d 0 1 1000 1000 0755 ''  1 0 -
+ 'file://host' '/home/user/cvs/dirbad' d 0 1 1000 1000 0755 ''  1 0 -
+ 'file://host' '/home/user/cvs/dirutd' d 0 1 1000 1000 0755 ''  1 0 -
  'file://host' '/home/user/cvs/dirutd/fileutd' f 0 1 1000 1000 0644 '' d41d8cd98f00b204e9800998ecf8427e-0 1 0 -
  'file://host' '/home/user/cvs/filenew.c' f 0 1 1000 1000 0644 '' d41d8cd98f00b204e9800998ecf8427e-0 1 0 -
  'file://host' '/home/user/cvs/fileutd.h' f 0 1 1000 1000 0644 '' d41d8cd98f00b204e9800998ecf8427e-0 1 0 -
- 'file://host' '/home/user/testdir' d 0 1 1000 1000 0755 '' N 1 0 -
+ 'file://host' '/home/user/dir space' d 0 1 1000 1000 0755 ''  1 0 -
+ 'file://host' '/home/user/dir space/file space' f 0 1 1000 1000 0644 '' d41d8cd98f00b204e9800998ecf8427e-0 1 0 -
+ 'file://host' '/home/user/test space' f 0 1 1000 1000 0644 '' d41d8cd98f00b204e9800998ecf8427e-0 1 0 -
+ 'file://host' '/home/user/testdir' d 0 1 1000 1000 0755 ''  1 0 -
  'file://host' '/home/user/testfile' f 13 1 1000 1000 0644 '' 59ca0efa9f5633cb0371bbc0355478d8-0 1 0 -
- 'file://host' '/home/user/testlink' l 8 1 1000 1000 0777 'testfile' N 1 0 -
- 'file://host' '/home/user2/testdir' d 0 1 1000 1000 0755 '' N 1 0 -
+ 'file://host' '/home/user/testlink' l 8 1 1000 1000 0777 'testfile'  1 0 -
+ 'file://host' '/home/user2/testdir' d 0 1 1000 1000 0755 ''  1 0 -
  'file://host' '/home/user2/testfile' f 15 1 1000 1000 0644 '' fcacc0dea4134dc0b9da49c1a9603196-0 1 0 -
- 'file://host' '/home/user2/testlink' l 8 1 1000 1000 0777 'testfile' N 1 0 -
- -> Scanning database list: 12 file(s)
- -> Saving database list: 12 file(s)
- -> Loaded database list: 12 file(s)
-List 12 elements:
- 'file://host' '/home/user/cvs' d 0 1 1000 1000 0755 '' N 1 0 -
- 'file://host' '/home/user/cvs/dirbad' d 0 1 1000 1000 0755 '' N 1 0 -
- 'file://host' '/home/user/cvs/dirutd' d 0 1 1000 1000 0755 '' N 1 0 -
+ 'file://host' '/home/user2/testlink' l 8 1 1000 1000 0777 'testfile'  1 0 -
+ -> Scanning database list: 15 file(s)
+ -> Saving database list: 15 file(s)
+ -> Loaded database list: 15 file(s)
+List 15 elements:
+ 'file://host' '/home/user/cvs' d 0 1 1000 1000 0755 ''  1 0 -
+ 'file://host' '/home/user/cvs/dirbad' d 0 1 1000 1000 0755 ''  1 0 -
+ 'file://host' '/home/user/cvs/dirutd' d 0 1 1000 1000 0755 ''  1 0 -
  'file://host' '/home/user/cvs/dirutd/fileutd' f 0 1 1000 1000 0644 '' d41d8cd98f00b204e9800998ecf8427e-0 1 0 -
  'file://host' '/home/user/cvs/filenew.c' f 0 1 1000 1000 0644 '' d41d8cd98f00b204e9800998ecf8427e-0 1 0 -
  'file://host' '/home/user/cvs/fileutd.h' f 0 1 1000 1000 0644 '' d41d8cd98f00b204e9800998ecf8427e-0 1 0 -
- 'file://host' '/home/user/testdir' d 0 1 1000 1000 0755 '' N 1 0 -
+ 'file://host' '/home/user/dir space' d 0 1 1000 1000 0755 ''  1 0 -
+ 'file://host' '/home/user/dir space/file space' f 0 1 1000 1000 0644 '' d41d8cd98f00b204e9800998ecf8427e-0 1 0 -
+ 'file://host' '/home/user/test space' f 0 1 1000 1000 0644 '' d41d8cd98f00b204e9800998ecf8427e-0 1 0 -
+ 'file://host' '/home/user/testdir' d 0 1 1000 1000 0755 ''  1 0 -
  'file://host' '/home/user/testfile' f 13 1 1000 1000 0644 '' 59ca0efa9f5633cb0371bbc0355478d8-0 1 0 -
- 'file://host' '/home/user/testlink' l 8 1 1000 1000 0777 'testfile' N 1 0 -
- 'file://host' '/home/user2/testdir' d 0 1 1000 1000 0755 '' N 1 0 -
+ 'file://host' '/home/user/testlink' l 8 1 1000 1000 0777 'testfile'  1 0 -
+ 'file://host' '/home/user2/testdir' d 0 1 1000 1000 0755 ''  1 0 -
  'file://host' '/home/user2/testfile' f 15 1 1000 1000 0644 '' fcacc0dea4134dc0b9da49c1a9603196-0 1 0 -
- 'file://host' '/home/user2/testlink' l 8 1 1000 1000 0777 'testfile' N 1 0 -
-List 9 elements:
+ 'file://host' '/home/user2/testlink' l 8 1 1000 1000 0777 'testfile'  1 0 -
+List 12 elements:
  cvs
  cvs/dirbad
  cvs/dirutd
  cvs/dirutd/fileutd
  cvs/filenew.c
  cvs/fileutd.h
+ dir space
+ dir space/file space
+ test space
  testdir
  testfile
  testlink
-List 12 elements:
- 'file://host' '/home/user/cvs' d 0 1 1000 1000 0755 '' N 1 0 -
- 'file://host' '/home/user/cvs/dirbad' d 0 1 1000 1000 0755 '' N 1 0 -
- 'file://host' '/home/user/cvs/dirutd' d 0 1 1000 1000 0755 '' N 1 0 -
+List 15 elements:
+ 'file://host' '/home/user/cvs' d 0 1 1000 1000 0755 ''  1 0 -
+ 'file://host' '/home/user/cvs/dirbad' d 0 1 1000 1000 0755 ''  1 0 -
+ 'file://host' '/home/user/cvs/dirutd' d 0 1 1000 1000 0755 ''  1 0 -
  'file://host' '/home/user/cvs/dirutd/fileutd' f 0 1 1000 1000 0644 '' d41d8cd98f00b204e9800998ecf8427e-0 1 0 -
  'file://host' '/home/user/cvs/filenew.c' f 0 1 1000 1000 0644 '' d41d8cd98f00b204e9800998ecf8427e-0 1 0 -
  'file://host' '/home/user/cvs/fileutd.h' f 0 1 1000 1000 0644 '' d41d8cd98f00b204e9800998ecf8427e-0 1 0 -
- 'file://host' '/home/user/testdir' d 0 1 1000 1000 0755 '' N 1 0 -
+ 'file://host' '/home/user/dir space' d 0 1 1000 1000 0755 ''  1 0 -
+ 'file://host' '/home/user/dir space/file space' f 0 1 1000 1000 0644 '' d41d8cd98f00b204e9800998ecf8427e-0 1 0 -
+ 'file://host' '/home/user/test space' f 0 1 1000 1000 0644 '' d41d8cd98f00b204e9800998ecf8427e-0 1 0 -
+ 'file://host' '/home/user/testdir' d 0 1 1000 1000 0755 ''  1 0 -
  'file://host' '/home/user/testfile' f 13 1 1000 1000 0644 '' 59ca0efa9f5633cb0371bbc0355478d8-0 1 0 -
- 'file://host' '/home/user/testlink' l 8 1 1000 1000 0777 'testfile' N 1 0 -
- 'file://host' '/home/user2/testdir' d 0 1 1000 1000 0755 '' N 1 0 -
+ 'file://host' '/home/user/testlink' l 8 1 1000 1000 0777 'testfile'  1 0 -
+ 'file://host' '/home/user2/testdir' d 0 1 1000 1000 0755 ''  1 0 -
  'file://host' '/home/user2/testfile' f 15 1 1000 1000 0644 '' fcacc0dea4134dc0b9da49c1a9603196-0 1 0 -
- 'file://host' '/home/user2/testlink' l 8 1 1000 1000 0777 'testfile' N 1 0 -
+ 'file://host' '/home/user2/testlink' l 8 1 1000 1000 0777 'testfile'  1 0 -
 List 3 elements:
  testdir
  testfile
  testlink
-List 12 elements:
- 'file://host' '/home/user/cvs' d 0 1 1000 1000 0755 '' N 1 0 -
- 'file://host' '/home/user/cvs/dirbad' d 0 1 1000 1000 0755 '' N 1 0 -
- 'file://host' '/home/user/cvs/dirutd' d 0 1 1000 1000 0755 '' N 1 0 -
+List 15 elements:
+ 'file://host' '/home/user/cvs' d 0 1 1000 1000 0755 ''  1 0 -
+ 'file://host' '/home/user/cvs/dirbad' d 0 1 1000 1000 0755 ''  1 0 -
+ 'file://host' '/home/user/cvs/dirutd' d 0 1 1000 1000 0755 ''  1 0 -
  'file://host' '/home/user/cvs/dirutd/fileutd' f 0 1 1000 1000 0644 '' d41d8cd98f00b204e9800998ecf8427e-0 1 0 -
  'file://host' '/home/user/cvs/filenew.c' f 0 1 1000 1000 0644 '' d41d8cd98f00b204e9800998ecf8427e-0 1 0 -
  'file://host' '/home/user/cvs/fileutd.h' f 0 1 1000 1000 0644 '' d41d8cd98f00b204e9800998ecf8427e-0 1 0 -
- 'file://host' '/home/user/testdir' d 0 1 1000 1000 0755 '' N 1 0 -
+ 'file://host' '/home/user/dir space' d 0 1 1000 1000 0755 ''  1 0 -
+ 'file://host' '/home/user/dir space/file space' f 0 1 1000 1000 0644 '' d41d8cd98f00b204e9800998ecf8427e-0 1 0 -
+ 'file://host' '/home/user/test space' f 0 1 1000 1000 0644 '' d41d8cd98f00b204e9800998ecf8427e-0 1 0 -
+ 'file://host' '/home/user/testdir' d 0 1 1000 1000 0755 ''  1 0 -
  'file://host' '/home/user/testfile' f 13 1 1000 1000 0644 '' 59ca0efa9f5633cb0371bbc0355478d8-0 1 0 -
- 'file://host' '/home/user/testlink' l 8 1 1000 1000 0777 'testfile' N 1 0 -
- 'file://host' '/home/user2/testdir' d 0 1 1000 1000 0755 '' N 1 0 -
+ 'file://host' '/home/user/testlink' l 8 1 1000 1000 0777 'testfile'  1 0 -
+ 'file://host' '/home/user2/testdir' d 0 1 1000 1000 0755 ''  1 0 -
  'file://host' '/home/user2/testfile' f 15 1 1000 1000 0644 '' fcacc0dea4134dc0b9da49c1a9603196-0 1 0 -
- 'file://host' '/home/user2/testlink' l 8 1 1000 1000 0777 'testfile' N 1 0 -
+ 'file://host' '/home/user2/testlink' l 8 1 1000 1000 0777 'testfile'  1 0 -
  --> Reorganizing db in: 'test_db/data' ... done
- -> Saving database list: 12 file(s)
+ -> Saving database list: 15 file(s)

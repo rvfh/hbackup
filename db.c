@@ -233,7 +233,12 @@ static int db_load(const char *filename, list_t list) {
             strcpy(db_data.link, string);
             break;
           case 10:  /* Checksum */
-            strcpy(db_data.filedata.checksum, string);
+            /* TODO: this is just transitory */
+            if (strcmp(string, "N")) {
+              strcpy(db_data.filedata.checksum, string);
+            } else {
+              db_data.filedata.checksum[0] = '\0';
+            }
             break;
           case 11:  /* Date in */
             if (sscanf(string, "%ld", &db_data.date_in) != 1) {
@@ -302,7 +307,7 @@ static int db_save(const char *filename, list_t list) {
         link = db_data->link;
       }
       fprintf(writefile,
-        "%s\t%s\t%c\t%ld\t%ld\t%u\t%u\t0%o\t%s\t%s\t%ld\t%ld\t%c\n",
+        "%s\t%s\t%c\t%ld\t%ld\t%u\t%u\t%o\t%s\t%s\t%ld\t%ld\t%c\n",
         db_data->host, db_data->filedata.path,
         type_letter(db_data->filedata.metadata.type),
         db_data->filedata.metadata.size, db_data->filedata.metadata.mtime,
@@ -743,15 +748,14 @@ int db_parse(const char *host, const char *real_path,
             strcpy(db_data->filedata.checksum, "N");
           }
         } else {
-          strcpy(db_data->filedata.checksum, "N");
+          strcpy(db_data->filedata.checksum, "");
         }
         if (S_ISLNK(filedata->metadata.type)) {
-          char full_path[FILENAME_MAX];
-          char string[FILENAME_MAX];
+          char *full_path = NULL;
+          char *string = malloc(FILENAME_MAX);
           int size;
 
-          strcpy(full_path, mount_path);
-          strcat(full_path, filedata->path);
+          asprintf(&full_path, "%s%s", mount_path, filedata->path);
           if ((size = readlink(full_path, string, FILENAME_MAX)) < 0) {
             failed = 1;
             fprintf(stderr, "db: parse: %s: %s, ignoring\n",
@@ -761,6 +765,8 @@ int db_parse(const char *host, const char *real_path,
             strncpy(db_data->link, string, size);
             db_data->link[size] = '\0';
           }
+          free(full_path);
+          free(string);
         }
         list_add(db_list, db_data);
         if ((++copied >= 1000)
@@ -878,7 +884,7 @@ int db_scan(const char *checksum) {
       }
     }
     return failed;
-  } else if (strcmp(checksum, "N")) {
+  } else if ((checksum[0] != '\0') && strcmp(checksum, "N")) {
     char path[FILENAME_MAX];
 
     if (getdir(checksum, path)) {
