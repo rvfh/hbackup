@@ -361,12 +361,12 @@ int list_compare(
       payload_right = list_entry_payload(entry_right);
     }
 
-    if (compare_f != NULL) {
-      result = compare_f(payload_left, payload_right);
-    } else if (payload_left == NULL) {
+    if (payload_left == NULL) {
       result = 1;
     } else if (payload_right == NULL) {
       result = -1;
+    } else if (compare_f != NULL) {
+      result = compare_f(payload_left, payload_right);
     } else {
       char  *string_left  = list_left->payload_get(payload_left);
       char  *string_right = list_right->payload_get(payload_right);
@@ -375,55 +375,25 @@ int list_compare(
       free(string_left);
       free(string_right);
     }
-    switch (result) {
-    case -2:
-      /* left data irrelevant */
-      entry_left = list_next(list_left_handle, entry_left);
-      break;
-    case 2:
-      /* right data irrelevant */
-      entry_right = list_next(list_right_handle, entry_right);
-      break;
-    case -1:
-      /* left < right => element is missing from right list */
-      differ = 1;
-      if (list_missing != NULL) {
-        /* The contents are NOT copied, so two lists have elements pointing to
-        the same data! */
-        list_append(list_missing, payload_left);
-      }
-      /* Consider next */
-      entry_left = list_next(list_left_handle, entry_left);
-      break;
-    case 1:
-      /* left > right => element was added in right list */
-      differ = 1;
-      if (list_added != NULL) {
-        /* The contents are NOT copied, so two lists have elements pointing to
-        the same data! */
-        list_append(list_added, payload_right);
-      }
-      /* Consider next */
-      entry_right = list_next(list_right_handle, entry_right);
-      break;
-    case 0:
-      /* left == right */
-      entry_left = list_next(list_left_handle, entry_left);
-      entry_right = list_next(list_right_handle, entry_right);
-      break;
-    default:
-      fprintf(stderr, "list: compare: unknown case\n");
-      return 2;
+    differ |= (result != 0);
+    /* left < right => element is missing from right list */
+    if ((result < 0) && (list_missing != NULL)) {
+      /* The contents are NOT copied, so the two lists have elements
+       * pointing to the same data! */
+      list_append(list_missing, payload_left);
     }
-  }
-
-  if ((list_missing != NULL) && (list_size(list_missing) == 0)) {
-    list_free(list_missing);
-    *list_missing_handle = NULL;
-  }
-  if ((list_added != NULL) && (list_size(list_added) == 0)) {
-    list_free(list_added);
-    *list_added_handle = NULL;
+    /* left > right => element was added in right list */
+    if ((result > 0) && (list_added != NULL)) {
+      /* The contents are NOT copied, so the two lists have elements
+       * pointing to the same data! */
+      list_append(list_added, payload_right);
+    }
+    if (result >= 0) {
+      entry_right = list_next(list_right_handle, entry_right);
+    }
+    if (result <= 0) {
+      entry_left = list_next(list_left_handle, entry_left);
+    }
   }
   if (differ) {
     return 1;
