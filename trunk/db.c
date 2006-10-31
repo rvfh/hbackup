@@ -47,8 +47,7 @@ typedef struct {
 static list_t *db_list = NULL;
 static char   *db_path = NULL;
 
-/* Current path being backed up */
-static char   *backup_path = NULL;
+/* Size of path being backed up */
 static int    backup_path_length = 0;
 
 static char type_letter(mode_t mode) {
@@ -331,17 +330,19 @@ static int db_save(const char *filename, list_t list) {
   return failed;
 }
 
-static void db_data_get(const void *payload, char **string_p) {
+static char *db_data_get(const void *payload) {
   const db_data_t *db_data = payload;
+  char *string = NULL;
 
   if (db_data->date_out == 0) {
     /* '@' > '9' */
-    asprintf(string_p, "%s %s %c", db_data->host, db_data->filedata.path, '@');
+    asprintf(&string, "%s %s %c", db_data->host, db_data->filedata.path, '@');
   } else {
     /* ' ' > '0' */
-    asprintf(string_p, "%s %s %11ld", db_data->host, db_data->filedata.path,
+    asprintf(&string, "%s %s %11ld", db_data->host, db_data->filedata.path,
       db_data->date_out);
   }
+  return string;
 }
 
 static int db_organize(char *path, int number) {
@@ -676,6 +677,19 @@ void db_close(void) {
   free(db_path);
 }
 
+static char *parse_select(const void *payload) {
+  const db_data_t *db_data = payload;
+  char *string = NULL;
+
+  if (db_data->date_out != 0) {
+    /* This string cannot be matched */
+    asprintf(&string, "\t");
+  } else {
+    asprintf(&string, "%s", db_data->filedata.path);
+  }
+  return string;
+}
+
 /* Need to compare only for matching paths */
 static int parse_compare(void *db_data_p, void *filedata_p) {
   const db_data_t *db_data  = db_data_p;
@@ -685,17 +699,6 @@ static int parse_compare(void *db_data_p, void *filedata_p) {
   /* No more data in database list: add to added list */
   if (db_data_p == NULL) {
     return 1;
-  }
-
-  /* Ignore removed files */
-  if (db_data->date_out != 0) {
-    return -2;
-  }
-
-  /* Ignore when paths do not match */
-  if ((db_data->filedata.path[backup_path_length] != '/')
-   || strncmp(db_data->filedata.path, backup_path, backup_path_length)) {
-    return -2;
   }
 
   /* No more data in file list: add to missing list */
@@ -728,18 +731,21 @@ static int parse_compare(void *db_data_p, void *filedata_p) {
 
 int db_parse(const char *host, const char *real_path,
     const char *mount_path, list_t file_list) {
+  char          *select_string = NULL;
+  list_t        selected_files_list;
   list_t        added_files_list;
   list_t        removed_files_list;
   list_entry_t  entry  = NULL;
   int           failed = 0;
 
   /* Compare list with db list for matching host */
-  asprintf(&backup_path, real_path);
   backup_path_length = strlen(real_path);
-  list_compare(db_list, file_list, &added_files_list, &removed_files_list,
-    parse_compare);
-  free(backup_path);
-  backup_path = NULL;
+  asprintf(&select_string, "%s/", real_path);
+  list_select(db_list, select_string, parse_select, &selected_files_list);
+  free(select_string);
+  list_compare(selected_files_list, file_list, &added_files_list,
+    &removed_files_list, parse_compare);
+  list_deselect(selected_files_list);
 
   /* Deal with new/modified data first */
   if (added_files_list != NULL) {
@@ -812,14 +818,10 @@ int db_parse(const char *host, const char *real_path,
           db_save("list", db_list);
         }
       }
-      /* This only unlists the data */
-      list_remove(added_files_list, entry);
     }
-    /* The list should be empty now */
-    if (list_size(added_files_list) != 0) {
+    /* This only unlists the data */
+    if (list_deselect(added_files_list) != 0) {
       fprintf(stderr, "db: parse: added_files_list not empty, ignoring\n");
-    } else {
-      list_free(added_files_list);
     }
   }
 
@@ -833,13 +835,10 @@ int db_parse(const char *host, const char *real_path,
 
       /* Same data as in db_list */
       db_data->date_out = time(NULL);
-      /* This only unlists the data */
-      list_remove(removed_files_list, entry);
     }
-    if (list_size(removed_files_list) != 0) {
+    /* This only unlists the data */
+    if (list_deselect(removed_files_list) != 0) {
       fprintf(stderr, "db: parse: removed_files_list not empty, ignoring\n");
-    } else {
-      list_free(removed_files_list);
     }
   }
 

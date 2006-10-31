@@ -17,8 +17,11 @@ typedef struct {
   mode_t  type;   /* File type */
 } cvs_entry_t;
 
-static void cvs_payload_get(const void *payload, char **string_p) {
-  asprintf(string_p, ((cvs_entry_t *) payload)->name);
+static char *cvs_payload_get(const void *payload) {
+  char *string = NULL;
+
+  asprintf(&string, ((cvs_entry_t *) payload)->name);
+  return string;
 }
 
 static int cvs_dir_check(void **handle, const char *dir_path) {

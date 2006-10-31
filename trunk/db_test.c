@@ -11,19 +11,23 @@
 /* List of files */
 static int verbose = 3;
 
-static void file_data_show(const void *payload, char **string_p) {
-  asprintf(string_p, ((filedata_t *) payload)->path);
+static char *file_data_show(const void *payload) {
+  char *string = NULL;
+
+  asprintf(&string, ((filedata_t *) payload)->path);
+  return string;
 }
 
-static void db_data_show(const void *payload, char **string_p) {
+static char *db_data_show(const void *payload) {
   const db_data_t *db_data = payload;
   char  *link = "";
+  char *string = NULL;
 
   if (db_data->link != NULL) {
     link = db_data->link;
   }
   /* Times are omitted here... */
-  asprintf(string_p, "'%s' '%s' %c %ld %d %u %u 0%o '%s' %s %d %d %c",
+  asprintf(&string, "'%s' '%s' %c %ld %d %u %u 0%o '%s' %s %d %d %c",
     db_data->host, db_data->filedata.path,
     type_letter(db_data->filedata.metadata.type),
     db_data->filedata.metadata.size,
@@ -31,6 +35,7 @@ static void db_data_show(const void *payload, char **string_p) {
     db_data->filedata.metadata.gid, db_data->filedata.metadata.mode, link,
     db_data->filedata.checksum, db_data->date_in || 0,
     db_data->date_out || 0, '-');
+  return string;
 }
 
 int verbosity(void) {
@@ -138,6 +143,8 @@ int main(void) {
 
   db_close();
 
+
+  /* Re-open database => no change */
   if ((status = db_open("test_db"))) {
     printf("db_open error status %u\n", status);
     if (status == 2) {
@@ -202,6 +209,9 @@ int main(void) {
 */
   db_close();
 
+
+
+  /* Re-open database => remove some files */
   if ((status = db_open("test_db"))) {
     printf("db_open error status %u\n", status);
     if (status == 2) {
@@ -209,6 +219,26 @@ int main(void) {
     }
   }
   list_show(db_list, NULL, db_data_show);
+
+  remove("test/testfile");
+
+  verbose = 2;
+  if ((status = filelist_new("test////", filters_handle, parsers_handle))) {
+    printf("file_list_new error status %u\n", status);
+    return 0;
+  }
+  verbose = 3;
+  list_show(filelist_get(), NULL, file_data_show);
+
+  if ((status = db_parse("file://host", "/home/user", "test",
+      filelist_get()))) {
+    printf("db_parse error status %u\n", status);
+    db_close();
+    return 0;
+  }
+  list_show(db_list, NULL, db_data_show);
+  list_show(db_list, NULL, parse_select);
+  filelist_free();
 
   verbose = 2;
   if ((status = filelist_new("test////", filters_handle, parsers_handle))) {
@@ -247,6 +277,7 @@ int main(void) {
   db_organize("test_db/data", 2);
 
   db_close();
+
 
   filters_free(filters_handle);
   parsers_free(parsers_handle);

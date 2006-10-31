@@ -5,11 +5,12 @@
 
 #include "clients.c"
 
-static void client_show(const void *payload, char **string_p) {
+static char *client_show(const void *payload) {
   const client_t *client_t     = payload;
   char           *credentials  = NULL;
   /* No to warn about null string */
   char           null_string[] = "";
+  char *string = NULL;
 
   if (client_t->username != NULL) {
     char *password = NULL;
@@ -24,9 +25,10 @@ static void client_show(const void *payload, char **string_p) {
   } else {
     asprintf(&credentials, null_string);
   }
-  asprintf(string_p, "%s://%s%s %s", client_t->protocol, credentials,
+  asprintf(&string, "%s://%s%s %s", client_t->protocol, credentials,
     client_t->hostname, client_t->listfile);
   free(credentials);
+  return string;
 }
 
 int verbosity(void) {

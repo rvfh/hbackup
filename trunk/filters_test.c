@@ -8,10 +8,12 @@
 #include "filters.c"
 
 /* Use payload as argument name, cast once and for all */
-static void filters_show(const void *payload, char **string_p) {
+static char *filters_show(const void *payload) {
   const filter_t *filter = payload;
+  char *string = NULL;
 
-  asprintf(string_p, "%s %u", filter->string, filter->type);
+  asprintf(&string, "%s %u", filter->string, filter->type);
+  return string;
 }
 
 int main(void) {

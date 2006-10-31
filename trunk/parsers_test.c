@@ -14,14 +14,16 @@ static void destroy(void) {
 static parser_t parser = { (parsers_dir_check_f *) 0x12345678, (parsers_dir_leave_f *) 0xDEADBEEF, (parsers_file_check_f *) 0x34567890, destroy, "test parser" };
 
 /* Use payload as argument name, cast once and for all */
-static void parsers_show(const void *payload, char **string_p) {
+static char *parsers_show(const void *payload) {
   const parser_t *parser = payload;
+  char *string = NULL;
 
-  asprintf(string_p, "%s [0x%08x, 0x%08x, 0x%08x]",
+  asprintf(&string, "%s [0x%08x, 0x%08x, 0x%08x]",
     parser->name,
     (unsigned int) parser->dir_check,
     (unsigned int) parser->dir_leave,
     (unsigned int) parser->file_check);
+  return string;
 }
 
 int main(void) {

@@ -9,7 +9,7 @@
 /* Type for function to convert payload into usable data
  * *string_p must be allocated by the function, but is freed by this module
  */
-typedef void (list_payload_get_f) (const void *payload, char **string_p);
+typedef char *(list_payload_get_f) (const void *payload);
 
 /* Type for function to compare payloads from two lists
  * Return codes:
@@ -27,13 +27,13 @@ typedef void *list_entry_t;
 
 /* Functions */
 
-/* Create empty list entry */
+/* Create empty list entry, return it */
 extern list_entry_t list_entry_new(void);
 
 /* Get list entry payload */
 extern void *list_entry_payload(const list_entry_t entry_handle);
 
-/* Create empty list */
+/* Create empty list, return it */
 extern list_t list_new(list_payload_get_f payload_get_f);
 
 /* Destroy list and its contents */
@@ -62,10 +62,11 @@ extern list_entry_t list_previous(const list_t list_handle,
 extern list_entry_t list_next(const list_t list_handle,
   const list_entry_t entry_handle);
 
-/* Find record in ordered list, or its next neighbour */
-/* If payload_get_f is NULL, the list default is used */
-/* If entry_handle is not NULL, is will contain the closest entry found */
-/* If an exact match is found, the function returns 0, non zero otherwise */
+/* Find record in ordered list, or its next neighbour, by matching
+ * search_string with the result of payload_get_f
+ * If payload_get_f is NULL, the list default is used
+ * If entry_handle is not NULL, it will contain the closest entry found
+ * If an exact match is found, the function returns 0, non zero otherwise */
 extern int list_find(const list_t list_handle, const char *search_string,
   list_payload_get_f payload_get_f, list_entry_t **entry_handle);
 
@@ -74,11 +75,31 @@ extern int list_find(const list_t list_handle, const char *search_string,
 extern void list_show(const list_t list_handle, list_entry_t *entry,
   list_payload_get_f payload_get_f);
 
+/* Compare two lists, using compare function
+ * if compare_f is NULL, the default payload functions and strcmp are used
+ * If list_added_handle is not NULL, it will contain the list of added entries
+ * If list_missing_handle is not NULL, it will contain the list of removed e.
+ * Important note: the lists elements payloads are not copied!!!
+ * To delete the added and removed elements lists, call list_deselect or do a
+ * list_remove on each element before calling list_free. */
 extern int list_compare(
     const list_t            list_left_handle,
     const list_t            list_right_handle,
     list_t                  *list_added_handle,
     list_t                  *list_missing_handle,
     list_payloads_compare_f compare_f);
+
+/* Select records in list, by matching search_string with the result of
+ * payload_get_f. If payload_get_f is NULL, the list default is used
+ * On success the function returns 0, otherwise non zero and list will be NULL.
+ * Important note: the list elements payloads are not copied!!!
+ * To delete the returned list, call list_deselect or do a list_remove on each
+ * element before calling list_free. */
+extern int list_select(const list_t list_handle, const char *search_string,
+  list_payload_get_f payload_get_f, list_t *list_selected_handle);
+
+/* Free list and its elements without freeing the payloads
+ * Returns the number of elements not freed */
+extern int list_deselect(list_t list_handle);
 
 #endif
