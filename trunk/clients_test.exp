@@ -3,6 +3,10 @@ clients: backup: keyword not implemented in list file etc/localhost.list, line 3
 mount: only root can do that
 clients: backup: could not mount smb share
 clients: backup: ssh protocol not supported
+clients: backup: client test protocol not supported
+clients: backup: client test2 protocol not supported
+clients: backup: client test3 protocol not supported
+clients: backup: client test4 protocol not supported
 clients: backup: keyword not implemented in list file etc/localhost.list, line 3
 List 0 elements:
 List 1 elements:
@@ -17,6 +21,32 @@ List 3 elements:
  file://localhost etc/localhost.list
  smb://Myself:flesyM@myclient C:\Backup\Backup.LST
  ssh://otherclient /home/backup/Backup.list
+List 4 elements:
+ file://localhost etc/localhost.list
+ smb://Myself:flesyM@myclient C:\Backup\Backup.LST
+ ssh://otherclient /home/backup/Backup.list
+ client test://user@client /home/BlaH/Backup.list
+List 5 elements:
+ file://localhost etc/localhost.list
+ smb://Myself:flesyM@myclient C:\Backup\Backup.LST
+ ssh://otherclient /home/backup/Backup.list
+ client test://user@client /home/BlaH/Backup.list
+ client test2://user@client /home/BlaH/Backup.list
+List 6 elements:
+ file://localhost etc/localhost.list
+ smb://Myself:flesyM@myclient C:\Backup\Backup.LST
+ ssh://otherclient /home/backup/Backup.list
+ client test://user@client /home/BlaH/Backup.list
+ client test2://user@client /home/BlaH/Backup.list
+ client test3://client /home/BlaH/Backup.list
+List 7 elements:
+ file://localhost etc/localhost.list
+ smb://Myself:flesyM@myclient C:\Backup\Backup.LST
+ ssh://otherclient /home/backup/Backup.list
+ client test://user@client /home/BlaH/Backup.list
+ client test2://user@client /home/BlaH/Backup.list
+ client test3://client /home/BlaH/Backup.list
+ client test4://client /home/BlaH/Backup.list
  -> Initialized database list
 Backup client 'localhost' using protocol 'file'
 Backup path 'test'

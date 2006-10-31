@@ -348,11 +348,11 @@ static char *db_data_get(const void *payload) {
 static int db_organize(char *path, int number) {
   DIR           *directory;
   struct dirent *dir_entry;
-  char          *nofiles = malloc(strlen(path) + strlen("/.nofiles") + 1);
+  char          *nofiles = NULL;
   int           failed   = 0;
 
   /* Already organized? */
-  sprintf(nofiles, "%s/.nofiles", path);
+  asprintf(&nofiles, "%s/.nofiles", path);
   if (! testfile(nofiles, 0)) {
     free(nofiles);
     return 0;
@@ -380,31 +380,31 @@ static int db_organize(char *path, int number) {
        || ! strcmp(dir_entry->d_name, "..")) {
         continue;
       }
-      /* Add 2: '\0' and '/' */
-      source_path = malloc(strlen(path) + strlen(dir_entry->d_name) + 2);
-      sprintf(source_path, "%s/%s", path, dir_entry->d_name);
+      asprintf(&source_path, "%s/%s", path, dir_entry->d_name);
       if (metadata_get(source_path, &metadata)) {
         fprintf(stderr, "db: organize: cannot get metadata: %s\n", source_path);
         failed = 2;
       } else if (S_ISDIR(metadata.type) && (dir_entry->d_name[2] != '-')) {
         /* Add 2: '\0' and '/' */
-        char *dest_path = malloc(strlen(source_path) + 2);
+        char *dir_path = NULL;
 
         /* Create two-letter directory */
-        strcpy(dest_path, path);
-        strcat(dest_path, "/");
-        strncat(dest_path, dir_entry->d_name, 2);
-        if (testdir(dest_path, 1) == 2) {
+        asprintf(&dir_path, "%s/%c%c", path, dir_entry->d_name[0],
+          dir_entry->d_name[1]);
+        if (testdir(dir_path, 1) == 2) {
           failed = 2;
         } else {
+          char *dest_path = NULL;
+
           /* Create destination path */
-          strcat(dest_path, "/");
-          strcat(dest_path, &dir_entry->d_name[2]);
+          asprintf(&dest_path, "%s/%s", dir_path, &dir_entry->d_name[2]);
           /* Move directory accross, changing its name */
           if (rename(source_path, dest_path)) {
             failed = 1;
           }
+          free(dest_path);
         }
+        free(dir_path);
       }
       free(source_path);
     }
@@ -787,9 +787,8 @@ int db_parse(const char *host, const char *real_path,
             fprintf(stderr, "db: parse: %s: %s, ignoring\n",
               strerror(errno), db_data->filedata.path);
           } else {
-            db_data->link = malloc(size + 1);
-            strncpy(db_data->link, string, size);
-            db_data->link[size] = '\0';
+            string[size] = '\0';
+            asprintf(&db_data->link, string);
           }
           free(full_path);
           free(string);

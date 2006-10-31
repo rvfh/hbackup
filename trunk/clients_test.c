@@ -62,6 +62,14 @@ int main(void) {
   list_show(clients, NULL, client_show);
   clients_add("sSh://otherClient", "/home/backup/Backup.list");
   list_show(clients, NULL, client_show);
+  clients_add("client test://user@Client", "/home/BlaH/Backup.list");
+  list_show(clients, NULL, client_show);
+  clients_add("client test2://user:@Client", "/home/BlaH/Backup.list");
+  list_show(clients, NULL, client_show);
+  clients_add("client test3://@Client", "/home/BlaH/Backup.list");
+  list_show(clients, NULL, client_show);
+  clients_add("client test4://:@Client", "/home/BlaH/Backup.list");
+  list_show(clients, NULL, client_show);
   db_open("test_db");
   clients_backup("test_db/mount");
   db_close();

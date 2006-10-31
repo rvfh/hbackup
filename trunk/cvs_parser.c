@@ -25,12 +25,11 @@ static char *cvs_payload_get(const void *payload) {
 }
 
 static int cvs_dir_check(void **handle, const char *dir_path) {
-  char    *d_path = malloc(strlen(dir_path) + strlen("/CVS/Entries") + 1);
+  char    *d_path = NULL;
   FILE    *entries;
   int     failed = 0;
 
-  strcpy(d_path, dir_path);
-  strcat(d_path, "/CVS/Entries");
+  asprintf(&d_path, "%s/CVS/Entries", dir_path);
 
   /* Check that file exists */
   if ((entries = fopen(d_path, "r")) == NULL) {
@@ -39,8 +38,8 @@ static int cvs_dir_check(void **handle, const char *dir_path) {
     failed = 1;
   } else {
     list_t  list = list_new(cvs_payload_get);
-    char    *buffer = malloc(256);
-    size_t  size;
+    char    *buffer = NULL;
+    size_t  size    = 0;
 
     /* Return list */
     *handle = list;
@@ -66,9 +65,8 @@ static int cvs_dir_check(void **handle, const char *dir_path) {
         continue;
       }
 
-      cvs_entry.name = malloc(delim - start + 1);
-      strncpy(cvs_entry.name, start, delim - start);
-      cvs_entry.name[delim - start] = '\0';
+      *delim = '\0';
+      asprintf(&cvs_entry.name, start);
 
       payload = malloc(sizeof(cvs_entry_t));
       *payload = cvs_entry;
