@@ -48,7 +48,7 @@ static list_t *db_list = NULL;
 static char   *db_path = NULL;
 
 /* Current path being backed up */
-static char   backup_path[FILENAME_MAX] = "";
+static char   *backup_path = NULL;
 static int    backup_path_length = 0;
 
 static char type_letter(mode_t mode) {
@@ -423,7 +423,7 @@ static int db_write(const char *mount_path, const char *path, size_t size, char 
   char  *source_path = NULL;
   char  *temp_path   = NULL;
   char  *dest_path   = NULL;
-  char  temp_checksum[256];
+  char  temp_checksum[36];
   FILE  *writefile;
   FILE  *readfile;
   int   index = 0;
@@ -453,69 +453,73 @@ static int db_write(const char *mount_path, const char *path, size_t size, char 
   }
 
   /* Make sure our checksum is unique */
-  if (! failed) do {
-    char  *final_path = NULL;
-    int   differ = 0;
+  if (! failed) {
+    do {
+      char  *final_path = NULL;
+      int   differ = 0;
 
-    /* Complete checksum with index */
-    sprintf((char *) checksum, "%s-%u", temp_checksum, index);
-    asprintf(&final_path, "%s-%u/", dest_path, index);
-    if (! testdir(final_path, 1)) {
-      /* Directory exists */
-      char  *try_path = NULL;
+      /* Complete checksum with index */
+      sprintf((char *) checksum, "%s-%u", temp_checksum, index);
+      asprintf(&final_path, "%s-%u/", dest_path, index);
+      if (! testdir(final_path, 1)) {
+        /* Directory exists */
+        char  *try_path = NULL;
 
-      asprintf(&try_path, "%s/data", final_path);
-      if (! testfile(try_path, 0)) {
-        /* A file already exists, let's compare */
-        metadata_t try_md;
-        metadata_t temp_md;
+        asprintf(&try_path, "%s/data", final_path);
+        if (! testfile(try_path, 0)) {
+          /* A file already exists, let's compare */
+          metadata_t try_md;
+          metadata_t temp_md;
 
-        differ = 1;
+          differ = 1;
 
-        /* Compare sizes first */
-        if (! metadata_get(try_path, &try_md)
-         && ! metadata_get(temp_path, &temp_md)
-         && (try_md.size == temp_md.size)) {
-          /* Compare try_path to temp_path */
-          if ((readfile = fopen(try_path, "r")) != NULL) {
-            if ((writefile = fopen(temp_path, "r")) != NULL) {
-              char    buffer1[10240];
-              char    buffer2[10240];
-              differ = 0;
+          /* Compare sizes first */
+          if (! metadata_get(try_path, &try_md)
+          && ! metadata_get(temp_path, &temp_md)
+          && (try_md.size == temp_md.size)) {
+            /* Compare try_path to temp_path */
+            if ((readfile = fopen(try_path, "r")) != NULL) {
+              if ((writefile = fopen(temp_path, "r")) != NULL) {
+                char    buffer1[10240];
+                char    buffer2[10240];
+                differ = 0;
 
-              do {
-                size_t length = fread(buffer1, 1, 10240, readfile);
-                /* Does fread read as much as possible? */
-                if ((fread(buffer2, 1, length, writefile) != length) || strncmp(buffer1, buffer2, length)) {
-                  differ = 1;
-                  break;
+                do {
+                  size_t length = fread(buffer1, 1, 10240, readfile);
+
+                  /* Does fread read as much as possible? */
+                  if ((fread(buffer2, 1, length, writefile) != length)
+                   || strncmp(buffer1, buffer2, length)) {
+                    differ = 1;
+                    break;
+                  }
+                } while (! feof(readfile) && ! feof(writefile));
+                /* Is there more data in one of the files? */
+                if (!differ) {
+                  differ = fread(buffer1, 1, 1, readfile)
+                        || fread(buffer2, 1, 1, writefile);
                 }
-              } while (! feof(readfile) && ! feof(writefile));
-              /* Is there more data in one of the files? */
-              if (!differ) {
-                differ = fread(buffer1, 1, 1, readfile)
-                      || fread(buffer2, 1, 1, writefile);
+                if (! differ) {
+                  delete = 1;
+                }
+                fclose(writefile);
               }
-              if (! differ) {
-                delete = 1;
-              }
-              fclose(writefile);
+              fclose(readfile);
             }
-            fclose(readfile);
           }
         }
+        free(try_path);
       }
-      free(try_path);
-    }
-    if (! differ) {
-      free(dest_path);
-      dest_path = final_path;
-      break;
-    } else {
-      free(final_path);
-    }
-    index++;
-  } while (1);
+      if (! differ) {
+        free(dest_path);
+        dest_path = final_path;
+        break;
+      } else {
+        free(final_path);
+      }
+      index++;
+    } while (1);
+  }
 
   /* Now move the file in its place */
   {
@@ -536,7 +540,8 @@ static int db_write(const char *mount_path, const char *path, size_t size, char 
     remove(temp_path);
   }
   free(temp_path);
-  /* TODO not nice */
+
+  /* Make sure we won't exceed the file number limit */
   if (! failed) {
     /* dest_path is /path/to/checksum/data */
     char *delim = strrchr(dest_path, '/');
@@ -556,22 +561,25 @@ static int db_write(const char *mount_path, const char *path, size_t size, char 
 }
 
 int db_open(const char *path) {
-  char temp_path[FILENAME_MAX];
+  char *data_path = NULL;
+  char *lock_path = NULL;
   FILE *file;
+  int  status = 0;
 
   asprintf(&db_path, path);
 
-  /* Check that data exists (no need to lock) */
-  strcpy(temp_path, db_path);
-  strcat(temp_path, "/data");
-  if (testdir(temp_path, 1) == 2) {
+  /* Check that data dir exists, create it (no need to lock) */
+  asprintf(&data_path, "%s/data", db_path);
+  status = testdir(data_path, 1);
+  free(data_path);
+  if (status == 2) {
     return 2;
   }
+  status = 0;
 
   /* Take lock */
-  strcpy(temp_path, db_path);
-  strcat(temp_path, "/lock");
-  if ((file = fopen(temp_path, "r")) != NULL) {
+  asprintf(&lock_path, "%s/lock", db_path);
+  if ((file = fopen(lock_path, "r")) != NULL) {
     pid_t pid;
 
     /* Lock already taken */
@@ -582,44 +590,49 @@ int db_open(const char *path) {
       kill(pid, 0);
       if (errno == ESRCH) {
         fprintf(stderr, "db: open: lock reset\n");
-        remove(temp_path);
+        remove(lock_path);
       } else {
         fprintf(stderr, "db: open: lock taken by process with pid %d\n", pid);
-        return 2;
+        status = 2;
       }
     } else {
       fprintf(stderr, "db: open: lock taken by an unidentified process!\n");
-      return 2;
+      status = 2;
     }
   }
-  if ((file = fopen(temp_path, "w")) != NULL) {
-    /* Lock taken */
-    fprintf(file, "%u\n", getpid());
-    fclose(file);
-  } else {
-    /* Lock cannot be taken */
-    fprintf(stderr, "db: open: cannot lock\n");
-    return 2;
+  if (! status) {
+    if ((file = fopen(lock_path, "w")) != NULL) {
+      /* Lock taken */
+      fprintf(file, "%u\n", getpid());
+      fclose(file);
+    } else {
+      /* Lock cannot be taken */
+      fprintf(stderr, "db: open: cannot take lock\n");
+      status = 2;
+    }
   }
 
   /* Read database list */
-  db_list = list_new(db_data_get);
-  switch (db_load("list", db_list)) {
-    case 0:
-      if (verbosity() > 1) {
-        printf(" -> Loaded database list: %u file(s)\n", list_size(db_list));
-      }
-      break;
-    case 1:
-      if (verbosity() > 1) {
-        printf(" -> Initialized database list\n");
-      }
-      break;
-    case 2:
-      remove(temp_path);
-      return 2;
+  if (! status) {
+    db_list = list_new(db_data_get);
+    switch (db_load("list", db_list)) {
+      case 0:
+        if (verbosity() > 1) {
+          printf(" -> Loaded database list: %u file(s)\n", list_size(db_list));
+        }
+        break;
+      case 1:
+        if (verbosity() > 1) {
+          printf(" -> Initialized database list\n");
+        }
+        break;
+      case 2:
+        remove(lock_path);
+        status = 2;
+    }
   }
-  return 0;
+  free(lock_path);
+  return status;
 }
 
 static void db_list_free(list_t list) {
@@ -721,10 +734,12 @@ int db_parse(const char *host, const char *real_path,
   int           failed = 0;
 
   /* Compare list with db list for matching host */
-  strcpy(backup_path, real_path);
-  backup_path_length = strlen(backup_path);
+  asprintf(&backup_path, real_path);
+  backup_path_length = strlen(real_path);
   list_compare(db_list, file_list, &added_files_list, &removed_files_list,
     parse_compare);
+  free(backup_path);
+  backup_path = NULL;
 
   /* Deal with new/modified data first */
   if (added_files_list != NULL) {
@@ -741,7 +756,7 @@ int db_parse(const char *host, const char *real_path,
 
         asprintf(&db_data->host, host);
         db_data->filedata.metadata = filedata->metadata;
-        asprintf(&db_data->filedata.path, "%s/%s", backup_path,
+        asprintf(&db_data->filedata.path, "%s/%s", real_path,
           filedata->path);
         db_data->link = NULL;
         db_data->date_in = time(NULL);
