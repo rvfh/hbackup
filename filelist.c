@@ -85,10 +85,8 @@ static int iterate_directory(const char *path, parser_t *parser) {
       continue;
     }
     asprintf(&file_path, "%s/%s", path, dir_entry->d_name);
-    /* Remove mount path from records */
-    filedata.path = malloc(strlen(file_path) - mount_path_length + 1);
-    /* Remove leading slash */
-    strcpy(filedata.path, &file_path[mount_path_length + 1]);
+    /* Remove mount path and leading slash from records */
+    asprintf(&filedata.path, &file_path[mount_path_length + 1]);
     strcpy(filedata.checksum, "");
     if (metadata_get(file_path, &filedata.metadata)) {
       fprintf(stderr, "filelist: cannot get metadata: %s\n", file_path);

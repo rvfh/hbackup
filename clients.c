@@ -146,65 +146,70 @@ void clients_free(void) {
 
 int clients_add(const char *info, const char *listfile) {
   client_t *client = malloc(sizeof(client_t));
-  const char *start = info;
-  char *delim = strchr(start, ':');
+  char     *linecopy = NULL;
+  char     *start;
+  char     *delim;
+  int      failed = 0;
 
+  asprintf(&linecopy, info);
+  start = linecopy;
+  delim = strchr(start, ':');
   if (delim == NULL) {
-    return 1;
-  }
-  /* Protocol */
-  client->protocol = malloc(delim - start + 1);
-  strncpy(client->protocol, start, delim - start);
-  client->protocol[delim - start] = '\0';
-  /* Lower case */
-  strtolower(client->protocol);
-  start = delim + 1;
-  /* There should be two / now */
-  if (*start != '/') {
-    return 1;
-  }
-  start++;
-  if (*start != '/') {
-    return 1;
-  }
-  start++;
-  /* Host name */
-  delim = strchr(start, '@');
-  if (delim == NULL) {
-    /* No username/password */
-    client->username = NULL;
-    client->password = NULL;
-    client->hostname = malloc(strlen(start) + 1);
-    strcpy(client->hostname, start);
-    /* Lower case */
-    strtolower(client->hostname);
+    failed = 1;
   } else {
-    char *colon = strchr(start, ':');
-
-    client->hostname = malloc(strlen(delim + 1) + 1);
-    strcpy(client->hostname, delim + 1);
+    /* Protocol */
+    *delim = '\0';
+    asprintf(&client->protocol, start);
     /* Lower case */
-    strtolower(client->hostname);
-    if (colon == NULL) {
-      /* No password */
-      client->username = malloc(delim - start + 1);
-      strncpy(client->username, start, delim - start);
-      client->username[delim - start] = '\0';
-      client->password = NULL;
+    strtolower(client->protocol);
+    start = delim + 1;
+    /* There should be two / now */
+    if ((*start++ != '/') || (*start++ != '/')) {
+      failed = 1;
     } else {
-      client->username = malloc(colon - start + 1);
-      strncpy(client->username, start, colon - start);
-      client->username[colon - start] = '\0';
-      client->password = malloc(delim - colon - 1 + 1);
-      strncpy(client->password, colon + 1, delim - colon - 1);
-      client->password[delim - colon - 1] = '\0';
+      /* Host name */
+      delim = strchr(start, '@');
+      if (delim == NULL) {
+        /* No username/password */
+        client->username = NULL;
+        client->password = NULL;
+        asprintf(&client->hostname, start);
+        /* Lower case */
+        strtolower(client->hostname);
+      } else {
+        char *colon = strchr(start, ':');
+
+        *delim = '\0';
+        /* Host name */
+        asprintf(&client->hostname, delim + 1);
+        strtolower(client->hostname);
+        /* Password */
+        if (colon == NULL) {
+          /* No password */
+          client->password = NULL;
+        } else {
+          if (strlen(colon + 1) != 0) {
+            asprintf(&client->password, colon + 1);
+          } else {
+            client->password = NULL;
+          }
+          *colon = '\0';
+        }
+        /* Username */
+        if (strlen(start) != 0) {
+          asprintf(&client->username, start);
+        } else {
+          client->username = NULL;
+        }
+      }
+
+      /* List file */
+      asprintf(&client->listfile, listfile);
+      list_append(clients, client);
     }
   }
-
-  /* List file */
-  asprintf(&client->listfile, listfile);
-  list_append(clients, client);
-  return 0;
+  free(linecopy);
+  return failed;
 }
 
 static int add_filter(list_t handle, const char *type, const char *string) {

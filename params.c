@@ -42,13 +42,14 @@ static char *find_blank(const char *string) {
 
 int params_readline(const char *line, char *keyword, char *type,
     char *string) {
-  char *linecopy = malloc(strlen(line) + 1);
-  char *start = linecopy;
+  char *linecopy = NULL;
+  char *start;
   char *delim;
   int param_count = 0;
 
   /* Reset all */
-  strcpy(linecopy, line);
+  asprintf(&linecopy, line);
+  start = linecopy;
   strcpy(keyword, "");
   strcpy(type, "");
   strcpy(string, "");
