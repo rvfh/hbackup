@@ -50,9 +50,11 @@ List 3 elements:
  test/subdir
  test/testfile
 Both lists with comparison function
-List 1 elements:
+List 2 elements:
  test/subdir/added
-List 3 elements:
+ test/subdir/testfile1
+List 4 elements:
+ test
  test/subdir
  test/testfile
  test/testfile

@@ -696,18 +696,8 @@ static int parse_compare(void *db_data_p, void *filedata_p) {
   filedata_t      *filedata = filedata_p;
   int             result;
 
-  /* No more data in database list: add to added list */
-  if (db_data_p == NULL) {
-    return 1;
-  }
-
-  /* No more data in file list: add to missing list */
-  if (filedata_p == NULL) {
-    return -1;
-  }
-
   /* If paths differ, that's all we want to check */
-  if ((result = strcmp(&db_data->filedata.path[backup_path_length + 1],
+  if ((result = strcmp(&db_data->filedata.path[backup_path_length],
       filedata->path))) {
     return result;
   }
@@ -739,8 +729,8 @@ int db_parse(const char *host, const char *real_path,
   int           failed = 0;
 
   /* Compare list with db list for matching host */
-  backup_path_length = strlen(real_path);
   asprintf(&select_string, "%s/", real_path);
+  backup_path_length = strlen(select_string);
   list_select(db_list, select_string, parse_select, &selected_files_list);
   free(select_string);
   list_compare(selected_files_list, file_list, &added_files_list,
@@ -748,7 +738,7 @@ int db_parse(const char *host, const char *real_path,
   list_deselect(selected_files_list);
 
   /* Deal with new/modified data first */
-  if (added_files_list != NULL) {
+  if (list_size(added_files_list) != 0) {
     static int   copied = 0;
     static off_t volume = 0;
 
@@ -819,14 +809,12 @@ int db_parse(const char *host, const char *real_path,
         }
       }
     }
-    /* This only unlists the data */
-    if (list_deselect(added_files_list) != 0) {
-      fprintf(stderr, "db: parse: added_files_list not empty, ignoring\n");
-    }
   }
+  /* This only unlists the data */
+  list_deselect(added_files_list);
 
   /* Deal with removed/modified data */
-  if (removed_files_list != NULL) {
+  if (list_size(removed_files_list) != 0) {
     if (verbosity() > 2) {
       printf(" --> Files to remove: %u\n", list_size(removed_files_list));
     }
@@ -836,11 +824,9 @@ int db_parse(const char *host, const char *real_path,
       /* Same data as in db_list */
       db_data->date_out = time(NULL);
     }
-    /* This only unlists the data */
-    if (list_deselect(removed_files_list) != 0) {
-      fprintf(stderr, "db: parse: removed_files_list not empty, ignoring\n");
-    }
   }
+  /* This only unlists the data */
+  list_deselect(removed_files_list);
 
   /* Report errors */
   if (failed) {

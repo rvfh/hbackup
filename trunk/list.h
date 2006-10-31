@@ -13,14 +13,13 @@ typedef char *(list_payload_get_f) (const void *payload);
 
 /* Type for function to compare payloads from two lists
  * Return codes:
- * -2 left data should be ignored
- * -1 left data is less than right data (add left to missing list)
- *  0 left data is same as right data (skip both)
- *  1 left data is more than right data (add right to added list)
- *  2 right data should be ignored
+ * <0 left data is less than right data / add left to missing list
+ * =0 left data is same as right data / skip both
+ * >0 left data is more than right data / add right to added list
  * The pointed is not const, so the function can actually alter it if needed.
  */
-typedef int (list_payloads_compare_f) (void *payload_left, void *payload_right);
+typedef int (list_payloads_compare_f) (void *payload_left,
+  void *payload_right);
 
 typedef void *list_t;
 typedef void *list_entry_t;
