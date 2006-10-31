@@ -105,7 +105,7 @@ int main(void) {
     return 0;
   }
   verbose = 3;
-  list_show(filelist_getlist(), NULL, file_data_show);
+  list_show(filelist_get(), NULL, file_data_show);
 
   /* Test database */
   if ((status = db_open("test_db"))) {
@@ -128,8 +128,8 @@ int main(void) {
     return 0;
   }
 
-  if ((status = db_parse("file://host", "/home/user/", filelist_getpath(),
-      filelist_getlist()))) {
+  if ((status = db_parse("file://host", "/home/user", "test",
+      filelist_get()))) {
     printf("db_parse error status %u\n", status);
     db_close();
     return 0;
@@ -146,8 +146,8 @@ int main(void) {
   }
   list_show(db_list, NULL, db_data_show);
 
-  if ((status = db_parse("file://host", "/home/user/", filelist_getpath(),
-      filelist_getlist()))) {
+  if ((status = db_parse("file://host", "/home/user", "test",
+      filelist_get()))) {
     printf("db_parse error status %u\n", status);
     db_close();
     return 0;
@@ -161,10 +161,10 @@ int main(void) {
     return 0;
   }
   verbose = 3;
-  list_show(filelist_getlist(), NULL, file_data_show);
+  list_show(filelist_get(), NULL, file_data_show);
 
-  if ((status = db_parse("file://host", "/home/user2/", filelist_getpath(),
-      filelist_getlist()))) {
+  if ((status = db_parse("file://host", "/home/user2", "test2",
+      filelist_get()))) {
     printf("db_parse error status %u\n", status);
     db_close();
     return 0;
@@ -216,10 +216,10 @@ int main(void) {
     return 0;
   }
   verbose = 3;
-  list_show(filelist_getlist(), NULL, file_data_show);
+  list_show(filelist_get(), NULL, file_data_show);
 
-  if ((status = db_parse("file://host", "/home/user/", filelist_getpath(),
-      filelist_getlist()))) {
+  if ((status = db_parse("file://host", "/home/user", "test",
+      filelist_get()))) {
     printf("db_parse error status %u\n", status);
     db_close();
     return 0;
@@ -233,10 +233,10 @@ int main(void) {
     return 0;
   }
   verbose = 3;
-  list_show(filelist_getlist(), NULL, file_data_show);
+  list_show(filelist_get(), NULL, file_data_show);
 
-  if ((status = db_parse("file://host", "/home/user2/", filelist_getpath(),
-      filelist_getlist()))) {
+  if ((status = db_parse("file://host", "/home/user2", "test2",
+      filelist_get()))) {
     printf("db_parse error status %u\n", status);
     db_close();
     return 0;

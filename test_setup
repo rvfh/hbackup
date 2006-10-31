@@ -90,5 +90,5 @@ ignore end ~
 ignore end ".o"
 parser cvs
 
-path test2
+path test2//
 EOF

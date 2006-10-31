@@ -6,8 +6,8 @@
 #ifndef TOOLS_H
 #define TOOLS_H
 
-/* Make sure string finish by one slash and only one */
-extern void one_trailing_slash(char *string);
+/* Make sure string finishes without slash */
+extern void no_trailing_slash(char *string);
 
 /* Convert string to lower case */
 extern void strtolower(char *string);

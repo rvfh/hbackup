@@ -12,14 +12,12 @@
 #include <ctype.h>
 #include "tools.h"
 
-void one_trailing_slash(char *string) {
+void no_trailing_slash(char *string) {
   char *last = &string[strlen(string) - 1];
 
   while ((last >= string) && (*last == '/')) {
     *last-- = '\0';
   }
-  *++last = '/';
-  *++last = '\0';
 }
 
 void strtolower(char *string) {

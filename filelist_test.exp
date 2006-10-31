@@ -106,18 +106,3 @@ List 13 elements:
  testdir
  testfile
  testfile~
-filelist_new, as previous with ending slash
-List 13 elements:
- cvs
- cvs/dirbad
- cvs/dirutd
- cvs/dirutd/fileutd
- cvs/filemod.o
- cvs/filenew.c
- cvs/fileutd.h
- dir space
- dir space/file space
- test space
- testdir
- testfile
- testfile~

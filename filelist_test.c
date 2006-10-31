@@ -29,11 +29,11 @@ int main(int argc, char *argv[]) {
     printf("parsers_new error status %u\n", status);
   }
   parsers_handle = test_parsers_handle;
-  mount_path_length = 5;
+  mount_path_length = 4;
 
   printf("iterate_directory\n");
   files = list_new(filedata_get);
-  if (! iterate_directory("test/", NULL)) {
+  if (! iterate_directory("test", NULL)) {
     list_show(files, NULL, NULL);
   }
   list_free(files);
@@ -43,7 +43,7 @@ int main(int argc, char *argv[]) {
     printf("ignore_add error status %u\n", status);
   }
   files = list_new(filedata_get);
-  if (! iterate_directory("test/", NULL)) {
+  if (! iterate_directory("test", NULL)) {
     list_show(files, NULL, NULL);
   }
   list_free(files);
@@ -53,7 +53,7 @@ int main(int argc, char *argv[]) {
     printf("ignore_add error status %u\n", status);
   }
   files = list_new(filedata_get);
-  if (! iterate_directory("test/", NULL)) {
+  if (! iterate_directory("test", NULL)) {
     list_show(files, NULL, NULL);
   }
   list_free(files);
@@ -61,7 +61,7 @@ int main(int argc, char *argv[]) {
   printf("as previous with CVS parser\n");
   parsers_add(test_parsers_handle, cvs_parser_new());
   files = list_new(filedata_get);
-  if (! iterate_directory("test/", NULL)) {
+  if (! iterate_directory("test", NULL)) {
     list_show(files, NULL, NULL);
   }
   list_free(files);
@@ -73,12 +73,6 @@ int main(int argc, char *argv[]) {
 
   printf("filelist_new, as previous\n");
   if (! filelist_new("test", test_filters_handle, test_parsers_handle)) {
-    list_show(files, NULL, NULL);
-    filelist_free();
-  }
-
-  printf("filelist_new, as previous with ending slash\n");
-  if (! filelist_new("test/", test_filters_handle, test_parsers_handle)) {
     list_show(files, NULL, NULL);
     filelist_free();
   }

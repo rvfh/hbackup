@@ -19,8 +19,17 @@
 #include "clients.h"
 #include "hbackup.h"
 
+/* DEFAULTS */
+
 /* Verbosity */
 static int verbose = 0;
+
+/* Configuration path */
+static const char default_config_path[] = "/etc/hbackup.conf";
+
+/* Configuration path */
+static const char default_db_path[] = "/hbackup";
+
 
 /* Signal received? */
 static int killed = 0;
@@ -54,9 +63,8 @@ void sighandler(int signal) {
 }
 
 int main(int argc, char **argv) {
-  char config_path[FILENAME_MAX] = "/etc/hbackup.conf";
-  char db_path[FILENAME_MAX]     = "/hbackup";
-  char *mount_path;
+  const char *config_path = NULL;
+  char *db_path     = NULL;
   FILE *config;
   int failed = 0;
   int expect_configpath = 0;
@@ -79,7 +87,7 @@ int main(int argc, char **argv) {
 
     /* Get config path if request */
     if (expect_configpath) {
-      strcpy(config_path, argv[argn]);
+      config_path = argv[argn];
       expect_configpath = 0;
     }
 
@@ -146,6 +154,10 @@ int main(int argc, char **argv) {
     return 2;
   }
 
+  if (config_path == NULL) {
+    config_path = default_config_path;
+  }
+
   if (verbosity() > 2) {
     printf("Verbosity level: %u\n", verbosity());
   }
@@ -153,11 +165,11 @@ int main(int argc, char **argv) {
   /* Open configuration file */
   if ((config = fopen(config_path, "r")) == NULL) {
     fprintf(stderr, "Configuration file not found %s\n", config_path);
-    return 2;
+    failed = 2;
   } else {
     /* Read configuration file */
-    char *buffer = malloc(FILENAME_MAX);
-    size_t size;
+    char *buffer = NULL;
+    size_t size  = 0;
     int line = 0;
 
     if (clients_new()) {
@@ -166,13 +178,13 @@ int main(int argc, char **argv) {
       while (getline(&buffer, &size, config) >= 0) {
         char keyword[256];
         char type[256];
-        char string[FILENAME_MAX];
+        char *string = malloc(size);
         int params = params_readline(buffer, keyword, type, string);
 
         line++;
         if (params > 1) {
           if (! strcmp(keyword, "db")) {
-            strcpy(db_path, string);
+            asprintf(&db_path, string);
           } else if (! strcmp(keyword, "client")) {
             if (clients_add(type, string)) {
               fprintf(stderr,
@@ -187,11 +199,15 @@ int main(int argc, char **argv) {
             failed = 2;
           }
         }
+        free(string);
       }
       fclose(config);
       free(buffer);
 
       if (! failed) {
+        if (db_path == NULL) {
+          asprintf(&db_path, default_db_path);
+        }
         /* Open backup database */
         if (db_open(db_path) == 2) {
           fprintf(stderr, "Failed to open database in '%s'\n", db_path);
@@ -202,10 +218,10 @@ int main(int argc, char **argv) {
           } else if (scan) {
             db_scan(NULL);
           } else {
+            char *mount_path = NULL;
+
             /* Make sure we have a mount path */
-            one_trailing_slash(db_path);
-            mount_path = malloc(strlen(db_path) + strlen("mount/") + 1);
-            sprintf(mount_path, "%s%s", db_path, "mount/");
+            asprintf(&mount_path, "%s/mount", db_path);
             if (testdir(mount_path, 1) == 2) {
               fprintf(stderr, "Failed to create mount point\n");
               failed = 2;
@@ -216,6 +232,7 @@ int main(int argc, char **argv) {
               fprintf(stderr, "Failed to backup\n");
               failed = 1;
             }
+            free(mount_path);
           }
 
           db_close();
@@ -224,6 +241,7 @@ int main(int argc, char **argv) {
       clients_free();
     }
   }
+  free(db_path);
 
   return failed;
 }
