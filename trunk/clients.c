@@ -41,12 +41,11 @@ static int unmount_share(const char *mount_point) {
   int failed = 0;
 
   if (mounted != NULL) {
-    char *command = malloc(strlen("umount ") + strlen(mount_point) + 1);
+    char *command = NULL;
 
     free(mounted);
     mounted = NULL;
-    strcpy(command, "umount ");
-    strcat(command, mount_point);
+    asprintf(&command, "umount %s", mount_point);
     if (verbosity() > 2) {
       printf(" --> Issuing command: %s\n", command);
     }
@@ -64,9 +63,9 @@ static int mount_share(const char *mount_point, const client_t *client,
 
   if (! strcmp(client->protocol, "smb")) {
     /* Mount SaMBa share (//hostname/share) */
-    char *share = malloc(strlen(client->hostname) + strlen(client_share) + 4);
+    char *share = NULL;
 
-    sprintf(share, "//%s/%s", client->hostname, client_share);
+    asprintf(&share, "//%s/%s", client->hostname, client_share);
     if ((mounted != NULL) && strcmp(mounted, share)) {
       /* Different share mounted: unmount */
       unmount_share(mount_point);
@@ -203,8 +202,7 @@ int clients_add(const char *info, const char *listfile) {
   }
 
   /* List file */
-  client->listfile = malloc(strlen(listfile) + 1);
-  strcpy(client->listfile, listfile);
+  asprintf(&client->listfile, listfile);
   list_append(clients, client);
   return 0;
 }
@@ -227,12 +225,12 @@ static int add_filter(list_t handle, const char *type, const char *string) {
 }
 
 static int read_listfile(const char *listfilename, list_t backups) {
-  FILE *listfile;
-  char *buffer = malloc(FILENAME_MAX);
-  size_t size;
-  int line = 0;
+  FILE     *listfile;
+  char     *buffer = NULL;
+  size_t   size    = 0;
+  int      line    = 0;
   backup_t *backup = NULL;
-  int failed = 0;
+  int      failed  = 0;
 
   /* Open list file */
   if ((listfile = fopen(listfilename, "r")) == NULL) {
@@ -244,7 +242,7 @@ static int read_listfile(const char *listfilename, list_t backups) {
     while (getline(&buffer, &size, listfile) >= 0) {
       char keyword[256];
       char type[256];
-      char string[FILENAME_MAX];
+      char *string = malloc(size);
       int params = params_readline(buffer, keyword, type, string);
 
       line++;
@@ -255,9 +253,7 @@ static int read_listfile(const char *listfilename, list_t backups) {
             listfilename, line);
           failed = 1;
         }
-        continue;
-      }
-      if (! strcmp(keyword, "compress")) {
+      } else if (! strcmp(keyword, "compress")) {
         fprintf(stderr,
           "clients: backup: keyword not implemented in list file %s, line %u\n",
           listfilename, line);
@@ -287,16 +283,16 @@ static int read_listfile(const char *listfilename, list_t backups) {
         filters_new(&backup->compress_handle);
         filters_new(&backup->ignore_handle);
         parsers_new(&backup->parsers_handle);
-        backup->path = malloc(strlen(string) + 1);
-        strcpy(backup->path, string);
+        asprintf(&backup->path, string);
+        no_trailing_slash(backup->path);
         list_append(backups, backup);
       } else {
         fprintf(stderr,
           "clients: backup: syntax error in list file %s, line %u\n",
           listfilename, line);
         failed = 1;
-        continue;
       }
+      free(string);
     }
     /* Close list file */
     fclose(listfile);
@@ -308,27 +304,22 @@ static int read_listfile(const char *listfilename, list_t backups) {
 /* Return 1 to force mount */
 static int get_paths(const char *protocol, const char *backup_path,
     const char *mount_point, char **share, char **path) {
+  int status = 2;
 
   if (! strcmp(protocol, "file")) {
     *share = malloc(1);
     *share[0] = '\0';
-    *path = malloc(strlen(backup_path) + 1);
-    strcpy(*path, backup_path);
-    return 0;
+    asprintf(path, backup_path);
+    status = 0;
   } else if (! strcmp(protocol, "smb")) {
-    *share = malloc(3);
-    (*share)[0] = backup_path[0];
-    (*share)[1] = '$';
-    (*share)[2] = '\0';
-    *path = malloc(strlen(mount_point) + strlen(backup_path) - 3 + 2);
-    sprintf(*path, "%s/%s", mount_point, &backup_path[3]);
+    asprintf(share, "%c$", backup_path[0]);
+    asprintf(path, "%s/%s", mount_point, &backup_path[3]);
     /* Lower case */
     strtolower(*path);
     pathtolinux(*path);
-    return 1;
-  } else {
-    return 2;
+    status = 1;
   }
+  return status;
 }
 
 static int prepare_share(client_t *client, const char *mount_point,
@@ -336,6 +327,7 @@ static int prepare_share(client_t *client, const char *mount_point,
   char  *share = NULL;
   int   failed = 0;
 
+  *path = NULL;
   failed = get_paths(client->protocol, backup_path, mount_point, &share, path);
   switch (failed) {
     case 1:
@@ -376,7 +368,6 @@ int clients_backup(const char *mount_point) {
         list_entry_t entry = NULL;
 
         while ((entry = list_next(backups, entry)) != NULL) {
-          char     prefix[FILENAME_MAX];
           backup_t *backup = list_entry_payload(entry);
           char     *backup_path = NULL;
 
@@ -392,19 +383,22 @@ int clients_backup(const char *mount_point) {
                     &backup_path)
              && ! filelist_new(backup_path, backup->ignore_handle,
                 backup->parsers_handle)) {
+              char *prefix = NULL;
+
               if (verbosity() > 1) {
                 printf(" -> Parsing list of files\n");
               }
-              sprintf(prefix, "%s://%s", client->protocol, client->hostname);
+              asprintf(&prefix, "%s://%s", client->protocol, client->hostname);
               strtolower(backup->path);
               pathtolinux(backup->path);
-              if (db_parse(prefix, backup->path, filelist_getpath(),
-                filelist_getlist())) {
+              if (db_parse(prefix, backup->path, backup_path,
+                  filelist_get())) {
                 if (! terminating()) {
                   fprintf(stderr, "clients: backup: parsing failed\n");
                 }
                 failed = 1;
               }
+              free(prefix);
               filelist_free();
             } else {
               if (! terminating()) {

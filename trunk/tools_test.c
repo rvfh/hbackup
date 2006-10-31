@@ -10,17 +10,17 @@ int main(void) {
 
   strcpy(line, "/this/is/a/line");
   printf("Check slashes to '%s': ", line);
-  one_trailing_slash(line);
+  no_trailing_slash(line);
   printf("'%s'\n", line);
 
   strcpy(line, "/this/is/a/line/");
   printf("Check slashes to '%s': ", line);
-  one_trailing_slash(line);
+  no_trailing_slash(line);
   printf("'%s'\n", line);
 
   strcpy(line, "/this/is/a/line/////////////");
   printf("Check slashes to '%s': ", line);
-  one_trailing_slash(line);
+  no_trailing_slash(line);
   printf("'%s'\n", line);
 
   strcpy(line, "This is a text which I like");

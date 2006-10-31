@@ -30,9 +30,6 @@ extern int filelist_new(const char *path, list_t filters, list_t parsers);
 extern void filelist_free(void);
 
 /* Obtain list of files */
-extern list_t filelist_getlist(void);
-
-/* Obtain files startup path (mount point) */
-extern const char *filelist_getpath(void);
+extern list_t filelist_get(void);
 
 #endif

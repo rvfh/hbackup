@@ -45,7 +45,7 @@ typedef struct {
 } db_data_t;
 
 static list_t *db_list = NULL;
-static char   db_path[FILENAME_MAX];
+static char   *db_path = NULL;
 
 /* Current path being backed up */
 static char   backup_path[FILENAME_MAX] = "";
@@ -131,29 +131,34 @@ static size_t copy(const char *source_path, const char *dest_path, char *checksu
   return size;
 }
 
-static int getdir(const char *checksum, char *path) {
+static int getdir(const char *checksum, char **path_p) {
   const char  *checksumpart = checksum;
-  char        *dir_path;
+  char        *dir_path = NULL;
   int         status;
   int         failed = 0;
 
-  asprintf(&dir_path, "%sdata/", db_path);
+  asprintf(&dir_path, "%s/data", db_path);
   /* Two cases: either there are files, or a .nofiles file and directories */
   do {
-    char *temp_path;
+    char *temp_path = NULL;
 
     /* If we can find a .nofiles file, then go down one more directory */
-    asprintf(&temp_path, "%s.nofiles", dir_path);
-    if (! (status = testfile(temp_path, 0))) {
-      strncat(dir_path, (char *) checksumpart, 2);
-      strcat(dir_path, "/");
-      checksumpart += 2;
-    }
+    asprintf(&temp_path, "%s/.nofiles", dir_path);
+    status = testfile(temp_path, 0);
     free(temp_path);
+
+    if (! status) {
+      char *new_dir_path = NULL;
+
+      asprintf(&new_dir_path, "%s/%c%c", dir_path, checksumpart[0],
+        checksumpart[1]);
+      checksumpart += 2;
+      free(dir_path);
+      dir_path = new_dir_path;
+    }
   } while (! status);
   /* Return path */
-  strcpy(path, dir_path);
-  strcat(path, (char *) checksumpart);
+  asprintf(path_p, "%s/%s", dir_path, (char *) checksumpart);
   if (testdir(dir_path, 1)) {
     failed = 1;
   }
@@ -166,7 +171,7 @@ static int db_load(const char *filename, list_t list) {
   FILE *readfile;
   int  failed = 0;
 
-  asprintf(&source_path, "%s%s", db_path, filename);
+  asprintf(&source_path, "%s/%s", db_path, filename);
   if ((readfile = fopen(source_path, "r")) != NULL) {
     /* Read the file into memory */
     char *buffer = NULL;
@@ -190,12 +195,10 @@ static int db_load(const char *filename, list_t list) {
         failed = 0;
         switch (++field) {
           case 1:   /* Prefix */
-            db_data.host = malloc(strlen(string) + 1);
-            strcpy(db_data.host, string);
+            asprintf(&db_data.host, string);
             break;
           case 2:   /* Path */
-            db_data.filedata.path = malloc(strlen(string) + 1);
-            strcpy(db_data.filedata.path, string);
+            asprintf(&db_data.filedata.path, string);
             break;
           case 3:   /* Type */
             if (sscanf(string, "%c", &letter) != 1) {
@@ -229,8 +232,7 @@ static int db_load(const char *filename, list_t list) {
             }
             break;
           case 9:   /* Link */
-            db_data.link = malloc(strlen(string) + 1);
-            strcpy(db_data.link, string);
+            asprintf(&db_data.link, string);
             break;
           case 10:  /* Checksum */
             /* TODO: this is just transitory */
@@ -293,7 +295,7 @@ static int db_save(const char *filename, list_t list) {
   FILE *writefile;
   int  failed = 0;
 
-  asprintf(&temp_path, "%s%s.part", db_path, filename);
+  asprintf(&temp_path, "%s/%s.part", db_path, filename);
   if ((writefile = fopen(temp_path, "w")) != NULL) {
     char *dest_path = NULL;
     list_entry_t entry = NULL;
@@ -318,7 +320,7 @@ static int db_save(const char *filename, list_t list) {
     fclose(writefile);
 
     /* All done */
-    asprintf(&dest_path, "%s%s", db_path, filename);
+    asprintf(&dest_path, "%s/%s", db_path, filename);
     failed = rename(temp_path, dest_path);
     free(dest_path);
   } else {
@@ -418,8 +420,9 @@ static int db_organize(char *path, int number) {
 }
 
 static int db_write(const char *mount_path, const char *path, size_t size, char *checksum) {
-  char  temp_path[FILENAME_MAX];
-  char  dest_path[FILENAME_MAX];
+  char  *source_path = NULL;
+  char  *temp_path   = NULL;
+  char  *dest_path   = NULL;
   char  temp_checksum[256];
   FILE  *writefile;
   FILE  *readfile;
@@ -427,37 +430,41 @@ static int db_write(const char *mount_path, const char *path, size_t size, char 
   int   delete = 0;
   int   failed = 0;
 
-  /* File to read from (dest_path is used here temporarily) */
-  strcpy(dest_path, mount_path);
-  strcat(dest_path, path);
+  /* File to read from */
+  asprintf(&source_path, "%s/%s", mount_path, path);
 
   /* Temporary file to write to */
-  strcpy(temp_path, db_path);
-  strcat(temp_path, "filedata");
+  asprintf(&temp_path, "%s/filedata", db_path);
 
-  /* Get file final location (dest_path gets overwritten here by getdir) */
-  if ((copy(dest_path, temp_path, temp_checksum) != size) || (getdir(temp_checksum, dest_path) == 2)) {
+  /* Copy file locally */
+  if (copy(source_path, temp_path, temp_checksum) != size) {
     if (! terminating()) {
       /* Don't signal errors on termination */
-      fprintf(stderr, "db: write: failed to copy or get dir for: %s\n", path);
+      fprintf(stderr, "db: write: failed to copy file: %s\n", path);
     }
+    failed = 1;
+  }
+  free(source_path);
+
+  /* Get file final location */
+  if (! failed && getdir(temp_checksum, &dest_path) == 2) {
+    fprintf(stderr, "db: write: failed to get dir for: %s\n", temp_checksum);
     failed = 1;
   }
 
   /* Make sure our checksum is unique */
   if (! failed) do {
-    char  final_path[FILENAME_MAX];
+    char  *final_path = NULL;
     int   differ = 0;
 
     /* Complete checksum with index */
     sprintf((char *) checksum, "%s-%u", temp_checksum, index);
-    sprintf(final_path, "%s-%u/", dest_path, index);
+    asprintf(&final_path, "%s-%u/", dest_path, index);
     if (! testdir(final_path, 1)) {
       /* Directory exists */
-      char  try_path[FILENAME_MAX];
+      char  *try_path = NULL;
 
-      strcpy(try_path, final_path);
-      strcat(try_path, "data");
+      asprintf(&try_path, "%s/data", final_path);
       if (! testfile(try_path, 0)) {
         /* A file already exists, let's compare */
         metadata_t try_md;
@@ -498,16 +505,26 @@ static int db_write(const char *mount_path, const char *path, size_t size, char 
           }
         }
       }
+      free(try_path);
     }
     if (! differ) {
-      strcpy(dest_path, final_path);
+      free(dest_path);
+      dest_path = final_path;
       break;
+    } else {
+      free(final_path);
     }
     index++;
   } while (1);
 
   /* Now move the file in its place */
-  strcat(dest_path, "data");
+  {
+    char *data_path = NULL;
+
+    asprintf(&data_path, "%s/data", dest_path);
+    free(dest_path);
+    dest_path = data_path;
+  }
   if (! failed && rename(temp_path, dest_path)) {
     fprintf(stderr, "db: write: failed to move file %s to %s: %s\n",
       strerror(errno), temp_path, dest_path);
@@ -518,9 +535,9 @@ static int db_write(const char *mount_path, const char *path, size_t size, char 
   if (failed || delete) {
     remove(temp_path);
   }
-  if (failed) {
-    return 2;
-  } else {
+  free(temp_path);
+  /* TODO not nice */
+  if (! failed) {
     /* dest_path is /path/to/checksum/data */
     char *delim = strrchr(dest_path, '/');
 
@@ -534,26 +551,26 @@ static int db_write(const char *mount_path, const char *path, size_t size, char 
       }
     }
   }
-  return 0;
+  free(dest_path);
+  return failed;
 }
 
 int db_open(const char *path) {
   char temp_path[FILENAME_MAX];
   FILE *file;
 
-  strcpy(db_path, path);
-  strcat(db_path, "/");
+  asprintf(&db_path, path);
 
   /* Check that data exists (no need to lock) */
   strcpy(temp_path, db_path);
-  strcat(temp_path, "data");
+  strcat(temp_path, "/data");
   if (testdir(temp_path, 1) == 2) {
     return 2;
   }
 
   /* Take lock */
   strcpy(temp_path, db_path);
-  strcat(temp_path, "lock");
+  strcat(temp_path, "/lock");
   if ((file = fopen(temp_path, "r")) != NULL) {
     pid_t pid;
 
@@ -640,9 +657,10 @@ void db_close(void) {
   db_list_free(db_list);
 
   /* Release lock */
-  asprintf(&temp_path, "%slock", db_path);
+  asprintf(&temp_path, "%s/lock", db_path);
   remove(temp_path);
   free(temp_path);
+  free(db_path);
 }
 
 /* Need to compare only for matching paths */
@@ -662,7 +680,8 @@ static int parse_compare(void *db_data_p, void *filedata_p) {
   }
 
   /* Ignore when paths do not match */
-  if (strncmp(db_data->filedata.path, backup_path, backup_path_length)) {
+  if ((db_data->filedata.path[backup_path_length] != '/')
+   || strncmp(db_data->filedata.path, backup_path, backup_path_length)) {
     return -2;
   }
 
@@ -672,7 +691,7 @@ static int parse_compare(void *db_data_p, void *filedata_p) {
   }
 
   /* If paths differ, that's all we want to check */
-  if ((result = strcmp(&db_data->filedata.path[backup_path_length],
+  if ((result = strcmp(&db_data->filedata.path[backup_path_length + 1],
       filedata->path))) {
     return result;
   }
@@ -703,7 +722,6 @@ int db_parse(const char *host, const char *real_path,
 
   /* Compare list with db list for matching host */
   strcpy(backup_path, real_path);
-  one_trailing_slash(backup_path);
   backup_path_length = strlen(backup_path);
   list_compare(db_list, file_list, &added_files_list, &removed_files_list,
     parse_compare);
@@ -721,13 +739,10 @@ int db_parse(const char *host, const char *real_path,
         filedata_t *filedata = list_entry_payload(entry);
         db_data_t  *db_data  = malloc(sizeof(db_data_t));
 
-        db_data->host = malloc(strlen(host) + 1);
-        strcpy(db_data->host, host);
+        asprintf(&db_data->host, host);
         db_data->filedata.metadata = filedata->metadata;
-        db_data->filedata.path =
-          malloc(backup_path_length + strlen(filedata->path) + 1);
-        strcpy(db_data->filedata.path, backup_path);
-        strcat(db_data->filedata.path, filedata->path);
+        asprintf(&db_data->filedata.path, "%s/%s", backup_path,
+          filedata->path);
         db_data->link = NULL;
         db_data->date_in = time(NULL);
         db_data->date_out = 0;
@@ -755,7 +770,7 @@ int db_parse(const char *host, const char *real_path,
           char *string = malloc(FILENAME_MAX);
           int size;
 
-          asprintf(&full_path, "%s%s", mount_path, filedata->path);
+          asprintf(&full_path, "%s/%s", mount_path, filedata->path);
           if ((size = readlink(full_path, string, FILENAME_MAX)) < 0) {
             failed = 1;
             fprintf(stderr, "db: parse: %s: %s, ignoring\n",
@@ -821,47 +836,56 @@ int db_parse(const char *host, const char *real_path,
 }
 
 int db_read(const char *path, const char *checksum) {
-  char  source_path[FILENAME_MAX];
-  char  temp_path[FILENAME_MAX];
-  char  temp_checksum[256];
+  char *source_path = NULL;
+  char *temp_path   = NULL;
+  char temp_checksum[256];
+  int  failed = 0;
 
-  if (getdir(checksum, source_path)) {
+  if (getdir(checksum, &temp_path)) {
     fprintf(stderr, "db: read: failed to get dir for: %s\n", checksum);
     return 2;
   }
-  strcat(source_path, "/data");
+  asprintf(&source_path, "%s/data", temp_path);
+  free(temp_path);
+  temp_path = NULL;
 
   /* Open temporary file to write to */
-  strcpy(temp_path, path);
-  strcat(temp_path, ".part");
+  asprintf(&temp_path, "%s.part", path);
 
   /* Copy file to temporary name (size not checked: checksum suffices) */
   if (copy(source_path, temp_path, temp_checksum) < 0) {
     fprintf(stderr, "db: read: failed to copy file: %s\n", source_path);
-    remove(temp_path);
-    return 2;
-  }
+    failed = 2;
+  } else
 
   /* Verify that checksums match before overwriting current final destination */
   if (strncmp(checksum, temp_checksum, strlen(temp_checksum))) {
-    fprintf(stderr, "db: read: checksums don't match: %s %s\n", source_path, temp_checksum);
-    remove(temp_path);
-    return 2;
-  }
+    fprintf(stderr, "db: read: checksums don't match: %s %s\n",
+      source_path, temp_checksum);
+    failed = 2;
+  } else
 
   /* All done */
   if (rename(temp_path, path)) {
-    fprintf(stderr, "db: read: failed to rename file to %s: %s\n", strerror(errno), path);
-    return 2;
+    fprintf(stderr, "db: read: failed to rename file to %s: %s\n",
+      strerror(errno), path);
+    failed = 2;
   }
 
-  return 0;
+  if (failed) {
+    remove(temp_path);
+  }
+  free(source_path);
+  free(temp_path);
+
+  return failed;
 }
 
 int db_scan(const char *checksum) {
+  int failed = 0;
+
   if (checksum == NULL) {
     list_entry_t entry = NULL;
-    int failed = 0;
     int files = list_size(db_list);
 
     if (verbosity() > 1) {
@@ -883,26 +907,31 @@ int db_scan(const char *checksum) {
         return 3;
       }
     }
-    return failed;
   } else if ((checksum[0] != '\0') && strcmp(checksum, "N")) {
-    char path[FILENAME_MAX];
+    char *path = NULL;
 
-    if (getdir(checksum, path)) {
-      return 1;
+    if (getdir(checksum, &path)) {
+      failed = 1;
+    } else {
+      char *test_path = NULL;
+
+      asprintf(&test_path, "%s/data", path);
+      if (testfile(test_path, 0)) {
+        failed = 2;
+      }
+      free(test_path);
     }
-    strcat(path, "/data");
-    if (testfile(path, 0)) {
-      return 2;
-    }
+    free(path);
   }
-  return 0;
+  return failed;
 }
 
 int db_check(const char *checksum) {
+  int failed = 0;
+
   if (checksum == NULL) {
     list_entry_t entry = NULL;
-    int failed = 0;
-    int files = list_size(db_list);
+    int          files = list_size(db_list);
 
     if (verbosity() > 1) {
       printf(" -> Checking database list: %u file(s)\n", list_size(db_list));
@@ -932,34 +961,41 @@ int db_check(const char *checksum) {
     }
     return failed;
   } else if (strcmp(checksum, "N")) {
-    char        path[FILENAME_MAX];
-    FILE        *readfile;
-    char        buffer[10240];
-    char        check[36];
-    EVP_MD_CTX  ctx;
-    size_t      rlength;
+    char       *path = NULL;
 
-    if (getdir(checksum, path)) {
-      return 1;
-    }
-    strcat(path, "/data");
-    /* Read file to compute checksum, compare with expected */
-    if ((readfile = fopen(path, "r")) == NULL) {
-      return 1;
-    }
+    if (getdir(checksum, &path)) {
+      failed = 1;
+    } else {
+      FILE *readfile;
+      char *check_path = NULL;
 
-    EVP_DigestInit(&ctx, EVP_md5());
-    while (! feof(readfile) && ! terminating()) {
-      rlength = fread(buffer, 1, 10240, readfile);
-      EVP_DigestUpdate(&ctx, buffer, rlength);
+      asprintf(&check_path, "%s/data", path);
+      /* Read file to compute checksum, compare with expected */
+      if ((readfile = fopen(check_path, "r")) == NULL) {
+        failed = 1;
+      } else {
+        char       check[36];
+        EVP_MD_CTX ctx;
+        size_t     rlength;
+
+        EVP_DigestInit(&ctx, EVP_md5());
+        while (! feof(readfile) && ! terminating()) {
+          char buffer[10240];
+
+          rlength = fread(buffer, 1, 10240, readfile);
+          EVP_DigestUpdate(&ctx, buffer, rlength);
+        }
+        fclose(readfile);
+        /* Re-use length */
+        EVP_DigestFinal(&ctx, (unsigned char *) check, &rlength);
+        md5sum(check, rlength);
+        if (strcmp(check, checksum)) {
+          failed = 2;
+        }
+      }
+      free(check_path);
     }
-    fclose(readfile);
-    /* Re-use length */
-    EVP_DigestFinal(&ctx, (unsigned char *) check, &rlength);
-    md5sum(check, rlength);
-    if (strcmp(check, checksum)) {
-      return 2;
-    }
+    free(path);
   }
-  return 0;
+  return failed;
 }

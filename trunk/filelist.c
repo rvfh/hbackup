@@ -32,8 +32,7 @@ Algorithm for temporary list creation:
 #include "tools.h"
 #include "filelist.h"
 
-/* Mount point */
-static char mount_path[FILENAME_MAX] = "";
+/* Mount point string length */
 static int mount_path_length = 0;
 
 static list_t files = NULL;
@@ -83,13 +82,11 @@ static int iterate_directory(const char *path, parser_t *parser) {
     if (! strcmp(dir_entry->d_name, ".") || ! strcmp(dir_entry->d_name, "..")){
       continue;
     }
-    /* Add 2 for '\0' and '/' */
-    file_path = malloc(strlen(path) + strlen(dir_entry->d_name) + 2);
-    strcpy(file_path, path);
-    strcat(file_path, dir_entry->d_name);
+    asprintf(&file_path, "%s/%s", path, dir_entry->d_name);
     /* Remove mount path from records */
     filedata.path = malloc(strlen(file_path) - mount_path_length + 1);
-    strcpy(filedata.path, &file_path[mount_path_length]);
+    /* Remove leading slash */
+    strcpy(filedata.path, &file_path[mount_path_length + 1]);
     strcpy(filedata.checksum, "");
     if (metadata_get(file_path, &filedata.metadata)) {
       fprintf(stderr, "filelist: cannot get metadata: %s\n", file_path);
@@ -106,7 +103,6 @@ static int iterate_directory(const char *path, parser_t *parser) {
     } else
     if (S_ISDIR(filedata.metadata.type)) {
       filedata.metadata.size = 0;
-      strcat(file_path, "/");
       if (iterate_directory(file_path, parser)) {
         if (! terminating()) {
           fprintf(stderr, "filelist: cannot iterate into directory: %s\n",
@@ -139,11 +135,8 @@ int filelist_new(const char *path, list_t filters, list_t parsers) {
     fprintf(stderr, "filelist: new: cannot initialise\n");
     return 2;
   }
-  /* Remove trailing slashes */
-  strcpy(mount_path, path);
-  one_trailing_slash(mount_path);
-  mount_path_length = strlen(mount_path);
-  if (iterate_directory(mount_path, NULL)) {
+  mount_path_length = strlen(path);
+  if (iterate_directory(path, NULL)) {
     filelist_free();
     return 1;
   }
@@ -161,10 +154,7 @@ void filelist_free(void) {
   list_free(files);
 }
 
-list_t filelist_getlist(void) {
+list_t filelist_get(void) {
   return files;
 }
 
-const char *filelist_getpath(void) {
-  return mount_path;
-}
