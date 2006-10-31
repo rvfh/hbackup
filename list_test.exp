@@ -57,6 +57,22 @@ List 3 elements:
  test/testfile
  test/testfile
 
+Select part of list
+List 5 elements:
+ test
+ test/subdir
+ test/subdir/testfile1
+ test/testfile
+ test/testfile
+List 1 elements:
+ test/subdir/testfile1
+List 5 elements:
+ test
+ test/subdir
+ test/subdir/testfile1
+ test/testfile
+ test/testfile
+
 Empty list
 List 4 elements:
  test

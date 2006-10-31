@@ -11,8 +11,7 @@ install: hbackup
 	@mkdir -p ${PREFIX}
 	@cp $^ ${PREFIX}
 
-test:	setup \
-	params_test.dif \
+test:	params_test.dif \
 	list_test.dif \
 	tools_test.dif \
 	metadata_test.dif \
@@ -27,10 +26,6 @@ clean:
 	rm -f *.[oa] *~ *.out *.out.failed *.dif *_test hbackup
 	@./test_setup clean
 	@echo "Cleaning test environment"
-
-setup:
-	@./test_setup
-	@echo "Setting up test environment"
 
 # Dependencies
 metadata_test: metadata.a
@@ -63,7 +58,8 @@ clients.a: clients.h list.h
 	$(AR) cru $@ $^
 	$(RANLIB) $@
 
-%.out: %
+%.out: % test_setup
+	@./test_setup
 	./$< > $@ 2>&1
 
 %.dif: %.out %.exp

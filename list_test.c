@@ -18,15 +18,20 @@ typedef struct {
   char filename[256];
 } payload2_t;
 
-static void payload_get(const void *payload_p, char **string_p) {
+static char *payload_get(const void *payload_p) {
   const payload_t *payload = payload_p;
-  asprintf(string_p, "%s", payload->name);
+  char *string = NULL;
+
+  asprintf(&string, "%s", payload->name);
+  return string;
 }
 
-static void payload2_get(const void *payload_p, char **string_p) {
-  const payload2_t  *payload = payload_p;
+static char *payload2_get(const void *payload_p) {
+  const payload2_t *payload = payload_p;
+  char *string = NULL;
 
-  asprintf(string_p, "%s/%s", payload->dir, payload->filename);
+  asprintf(&string, "%s/%s", payload->dir, payload->filename);
+  return string;
 }
 
 static int payloads_compare(void *payload_left, void *payload_right) {
@@ -70,7 +75,7 @@ int main() {
   list_add(list, list_test_new(payload));
   list_show(list, NULL, payload_get);
   list_find(list, "test", NULL, &entry);
-  payload_get(list_entry_payload(entry), &string);
+  string = payload_get(list_entry_payload(entry));
   if (strcmp(string, "test")) {
     printf("test not found???\n");
   }
@@ -113,21 +118,53 @@ int main() {
   if (list_compare(list, list2, &added, NULL, NULL)) {
     printf("Added list only\n");
     list_show(added, NULL, NULL);
+    if (list_deselect(added) != 0) {
+      printf("Added list not freed\n");
+    }
   }
   if (list_compare(list, list2, NULL, &missing, NULL)) {
     printf("Missing list only\n");
     list_show(missing, NULL, NULL);
+    if (list_deselect(missing) != 0) {
+      printf("Missing list not freed\n");
+    }
   }
   if (list_compare(list, list2, &added, &missing, NULL)) {
     printf("Both lists\n");
     list_show(added, NULL, NULL);
+    if (list_deselect(added) != 0) {
+      printf("Added list not freed\n");
+    }
     list_show(missing, NULL, NULL);
+    if (list_deselect(missing) != 0) {
+      printf("Missing list not freed\n");
+    }
   }
   if (list_compare(list, list2, &added, &missing, payloads_compare)) {
     printf("Both lists with comparison function\n");
     list_show(added, NULL, NULL);
+    if (list_deselect(added) != 0) {
+      printf("Added list not freed\n");
+    }
     list_show(missing, NULL, NULL);
+    if (list_deselect(missing) != 0) {
+      printf("Missing list not freed\n");
+    }
   }
+
+  list_free(list2);
+
+  printf("\nSelect part of list\n");
+  list_show(list, NULL, payload_get);
+  if (list_select(list, "test/subdir/", NULL, list2)) {
+    printf("Select failed\n");
+  } else {
+    list_show(list2, NULL, NULL);
+    if (list_deselect(list2) != 0) {
+      printf("Selected list not freed\n");
+    }
+  }
+  list_show(list, NULL, payload_get);
 
   printf("\nEmpty list\n");
   list_drop(list, entry);

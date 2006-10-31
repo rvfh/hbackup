@@ -39,10 +39,12 @@ static list_t files = NULL;
 static void *filters_handle = NULL;
 static void *parsers_handle = NULL;
 
-static void filedata_get(const void *payload, char **string_p) {
+static char *filedata_get(const void *payload) {
   const filedata_t *filedata = payload;
+  char *string = NULL;
 
-  asprintf(string_p, filedata->path);
+  asprintf(&string, filedata->path);
+  return string;
 }
 
 static int iterate_directory(const char *path, parser_t *parser) {
