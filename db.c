@@ -100,14 +100,12 @@ static size_t copy(const char *source_path, const char *dest_path, char *checksu
 
   /* Open file to read from */
   if ((readfile = fopen(source_path, "r")) == NULL) {
-    fprintf(stderr, "db: failed to open source file: %s\n", source_path);
     return -1;
   }
 
   /* Open file to write to */
   if ((writefile = fopen(dest_path, "w")) == NULL) {
     fclose(readfile);
-    fprintf(stderr, "db: failed to open destination file: %s\n", dest_path);
     return -1;
   }
 
@@ -194,10 +192,10 @@ static int db_load(const char *filename, list_t list) {
         failed = 0;
         switch (++field) {
           case 1:   /* Prefix */
-            asprintf(&db_data.host, string);
+            asprintf(&db_data.host, "%s", string);
             break;
           case 2:   /* Path */
-            asprintf(&db_data.filedata.path, string);
+            asprintf(&db_data.filedata.path, "%s", string);
             break;
           case 3:   /* Type */
             if (sscanf(string, "%c", &letter) != 1) {
@@ -231,7 +229,7 @@ static int db_load(const char *filename, list_t list) {
             }
             break;
           case 9:   /* Link */
-            asprintf(&db_data.link, string);
+            asprintf(&db_data.link, "%s", string);
             break;
           case 10:  /* Checksum */
             /* TODO: this is just transitory */
@@ -421,15 +419,16 @@ static int db_organize(char *path, int number) {
 }
 
 static int db_write(const char *mount_path, const char *path, size_t size, char *checksum) {
-  char  *source_path = NULL;
-  char  *temp_path   = NULL;
-  char  *dest_path   = NULL;
-  char  temp_checksum[36];
-  FILE  *writefile;
-  FILE  *readfile;
-  int   index = 0;
-  int   delete = 0;
-  int   failed = 0;
+  char    *source_path = NULL;
+  char    *temp_path   = NULL;
+  char    *dest_path   = NULL;
+  char    temp_checksum[36];
+  FILE    *writefile;
+  FILE    *readfile;
+  int     index = 0;
+  int     delete = 0;
+  int     failed = 0;
+  size_t  copied;
 
   /* File to read from */
   asprintf(&source_path, "%s/%s", mount_path, path);
@@ -438,8 +437,9 @@ static int db_write(const char *mount_path, const char *path, size_t size, char 
   asprintf(&temp_path, "%s/filedata", db_path);
 
   /* Copy file locally */
-  if (copy(source_path, temp_path, temp_checksum) != size) {
-    if (! terminating()) {
+  copied = copy(source_path, temp_path, temp_checksum);
+  if (copied != size) {
+    if (! terminating() && (copied != -1)) {
       /* Don't signal errors on termination */
       fprintf(stderr, "db: write: failed to copy file: %s\n", path);
     }
@@ -567,7 +567,7 @@ int db_open(const char *path) {
   FILE *file;
   int  status = 0;
 
-  asprintf(&db_path, path);
+  asprintf(&db_path, "%s", path);
 
   /* Check that data dir exists, create it (no need to lock) */
   asprintf(&data_path, "%s/data", db_path);
@@ -750,7 +750,7 @@ int db_parse(const char *host, const char *real_path,
         filedata_t *filedata = list_entry_payload(entry);
         db_data_t  *db_data  = malloc(sizeof(db_data_t));
 
-        asprintf(&db_data->host, host);
+        asprintf(&db_data->host, "%s", host);
         db_data->filedata.metadata = filedata->metadata;
         asprintf(&db_data->filedata.path, "%s/%s", real_path,
           filedata->path);
@@ -788,7 +788,7 @@ int db_parse(const char *host, const char *real_path,
               strerror(errno), db_data->filedata.path);
           } else {
             string[size] = '\0';
-            asprintf(&db_data->link, string);
+            asprintf(&db_data->link, "%s", string);
           }
           free(full_path);
           free(string);

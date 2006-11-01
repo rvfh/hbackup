@@ -20,7 +20,7 @@ typedef struct {
 static char *cvs_payload_get(const void *payload) {
   char *string = NULL;
 
-  asprintf(&string, ((cvs_entry_t *) payload)->name);
+  asprintf(&string, "%s", ((cvs_entry_t *) payload)->name);
   return string;
 }
 
@@ -66,7 +66,7 @@ static int cvs_dir_check(void **handle, const char *dir_path) {
       }
 
       *delim = '\0';
-      asprintf(&cvs_entry.name, start);
+      asprintf(&cvs_entry.name, "%s", start);
 
       payload = malloc(sizeof(cvs_entry_t));
       *payload = cvs_entry;

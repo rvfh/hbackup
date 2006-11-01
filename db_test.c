@@ -14,7 +14,7 @@ static int verbose = 3;
 static char *file_data_show(const void *payload) {
   char *string = NULL;
 
-  asprintf(&string, ((filedata_t *) payload)->path);
+  asprintf(&string, "%s", ((filedata_t *) payload)->path);
   return string;
 }
 
