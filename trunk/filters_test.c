@@ -12,13 +12,28 @@ static char *filters_show(const void *payload) {
   const filter_t *filter = payload;
   char *string = NULL;
 
-  asprintf(&string, "%s %u", filter->string, filter->type);
+  switch (filter->type) {
+    case filter_end:
+    case filter_path_start:
+    case filter_path_regexp:
+    case filter_file_start:
+    case filter_file_regexp:
+      asprintf(&string, "%s %u", filter->string, filter->type);
+      break;
+    case filter_size_min:
+    case filter_size_max:
+      asprintf(&string, "%u %u", filter->size, filter->type);
+      break;
+    default:
+      asprintf(&string, "unknown filter type");
+  }
   return string;
 }
 
 int main(void) {
   void *handle = NULL;
   void *handle2 = NULL;
+  filedata_t filedata;
 
   printf("filter_end_check\n");
   if (! filter_end_check("this is/a path/to a file.txt", ".txt")) {
@@ -63,68 +78,133 @@ int main(void) {
   if (filters_new(&handle)) {
     printf("Failed to create\n");
   } else {
-    if (filters_add(handle, "^to a.*\\.txt", filter_file_regexp)) {
+    if (filters_add(handle, filter_file_regexp, "^to a.*\\.txt")) {
       printf("Failed to add\n");
     } else {
       list_show(handle, NULL, filters_show);
     }
-    if (filters_add(handle, "^to a.*\\.t.t", filter_file_regexp)) {
+    if (filters_add(handle, filter_file_regexp, "^to a.*\\.t.t")) {
       printf("Failed to add\n");
     } else {
       list_show(handle, NULL, filters_show);
     }
-    if (filters_match(handle, "this is/a path/to a file.txt")) {
+    filedata.path = "this is/a path/to a file.txt";
+    if (filters_match(handle, &filedata)) {
       printf("Not matching 1\n");
     }
-    if (filters_match(handle, "this is/a path/to a file.tst")) {
+    filedata.path = "this is/a path/to a file.tst";
+    if (filters_match(handle, &filedata)) {
       printf("Not matching 2\n");
     }
-    if (filters_match(handle, "this is/a path/to a file.tsu")) {
+    filedata.path = "this is/a path/to a file.tsu";
+    if (filters_match(handle, &filedata)) {
       printf("Not matching 3\n");
     }
 
     if (filters_new(&handle2)) {
       printf("Failed to create\n");
     } else {
-      if (filters_match(handle2, "this is/a path/to a file.txt")) {
+      filedata.path = "this is/a path/to a file.txt";
+      if (filters_match(handle2, &filedata)) {
         printf("Not matching +1\n");
       }
-      if (filters_match(handle2, "this is/a path/to a file.tst")) {
+      filedata.path = "this is/a path/to a file.tst";
+      if (filters_match(handle2, &filedata)) {
         printf("Not matching +2\n");
       }
-      if (filters_match(handle2, "this is/a path/to a file.tsu")) {
+      filedata.path = "this is/a path/to a file.tsu";
+      if (filters_match(handle2, &filedata)) {
         printf("Not matching +3\n");
       }
-      if (filters_add(handle2, "^to a.*\\.txt", filter_file_regexp)) {
+      if (filters_add(handle2, filter_file_regexp, "^to a.*\\.txt")) {
         printf("Failed to add\n");
       } else {
         list_show(handle2, NULL, filters_show);
       }
-      if (filters_add(handle2, "^to a.*\\.t.t", filter_file_regexp)) {
+      if (filters_add(handle2, filter_file_regexp, "^to a.*\\.t.t")) {
         printf("Failed to add\n");
       } else {
         list_show(handle2, NULL, filters_show);
       }
-      if (filters_match(handle2, "this is/a path/to a file.txt")) {
+      filedata.path = "this is/a path/to a file.txt";
+      if (filters_match(handle2, &filedata)) {
         printf("Not matching +1\n");
       }
-      if (filters_match(handle2, "this is/a path/to a file.tst")) {
+      filedata.path = "this is/a path/to a file.tst";
+      if (filters_match(handle2, &filedata)) {
         printf("Not matching +2\n");
       }
-      if (filters_match(handle2, "this is/a path/to a file.tsu")) {
+      filedata.path = "this is/a path/to a file.tsu";
+      if (filters_match(handle2, &filedata)) {
         printf("Not matching +3\n");
       }
       filters_free(handle2);
     }
 
-    if (filters_match(handle, "this is/a path/to a file.txt")) {
+    filedata.path = "this is/a path/to a file.txt";
+    if (filters_match(handle, &filedata)) {
       printf("Not matching 1\n");
     }
-    if (filters_match(handle, "this is/a path/to a file.tst")) {
+    filedata.path = "this is/a path/to a file.tst";
+    if (filters_match(handle, &filedata)) {
       printf("Not matching 2\n");
     }
-    if (filters_match(handle, "this is/a path/to a file.tsu")) {
+    filedata.path = "this is/a path/to a file.tsu";
+    if (filters_match(handle, &filedata)) {
       printf("Not matching 3\n");
+    }
+    filters_free(handle);
+  }
+
+  if (filters_new(&handle)) {
+    printf("Failed to create\n");
+  } else {
+    filedata.metadata.type = S_IFREG;
+    filedata.metadata.size = 0;
+    if (filters_match(handle, &filedata)) {
+      printf("Not matching +1\n");
+    }
+    filedata.metadata.size = 1000;
+    if (filters_match(handle, &filedata)) {
+      printf("Not matching +2\n");
+    }
+    filedata.metadata.size = 1000000;
+    if (filters_match(handle, &filedata)) {
+      printf("Not matching +3\n");
+    }
+    if (filters_add(handle, filter_size_max, 500)) {
+      printf("Failed to add\n");
+    } else {
+      list_show(handle, NULL, filters_show);
+    }
+    filedata.metadata.size = 0;
+    if (filters_match(handle, &filedata)) {
+      printf("Not matching +1\n");
+    }
+    filedata.metadata.size = 1000;
+    if (filters_match(handle, &filedata)) {
+      printf("Not matching +2\n");
+    }
+    filedata.metadata.size = 1000000;
+    if (filters_match(handle, &filedata)) {
+      printf("Not matching +3\n");
+    }
+    if (filters_add(handle, filter_size_min, 5000)) {
+      printf("Failed to add\n");
+    } else {
+      list_show(handle, NULL, filters_show);
+    }
+    filedata.metadata.size = 0;
+    if (filters_match(handle, &filedata)) {
+      printf("Not matching +1\n");
+    }
+    filedata.metadata.size = 1000;
+    if (filters_match(handle, &filedata)) {
+      printf("Not matching +2\n");
+    }
+    filedata.metadata.size = 1000000;
+    if (filters_match(handle, &filedata)) {
+      printf("Not matching +3\n");
     }
     filters_free(handle);
   }

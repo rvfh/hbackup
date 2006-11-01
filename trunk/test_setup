@@ -88,6 +88,7 @@ compress end .c
 ignore path_start subdir
 ignore end ~
 ignore end ".o"
+ignore size_above 10
 parser cvs
 
 path test2//

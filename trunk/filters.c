@@ -5,6 +5,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <stdarg.h>
 #include <sys/types.h>
 #include <regex.h>
 #include "metadata.h"
@@ -13,6 +14,7 @@
 
 typedef struct {
   char          string[256];
+  size_t        size;
   filter_type_t type;
 } filter_t;
 
@@ -75,15 +77,35 @@ void filters_free(void *handle) {
   list_free(handle);
 }
 
-int filters_add(void *handle, const char *string, filter_type_t type) {
+int filters_add(void *handle, filter_type_t type, ...) {
   filter_t *filter = malloc(sizeof(filter_t));
+  va_list  args;
 
   if (filter == NULL) {
     fprintf(stderr, "filters: add: cannot allocate memory\n");
     return 2;
   }
   filter->type = type;
-  strcpy(filter->string, string);
+
+  va_start(args, type);
+  switch (type) {
+    case filter_end:
+    case filter_path_start:
+    case filter_path_regexp:
+    case filter_file_start:
+    case filter_file_regexp:
+      strcpy(filter->string, va_arg(args, char *));
+      break;
+    case filter_size_min:
+    case filter_size_max:
+      filter->size = va_arg(args, size_t);
+      break;
+    default:
+      fprintf(stderr, "filters: add: unknown filter type\n");
+      return 2;
+  }
+  va_end(args);
+
   if (list_add(handle, filter)) {
     fprintf(stderr, "filters: add: failed\n");
     return 2;
@@ -91,7 +113,7 @@ int filters_add(void *handle, const char *string, filter_type_t type) {
   return 0;
 }
 
-int filters_match(void *handle, const char *path) {
+int filters_match(void *handle, const filedata_t *filedata) {
   list_entry_t *entry = NULL;
 
   while ((entry = list_next(handle, entry)) != NULL) {
@@ -99,27 +121,37 @@ int filters_match(void *handle, const char *path) {
 
     switch(filter->type) {
     case filter_end:
-      if (! filter_end_check(path, filter->string)) {
+      if (! filter_end_check(filedata->path, filter->string)) {
         return 0;
       }
       break;
     case filter_path_start:
-      if (! filter_path_start_check(path, filter->string)) {
+      if (! filter_path_start_check(filedata->path, filter->string)) {
         return 0;
       }
       break;
     case filter_path_regexp:
-      if (! filter_path_regexp_check(path, filter->string)) {
+      if (! filter_path_regexp_check(filedata->path, filter->string)) {
         return 0;
       }
       break;
     case filter_file_start:
-      if (! filter_file_start_check(path, filter->string)) {
+      if (! filter_file_start_check(filedata->path, filter->string)) {
         return 0;
       }
       break;
     case filter_file_regexp:
-      if (! filter_file_regexp_check(path, filter->string)) {
+      if (! filter_file_regexp_check(filedata->path, filter->string)) {
+        return 0;
+      }
+      break;
+    case filter_size_min:
+      if (S_ISREG(filedata->metadata.type) && (filedata->metadata.size > filter->size)) {
+        return 0;
+      }
+      break;
+    case filter_size_max:
+      if (S_ISREG(filedata->metadata.type) && (filedata->metadata.size < filter->size)) {
         return 0;
       }
       break;

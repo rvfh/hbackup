@@ -24,3 +24,14 @@ List 2 elements:
  ^to a.*\.t.t 4
 Not matching +3
 Not matching 3
+Not matching +1
+Not matching +2
+Not matching +3
+List 1 elements:
+ 500 6
+Not matching +2
+Not matching +3
+List 2 elements:
+ 500 6
+ 5000 5
+Not matching +2

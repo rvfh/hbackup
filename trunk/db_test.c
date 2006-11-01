@@ -87,19 +87,19 @@ int main(void) {
     printf("parsers_new error status %u\n", status);
     return 0;
   }
-  if ((status = filters_add(filters_handle, ".svn", filter_file_start))) {
+  if ((status = filters_add(filters_handle, filter_file_start, ".svn"))) {
     printf("ignore_add error status %u\n", status);
     return 0;
   }
-  if ((status = filters_add(filters_handle, "subdir", filter_path_start))) {
+  if ((status = filters_add(filters_handle, filter_path_start, "subdir"))) {
     printf("ignore_add error status %u\n", status);
     return 0;
   }
-  if ((status = filters_add(filters_handle, "~", filter_end))) {
+  if ((status = filters_add(filters_handle, filter_end, "~"))) {
     printf("ignore_add error status %u\n", status);
     return 0;
   }
-  if ((status = filters_add(filters_handle, "\\.o$", filter_file_regexp))) {
+  if ((status = filters_add(filters_handle, filter_file_regexp, "\\.o$"))) {
     printf("ignore_add error status %u\n", status);
     return 0;
   }
