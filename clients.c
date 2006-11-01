@@ -214,15 +214,19 @@ int clients_add(const char *info, const char *listfile) {
 
 static int add_filter(list_t handle, const char *type, const char *string) {
   if (! strcmp(type, "end")) {
-    filters_add(handle, string, filter_end);
+    filters_add(handle, filter_end, string);
   } else if (! strcmp(type, "path_start")) {
-    filters_add(handle, string, filter_path_start);
+    filters_add(handle, filter_path_start, string);
   } else if (! strcmp(type, "path_regexp")) {
-    filters_add(handle, string, filter_path_regexp);
+    filters_add(handle, filter_path_regexp, string);
   } else if (! strcmp(type, "file_start")) {
-    filters_add(handle, string, filter_file_start);
+    filters_add(handle, filter_file_start, string);
   } else if (! strcmp(type, "file_regexp")) {
-    filters_add(handle, string, filter_file_regexp);
+    filters_add(handle, filter_file_regexp, string);
+  } else if (! strcmp(type, "size_below")) {
+    filters_add(handle, filter_size_max, strtoul(string, NULL, 10));
+  } else if (! strcmp(type, "size_above")) {
+    filters_add(handle, filter_size_min, strtoul(string, NULL, 10));
   } else {
     return 1;
   }

@@ -39,7 +39,7 @@ int main(int argc, char *argv[]) {
   list_free(files);
 
   printf("as previous with subdir in ignore list\n");
-  if ((status = filters_add(test_filters_handle, "subdir", filter_path_start))) {
+  if ((status = filters_add(test_filters_handle, filter_path_start, "subdir"))) {
     printf("ignore_add error status %u\n", status);
   }
   files = list_new(filedata_get);
@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
   list_free(files);
 
   printf("as previous with testlink in ignore list\n");
-  if ((status = filters_add(test_filters_handle, "testlink", filter_path_start))) {
+  if ((status = filters_add(test_filters_handle, filter_path_start, "testlink"))) {
     printf("ignore_add error status %u\n", status);
   }
   files = list_new(filedata_get);

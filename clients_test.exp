@@ -55,8 +55,8 @@ Backup path 'test'
 Backup path 'test2'
  -> Building list of files
  -> Parsing list of files
- -> Saving database list: 16 file(s)
- -> Loaded database list: 16 file(s)
+ -> Saving database list: 15 file(s)
+ -> Loaded database list: 15 file(s)
 Backup client 'localhost' using protocol 'file'
 Backup path 'test'
  -> Building list of files
@@ -64,4 +64,4 @@ Backup path 'test'
 Backup path 'test2'
  -> Building list of files
  -> Parsing list of files
- -> Saving database list: 16 file(s)
+ -> Saving database list: 15 file(s)

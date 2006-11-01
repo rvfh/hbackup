@@ -232,12 +232,7 @@ static int db_load(const char *filename, list_t list) {
             asprintf(&db_data.link, "%s", string);
             break;
           case 10:  /* Checksum */
-            /* TODO: this is just transitory */
-            if (strcmp(string, "N")) {
-              strcpy(db_data.filedata.checksum, string);
-            } else {
-              db_data.filedata.checksum[0] = '\0';
-            }
+            strcpy(db_data.filedata.checksum, string);
             break;
           case 11:  /* Date in */
             if (sscanf(string, "%ld", &db_data.date_in) != 1) {

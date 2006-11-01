@@ -98,7 +98,7 @@ static int iterate_directory(const char *path, parser_t *parser) {
     } else
     /* Now pass it through the filters */
     if ((filters_handle != NULL) && ! filters_match(filters_handle,
-      filedata.path)) {
+        &filedata)) {
       failed = 1;
     } else
     if (S_ISDIR(filedata.metadata.type)) {
