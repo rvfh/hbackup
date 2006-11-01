@@ -193,7 +193,7 @@ int main(void) {
     }
   }
 
-/*  if ((status = db_check("59ca0efa9f5633cb0371bbc0355478d8-0"))) {
+  if ((status = db_check("59ca0efa9f5633cb0371bbc0355478d8-0"))) {
     printf("db_check error status %u\n", status);
     if (status) {
       return 0;
@@ -206,7 +206,7 @@ int main(void) {
       return 0;
     }
   }
-*/
+
   db_close();
 
 

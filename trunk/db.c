@@ -959,11 +959,11 @@ int db_check(const char *checksum) {
       }
     }
     return failed;
-  } else if (strcmp(checksum, "N")) {
+  } else if (strlen(checksum)) {
     char       *path = NULL;
 
     if (getdir(checksum, &path)) {
-      failed = 1;
+      failed = 2;
     } else {
       FILE *readfile;
       char *check_path = NULL;
@@ -988,8 +988,10 @@ int db_check(const char *checksum) {
         /* Re-use length */
         EVP_DigestFinal(&ctx, (unsigned char *) check, &rlength);
         md5sum(check, rlength);
-        if (strcmp(check, checksum)) {
-          failed = 2;
+        if (strncmp(check, checksum, rlength)) {
+          failed = 1;
+          fprintf(stderr, "db: check: checksum for %s found to be %s\n",
+            checksum, check);
         }
       }
       free(check_path);

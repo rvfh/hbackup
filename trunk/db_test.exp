@@ -95,6 +95,7 @@ List 15 elements:
  'file://host' '/home/user2/testfile' f 15 1 1000 1000 0644 '' fcacc0dea4134dc0b9da49c1a9603196-0 1 0 -
  'file://host' '/home/user2/testlink' l 8 1 1000 1000 0777 'testfile'  1 0 -
  -> Scanning database list: 15 file(s)
+ -> Checking database list: 15 file(s)
  -> Saving database list: 15 file(s)
  -> Loaded database list: 15 file(s)
 List 15 elements:
