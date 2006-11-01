@@ -43,7 +43,7 @@ static char *filedata_get(const void *payload) {
   const filedata_t *filedata = payload;
   char *string = NULL;
 
-  asprintf(&string, filedata->path);
+  asprintf(&string, "%s", filedata->path);
   return string;
 }
 
@@ -86,7 +86,7 @@ static int iterate_directory(const char *path, parser_t *parser) {
     }
     asprintf(&file_path, "%s/%s", path, dir_entry->d_name);
     /* Remove mount path and leading slash from records */
-    asprintf(&filedata.path, &file_path[mount_path_length + 1]);
+    asprintf(&filedata.path, "%s", &file_path[mount_path_length + 1]);
     strcpy(filedata.checksum, "");
     if (metadata_get(file_path, &filedata.metadata)) {
       fprintf(stderr, "filelist: cannot get metadata: %s\n", file_path);

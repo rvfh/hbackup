@@ -184,7 +184,7 @@ int main(int argc, char **argv) {
         line++;
         if (params > 1) {
           if (! strcmp(keyword, "db")) {
-            asprintf(&db_path, string);
+            asprintf(&db_path, "%s", string);
           } else if (! strcmp(keyword, "client")) {
             if (clients_add(type, string)) {
               fprintf(stderr,
@@ -206,7 +206,7 @@ int main(int argc, char **argv) {
 
       if (! failed) {
         if (db_path == NULL) {
-          asprintf(&db_path, default_db_path);
+          asprintf(&db_path, "%s", default_db_path);
         }
         /* Open backup database */
         if (db_open(db_path) == 2) {

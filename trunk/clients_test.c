@@ -18,12 +18,12 @@ static char *client_show(const void *payload) {
     if (client_t->password != NULL) {
       asprintf(&password, ":%s", client_t->password);
     } else {
-      asprintf(&password, null_string);
+      asprintf(&password, "%s", null_string);
     }
     asprintf(&credentials, "%s%s@", client_t->username, password);
     free(password);
   } else {
-    asprintf(&credentials, null_string);
+    asprintf(&credentials, "%s", null_string);
   }
   asprintf(&string, "%s://%s%s %s", client_t->protocol, credentials,
     client_t->hostname, client_t->listfile);

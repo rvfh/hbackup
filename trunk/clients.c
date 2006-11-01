@@ -151,7 +151,7 @@ int clients_add(const char *info, const char *listfile) {
   char     *delim;
   int      failed = 0;
 
-  asprintf(&linecopy, info);
+  asprintf(&linecopy, "%s", info);
   start = linecopy;
   delim = strchr(start, ':');
   if (delim == NULL) {
@@ -159,7 +159,7 @@ int clients_add(const char *info, const char *listfile) {
   } else {
     /* Protocol */
     *delim = '\0';
-    asprintf(&client->protocol, start);
+    asprintf(&client->protocol, "%s", start);
     /* Lower case */
     strtolower(client->protocol);
     start = delim + 1;
@@ -173,7 +173,7 @@ int clients_add(const char *info, const char *listfile) {
         /* No username/password */
         client->username = NULL;
         client->password = NULL;
-        asprintf(&client->hostname, start);
+        asprintf(&client->hostname, "%s", start);
         /* Lower case */
         strtolower(client->hostname);
       } else {
@@ -181,7 +181,7 @@ int clients_add(const char *info, const char *listfile) {
 
         *delim = '\0';
         /* Host name */
-        asprintf(&client->hostname, delim + 1);
+        asprintf(&client->hostname, "%s", delim + 1);
         strtolower(client->hostname);
         /* Password */
         if (colon == NULL) {
@@ -189,7 +189,7 @@ int clients_add(const char *info, const char *listfile) {
           client->password = NULL;
         } else {
           if (strlen(colon + 1) != 0) {
-            asprintf(&client->password, colon + 1);
+            asprintf(&client->password, "%s", colon + 1);
           } else {
             client->password = NULL;
           }
@@ -197,14 +197,14 @@ int clients_add(const char *info, const char *listfile) {
         }
         /* Username */
         if (strlen(start) != 0) {
-          asprintf(&client->username, start);
+          asprintf(&client->username, "%s", start);
         } else {
           client->username = NULL;
         }
       }
 
       /* List file */
-      asprintf(&client->listfile, listfile);
+      asprintf(&client->listfile, "%s", listfile);
       list_append(clients, client);
     }
   }
@@ -288,7 +288,7 @@ static int read_listfile(const char *listfilename, list_t backups) {
         filters_new(&backup->compress_handle);
         filters_new(&backup->ignore_handle);
         parsers_new(&backup->parsers_handle);
-        asprintf(&backup->path, string);
+        asprintf(&backup->path, "%s", string);
         no_trailing_slash(backup->path);
         list_append(backups, backup);
       } else {
@@ -314,7 +314,7 @@ static int get_paths(const char *protocol, const char *backup_path,
   if (! strcmp(protocol, "file")) {
     *share = malloc(1);
     *share[0] = '\0';
-    asprintf(path, backup_path);
+    asprintf(path, "%s", backup_path);
     status = 0;
   } else if (! strcmp(protocol, "smb")) {
     asprintf(share, "%c$", backup_path[0]);

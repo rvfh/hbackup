@@ -48,7 +48,7 @@ int params_readline(const char *line, char *keyword, char *type,
   int param_count = 0;
 
   /* Reset all */
-  asprintf(&linecopy, line);
+  asprintf(&linecopy, "%s", line);
   start = linecopy;
   strcpy(keyword, "");
   strcpy(type, "");
