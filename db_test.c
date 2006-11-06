@@ -8,7 +8,6 @@
 /* Yes, include C file */
 #include "db.c"
 
-/* List of files */
 static int verbose = 3;
 
 static char *file_data_show(const void *payload) {
