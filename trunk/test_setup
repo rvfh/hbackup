@@ -84,10 +84,10 @@ EOF
 cat << EOF > "$CONFIGDIR/localhost.list"
 # Share test
 path "test" # should work
-compress end .c
+compress path_end .c
 ignore path_start subdir
-ignore end ~
-ignore end ".o"
+ignore file/path_end ~
+ignore path_end ".o"
 ignore size_above 10
 parser cvs
 

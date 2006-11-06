@@ -1,37 +1,33 @@
-filter_end_check
+filter_path_end_check
 match 1.1
 filter_path_start_check
 match 2.1
 filter_path_regexp_check
 match 3.1
-filter_file_start_check
-match 4.1
-filter_file_regexp_check
-match 5.1
 List 1 elements:
- ^to a.*\.txt 4
+ ^to a.*\.txt 2
 List 2 elements:
- ^to a.*\.txt 4
- ^to a.*\.t.t 4
+ ^to a.*\.txt 2
+ ^to a.*\.t.t 2
 Not matching 3
 Not matching +1
 Not matching +2
 Not matching +3
 List 1 elements:
- ^to a.*\.txt 4
+ ^to a.*\.txt 2
 List 2 elements:
- ^to a.*\.txt 4
- ^to a.*\.t.t 4
+ ^to a.*\.txt 2
+ ^to a.*\.t.t 2
 Not matching +3
 Not matching 3
 Not matching +1
 Not matching +2
 Not matching +3
 List 1 elements:
- 500 6
+ 500 4
 Not matching +2
 Not matching +3
 List 2 elements:
- 500 6
- 5000 5
+ 500 4
+ 5000 3
 Not matching +2

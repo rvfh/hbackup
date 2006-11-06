@@ -17,16 +17,12 @@ typedef void (parsers_dir_leave_f) (void *handle);
 /* Type for function to check whether a file is under control */
 typedef int (parsers_file_check_f) (void *handle, const filedata_t *file_data);
 
-/* Function to destroy the parser */
-typedef void (parsers_destroy_f) (void);
-
 /* Our data */
 typedef struct {
   parsers_dir_check_f   *dir_check;
   parsers_dir_leave_f   *dir_leave;
   parsers_file_check_f  *file_check;
-  parsers_destroy_f     *destroy;
-  char                  name[256];
+  char                  name[32];
 } parser_t;
 
 /* Create parsers list */
