@@ -4,10 +4,14 @@ clients: backup: could not mount nfs share
 mount: only root can do that
 clients: backup: could not mount smb share
 clients: backup: ssh protocol not supported
-clients: backup: client test protocol not supported
-clients: backup: client test2 protocol not supported
-clients: backup: client test3 protocol not supported
-clients: backup: client test4 protocol not supported
+mount: only root can do that
+clients: backup: could not mount smb share
+mount: only root can do that
+clients: backup: could not mount smb share
+mount: only root can do that
+clients: backup: could not mount smb share
+mount: only root can do that
+clients: backup: could not mount smb share
 clients: backup: keyword not implemented in list file etc/localhost.list, line 3
 clients: backup: keyword not implemented in list file etc/localhost.list, line 3
 List 0 elements:
@@ -22,36 +26,40 @@ List 2 elements:
 List 3 elements:
  nfs://myclient /home/User/devel
  smb://Myself:flesyM@myclient C:\Backup\Backup.LST
- ssh://otherclient /home/backup/Backup.list
+ ssh://otherclient c:/home/backup/Backup.list
 List 4 elements:
  nfs://myclient /home/User/devel
  smb://Myself:flesyM@myclient C:\Backup\Backup.LST
- ssh://otherclient /home/backup/Backup.list
- client test://user@client /home/BlaH/Backup.list
+ ssh://otherclient c:/home/backup/Backup.list
+ smb://user@client c:/home/BlaH/Backup.list
 List 5 elements:
  nfs://myclient /home/User/devel
  smb://Myself:flesyM@myclient C:\Backup\Backup.LST
- ssh://otherclient /home/backup/Backup.list
- client test://user@client /home/BlaH/Backup.list
- client test2://user@client /home/BlaH/Backup.list
+ ssh://otherclient c:/home/backup/Backup.list
+ smb://user@client c:/home/BlaH/Backup.list
+ smb://user@client c:/home/BlaH/Backup.list
 List 6 elements:
  nfs://myclient /home/User/devel
  smb://Myself:flesyM@myclient C:\Backup\Backup.LST
- ssh://otherclient /home/backup/Backup.list
- client test://user@client /home/BlaH/Backup.list
- client test2://user@client /home/BlaH/Backup.list
- client test3://client /home/BlaH/Backup.list
+ ssh://otherclient c:/home/backup/Backup.list
+ smb://user@client c:/home/BlaH/Backup.list
+ smb://user@client c:/home/BlaH/Backup.list
+ smb://client c:/home/BlaH/Backup.list
 List 7 elements:
  nfs://myclient /home/User/devel
  smb://Myself:flesyM@myclient C:\Backup\Backup.LST
- ssh://otherclient /home/backup/Backup.list
- client test://user@client /home/BlaH/Backup.list
- client test2://user@client /home/BlaH/Backup.list
- client test3://client /home/BlaH/Backup.list
- client test4://client /home/BlaH/Backup.list
+ ssh://otherclient c:/home/backup/Backup.list
+ smb://user@client c:/home/BlaH/Backup.list
+ smb://user@client c:/home/BlaH/Backup.list
+ smb://client c:/home/BlaH/Backup.list
+ smb://client c:/home/BlaH/Backup.list
  -> Initialized database list
  --> Issuing command: mount -t nfs -o ro,nolock myclient:/home/User/devel test_db/mount
  --> Issuing command: mount -t smbfs -o ro,nocase,username=Myself,password=flesyM //myclient/C$ test_db/mount
+ --> Issuing command: mount -t smbfs -o ro,nocase,username=user //client/c$ test_db/mount
+ --> Issuing command: mount -t smbfs -o ro,nocase,username=user //client/c$ test_db/mount
+ --> Issuing command: mount -t smbfs -o ro,nocase //client/c$ test_db/mount
+ --> Issuing command: mount -t smbfs -o ro,nocase //client/c$ test_db/mount
  -> Saving database list: 0 file(s)
  -> Loaded database list: 0 file(s)
 Backup client 'localhost' using protocol 'file'
