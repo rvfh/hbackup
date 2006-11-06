@@ -1,7 +1,7 @@
 AR := ar
 RANLIB := ranlib
 CFLAGS := -Wall -O2 -ansi -pedantic
-LDFLAGS := -lssl
+LDFLAGS := -lssl -lz
 PREFIX := /usr/local/bin
 
 all: test hbackup

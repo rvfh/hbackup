@@ -90,8 +90,6 @@ static int mount_share(const char *mount_point, const client_t *client,
   } else
   if (! strcmp(client->protocol, "smb")) {
     char  *credentials  = NULL;
-    /* No to warn about null string */
-    char  null_string[] = "";
 
     if (client->username != NULL) {
       char *password = NULL;
@@ -99,12 +97,12 @@ static int mount_share(const char *mount_point, const client_t *client,
       if (client->password != NULL) {
         asprintf(&password, ",password=%s", client->password);
       } else {
-        asprintf(&password, "%s", null_string);
+        asprintf(&password, "%s", "");
       }
       asprintf(&credentials, ",username=%s%s", client->username, password);
       free(password);
     } else {
-      asprintf(&credentials, "%s", null_string);
+      asprintf(&credentials, "%s", "");
     }
     asprintf(&command, "mount -t smbfs -o ro,nocase%s %s %s", credentials,
       share, mount_point);
@@ -350,8 +348,7 @@ static int get_paths(const char *protocol, const char *backup_path,
   int status = 2;
 
   if (! strcmp(protocol, "file")) {
-    *share = malloc(1);
-    *share[0] = '\0';
+    asprintf(share, "%s", "");
     asprintf(path, "%s", backup_path);
     status = 0;
   } else
