@@ -7,7 +7,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/mount.h>
 #include "params.h"
 #include "tools.h"
 #include "list.h"
@@ -59,63 +58,72 @@ static int unmount_share(const char *mount_point) {
 
 static int mount_share(const char *mount_point, const client_t *client,
     const char *client_share) {
-  int result = 0;
+  int  result   = 0;
+  char *share   = NULL;
+  char *command = NULL;
 
+  /* Determine share */
+  if (! strcmp(client->protocol, "nfs")) {
+    /* Mount Network File System share (hostname:share) */
+    asprintf(&share, "%s:%s", client->hostname, client_share);
+  } else
   if (! strcmp(client->protocol, "smb")) {
     /* Mount SaMBa share (//hostname/share) */
-    char *share = NULL;
-
     asprintf(&share, "//%s/%s", client->hostname, client_share);
-    if ((mounted != NULL) && strcmp(mounted, share)) {
+  }
+
+  /* Check what is mounted */
+  if (mounted != NULL) {
+    if (strcmp(mounted, share)) {
       /* Different share mounted: unmount */
       unmount_share(mount_point);
-    }
-    if (mounted != NULL) {
-      /* Same share mounted */
-      free(share);
     } else {
-      /* No share mounted */
-      char *command;
-      int  command_length = strlen("mount -t smbfs -o ro,nocase") + 1  /* Ending '\0' */
-                          + strlen(mount_point) + 1       /* Space before */
-                          + strlen(share) + 1;            /* Space before */
-
-      if (client->username != NULL) {
-        command_length += strlen(",username=") + strlen(client->username);
-        if (client->password != NULL) {
-          command_length += strlen(",password=") + strlen(client->password);
-        }
-      }
-
-      command = malloc(command_length);
-      strcpy(command, "mount -t smbfs -o ro,nocase");
-      if (client->username != NULL) {
-        strcat(command, ",username=");
-        strcat(command, client->username);
-        if (client->password != NULL) {
-          strcat(command, ",password=");
-          strcat(command, client->password);
-        }
-      }
-      strcat(command, " ");
-      strcat(command, share);
-      strcat(command, " ");
-      strcat(command, mount_point);
-
-      if (verbosity() > 2) {
-        printf(" --> Issuing command: %s\n", command);
-      }
-      if (system(command)) {
-        fprintf(stderr, "clients: backup: could not mount %s share\n",
-          client->protocol);
-        free(share);
-        result = 1;
-      } else {
-        mounted = share;
-      }
-      free(command);
+      /* Same share mounted: nothing to do */
+      free(share);
+      return 0;
     }
   }
+
+  /* Build mount command */
+  if (! strcmp(client->protocol, "nfs")) {
+    asprintf(&command, "mount -t nfs -o ro,nolock %s %s", share, mount_point);
+  } else
+  if (! strcmp(client->protocol, "smb")) {
+    char  *credentials  = NULL;
+    /* No to warn about null string */
+    char  null_string[] = "";
+
+    if (client->username != NULL) {
+      char *password = NULL;
+
+      if (client->password != NULL) {
+        asprintf(&password, ",password=%s", client->password);
+      } else {
+        asprintf(&password, "%s", null_string);
+      }
+      asprintf(&credentials, ",username=%s%s", client->username, password);
+      free(password);
+    } else {
+      asprintf(&credentials, "%s", null_string);
+    }
+    asprintf(&command, "mount -t smbfs -o ro,nocase%s %s %s", credentials,
+      share, mount_point);
+    free(credentials);
+  }
+
+  /* Issue mount command */
+  if (verbosity() > 2) {
+    printf(" --> Issuing command: %s\n", command);
+  }
+  result = system(command);
+  if (result != 0) {
+    free(share);
+    fprintf(stderr, "clients: backup: could not mount %s share\n",
+      client->protocol);
+  } else {
+    mounted = share;
+  }
+  free(command);
   return result;
 }
 
@@ -241,7 +249,7 @@ static int add_filter(list_t handle, const char *type, const char *string) {
     filter_type = type;
     file_type = S_IFMT;
   }
-  
+
   /* Add specified filter */
   if (! strcmp(filter_type, "path_end")) {
     filters_add(handle, file_type, filter_path_end, string);
@@ -346,12 +354,18 @@ static int get_paths(const char *protocol, const char *backup_path,
     *share[0] = '\0';
     asprintf(path, "%s", backup_path);
     status = 0;
-  } else if (! strcmp(protocol, "smb")) {
+  } else
+  if (! strcmp(protocol, "smb")) {
     asprintf(share, "%c$", backup_path[0]);
     asprintf(path, "%s/%s", mount_point, &backup_path[3]);
     /* Lower case */
     strtolower(*path);
     pathtolinux(*path);
+    status = 1;
+  } else
+  if (! strcmp(protocol, "nfs")) {
+    asprintf(share, "%s", backup_path);
+    asprintf(path, "%s", mount_point);
     status = 1;
   }
   return status;
