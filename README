@@ -20,15 +20,15 @@ the -c option. Only two keywords are acceptable there: 'db' and 'client'.
 CLIENT CONFIGURATION
 
 Each client must provide its own configuration file. Four keywords may be used:
-* path: start of a new backup list, gives the path information. Syntax:
-  path "<path to backup>"
-* compress: files to compress (for filter types, see FILTERS below). Syntax:
-  compress <filter type> "<string>"
-* ignore: files to ignore (for filter types, see FILTERS below). Syntax:
-  ignore <filter type> "<string>"
+* path: start of a new backup list, gives the path information.
+  Syntax: path "<path to backup>"
+* compress: regular files to compress (for filter types, see FILTERS below).
+  Syntax: compress <filter type> "<string>"
+* ignore: files to ignore (for filter types, see FILTERS below).
+  Syntax: ignore [<file type>/]<filter type> "<string>"
 * parser: detection of directories under version control (for existing
-parsers, see PARSERS below). Syntax:
-  parser "<parser name>"
+parsers, see PARSERS below).
+  Syntax: parser "<parser name>"
 
 COMPRESSION
 
@@ -36,12 +36,21 @@ Not implemented.
 
 FILTERS
 
+There are seven types of files:
+* file: regular file
+* dir: directory
+* char: character device
+* block: block device
+* pipe: FIFO
+* link: symbolic link
+* socket
+
 There are five types of filters:
-* end: match end of path/file name
+* path_end: match end of path
 * path_start: match start of path
 * path_regexp: match regular expression on path
-* file_start: match start of file name
-* file_regexp: match regular expression on file name
+* size_above: match files which size is above given value (file type n/a)
+* size_below: match files which size is below given value (file type n/a)
 
 PARSERS
 

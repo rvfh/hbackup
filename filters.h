@@ -10,21 +10,19 @@
 
 /* Filter types */
 typedef enum {
-  filter_end,         /* End of path/file name */
-  filter_path_start,  /* Start of path */
-  filter_path_regexp, /* Regular expression on path */
-  filter_file_start,  /* Start of file name */
-  filter_file_regexp, /* Regular expression on file name */
-  filter_size_min,    /* Minimum (regular file) size */
-  filter_size_max     /* Maximum (regular file) size */
+  filter_path_end,    /* End of file name */
+  filter_path_start,  /* Start of file name */
+  filter_path_regexp, /* Regular expression on file name */
+  filter_size_above,  /* Minimum size (only applies to regular files) */
+  filter_size_below   /* Maximum size (only applies to regular files) */
 } filter_type_t;
 
 /* Create filters list */
 extern int filters_new(void **handle);
 
 /* Add to list of filters */
-/* TODO: specify which type of files (dir, pipe, reg, link) this applies to */
-extern int filters_add(void *handle, filter_type_t type, ...);
+extern int filters_add(void *handle, mode_t file_type, filter_type_t 
+  filter_type, ...);
 
 /* Destroy filters list and all filters */
 extern void filters_free(void *handle);

@@ -213,20 +213,46 @@ int clients_add(const char *info, const char *listfile) {
 }
 
 static int add_filter(list_t handle, const char *type, const char *string) {
-  if (! strcmp(type, "end")) {
-    filters_add(handle, filter_end, string);
-  } else if (! strcmp(type, "path_start")) {
-    filters_add(handle, filter_path_start, string);
-  } else if (! strcmp(type, "path_regexp")) {
-    filters_add(handle, filter_path_regexp, string);
-  } else if (! strcmp(type, "file_start")) {
-    filters_add(handle, filter_file_start, string);
-  } else if (! strcmp(type, "file_regexp")) {
-    filters_add(handle, filter_file_regexp, string);
-  } else if (! strcmp(type, "size_below")) {
-    filters_add(handle, filter_size_max, strtoul(string, NULL, 10));
-  } else if (! strcmp(type, "size_above")) {
-    filters_add(handle, filter_size_min, strtoul(string, NULL, 10));
+  const char *filter_type;
+  const char *delim    = strchr(type, '/');
+  mode_t     file_type = 0;
+
+  /* Check whether file type was specified */
+  if (delim != NULL) {
+    filter_type = delim + 1;
+    if (! strncmp(type, "file", delim - type)) {
+      file_type = S_IFREG;
+    } else if (! strncmp(type, "dir", delim - type)) {
+      file_type = S_IFDIR;
+    } else if (! strncmp(type, "char", delim - type)) {
+      file_type = S_IFCHR;
+    } else if (! strncmp(type, "block", delim - type)) {
+      file_type = S_IFBLK;
+    } else if (! strncmp(type, "pipe", delim - type)) {
+      file_type = S_IFIFO;
+    } else if (! strncmp(type, "link", delim - type)) {
+      file_type = S_IFLNK;
+    } else if (! strncmp(type, "socket", delim - type)) {
+      file_type = S_IFSOCK;
+    } else {
+      return 1;
+    }
+  } else {
+    filter_type = type;
+    file_type = S_IFMT;
+  }
+  
+  /* Add specified filter */
+  if (! strcmp(filter_type, "path_end")) {
+    filters_add(handle, file_type, filter_path_end, string);
+  } else if (! strcmp(filter_type, "path_start")) {
+    filters_add(handle, file_type, filter_path_start, string);
+  } else if (! strcmp(filter_type, "path_regexp")) {
+    filters_add(handle, file_type, filter_path_regexp, string);
+  } else if (! strcmp(filter_type, "size_below")) {
+    filters_add(handle, 0, filter_size_below, strtoul(string, NULL, 10));
+  } else if (! strcmp(filter_type, "size_above")) {
+    filters_add(handle, 0, filter_size_above, strtoul(string, NULL, 10));
   } else {
     return 1;
   }

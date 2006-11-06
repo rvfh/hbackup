@@ -18,16 +18,6 @@ int parsers_new(void **handle) {
 }
 
 void parsers_free(void *handle) {
-  /* First destroy all parsers */
-  list_entry_t *entry = NULL;
-  while ((entry = list_next(handle, entry)) != NULL) {
-    parser_t *parser = (parser_t *) list_entry_payload(entry);
-
-    if (parser->destroy != NULL) {
-      parser->destroy();
-    }
-  }
-  /* Then free list */
   list_free(handle);
 }
 
