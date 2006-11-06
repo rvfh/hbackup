@@ -3,6 +3,8 @@
 20061008 Creation
 */
 
+/* Compression to use when required: gzip -5 (best speed/ratio) */
+
 /* List file contents:
  *  host          (given in the format: 'protocol://host')
  *  path          (metadata)
@@ -30,11 +32,14 @@
 #include <errno.h>
 #include <openssl/md5.h>
 #include <openssl/evp.h>
+#include <zlib.h>
 #include "filelist.h"
 #include "list.h"
 #include "tools.h"
 #include "hbackup.h"
 #include "db.h"
+
+#define CHUNK 10240
 
 typedef struct {
   char        *host;
@@ -89,14 +94,18 @@ static void md5sum(char *checksum, int bytes) {
   free(copy);
 }
 
-static size_t copy(const char *source_path, const char *dest_path, char *checksum) {
-  FILE        *writefile;
-  FILE        *readfile;
-  char        buffer[10240];
-  EVP_MD_CTX  ctx;
-  size_t      rlength;
-  size_t      wlength;
-  size_t      size = 0;
+static size_t zcopy(const char *source_path, const char *dest_path,
+    char *checksum_in, char *checksum_out, int compress) {
+  FILE          *writefile;
+  FILE          *readfile;
+  unsigned char buffer_in[CHUNK];
+  unsigned char buffer_out[CHUNK];
+  EVP_MD_CTX    ctx_in;
+  EVP_MD_CTX    ctx_out;
+  size_t        length;
+  size_t        size_in = 0;
+  size_t        size_out = 0;
+  z_stream      strm;
 
   /* Open file to read from */
   if ((readfile = fopen(source_path, "r")) == NULL) {
@@ -109,23 +118,99 @@ static size_t copy(const char *source_path, const char *dest_path, char *checksu
     return -1;
   }
 
-  /* We shall copy and compute the checksum in one go */
-  EVP_DigestInit(&ctx, EVP_md5());
+  /* Create zlib resources */
+  if (compress != 0) {
+    /* Create openssl resources */
+    EVP_DigestInit(&ctx_out, EVP_md5());
+
+    strm.zalloc = Z_NULL;
+    strm.zfree = Z_NULL;
+    strm.opaque = Z_NULL;
+    if (compress > 0) {
+      /* Compress */
+      if (deflateInit(&strm, 5)) {
+        compress = 0;
+      }
+    } else {
+      /* De-compress */
+      strm.avail_in = 0;
+      strm.next_in = Z_NULL;
+      if (inflateInit(&strm)) {
+        compress = 0;
+      }
+    }
+  }
+
+  /* Create openssl resources */
+  EVP_DigestInit(&ctx_in, EVP_md5());
+
+  /* We shall copy, (de-)compress and compute the checksum in one go */
   while (! feof(readfile) && ! terminating()) {
-    rlength = fread(buffer, 1, 10240, readfile);
-    size += rlength;
-    EVP_DigestUpdate(&ctx, buffer, rlength);
-    do {
-      wlength = fwrite(buffer, 1, rlength, writefile);
-      rlength -= wlength;
-    } while ((rlength != 0) && (wlength != 0));
+    size_t rlength = fread(buffer_in, 1, CHUNK, readfile);
+    size_t wlength;
+
+    /* Size read */
+    size_in += rlength;
+
+    /* Checksum computation */
+    EVP_DigestUpdate(&ctx_in, buffer_in, rlength);
+
+    /* Compression */
+    if (compress != 0) {
+      strm.avail_in = rlength;
+      strm.next_in = buffer_in;
+
+      do {
+        strm.avail_out = CHUNK;
+        strm.next_out = buffer_out;
+        if (compress > 0) {
+          deflate(&strm, feof(readfile) ? Z_FINISH : Z_NO_FLUSH);
+        } else {
+          inflate(&strm, Z_NO_FLUSH);
+        }
+        rlength = CHUNK - strm.avail_out;
+
+        /* Checksum computation */
+        EVP_DigestUpdate(&ctx_out, buffer_out, rlength);
+
+        /* Size to write */
+        size_out += rlength;
+
+        do {
+          wlength = fwrite(buffer_out, 1, rlength, writefile);
+          rlength -= wlength;
+        } while ((rlength != 0) && (wlength != 0));
+      } while (strm.avail_out == 0);
+    } else {
+      do {
+        wlength = fwrite(buffer_in, 1, rlength, writefile);
+        rlength -= wlength;
+      } while ((rlength != 0) && (wlength != 0));
+    }
   }
   fclose(readfile);
   fclose(writefile);
-  /* Re-use length */
-  EVP_DigestFinal(&ctx, (unsigned char *) checksum, &rlength);
-  md5sum(checksum, rlength);
-  return size;
+
+  /* Get checksum for input file */
+  EVP_DigestFinal(&ctx_in, (unsigned char *) checksum_in, &length);
+  md5sum(checksum_in, length);
+
+  /* Destroy zlib resources */
+  if (compress != 0) {
+    /* Get checksum for output file */
+    if (checksum_out != NULL) {
+      EVP_DigestFinal(&ctx_out, (unsigned char *) checksum_out, &length);
+      md5sum(checksum_out, length);
+    }
+
+    if (compress > 0) {
+      deflateEnd(&strm);
+    } else
+    if (compress < 0) {
+      inflateEnd(&strm);
+    }
+  }
+  return size_in;
 }
 
 static int getdir(const char *checksum, char **path_p) {
@@ -413,7 +498,8 @@ static int db_organize(char *path, int number) {
   return failed;
 }
 
-static int db_write(const char *mount_path, const char *path, size_t size, char *checksum) {
+static int db_write(const char *mount_path, const char *path, size_t size,
+    char *checksum, int compress) {
   char    *source_path = NULL;
   char    *temp_path   = NULL;
   char    *dest_path   = NULL;
@@ -432,7 +518,7 @@ static int db_write(const char *mount_path, const char *path, size_t size, char 
   asprintf(&temp_path, "%s/filedata", db_path);
 
   /* Copy file locally */
-  copied = copy(source_path, temp_path, temp_checksum);
+  copied = zcopy(source_path, temp_path, temp_checksum, NULL, compress);
   if (copied != size) {
     if (! terminating() && (copied != -1)) {
       /* Don't signal errors on termination */
@@ -476,12 +562,12 @@ static int db_write(const char *mount_path, const char *path, size_t size, char 
             /* Compare try_path to temp_path */
             if ((readfile = fopen(try_path, "r")) != NULL) {
               if ((writefile = fopen(temp_path, "r")) != NULL) {
-                char    buffer1[10240];
-                char    buffer2[10240];
+                char    buffer1[CHUNK];
+                char    buffer2[CHUNK];
                 differ = 0;
 
                 do {
-                  size_t length = fread(buffer1, 1, 10240, readfile);
+                  size_t length = fread(buffer1, 1, CHUNK, readfile);
 
                   /* Does fread read as much as possible? */
                   if ((fread(buffer2, 1, length, writefile) != length)
@@ -758,7 +844,7 @@ int db_parse(const char *host, const char *real_path,
             /* We need the old checksum here! */
             strcpy(db_data->filedata.checksum, filedata->checksum);
           } else if (db_write(mount_path, filedata->path,
-              db_data->filedata.metadata.size, db_data->filedata.checksum)) {
+              db_data->filedata.metadata.size, db_data->filedata.checksum, 0)) {
             /* Write failed, need to go on */
             failed = 1;
             if (! terminating()) {
@@ -847,7 +933,7 @@ int db_read(const char *path, const char *checksum) {
   asprintf(&temp_path, "%s.part", path);
 
   /* Copy file to temporary name (size not checked: checksum suffices) */
-  if (copy(source_path, temp_path, temp_checksum) < 0) {
+  if (zcopy(source_path, temp_path, temp_checksum, NULL, 0) < 0) {
     fprintf(stderr, "db: read: failed to copy file: %s\n", source_path);
     failed = 2;
   } else
@@ -974,9 +1060,9 @@ int db_check(const char *checksum) {
 
         EVP_DigestInit(&ctx, EVP_md5());
         while (! feof(readfile) && ! terminating()) {
-          char buffer[10240];
+          char buffer[CHUNK];
 
-          rlength = fread(buffer, 1, 10240, readfile);
+          rlength = fread(buffer, 1, CHUNK, readfile);
           EVP_DigestUpdate(&ctx, buffer, rlength);
         }
         fclose(readfile);

@@ -11,8 +11,6 @@ static char *client_show(const void *payload) {
   const client_t *client = payload;
   char  *credentials       = NULL;
   char  *string            = NULL;
-  /* No to get a warning about null string */
-  char  null_string[]      = "";
 
   if (client->username != NULL) {
     char *password = NULL;
@@ -20,12 +18,12 @@ static char *client_show(const void *payload) {
     if (client->password != NULL) {
       asprintf(&password, ":%s", client->password);
     } else {
-      asprintf(&password, "%s", null_string);
+      asprintf(&password, "%s", "");
     }
     asprintf(&credentials, "%s%s@", client->username, password);
     free(password);
   } else {
-    asprintf(&credentials, "%s", null_string);
+    asprintf(&credentials, "%s", "");
   }
   asprintf(&string, "%s://%s%s %s", client->protocol, credentials,
     client->hostname, client->listfile);

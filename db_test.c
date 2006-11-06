@@ -123,7 +123,7 @@ int main(void) {
   }
 
   /* Write and read back */
-  if ((status = db_write("test/", "testfile", 13, checksum))) {
+  if ((status = db_write("test/", "testfile", 13, checksum, 0))) {
     printf("db_write error status %u\n", status);
     db_close();
     return 0;
