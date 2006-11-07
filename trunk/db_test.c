@@ -49,6 +49,7 @@ int main(void) {
   void *filters_handle = NULL;
   void *parsers_handle = NULL;
   char checksum[40];
+  char zchecksum[40];
   int  status;
 
   /* Test internal functions */
@@ -71,6 +72,12 @@ int main(void) {
   printf("Link   : 0%06o\n", type_mode('l'));
   printf("Socket : 0%06o\n", type_mode('s'));
   printf("Unknown: 0%06o\n", type_mode('?'));
+
+  printf("Copied %u bytes: %s -> %s\n", zcopy("test/testfile",
+    "test_db/testfile.gz", checksum, zchecksum, 5), checksum, zchecksum);
+
+  printf("Copied %u bytes: %s -> %s\n", zcopy("test_db/testfile.gz",
+    "test/testfile", checksum, zchecksum, -1), checksum, zchecksum);
 
   /* Use other modules */
   if ((status = parsers_new(&parsers_handle))) {

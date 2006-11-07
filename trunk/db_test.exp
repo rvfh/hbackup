@@ -16,6 +16,8 @@ FIFO   : 0010000
 Link   : 0120000
 Socket : 0140000
 Unknown: 0000000
+Copied 13 bytes: 59ca0efa9f5633cb0371bbc0355478d8 -> f94b4a4f91902f37f53e9e38fafbb524
+Copied 33 bytes: f94b4a4f91902f37f53e9e38fafbb524 -> 59ca0efa9f5633cb0371bbc0355478d8
 List 12 elements:
  cvs
  cvs/dirbad

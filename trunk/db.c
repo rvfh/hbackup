@@ -123,19 +123,21 @@ static size_t zcopy(const char *source_path, const char *dest_path,
     /* Create openssl resources */
     EVP_DigestInit(&ctx_out, EVP_md5());
 
-    strm.zalloc = Z_NULL;
-    strm.zfree = Z_NULL;
-    strm.opaque = Z_NULL;
+    strm.zalloc   = Z_NULL;
+    strm.zfree    = Z_NULL;
+    strm.opaque   = Z_NULL;
+    strm.avail_in = 0;
+    strm.next_in  = Z_NULL;
     if (compress > 0) {
       /* Compress */
-      if (deflateInit(&strm, 5)) {
+      if (deflateInit2(&strm, compress, Z_DEFLATED, 16 + 15, 9,
+          Z_DEFAULT_STRATEGY)) {
+        fprintf(stderr, "zcopy: deflate init failed\n");
         compress = 0;
       }
     } else {
       /* De-compress */
-      strm.avail_in = 0;
-      strm.next_in = Z_NULL;
-      if (inflateInit(&strm)) {
+      if (inflateInit2(&strm, 32 + 15)) {
         compress = 0;
       }
     }
@@ -166,7 +168,13 @@ static size_t zcopy(const char *source_path, const char *dest_path,
         if (compress > 0) {
           deflate(&strm, feof(readfile) ? Z_FINISH : Z_NO_FLUSH);
         } else {
-          inflate(&strm, Z_NO_FLUSH);
+          switch (inflate(&strm, Z_NO_FLUSH)) {
+            case Z_NEED_DICT:
+            case Z_DATA_ERROR:
+            case Z_MEM_ERROR:
+              fprintf(stderr, "zcopy: inflate failed\n");
+              break;
+          }
         }
         rlength = CHUNK - strm.avail_out;
 
