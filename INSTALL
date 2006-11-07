@@ -1,6 +1,7 @@
 DEPENDENCIES
 
 * openssl: for MD5 sum calculation
+* zlib: for compression and decompression
 
 COMPILATION/TEST
 

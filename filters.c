@@ -92,6 +92,7 @@ int filters_add(void *handle, mode_t file_type, filter_type_t type, ...) {
   return 0;
 }
 
+/* TODO This is a OR, also have AND (OR linked list of AND linked lists) */
 int filters_match(void *handle, const filedata_t *filedata) {
   list_entry_t *entry = NULL;
 
