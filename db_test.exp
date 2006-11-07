@@ -16,8 +16,10 @@ FIFO   : 0010000
 Link   : 0120000
 Socket : 0140000
 Unknown: 0000000
-Copied 13 bytes: 59ca0efa9f5633cb0371bbc0355478d8 -> f94b4a4f91902f37f53e9e38fafbb524
-Copied 33 bytes: f94b4a4f91902f37f53e9e38fafbb524 -> 59ca0efa9f5633cb0371bbc0355478d8
+Copied 13 -> 33 bytes: 59ca0efa9f5633cb0371bbc0355478d8 -> f94b4a4f91902f37f53e9e38fafbb524
+Copied 33 -> 13 bytes: f94b4a4f91902f37f53e9e38fafbb524 -> 59ca0efa9f5633cb0371bbc0355478d8
+Copied 524288 -> ? bytes 59071590099d21dd439896592338bf95 -> ?
+Copied ? -> 543 bytes ? -> 29178ac07006174c64c06f39b745a30b
 List 12 elements:
  cvs
  cvs/dirbad
@@ -33,6 +35,10 @@ List 12 elements:
  testlink
  -> Initialized database list
 59ca0efa9f5633cb0371bbc0355478d8-0  test/testfile
+List 1 elements:
+ 'this is a host' 'test/testfile' f 0 1 1000 1000 0644 'this is a link' 59ca0efa9f5633cb0371bbc0355478d8 1 0 -
+List 1 elements:
+ 'this is a host' 'test/testfile' f 0 1 1000 1000 0644 'this is a link' 59ca0efa9f5633cb0371bbc0355478d8 1 1 -
  --> Files to add: 12
 List 12 elements:
  'file://host' '/home/user/cvs' d 0 1 1000 1000 0755 ''  1 0 -

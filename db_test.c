@@ -46,11 +46,15 @@ int terminating(void) {
 }
 
 int main(void) {
-  void *filters_handle = NULL;
-  void *parsers_handle = NULL;
-  char checksum[40];
-  char zchecksum[40];
-  int  status;
+  void      *filters_handle = NULL;
+  void      *parsers_handle = NULL;
+  char      checksum[40];
+  char      zchecksum[40];
+  db_data_t db_data;
+  size_t    size;
+  size_t    zsize;
+  list_t    filelist;
+  int       status;
 
   /* Test internal functions */
   printf("type_letter\n");
@@ -73,11 +77,23 @@ int main(void) {
   printf("Socket : 0%06o\n", type_mode('s'));
   printf("Unknown: 0%06o\n", type_mode('?'));
 
-  printf("Copied %u bytes: %s -> %s\n", zcopy("test/testfile",
-    "test_db/testfile.gz", checksum, zchecksum, 5), checksum, zchecksum);
+  zcopy("test/testfile", "test_db/testfile.gz", &size, &zsize, checksum,
+    zchecksum, 5);
+  printf("Copied %u -> %u bytes: %s -> %s\n",
+    size, zsize, checksum, zchecksum);
 
-  printf("Copied %u bytes: %s -> %s\n", zcopy("test_db/testfile.gz",
-    "test/testfile", checksum, zchecksum, -1), checksum, zchecksum);
+  zcopy("test_db/testfile.gz", "test/testfile", &size, &zsize, checksum,
+    zchecksum, -1);
+  printf("Copied %u -> %u bytes: %s -> %s\n",
+    size, zsize, checksum, zchecksum);
+
+  zcopy("test2/testfile~", "test_db/testfile.gz", &size, NULL, checksum,
+    NULL, 5);
+  printf("Copied %u -> ? bytes %s -> ?\n", size, checksum);
+
+  zcopy("test2/testfile~", "test_db/testfile.gz", NULL, &zsize, NULL,
+    zchecksum, 9);
+  printf("Copied ? -> %u bytes ? -> %s\n", zsize, zchecksum);
 
   /* Use other modules */
   if ((status = parsers_new(&parsers_handle))) {
@@ -129,13 +145,32 @@ int main(void) {
     }
   }
 
-  /* Write and read back */
-  if ((status = db_write("test/", "testfile", 13, checksum, 0))) {
+  /* Write check */
+  db_data.filedata.path = "test/testfile";
+  metadata_get(db_data.filedata.path, &db_data.filedata.metadata);
+  db_data.host = "this is a host";
+  db_data.link = "this is a link";
+  db_data.date_in = time(NULL);
+  db_data.date_out = 0;
+  if ((status = db_write("test/", "testfile", &db_data, checksum, 0))) {
     printf("db_write error status %u\n", status);
     db_close();
     return 0;
   }
   printf("%s  test/testfile\n", checksum);
+  filelist = list_new(db_data_show);
+  db_load("data/59ca0efa9f5633cb0371bbc0355478d8-0/list", filelist);
+  list_show(filelist, NULL, db_data_show);
+  list_free(filelist);
+
+  /* Obsolete check */
+  db_obsolete(db_data.host, db_data.filedata.path, checksum);
+  filelist = list_new(db_data_show);
+  db_load("data/59ca0efa9f5633cb0371bbc0355478d8-0/list", filelist);
+  list_show(filelist, NULL, db_data_show);
+  list_free(filelist);
+
+  /* Read check */
   if ((status = db_read("test_db/blah", checksum))) {
     printf("db_read error status %u\n", status);
     db_close();

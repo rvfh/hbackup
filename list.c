@@ -148,13 +148,13 @@ int list_append(void *list_handle, void *payload) {
   return 0;
 }
 
-int list_add(void *list_handle, void *payload) {
+list_entry_t list_add(void *list_handle, void *payload) {
   __list_t *list = list_handle;
   __list_entry_t *entry = list_entry_new();
 
   if ((list_handle == NULL) || (entry == NULL)) {
     fprintf(stderr, "list: add: failed\n");
-    return 2;
+    return NULL;
   }
   entry->payload = payload;
   if (list->payload_get == NULL) {
@@ -180,7 +180,7 @@ int list_add(void *list_handle, void *payload) {
   }
   list->hint = entry;
   list->size++;
-  return 0;
+  return entry;
 }
 
 void *list_remove(void *list_handle, void *entry_handle) {
@@ -245,7 +245,7 @@ list_entry_t list_next(const list_t list_handle, const list_entry_t entry_handle
 }
 
 int list_find(const list_t list_handle, const char *search_string,
-    list_payload_get_f payload_get, list_entry_t **entry_handle) {
+    list_payload_get_f payload_get, list_entry_t *entry_handle) {
   const __list_t  *list = list_handle;
   __list_entry_t  *entry;
   char            *string = NULL;
@@ -263,7 +263,7 @@ int list_find(const list_t list_handle, const char *search_string,
 
   entry = list_find_hidden(list_handle, search_string, payload_get);
   if (entry_handle != NULL) {
-    *entry_handle = (list_entry_t *) entry;
+    *entry_handle = entry;
   }
   if (entry == NULL) {
     return 1;
