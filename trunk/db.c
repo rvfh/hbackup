@@ -94,8 +94,9 @@ static void md5sum(char *checksum, int bytes) {
   free(copy);
 }
 
-static size_t zcopy(const char *source_path, const char *dest_path,
-    char *checksum_in, char *checksum_out, int compress) {
+static int zcopy(const char *source_path, const char *dest_path,
+    size_t *size_in, size_t *size_out, char *checksum_in, char *checksum_out,
+    int compress) {
   FILE          *writefile;
   FILE          *readfile;
   unsigned char buffer_in[CHUNK];
@@ -103,19 +104,21 @@ static size_t zcopy(const char *source_path, const char *dest_path,
   EVP_MD_CTX    ctx_in;
   EVP_MD_CTX    ctx_out;
   size_t        length;
-  size_t        size_in = 0;
-  size_t        size_out = 0;
   z_stream      strm;
+
+  /* Initialise */
+  if (size_in != NULL)  *size_in  = 0;
+  if (size_out != NULL) *size_out = 0;
 
   /* Open file to read from */
   if ((readfile = fopen(source_path, "r")) == NULL) {
-    return -1;
+    return 2;
   }
 
   /* Open file to write to */
   if ((writefile = fopen(dest_path, "w")) == NULL) {
     fclose(readfile);
-    return -1;
+    return 2;
   }
 
   /* Create zlib resources */
@@ -152,7 +155,7 @@ static size_t zcopy(const char *source_path, const char *dest_path,
     size_t wlength;
 
     /* Size read */
-    size_in += rlength;
+    if (size_in != NULL) *size_in += rlength;
 
     /* Checksum computation */
     EVP_DigestUpdate(&ctx_in, buffer_in, rlength);
@@ -182,7 +185,7 @@ static size_t zcopy(const char *source_path, const char *dest_path,
         EVP_DigestUpdate(&ctx_out, buffer_out, rlength);
 
         /* Size to write */
-        size_out += rlength;
+        if (size_out != NULL) *size_out += rlength;
 
         do {
           wlength = fwrite(buffer_out, 1, rlength, writefile);
@@ -200,8 +203,10 @@ static size_t zcopy(const char *source_path, const char *dest_path,
   fclose(writefile);
 
   /* Get checksum for input file */
-  EVP_DigestFinal(&ctx_in, (unsigned char *) checksum_in, &length);
-  md5sum(checksum_in, length);
+  if (checksum_in != NULL) {
+    EVP_DigestFinal(&ctx_in, (unsigned char *) checksum_in, &length);
+    md5sum(checksum_in, length);
+  }
 
   /* Destroy zlib resources */
   if (compress != 0) {
@@ -217,8 +222,18 @@ static size_t zcopy(const char *source_path, const char *dest_path,
     if (compress < 0) {
       inflateEnd(&strm);
     }
+  } else {
+    /* Might want the original checksum in the output */
+    if (checksum_out != NULL) {
+      if (checksum_in != NULL) {
+        strcpy(checksum_out, checksum_in);
+      } else {
+        EVP_DigestFinal(&ctx_in, (unsigned char *) checksum_out, &length);
+        md5sum(checksum_out, length);
+      }
+    }
   }
-  return size_in;
+  return 0;
 }
 
 static int getdir(const char *checksum, char **path_p) {
@@ -292,33 +307,33 @@ static int db_load(const char *filename, list_t list) {
             break;
           case 3:   /* Type */
             if (sscanf(string, "%c", &letter) != 1) {
-              failed = field;
+              failed = 2;
             }
             db_data.filedata.metadata.type = type_mode(letter);
             break;
           case 4:   /* Size */
             if (sscanf(string, "%ld", &db_data.filedata.metadata.size) != 1) {
-              failed = field;
+              failed = 2;
             }
             break;
           case 5:   /* Modification time */
             if (sscanf(string, "%ld", &db_data.filedata.metadata.mtime) != 1) {
-              failed = field;
+              failed = 2;
             }
             break;
           case 6:   /* User */
             if (sscanf(string, "%u", &db_data.filedata.metadata.uid) != 1) {
-              failed = field;
+              failed = 2;
             }
             break;
           case 7:   /* Group */
             if (sscanf(string, "%u", &db_data.filedata.metadata.gid) != 1) {
-              failed = field;
+              failed = 2;
             }
             break;
           case 8:   /* Permissions */
             if (sscanf(string, "%o", &db_data.filedata.metadata.mode) != 1) {
-              failed = field;
+              failed = 2;
             }
             break;
           case 9:   /* Link */
@@ -329,21 +344,21 @@ static int db_load(const char *filename, list_t list) {
             break;
           case 11:  /* Date in */
             if (sscanf(string, "%ld", &db_data.date_in) != 1) {
-              failed = field;
+              failed = 2;
             }
             break;
           case 12:  /* Date out */
             if (sscanf(string, "%ld", &db_data.date_out) != 1) {
-              failed = field;
+              failed = 2;
             }
             break;
           case 13:  /* Mark */
             if (strcmp(string, "-")) {
-              failed = field;
+              failed = 2;
             }
             break;
           default:
-            failed = field;
+            failed = 2;
         }
         start = delim + 1;
         if (failed) {
@@ -358,12 +373,11 @@ static int db_load(const char *filename, list_t list) {
       }
       free(string);
       if (failed) {
-        fprintf(stderr, "db: failed to read list file: wrong format (%d)\n",
-          field);
+        fprintf(stderr, "db: failed to read list file (%s): wrong format (%d)\n", source_path, field);
       } else {
         db_data_p = malloc(sizeof(db_data_t));
         *db_data_p = db_data;
-        list_add(db_list, db_data_p);
+        list_add(list, db_data_p);
       }
     }
     free(buffer);
@@ -506,18 +520,20 @@ static int db_organize(char *path, int number) {
   return failed;
 }
 
-static int db_write(const char *mount_path, const char *path, size_t size,
-    char *checksum, int compress) {
+static int db_write(const char *mount_path, const char *path,
+    const db_data_t *db_data, char *checksum, int compress) {
   char    *source_path = NULL;
   char    *temp_path   = NULL;
   char    *dest_path   = NULL;
-  char    temp_checksum[36];
+  char    checksum_source[36];
+  char    checksum_dest[36];
   FILE    *writefile;
   FILE    *readfile;
   int     index = 0;
   int     delete = 0;
   int     failed = 0;
-  size_t  copied;
+  size_t  size_source;
+  size_t  size_dest;
 
   /* File to read from */
   asprintf(&source_path, "%s/%s", mount_path, path);
@@ -526,9 +542,9 @@ static int db_write(const char *mount_path, const char *path, size_t size,
   asprintf(&temp_path, "%s/filedata", db_path);
 
   /* Copy file locally */
-  copied = zcopy(source_path, temp_path, temp_checksum, NULL, compress);
-  if (copied != size) {
-    if (! terminating() && (copied != -1)) {
+  if (zcopy(source_path, temp_path, &size_source, &size_dest, checksum_source,
+      checksum_dest, compress)) {
+    if (! terminating()) {
       /* Don't signal errors on termination */
       fprintf(stderr, "db: write: failed to copy file: %s\n", path);
     }
@@ -536,9 +552,15 @@ static int db_write(const char *mount_path, const char *path, size_t size,
   }
   free(source_path);
 
+  /* Check size_source size */
+  if (size_source != db_data->filedata.metadata.size) {
+    fprintf(stderr, "db: write: file copy incomplete: %s\n", path);
+    failed = 1;
+  }
+
   /* Get file final location */
-  if (! failed && getdir(temp_checksum, &dest_path) == 2) {
-    fprintf(stderr, "db: write: failed to get dir for: %s\n", temp_checksum);
+  if (! failed && getdir(checksum_source, &dest_path) == 2) {
+    fprintf(stderr, "db: write: failed to get dir for: %s\n", checksum_source);
     failed = 1;
   }
 
@@ -549,8 +571,8 @@ static int db_write(const char *mount_path, const char *path, size_t size,
       int   differ = 0;
 
       /* Complete checksum with index */
-      sprintf((char *) checksum, "%s-%u", temp_checksum, index);
-      asprintf(&final_path, "%s-%u/", dest_path, index);
+      sprintf((char *) checksum, "%s-%u", checksum_source, index);
+      asprintf(&final_path, "%s-%u", dest_path, index);
       if (! testdir(final_path, 1)) {
         /* Directory exists */
         char  *try_path = NULL;
@@ -631,22 +653,85 @@ static int db_write(const char *mount_path, const char *path, size_t size,
   }
   free(temp_path);
 
-  /* Make sure we won't exceed the file number limit */
+  /* Save redundant information together with data */
   if (! failed) {
     /* dest_path is /path/to/checksum/data */
     char *delim = strrchr(dest_path, '/');
 
     if (delim != NULL) {
+      char         *listfile = NULL;
+      list_t       list;
+      list_entry_t entry;
+      db_data_t    new_db_data = *db_data;
+
       *delim = '\0';
       /* Now dest_path is /path/to/checksum */
-      if ((delim = strrchr(dest_path, '/')) != NULL) {
-        *delim = '\0';
-        /* Now dest_path is /path/to */
-        db_organize(dest_path, 256);
+      asprintf(&listfile, "%s/%s", &dest_path[strlen(db_path) + 1], "list");
+      list = list_new(db_data_get);
+      if (db_load(listfile, list) == 2) {
+        fprintf(stderr, "db: write: failed to open data list\n");
+      } else {
+        strcpy(new_db_data.filedata.checksum, checksum_dest);
+        new_db_data.filedata.metadata.size = size_dest;
+        entry = list_add(list, &new_db_data);
+        db_save(listfile, list);
+        list_remove(list, entry);
       }
+      list_free(list);
+      free(listfile);
+    }
+  }
+
+  /* Make sure we won't exceed the file number limit */
+  if (! failed) {
+    /* dest_path is /path/to/checksum */
+    char *delim = strrchr(dest_path, '/');
+
+    if (delim != NULL) {
+      *delim = '\0';
+      /* Now dest_path is /path/to */
+      db_organize(dest_path, 256);
     }
   }
   free(dest_path);
+  return failed;
+}
+
+static int db_obsolete(const char *prefix, const char *path,
+    const char *checksum) {
+  char         *listfile  = NULL;
+  char         *temp_path = NULL;
+  int          failed = 0;
+  list_t       list;
+
+  if (getdir(checksum, &temp_path)) {
+    fprintf(stderr, "db: read: failed to get dir for: %s\n", checksum);
+    return 2;
+  }
+  asprintf(&listfile, "%s/list", &temp_path[strlen(db_path) + 1]);
+  free(temp_path);
+
+  list = list_new(db_data_get);
+  if (db_load(listfile, list) == 2) {
+    fprintf(stderr, "db: write: failed to open data list\n");
+  } else {
+    db_data_t    *db_data;
+    list_entry_t entry;
+    char         *string = NULL;
+
+    asprintf(&string, "%s %s %c", prefix, path, '@');
+    list_find(list, string, NULL, &entry);
+    if (entry != NULL) {
+      db_data = list_entry_payload(entry);
+      db_data->date_out = time(NULL);
+      db_save(listfile, list);
+    }
+    free(string);
+  }
+  list_free(list);
+
+
+  free(listfile);
   return failed;
 }
 
@@ -851,8 +936,8 @@ int db_parse(const char *host, const char *real_path,
           if (filedata->checksum[0] != '\0') {
             /* We need the old checksum here! */
             strcpy(db_data->filedata.checksum, filedata->checksum);
-          } else if (db_write(mount_path, filedata->path,
-              db_data->filedata.metadata.size, db_data->filedata.checksum, 0)) {
+          } else if (db_write(mount_path, filedata->path, db_data,
+              db_data->filedata.checksum, 0)) {
             /* Write failed, need to go on */
             failed = 1;
             if (! terminating()) {
@@ -911,6 +996,13 @@ int db_parse(const char *host, const char *real_path,
 
       /* Same data as in db_list */
       db_data->date_out = time(NULL);
+
+      /* Update local list */
+      if (S_ISREG(db_data->filedata.metadata.type) &&
+          (db_data->filedata.checksum[0] != '\0')) {
+        db_obsolete(db_data->host, db_data->filedata.path,
+          db_data->filedata.checksum);
+      }
     }
   }
   /* This only unlists the data */
@@ -941,7 +1033,7 @@ int db_read(const char *path, const char *checksum) {
   asprintf(&temp_path, "%s.part", path);
 
   /* Copy file to temporary name (size not checked: checksum suffices) */
-  if (zcopy(source_path, temp_path, temp_checksum, NULL, 0) < 0) {
+  if (zcopy(source_path, temp_path, NULL, NULL, temp_checksum, NULL, 0)) {
     fprintf(stderr, "db: read: failed to copy file: %s\n", source_path);
     failed = 2;
   } else

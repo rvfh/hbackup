@@ -85,7 +85,7 @@ int filters_add(void *handle, mode_t file_type, filter_type_t type, ...) {
   }
   va_end(args);
 
-  if (list_add(handle, filter)) {
+  if (list_add(handle, filter) == NULL) {
     fprintf(stderr, "filters: add: failed\n");
     return 2;
   }

@@ -41,8 +41,8 @@ extern void list_free(list_t list_handle);
 /* Append given entry to list */
 extern int list_append(list_t list_handle, void *payload);
 
-/* Add given entry to list */
-extern int list_add(list_t list_handle, void *payload);
+/* Add new list entry with given payload, return pointer to entry or NULL */
+extern list_entry_t list_add(list_t list_handle, void *payload);
 
 /* Remove entry from list and destroy it, return its contents */
 extern void *list_remove(list_t list_handle, list_entry_t entry_handle);
@@ -67,7 +67,7 @@ extern list_entry_t list_next(const list_t list_handle,
  * If entry_handle is not NULL, it will contain the closest entry found
  * If an exact match is found, the function returns 0, non zero otherwise */
 extern int list_find(const list_t list_handle, const char *search_string,
-  list_payload_get_f payload_get_f, list_entry_t **entry_handle);
+  list_payload_get_f payload_get_f, list_entry_t *entry_handle);
 
 /* Show list contents (payload contents can be included) */
 /* If payload_get_f is NULL, the list default is used */
