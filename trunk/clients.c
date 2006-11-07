@@ -310,6 +310,8 @@ static int read_listfile(const char *listfilename, list_t backups) {
             listfilename, line);
         }
       } else if (! strcmp(keyword, "parser")) {
+        /* TODO Add keyword: all (add all controlled files), mod (only
+        modified files), not (only non-controlled files) */
         strtolower(string);
         if (! strcmp(string, "cvs")) {
           parsers_add(backup->parsers_handle, cvs_parser_new());
@@ -437,8 +439,9 @@ int clients_backup(const char *mount_point) {
               asprintf(&prefix, "%s://%s", client->protocol, client->hostname);
               strtolower(backup->path);
               pathtolinux(backup->path);
+              /* TODO compression should be system-wide (in hbackup.conf) */
               if (db_parse(prefix, backup->path, backup_path,
-                  filelist_get())) {
+                  filelist_get(), backup->compress_handle)) {
                 if (! terminating()) {
                   fprintf(stderr, "clients: backup: parsing failed\n");
                 }

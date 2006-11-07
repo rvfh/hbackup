@@ -21,6 +21,8 @@
  *  mark
  */
 
+/* TODO Re-create main list from local ones in case of catastrophy */
+
 #define _GNU_SOURCE
 #include <string.h>
 #include <sys/stat.h>
@@ -37,6 +39,7 @@
 #include "list.h"
 #include "tools.h"
 #include "hbackup.h"
+#include "filters.h"
 #include "db.h"
 
 #define CHUNK 10240
@@ -672,7 +675,6 @@ static int db_write(const char *mount_path, const char *path,
         fprintf(stderr, "db: write: failed to open data list\n");
       } else {
         strcpy(new_db_data.filedata.checksum, checksum_dest);
-        new_db_data.filedata.metadata.size = size_dest;
         entry = list_add(list, &new_db_data);
         db_save(listfile, list);
         list_remove(list, entry);
@@ -894,7 +896,7 @@ static int parse_compare(void *db_data_p, void *filedata_p) {
 }
 
 int db_parse(const char *host, const char *real_path,
-    const char *mount_path, list_t file_list) {
+    const char *mount_path, list_t file_list, list_t compress_list) {
   char          *select_string = NULL;
   list_t        selected_files_list;
   list_t        added_files_list;
@@ -934,18 +936,27 @@ int db_parse(const char *host, const char *real_path,
         /* Save new data */
         if (S_ISREG(filedata->metadata.type)) {
           if (filedata->checksum[0] != '\0') {
-            /* We need the old checksum here! */
+            /* Checksum given by the compare function */
             strcpy(db_data->filedata.checksum, filedata->checksum);
-          } else if (db_write(mount_path, filedata->path, db_data,
-              db_data->filedata.checksum, 0)) {
-            /* Write failed, need to go on */
-            failed = 1;
-            if (! terminating()) {
-              /* Don't signal errors on termination */
-              fprintf(stderr, "db: parse: %s: %s, ignoring\n",
-                  strerror(errno), db_data->filedata.path);
+          } else {
+            int compress = 0;
+
+            /* Really new file, compress? */
+            if ((compress_list != NULL) && ! filters_match(compress_list,
+                &db_data->filedata)) {
+              compress = 5;
             }
-            strcpy(db_data->filedata.checksum, "N");
+            if (db_write(mount_path, filedata->path, db_data,
+                db_data->filedata.checksum, compress)) {
+              /* Write failed, need to go on */
+              failed = 1;
+              if (! terminating()) {
+                /* Don't signal errors on termination */
+                fprintf(stderr, "db: parse: %s: %s, ignoring\n",
+                    strerror(errno), db_data->filedata.path);
+              }
+              strcpy(db_data->filedata.checksum, "N");
+            }
           }
         } else {
           strcpy(db_data->filedata.checksum, "");
@@ -1108,6 +1119,7 @@ int db_scan(const char *checksum) {
 
 int db_check(const char *checksum) {
   int failed = 0;
+  char checksum_real[256];
 
   if (checksum == NULL) {
     list_entry_t entry = NULL;
@@ -1143,14 +1155,35 @@ int db_check(const char *checksum) {
   } else if (strlen(checksum)) {
     char       *path = NULL;
 
+    strcpy(checksum_real, checksum);
     if (getdir(checksum, &path)) {
       failed = 2;
     } else {
-      FILE *readfile;
-      char *check_path = NULL;
+      FILE    *readfile;
+      char    *check_path = NULL;
+      char    *listfile   = NULL;
+      list_t  list;
 
-      asprintf(&check_path, "%s/data", path);
+      asprintf(&listfile, "%s/list", &path[strlen(db_path) + 1]);
+      list = list_new(db_data_get);
+      if (db_load(listfile, list) == 2) {
+        fprintf(stderr, "db: check: failed to open data list\n");
+      } else {
+        db_data_t    *db_data;
+        list_entry_t entry = list_next(list, NULL);
+
+        if (entry == NULL) {
+          fprintf(stderr, "db: check: failed to obtain checksum\n");
+        } else {
+          db_data = list_entry_payload(entry);
+          strcpy(checksum_real, db_data->filedata.checksum);
+        }
+      }
+      list_free(list);
+      free(listfile);
+
       /* Read file to compute checksum, compare with expected */
+      asprintf(&check_path, "%s/data", path);
       if ((readfile = fopen(check_path, "r")) == NULL) {
         failed = 1;
       } else {
@@ -1169,7 +1202,7 @@ int db_check(const char *checksum) {
         /* Re-use length */
         EVP_DigestFinal(&ctx, (unsigned char *) check, &rlength);
         md5sum(check, rlength);
-        if (strncmp(check, checksum, rlength)) {
+        if (strncmp(check, checksum_real, rlength)) {
           failed = 1;
           fprintf(stderr, "db: check: checksum for %s found to be %s\n",
             checksum, check);
