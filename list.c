@@ -126,13 +126,13 @@ void list_free(list_t list_handle) {
   }
 }
 
-int list_append(void *list_handle, void *payload) {
+list_entry_t list_append(void *list_handle, void *payload) {
   __list_t *list = list_handle;
   __list_entry_t *entry = list_entry_new();
 
   if ((list_handle == NULL) || (entry == NULL)) {
     fprintf(stderr, "list: append: failed\n");
-    return 2;
+    return NULL;
   }
   entry->payload = payload;
   entry->previous = list->last;
@@ -145,7 +145,7 @@ int list_append(void *list_handle, void *payload) {
   }
   list->hint = entry;
   list->size++;
-  return 0;
+  return entry;
 }
 
 list_entry_t list_add(void *list_handle, void *payload) {

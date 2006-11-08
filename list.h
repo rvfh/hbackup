@@ -39,7 +39,7 @@ extern list_t list_new(list_payload_get_f payload_get_f);
 extern void list_free(list_t list_handle);
 
 /* Append given entry to list */
-extern int list_append(list_t list_handle, void *payload);
+extern list_entry_t list_append(list_t list_handle, void *payload);
 
 /* Add new list entry with given payload, return pointer to entry or NULL */
 extern list_entry_t list_add(list_t list_handle, void *payload);
