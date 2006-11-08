@@ -1,24 +1,21 @@
 cvs parser: file check: not initialised
 test is not under CVS control
-List 5 elements:
- dirbad
- dirutd
- filemod.o
- filenew.c
- fileutd.h
+-> dirbad
+-> dirutd
+-> filemod.o
+-> filenew.c
+-> fileutd.h
 test/cvs/nofile is not under CVS control
 test/cvs/fileoth is not under CVS control
 test/cvs/diroth is not under CVS control
-List 1 elements:
- fileutd
+-> fileutd
 test/cvs/dirutd/fileoth is not under CVS control
 test/cvs/dirbad is not under CVS control
-List 5 elements:
- dirbad
- dirutd
- filemod.o
- filenew.c
- fileutd.h
+-> dirbad
+-> dirutd
+-> filemod.o
+-> filenew.c
+-> fileutd.h
 test/cvs/fileutd is not under CVS control
 test/cvs/fileoth is not under CVS control
 test/cvs/diroth is not under CVS control

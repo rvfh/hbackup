@@ -66,10 +66,12 @@ int main() {
   printf("Fill in list\n");
   strcpy(payload.name, "test");
   list_add(list, list_test_new(payload));
+  printf("List %u element(s):\n", list_size(list));
   list_show(list, NULL, payload_get);
 
   strcpy(payload.name, "test/testfile");
   list_add(list, list_test_new(payload));
+  printf("List %u element(s):\n", list_size(list));
   list_show(list, NULL, payload_get);
   list_find(list, "test", NULL, &entry);
   string = payload_get(list_entry_payload(entry));
@@ -80,14 +82,17 @@ int main() {
 
   strcpy(payload.name, "test/subdir/testfile1");
   list_add(list, list_test_new(payload));
+  printf("List %u element(s):\n", list_size(list));
   list_show(list, NULL, payload_get);
 
   strcpy(payload.name, "test/subdir");
   list_add(list, list_test_new(payload));
+  printf("List %u element(s):\n", list_size(list));
   list_show(list, NULL, payload_get);
 
   strcpy(payload.name, "test/testfile");
   list_add(list, list_test_new(payload));
+  printf("List %u element(s):\n", list_size(list));
   list_show(list, NULL, payload_get);
   printf("Reported size: %u\n", list_size(list));
 
@@ -97,15 +102,18 @@ int main() {
   strcpy(payload2.dir, "test");
   strcpy(payload2.filename, "testfile");
   list_add(list2, list2_test_new(payload2));
+  printf("List %u element(s):\n", list_size(list2));
   list_show(list2, NULL, NULL);
 
   strcpy(payload2.dir, "test/subdir");
   strcpy(payload2.filename, "testfile1");
   list_add(list2, list2_test_new(payload2));
+  printf("List %u element(s):\n", list_size(list2));
   list_show(list2, NULL, NULL);
 
   strcpy(payload2.filename, "added");
   list_add(list2, list2_test_new(payload2));
+  printf("List %u element(s):\n", list_size(list2));
   list_show(list2, NULL, NULL);
 
   printf("\nCompare lists\n");
@@ -114,6 +122,7 @@ int main() {
   }
   if (list_compare(list, list2, &added, NULL, NULL)) {
     printf("Added list only\n");
+    printf("List %u element(s):\n", list_size(added));
     list_show(added, NULL, NULL);
     if (list_deselect(added) != 0) {
       printf("Added list not freed\n");
@@ -121,6 +130,7 @@ int main() {
   }
   if (list_compare(list, list2, NULL, &missing, NULL)) {
     printf("Missing list only\n");
+    printf("List %u element(s):\n", list_size(missing));
     list_show(missing, NULL, NULL);
     if (list_deselect(missing) != 0) {
       printf("Missing list not freed\n");
@@ -128,10 +138,12 @@ int main() {
   }
   if (list_compare(list, list2, &added, &missing, NULL)) {
     printf("Both lists\n");
+    printf("List %u element(s):\n", list_size(added));
     list_show(added, NULL, NULL);
     if (list_deselect(added) != 0) {
       printf("Added list not freed\n");
     }
+    printf("List %u element(s):\n", list_size(missing));
     list_show(missing, NULL, NULL);
     if (list_deselect(missing) != 0) {
       printf("Missing list not freed\n");
@@ -139,10 +151,12 @@ int main() {
   }
   if (list_compare(list, list2, &added, &missing, payloads_compare)) {
     printf("Both lists with comparison function\n");
+    printf("List %u element(s):\n", list_size(added));
     list_show(added, NULL, NULL);
     if (list_deselect(added) != 0) {
       printf("Added list not freed\n");
     }
+    printf("List %u element(s):\n", list_size(missing));
     list_show(missing, NULL, NULL);
     if (list_deselect(missing) != 0) {
       printf("Missing list not freed\n");
@@ -152,25 +166,31 @@ int main() {
   list_free(list2);
 
   printf("\nSelect part of list\n");
+  printf("List %u element(s):\n", list_size(list));
   list_show(list, NULL, payload_get);
   if (list_select(list, "test/subdir/", NULL, list2)) {
     printf("Select failed\n");
   } else {
+    printf("List %u element(s):\n", list_size(list2));
     list_show(list2, NULL, NULL);
     if (list_deselect(list2) != 0) {
       printf("Selected list not freed\n");
     }
   }
+  printf("List %u element(s):\n", list_size(list));
   list_show(list, NULL, payload_get);
 
   printf("\nEmpty list\n");
   list_drop(list, entry);
+  printf("List %u element(s):\n", list_size(list));
   list_show(list, NULL, payload_get);
 
   list_drop(list, list_previous(list, NULL));
+  printf("List %u element(s):\n", list_size(list));
   list_show(list, NULL, payload_get);
 
   list_drop(list, list_next(list, NULL));
+  printf("List %u element(s):\n", list_size(list));
   list_show(list, NULL, payload_get);
 
   list_free(list);

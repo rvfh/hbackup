@@ -1,90 +1,90 @@
 Fill in list
-List 1 elements:
- test
-List 2 elements:
- test
- test/testfile
-List 3 elements:
- test
- test/subdir/testfile1
- test/testfile
-List 4 elements:
- test
- test/subdir
- test/subdir/testfile1
- test/testfile
-List 5 elements:
- test
- test/subdir
- test/subdir/testfile1
- test/testfile
- test/testfile
+List 1 element(s):
+-> test
+List 2 element(s):
+-> test
+-> test/testfile
+List 3 element(s):
+-> test
+-> test/subdir/testfile1
+-> test/testfile
+List 4 element(s):
+-> test
+-> test/subdir
+-> test/subdir/testfile1
+-> test/testfile
+List 5 element(s):
+-> test
+-> test/subdir
+-> test/subdir/testfile1
+-> test/testfile
+-> test/testfile
 Reported size: 5
 
 Fill in list2
-List 1 elements:
- test/testfile
-List 2 elements:
- test/subdir/testfile1
- test/testfile
-List 3 elements:
- test/subdir/added
- test/subdir/testfile1
- test/testfile
+List 1 element(s):
+-> test/testfile
+List 2 element(s):
+-> test/subdir/testfile1
+-> test/testfile
+List 3 element(s):
+-> test/subdir/added
+-> test/subdir/testfile1
+-> test/testfile
 
 Compare lists
 Lists differ
 Added list only
-List 1 elements:
- test/subdir/added
+List 1 element(s):
+-> test/subdir/added
 Missing list only
-List 3 elements:
- test
- test/subdir
- test/testfile
+List 3 element(s):
+-> test
+-> test/subdir
+-> test/testfile
 Both lists
-List 1 elements:
- test/subdir/added
-List 3 elements:
- test
- test/subdir
- test/testfile
+List 1 element(s):
+-> test/subdir/added
+List 3 element(s):
+-> test
+-> test/subdir
+-> test/testfile
 Both lists with comparison function
-List 2 elements:
- test/subdir/added
- test/subdir/testfile1
-List 4 elements:
- test
- test/subdir
- test/testfile
- test/testfile
+List 2 element(s):
+-> test/subdir/added
+-> test/subdir/testfile1
+List 4 element(s):
+-> test
+-> test/subdir
+-> test/testfile
+-> test/testfile
 
 Select part of list
-List 5 elements:
- test
- test/subdir
- test/subdir/testfile1
- test/testfile
- test/testfile
-List 1 elements:
- test/subdir/testfile1
-List 5 elements:
- test
- test/subdir
- test/subdir/testfile1
- test/testfile
- test/testfile
+List 5 element(s):
+-> test
+-> test/subdir
+-> test/subdir/testfile1
+-> test/testfile
+-> test/testfile
+List 1 element(s):
+-> test/subdir/testfile1
+List 5 element(s):
+-> test
+-> test/subdir
+-> test/subdir/testfile1
+-> test/testfile
+-> test/testfile
 
 Empty list
-List 4 elements:
- test
- test/subdir
- test/subdir/testfile1
- test/testfile
-List 3 elements:
- test
- test/subdir
- test/subdir/testfile1
-List 2 elements:
- test/subdir
- test/subdir/testfile1
+List 4 element(s):
+-> test
+-> test/subdir
+-> test/subdir/testfile1
+-> test/testfile
+List 3 element(s):
+-> test
+-> test/subdir
+-> test/subdir/testfile1
+List 2 element(s):
+-> test/subdir
+-> test/subdir/testfile1

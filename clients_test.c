@@ -45,8 +45,10 @@ int main(void) {
     printf("Failed to create\n");
     return 1;
   }
+  printf(">List %u client(s):\n", list_size(clients));
   list_show(clients, NULL, client_show);
   clients_add("file://localhost", "etc/doesnotexist");
+  printf(">List %u client(s):\n", list_size(clients));
   list_show(clients, NULL, client_show);
   clients_backup("test_db/mount");
   clients_free();
@@ -55,20 +57,28 @@ int main(void) {
     printf("Failed to create\n");
     return 1;
   }
+  printf(">List %u client(s):\n", list_size(clients));
   list_show(clients, NULL, client_show);
   clients_add("nFs://myClient", "/home/User/devel");
+  printf(">List %u client(s):\n", list_size(clients));
   list_show(clients, NULL, client_show);
   clients_add("Smb://Myself:flesyM@myClient", "C:\\Backup\\Backup.LST");
+  printf(">List %u client(s):\n", list_size(clients));
   list_show(clients, NULL, client_show);
   clients_add("sSh://otherClient", "c:/home/backup/Backup.list");
+  printf(">List %u client(s):\n", list_size(clients));
   list_show(clients, NULL, client_show);
   clients_add("Smb://user@Client", "c:/home/BlaH/Backup.list");
+  printf(">List %u client(s):\n", list_size(clients));
   list_show(clients, NULL, client_show);
   clients_add("Smb://user:@Client", "c:/home/BlaH/Backup.list");
+  printf(">List %u client(s):\n", list_size(clients));
   list_show(clients, NULL, client_show);
   clients_add("Smb://@Client", "c:/home/BlaH/Backup.list");
+  printf(">List %u client(s):\n", list_size(clients));
   list_show(clients, NULL, client_show);
   clients_add("Smb://:@Client", "c:/home/BlaH/Backup.list");
+  printf(">List %u client(s):\n", list_size(clients));
   list_show(clients, NULL, client_show);
   db_open("test_db");
   clients_backup("test_db/mount");

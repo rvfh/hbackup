@@ -277,6 +277,8 @@ int list_find(const list_t list_handle, const char *search_string,
 
 void list_show(const list_t list_handle, list_entry_t *entry_handle,
     list_payload_get_f payload_get) {
+  static int level = 0;
+
   if (list_handle != NULL) {
     if (payload_get == NULL) {
       const __list_t  *list = list_handle;
@@ -292,17 +294,24 @@ void list_show(const list_t list_handle, list_entry_t *entry_handle,
     if (entry_handle != NULL) {
       if (list_entry_payload(entry_handle) != NULL) {
         char *string = payload_get(list_entry_payload(entry_handle));
+        if (string != NULL) {
+          int i;
 
-        printf(" %s\n", string);
-        free(string);
+          for (i = 0; i < level; i++) {
+            printf("-");
+          }
+          printf("> %s\n", string);
+          free(string);
+        }
       } else {
         fprintf(stderr, "list: show: no payload!\n");
       }
     } else {
-      printf("List %u elements:\n", list_size(list_handle));
+      level++;
       while ((entry_handle = list_next(list_handle, entry_handle)) != NULL) {
         list_show(list_handle, entry_handle, payload_get);
       }
+      level--;
     }
   }
 }
