@@ -28,7 +28,6 @@ typedef struct {
 
 typedef struct {
   char    *path;
-  list_t  compress_handle;
   list_t  ignore_handle;
   list_t  parsers_handle;
 } backup_t;
@@ -299,15 +298,6 @@ static int read_listfile(const char *listfilename, list_t backups) {
             listfilename, line);
           failed = 1;
         }
-      } else if (! strcmp(keyword, "compress")) {
-        fprintf(stderr,
-          "clients: backup: keyword not implemented in list file %s, line %u\n",
-          listfilename, line);
-        if (add_filter(backup->compress_handle, type, string)) {
-          fprintf(stderr,
-            "clients: backup: unsupported filter type in list file %s, line %u\n",
-            listfilename, line);
-        }
       } else if (! strcmp(keyword, "ignore")) {
         if (add_filter(backup->ignore_handle, type, string)) {
           fprintf(stderr,
@@ -328,7 +318,6 @@ static int read_listfile(const char *listfilename, list_t backups) {
       } else if (! strcmp(keyword, "path")) {
         /* New backup entry */
         backup = malloc(sizeof(backup_t));
-        filters_new(&backup->compress_handle);
         filters_new(&backup->ignore_handle);
         parsers_new(&backup->parsers_handle);
         asprintf(&backup->path, "%s", string);
@@ -444,9 +433,8 @@ int clients_backup(const char *mount_point) {
               asprintf(&prefix, "%s://%s", client->protocol, client->hostname);
               strtolower(backup->path);
               pathtolinux(backup->path);
-              /* TODO compression should be system-wide (in hbackup.conf) */
               if (db_parse(prefix, backup->path, backup_path,
-                  filelist_get(), backup->compress_handle)) {
+                  filelist_get(), 100)) {
                 if (! terminating()) {
                   fprintf(stderr, "clients: backup: parsing failed\n");
                 }
@@ -465,7 +453,6 @@ int clients_backup(const char *mount_point) {
 
           /* Free encapsulated data */
           free(backup->path);
-          filters_free(backup->compress_handle);
           filters_free(backup->ignore_handle);
           parsers_free(backup->parsers_handle);
         }
