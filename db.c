@@ -896,7 +896,7 @@ static int parse_compare(void *db_data_p, void *filedata_p) {
 }
 
 int db_parse(const char *host, const char *real_path,
-    const char *mount_path, list_t file_list, list_t compress_list) {
+    const char *mount_path, list_t file_list, size_t compress_min) {
   char          *select_string = NULL;
   list_t        selected_files_list;
   list_t        added_files_list;
@@ -942,8 +942,7 @@ int db_parse(const char *host, const char *real_path,
             int compress = 0;
 
             /* Really new file, compress? */
-            if ((compress_list != NULL) && ! filters_match(compress_list,
-                &db_data->filedata)) {
+            if (filedata->metadata.size >= compress_min) {
               compress = 5;
             }
             if (db_write(mount_path, filedata->path, db_data,

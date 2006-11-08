@@ -12,8 +12,6 @@ mount: only root can do that
 clients: backup: could not mount smb share
 mount: only root can do that
 clients: backup: could not mount smb share
-clients: backup: keyword not implemented in list file etc/localhost.list, line 3
-clients: backup: keyword not implemented in list file etc/localhost.list, line 3
 >List 0 client(s):
 >List 1 client(s):
 -> file://localhost etc/doesnotexist

@@ -19,20 +19,18 @@ the -c option. Only two keywords are acceptable there: 'db' and 'client'.
 
 CLIENT CONFIGURATION
 
-Each client must provide its own configuration file. Four keywords may be used:
+Each client must provide its own configuration file. Keywords that may be used:
 * path: start of a new backup list, gives the path information.
   Syntax: path "<path to backup>"
-* compress: regular files to compress (for filter types, see FILTERS below).
-  Syntax: compress <filter type> "<string>"
-* ignore: files to ignore (for filter types, see FILTERS below).
+* ignore: files to ignore (for file and filter types, see FILTERS below).
   Syntax: ignore [<file type>/]<filter type> "<string>"
-* parser: detection of directories under version control (for existing
-parsers, see PARSERS below).
+* parser: detection of directories under version control (for existing parsers,
+          see PARSERS below).
   Syntax: parser "<parser name>"
 
 COMPRESSION
 
-Not implemented.
+All files above 100 bytes are compressed.
 
 FILTERS
 

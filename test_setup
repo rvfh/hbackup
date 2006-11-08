@@ -84,7 +84,6 @@ EOF
 cat << EOF > "$CONFIGDIR/localhost.list"
 # Share test
 path "test" # should work
-compress path_end .c
 ignore path_start subdir
 ignore file/path_end ~
 ignore path_end ".o"
