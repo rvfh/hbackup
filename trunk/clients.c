@@ -250,15 +250,20 @@ static int add_filter(list_t handle, const char *type, const char *string) {
 
   /* Add specified filter */
   if (! strcmp(filter_type, "path_end")) {
-    filters_add(handle, file_type, filter_path_end, string);
+    filters_rule_add(filters_rule_new(handle), file_type, filter_path_end,
+      string);
   } else if (! strcmp(filter_type, "path_start")) {
-    filters_add(handle, file_type, filter_path_start, string);
+    filters_rule_add(filters_rule_new(handle), file_type, filter_path_start,
+      string);
   } else if (! strcmp(filter_type, "path_regexp")) {
-    filters_add(handle, file_type, filter_path_regexp, string);
+    filters_rule_add(filters_rule_new(handle), file_type, filter_path_regexp,
+      string);
   } else if (! strcmp(filter_type, "size_below")) {
-    filters_add(handle, 0, filter_size_below, strtoul(string, NULL, 10));
+    filters_rule_add(filters_rule_new(handle), 0, filter_size_below,
+      strtoul(string, NULL, 10));
   } else if (! strcmp(filter_type, "size_above")) {
-    filters_add(handle, 0, filter_size_above, strtoul(string, NULL, 10));
+    filters_rule_add(filters_rule_new(handle), 0, filter_size_above,
+      strtoul(string, NULL, 10));
   } else {
     return 1;
   }

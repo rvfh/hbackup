@@ -42,21 +42,41 @@ static int filter_path_start_check(const char *path, const filter_t *filter) {
   return strncmp(path, filter->string, strlen(filter->string));
 }
 
-int filters_new(void **handle) {
+int filters_new(list_t *handle) {
   /* Create new list */
   *handle = list_new(NULL);
   if (*handle == NULL) {
-    fprintf(stderr, "filters: new: cannot intialise\n");
+    fprintf(stderr, "filters: new: failed\n");
     return 2;
   }
   return 0;
 }
 
-void filters_free(void *handle) {
+void filters_free(list_t handle) {
+  list_entry_t entry = NULL;
+
+  /* List of lists, free each embedded list */
+  while ((entry = list_next(handle, entry)) != NULL) {
+    list_free(list_remove(handle, entry));
+  }
+  if (list_size(handle) != 0) {
+    fprintf(stderr, "filters: free: failed\n");
+  }
   list_free(handle);
 }
 
-int filters_add(void *handle, mode_t file_type, filter_type_t type, ...) {
+list_t filters_rule_new(list_t handle) {
+  list_t rule = list_new(NULL);
+
+  if (list_append(handle, rule) == NULL) {
+    fprintf(stderr, "filters: rule new: failed\n");
+    return NULL;
+  }
+  return rule;
+}
+
+int filters_rule_add(list_t rule_handle, mode_t file_type,
+    filter_type_t type, ...) {
   filter_t *filter = malloc(sizeof(filter_t));
   va_list  args;
 
@@ -85,52 +105,59 @@ int filters_add(void *handle, mode_t file_type, filter_type_t type, ...) {
   }
   va_end(args);
 
-  if (list_add(handle, filter) == NULL) {
+  if (list_append(rule_handle, filter) == NULL) {
     fprintf(stderr, "filters: add: failed\n");
     return 2;
   }
   return 0;
 }
 
-/* TODO This is a OR, also have AND (OR linked list of AND linked lists) */
-int filters_match(void *handle, const filedata_t *filedata) {
-  list_entry_t *entry = NULL;
+static int filter_match(const filter_t *filter, const filedata_t *filedata) {
+  /* Check that file type matches */
+  if ((filter->file_type & filedata->metadata.type) == 0) {
+    return 1;
+  }
+  /* Run filters */
+  switch(filter->type) {
+  case filter_path_end:
+    return filter_path_end_check(filedata->path, filter);
+  case filter_path_start:
+    return filter_path_start_check(filedata->path, filter);
+  case filter_path_regexp:
+    return filter_path_regexp_check(filedata->path, filter);
+  case filter_size_above:
+    return filedata->metadata.size < filter->size;
+  case filter_size_below:
+    return filedata->metadata.size > filter->size;
+  default:
+    fprintf(stderr, "filters: match: unknown filter type\n");
+    return 2;
+  }
+  return 1;
+}
 
-  while ((entry = list_next(handle, entry)) != NULL) {
-    filter_t *filter = list_entry_payload(entry);
+int filters_match(list_t handle, const filedata_t *filedata) {
+  list_entry_t *rule_entry = NULL;
 
-    if ((filter->file_type & filedata->metadata.type) == 0) {
-      continue;
+  /* Read through list of rules */
+  while ((rule_entry = list_next(handle, rule_entry)) != NULL) {
+    list_t       rule         = list_entry_payload(rule_entry);
+    list_entry_t filter_entry = NULL;
+    int          match        = 1;
+
+    /* Read through list of filters in rule */
+    while ((filter_entry = list_next(rule, filter_entry)) != NULL) {
+      filter_t *filter = list_entry_payload(filter_entry);
+
+      /* All filters must match for rule to match */
+      if (filter_match(filter, filedata)) {
+        match = 0;
+        break;
+      }
     }
-    switch(filter->type) {
-    case filter_path_end:
-      if (! filter_path_end_check(filedata->path, filter)) {
-        return 0;
-      }
-      break;
-    case filter_path_start:
-      if (! filter_path_start_check(filedata->path, filter)) {
-        return 0;
-      }
-      break;
-    case filter_path_regexp:
-      if (! filter_path_regexp_check(filedata->path, filter)) {
-        return 0;
-      }
-      break;
-    case filter_size_above:
-      if (filedata->metadata.size > filter->size) {
-        return 0;
-      }
-      break;
-    case filter_size_below:
-      if (filedata->metadata.size < filter->size) {
-        return 0;
-      }
-      break;
-    default:
-      fprintf(stderr, "filters: match: unknown filter type\n");
-      return 2;
+    /* If all filters matched (or the rule is empty!), we have a rule match */
+    if (match) {
+      return 0;
     }
   }
   /* No match */

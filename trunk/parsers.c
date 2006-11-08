@@ -22,7 +22,7 @@ void parsers_free(void *handle) {
 }
 
 int parsers_add(void *handle, parser_t *parser) {
-  if (list_append(handle, parser)) {
+  if (list_append(handle, parser) == NULL) {
     fprintf(stderr, "parsers: add: failed\n");
     return 2;
   }
