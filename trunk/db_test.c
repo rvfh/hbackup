@@ -146,6 +146,7 @@ int main(void) {
     return 0;
   }
   verbose = 3;
+  printf(">List %u file(s):\n", list_size(filelist_get()));
   list_show(filelist_get(), NULL, file_data_show);
 
   /* Test database */
@@ -171,6 +172,7 @@ int main(void) {
   printf("%s  test/testfile\n", checksum);
   filelist = list_new(db_data_show);
   db_load("data/59ca0efa9f5633cb0371bbc0355478d8-0/list", filelist);
+  printf(">List %u element(s):\n", list_size(filelist));
   list_show(filelist, NULL, db_data_show);
   list_free(filelist);
 
@@ -178,6 +180,7 @@ int main(void) {
   db_obsolete(db_data.host, db_data.filedata.path, checksum);
   filelist = list_new(db_data_show);
   db_load("data/59ca0efa9f5633cb0371bbc0355478d8-0/list", filelist);
+  printf(">List %u element(s):\n", list_size(filelist));
   list_show(filelist, NULL, db_data_show);
   list_free(filelist);
 
@@ -194,6 +197,7 @@ int main(void) {
     db_close();
     return 0;
   }
+  printf(">List %u element(s):\n", list_size(db_list));
   list_show(db_list, NULL, db_data_show);
 
   db_close();
@@ -206,6 +210,7 @@ int main(void) {
       return 0;
     }
   }
+  printf(">List %u element(s):\n", list_size(db_list));
   list_show(db_list, NULL, db_data_show);
 
   if ((status = db_parse("file://host", "/home/user", "test",
@@ -214,6 +219,7 @@ int main(void) {
     db_close();
     return 0;
   }
+  printf(">List %u element(s):\n", list_size(db_list));
   list_show(db_list, NULL, db_data_show);
   filelist_free();
 
@@ -223,6 +229,7 @@ int main(void) {
     return 0;
   }
   verbose = 3;
+  printf(">List %u file(s):\n", list_size(filelist_get()));
   list_show(filelist_get(), NULL, file_data_show);
 
   if ((status = db_parse("file://host", "/home/user2", "test2",
@@ -231,6 +238,7 @@ int main(void) {
     db_close();
     return 0;
   }
+  printf(">List %u element(s):\n", list_size(db_list));
   list_show(db_list, NULL, db_data_show);
   filelist_free();
 
@@ -273,6 +281,7 @@ int main(void) {
       return 0;
     }
   }
+  printf(">List %u element(s):\n", list_size(db_list));
   list_show(db_list, NULL, db_data_show);
 
   remove("test/testfile");
@@ -283,6 +292,7 @@ int main(void) {
     return 0;
   }
   verbose = 3;
+  printf(">List %u file(s):\n", list_size(filelist_get()));
   list_show(filelist_get(), NULL, file_data_show);
 
   if ((status = db_parse("file://host", "/home/user", "test",
@@ -291,7 +301,9 @@ int main(void) {
     db_close();
     return 0;
   }
+  printf(">List %u element(s):\n", list_size(db_list));
   list_show(db_list, NULL, db_data_show);
+  printf(">List %u element(s):\n", list_size(db_list));
   list_show(db_list, NULL, parse_select);
   filelist_free();
 
@@ -301,6 +313,7 @@ int main(void) {
     return 0;
   }
   verbose = 3;
+  printf(">List %u file(s):\n", list_size(filelist_get()));
   list_show(filelist_get(), NULL, file_data_show);
 
   if ((status = db_parse("file://host", "/home/user", "test",
@@ -309,6 +322,7 @@ int main(void) {
     db_close();
     return 0;
   }
+  printf(">List %u element(s):\n", list_size(db_list));
   list_show(db_list, NULL, db_data_show);
   filelist_free();
 
@@ -318,6 +332,7 @@ int main(void) {
     return 0;
   }
   verbose = 3;
+  printf(">List %u file(s):\n", list_size(filelist_get()));
   list_show(filelist_get(), NULL, file_data_show);
 
   if ((status = db_parse("file://host", "/home/user2", "test2",
@@ -326,6 +341,7 @@ int main(void) {
     db_close();
     return 0;
   }
+  printf(">List %u element(s):\n", list_size(db_list));
   list_show(db_list, NULL, db_data_show);
   filelist_free();
 

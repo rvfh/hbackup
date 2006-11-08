@@ -15,14 +15,14 @@ static char *filters_show(const void *payload) {
     case filter_path_end:
     case filter_path_start:
     case filter_path_regexp:
-      asprintf(&string, "-> %s %u", filter->string, filter->type);
+      asprintf(&string, "%s %u", filter->string, filter->type);
       break;
     case filter_size_above:
     case filter_size_below:
-      asprintf(&string, "-> %u %u", filter->size, filter->type);
+      asprintf(&string, "%u %u", filter->size, filter->type);
       break;
     default:
-      asprintf(&string, "-> unknown filter type");
+      asprintf(&string, "unknown filter type");
   }
   return string;
 }
@@ -31,8 +31,7 @@ static char *filters_rule_show(const void *payload) {
   const list_t       rule    = (const list_t) payload;
   char               *string = NULL;
 
-  printf(" Start of rule\n");
-  asprintf(&string, "End of rule");
+  printf("-> List %u filter(s)\n", list_size(rule));
   list_show(rule, NULL, filters_show);
   return string;
 }
@@ -103,11 +102,13 @@ int main(void) {
     if (filters_rule_add(filters_rule_new(handle), S_IFREG, filter_path_regexp, "^to a.*\\.txt")) {
       printf("Failed to add\n");
     } else {
+      printf(">List %u rule(s):\n", list_size(handle));
       list_show(handle, NULL, filters_rule_show);
     }
     if (filters_rule_add(filters_rule_new(handle), S_IFREG, filter_path_regexp, "^to a.*\\.t.t")) {
       printf("Failed to add\n");
     } else {
+      printf(">List %u rule(s):\n", list_size(handle));
       list_show(handle, NULL, filters_rule_show);
     }
     filedata.path = "to a file.txt";
@@ -141,11 +142,13 @@ int main(void) {
       if (filters_rule_add(filters_rule_new(handle2), S_IFREG, filter_path_regexp, "^to a.*\\.txt")) {
         printf("Failed to add\n");
       } else {
+        printf(">List %u rule(s):\n", list_size(handle2));
         list_show(handle2, NULL, filters_rule_show);
       }
       if (filters_rule_add(filters_rule_new(handle2), S_IFREG, filter_path_regexp, "^to a.*\\.t.t")) {
         printf("Failed to add\n");
       } else {
+        printf(">List %u rule(s):\n", list_size(handle2));
         list_show(handle2, NULL, filters_rule_show);
       }
       filedata.path = "to a file.txt";
@@ -203,6 +206,7 @@ int main(void) {
     if (filters_rule_add(filters_rule_new(handle), 0, filter_size_below, 500)) {
       printf("Failed to add\n");
     } else {
+      printf(">List %u rule(s):\n", list_size(handle));
       list_show(handle, NULL, filters_rule_show);
     }
     filedata.metadata.size = 0;
@@ -227,6 +231,7 @@ int main(void) {
     if (filters_rule_add(filters_rule_new(handle), 0, filter_size_above, 5000)) {
       printf("Failed to add\n");
     } else {
+      printf(">List %u rule(s):\n", list_size(handle));
       list_show(handle, NULL, filters_rule_show);
     }
     filedata.metadata.size = 0;
@@ -257,17 +262,20 @@ int main(void) {
   } else {
     list_t rule = NULL;
 
+    printf(">List %u rule(s):\n", list_size(handle));
     list_show(handle, NULL, filters_rule_show);
 
     rule = filters_rule_new(handle);
     if (filters_rule_add(rule, 0, filter_size_below, 500)) {
       printf("Failed to add\n");
     } else {
+      printf(">List %u rule(s):\n", list_size(handle));
       list_show(handle, NULL, filters_rule_show);
     }
     if (filters_rule_add(rule, 0, filter_size_above, 400)) {
       printf("Failed to add\n");
     } else {
+      printf(">List %u rule(s):\n", list_size(handle));
       list_show(handle, NULL, filters_rule_show);
     }
     filedata.metadata.size = 600;

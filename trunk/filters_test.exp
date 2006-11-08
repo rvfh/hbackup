@@ -11,77 +11,55 @@ Matching 4000
 Not matching 6000
 
 Simple rules test
-List 1 elements:
- Start of rule
-List 1 elements:
- -> ^to a.*\.txt 2
- End of rule
-List 2 elements:
- Start of rule
-List 1 elements:
- -> ^to a.*\.txt 2
- End of rule
- Start of rule
-List 1 elements:
- -> ^to a.*\.t.t 2
- End of rule
+>List 1 rule(s):
+-> List 1 filter(s)
+--> ^to a.*\.txt 2
+>List 2 rule(s):
+-> List 1 filter(s)
+--> ^to a.*\.txt 2
+-> List 1 filter(s)
+--> ^to a.*\.t.t 2
 Not matching 3
 Not matching +1
 Not matching +2
 Not matching +3
-List 1 elements:
- Start of rule
-List 1 elements:
- -> ^to a.*\.txt 2
- End of rule
-List 2 elements:
- Start of rule
-List 1 elements:
- -> ^to a.*\.txt 2
- End of rule
- Start of rule
-List 1 elements:
- -> ^to a.*\.t.t 2
- End of rule
+>List 1 rule(s):
+-> List 1 filter(s)
+--> ^to a.*\.txt 2
+>List 2 rule(s):
+-> List 1 filter(s)
+--> ^to a.*\.txt 2
+-> List 1 filter(s)
+--> ^to a.*\.t.t 2
 Not matching +3
 Not matching 3
 Not matching 0
 Not matching 1000
 Not matching 1000000
-List 1 elements:
- Start of rule
-List 1 elements:
- -> 500 4
- End of rule
+>List 1 rule(s):
+-> List 1 filter(s)
+--> 500 4
 Matching 0
 Not matching 1000
 Not matching 1000000
-List 2 elements:
- Start of rule
-List 1 elements:
- -> 500 4
- End of rule
- Start of rule
-List 1 elements:
- -> 5000 3
- End of rule
+>List 2 rule(s):
+-> List 1 filter(s)
+--> 500 4
+-> List 1 filter(s)
+--> 5000 3
 Matching 0
 Not matching 1000
 Matching 1000000
 
 Complex rules test
-List 0 elements:
-List 1 elements:
- Start of rule
-List 1 elements:
- -> 500 4
- End of rule
-List 1 elements:
- Start of rule
-List 2 elements:
- -> 500 4
- -> 400 3
- End of rule
+>List 0 rule(s):
+>List 1 rule(s):
+-> List 1 filter(s)
+--> 500 4
+>List 1 rule(s):
+-> List 2 filter(s)
+--> 500 4
+--> 400 3
 Not matching 600
 Matching 500
 Matching 450

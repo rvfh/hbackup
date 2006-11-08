@@ -34,6 +34,7 @@ int main(int argc, char *argv[]) {
   printf("iterate_directory\n");
   files = list_new(filedata_get);
   if (! iterate_directory("test", NULL)) {
+    printf(">List %u file(s):\n", list_size(files));
     list_show(files, NULL, NULL);
   }
   list_free(files);
@@ -44,6 +45,7 @@ int main(int argc, char *argv[]) {
   }
   files = list_new(filedata_get);
   if (! iterate_directory("test", NULL)) {
+    printf(">List %u file(s):\n", list_size(files));
     list_show(files, NULL, NULL);
   }
   list_free(files);
@@ -54,6 +56,7 @@ int main(int argc, char *argv[]) {
   }
   files = list_new(filedata_get);
   if (! iterate_directory("test", NULL)) {
+    printf(">List %u file(s):\n", list_size(files));
     list_show(files, NULL, NULL);
   }
   list_free(files);
@@ -62,6 +65,7 @@ int main(int argc, char *argv[]) {
   parsers_add(test_parsers_handle, cvs_parser_new());
   files = list_new(filedata_get);
   if (! iterate_directory("test", NULL)) {
+    printf(">List %u file(s):\n", list_size(files));
     list_show(files, NULL, NULL);
   }
   list_free(files);
@@ -73,6 +77,7 @@ int main(int argc, char *argv[]) {
 
   printf("filelist_new, as previous\n");
   if (! filelist_new("test", test_filters_handle, test_parsers_handle)) {
+    printf(">List %u file(s):\n", list_size(files));
     list_show(files, NULL, NULL);
     filelist_free();
   }

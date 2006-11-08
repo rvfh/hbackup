@@ -1,108 +1,108 @@
 iterate_directory
-List 27 elements:
- cvs
- cvs/CVS
- cvs/CVS/Entries
- cvs/dirbad
- cvs/dirbad/fileoth
- cvs/dirbad/fileutd
- cvs/diroth
- cvs/dirutd
- cvs/dirutd/CVS
- cvs/dirutd/CVS/Entries
- cvs/dirutd/fileoth
- cvs/dirutd/fileutd
- cvs/filemod.o
- cvs/filenew.c
- cvs/fileoth
- cvs/fileutd.h
- dir space
- dir space/file space
- subdir
- subdir/testfile
- subdir/testfile1
- subdir/testfile2
- test space
- testdir
- testfile
- testfile~
- testlink
+>List 27 file(s):
+-> cvs
+-> cvs/CVS
+-> cvs/CVS/Entries
+-> cvs/dirbad
+-> cvs/dirbad/fileoth
+-> cvs/dirbad/fileutd
+-> cvs/diroth
+-> cvs/dirutd
+-> cvs/dirutd/CVS
+-> cvs/dirutd/CVS/Entries
+-> cvs/dirutd/fileoth
+-> cvs/dirutd/fileutd
+-> cvs/filemod.o
+-> cvs/filenew.c
+-> cvs/fileoth
+-> cvs/fileutd.h
+-> dir space
+-> dir space/file space
+-> subdir
+-> subdir/testfile
+-> subdir/testfile1
+-> subdir/testfile2
+-> test space
+-> testdir
+-> testfile
+-> testfile~
+-> testlink
 as previous with subdir in ignore list
-List 23 elements:
- cvs
- cvs/CVS
- cvs/CVS/Entries
- cvs/dirbad
- cvs/dirbad/fileoth
- cvs/dirbad/fileutd
- cvs/diroth
- cvs/dirutd
- cvs/dirutd/CVS
- cvs/dirutd/CVS/Entries
- cvs/dirutd/fileoth
- cvs/dirutd/fileutd
- cvs/filemod.o
- cvs/filenew.c
- cvs/fileoth
- cvs/fileutd.h
- dir space
- dir space/file space
- test space
- testdir
- testfile
- testfile~
- testlink
+>List 23 file(s):
+-> cvs
+-> cvs/CVS
+-> cvs/CVS/Entries
+-> cvs/dirbad
+-> cvs/dirbad/fileoth
+-> cvs/dirbad/fileutd
+-> cvs/diroth
+-> cvs/dirutd
+-> cvs/dirutd/CVS
+-> cvs/dirutd/CVS/Entries
+-> cvs/dirutd/fileoth
+-> cvs/dirutd/fileutd
+-> cvs/filemod.o
+-> cvs/filenew.c
+-> cvs/fileoth
+-> cvs/fileutd.h
+-> dir space
+-> dir space/file space
+-> test space
+-> testdir
+-> testfile
+-> testfile~
+-> testlink
 as previous with testlink in ignore list
-List 22 elements:
- cvs
- cvs/CVS
- cvs/CVS/Entries
- cvs/dirbad
- cvs/dirbad/fileoth
- cvs/dirbad/fileutd
- cvs/diroth
- cvs/dirutd
- cvs/dirutd/CVS
- cvs/dirutd/CVS/Entries
- cvs/dirutd/fileoth
- cvs/dirutd/fileutd
- cvs/filemod.o
- cvs/filenew.c
- cvs/fileoth
- cvs/fileutd.h
- dir space
- dir space/file space
- test space
- testdir
- testfile
- testfile~
+>List 22 file(s):
+-> cvs
+-> cvs/CVS
+-> cvs/CVS/Entries
+-> cvs/dirbad
+-> cvs/dirbad/fileoth
+-> cvs/dirbad/fileutd
+-> cvs/diroth
+-> cvs/dirutd
+-> cvs/dirutd/CVS
+-> cvs/dirutd/CVS/Entries
+-> cvs/dirutd/fileoth
+-> cvs/dirutd/fileutd
+-> cvs/filemod.o
+-> cvs/filenew.c
+-> cvs/fileoth
+-> cvs/fileutd.h
+-> dir space
+-> dir space/file space
+-> test space
+-> testdir
+-> testfile
+-> testfile~
 as previous with CVS parser
-List 13 elements:
- cvs
- cvs/dirbad
- cvs/dirutd
- cvs/dirutd/fileutd
- cvs/filemod.o
- cvs/filenew.c
- cvs/fileutd.h
- dir space
- dir space/file space
- test space
- testdir
- testfile
- testfile~
+>List 13 file(s):
+-> cvs
+-> cvs/dirbad
+-> cvs/dirutd
+-> cvs/dirutd/fileutd
+-> cvs/filemod.o
+-> cvs/filenew.c
+-> cvs/fileutd.h
+-> dir space
+-> dir space/file space
+-> test space
+-> testdir
+-> testfile
+-> testfile~
 filelist_new, as previous
-List 13 elements:
- cvs
- cvs/dirbad
- cvs/dirutd
- cvs/dirutd/fileutd
- cvs/filemod.o
- cvs/filenew.c
- cvs/fileutd.h
- dir space
- dir space/file space
- test space
- testdir
- testfile
- testfile~
+>List 13 file(s):
+-> cvs
+-> cvs/dirbad
+-> cvs/dirutd
+-> cvs/dirutd/fileutd
+-> cvs/filemod.o
+-> cvs/filenew.c
+-> cvs/fileutd.h
+-> dir space
+-> dir space/file space
+-> test space
+-> testdir
+-> testfile
+-> testfile~
