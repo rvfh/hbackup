@@ -260,7 +260,7 @@ int main(void) {
     }
   }
 
-  verbose = 1;
+  verbose = 2;
   remove("test_db/data/59ca0efa9f5633cb0371bbc0355478d8-1/data");
   if ((status = db_scan(NULL))) {
     printf("db_scan (full) error status %u\n", status);
