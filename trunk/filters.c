@@ -53,10 +53,11 @@ int filters_new(list_t *handle) {
 }
 
 void filters_free(list_t handle) {
-  list_entry_t entry = NULL;
+  /* Note: entry gets free in the loop */
+  list_entry_t entry;
 
   /* List of lists, free each embedded list */
-  while ((entry = list_next(handle, entry)) != NULL) {
+  while ((entry = list_next(handle, NULL)) != NULL) {
     list_free(list_remove(handle, entry));
   }
   if (list_size(handle) != 0) {
