@@ -1095,22 +1095,22 @@ int db_scan(const char *checksum) {
         failed = 1;
         fprintf(stderr, "File data missing for checksum %s\n",
           db_data->filedata.checksum);
-        if (verbosity() > 0) {
+        if (verbosity() > 1) {
           struct tm *time;
-          printf(" -> Client:     %s\n", db_data->host);
-          printf(" -> File name:  %s\n", db_data->filedata.path);
+          printf(" -> Client:      %s\n", db_data->host);
+          printf(" -> File name:   %s\n", db_data->filedata.path);
           time = localtime(&db_data->filedata.metadata.mtime);
-          printf(" -> Modified:   %04u-%02u-%02u %2u:%02u:%02u\n",
+          printf(" -> Modified:    %04u-%02u-%02u %2u:%02u:%02u\n",
             time->tm_year + 1900, time->tm_mon + 1, time->tm_mday,
             time->tm_hour, time->tm_min, time->tm_sec);
-          if (verbosity() > 1) {
+          if (verbosity() > 2) {
             time = localtime(&db_data->date_in);
-            printf(" -> Seen first: %04u-%02u-%02u %2u:%02u:%02u\n",
+            printf(" --> Seen first: %04u-%02u-%02u %2u:%02u:%02u\n",
               time->tm_year + 1900, time->tm_mon + 1, time->tm_mday,
               time->tm_hour, time->tm_min, time->tm_sec);
             if (db_data->date_out != 0) {
               time = localtime(&db_data->date_out);
-              printf(" -> Seen gone:  %04u-%02u-%02u %2u:%02u:%02u\n",
+              printf(" --> Seen gone:  %04u-%02u-%02u %2u:%02u:%02u\n",
                 time->tm_year + 1900, time->tm_mon + 1, time->tm_mday,
                 time->tm_hour, time->tm_min, time->tm_sec);
             }
@@ -1148,7 +1148,7 @@ int db_check(const char *checksum) {
     list_entry_t entry = NULL;
     int          files = list_size(db_list);
 
-    if (verbosity() > 1) {
+    if (verbosity() > 0) {
       printf("Checking database (contents: %u file(s))\n",
         list_size(db_list));
     }
@@ -1220,23 +1220,23 @@ int db_check(const char *checksum) {
           }
         }
         free(check_path);
-        if ((failed == 1) && verbosity() > 0) {
+        if ((failed == 1) && verbosity() > 1) {
           struct tm *time;
 
-          printf(" -> Client:     %s\n", db_data->host);
-          printf(" -> File name:  %s\n", db_data->filedata.path);
+          printf(" -> Client:      %s\n", db_data->host);
+          printf(" -> File name:   %s\n", db_data->filedata.path);
           time = localtime(&db_data->filedata.metadata.mtime);
-          printf(" -> Modified:   %04u-%02u-%02u %2u:%02u:%02u\n",
+          printf(" -> Modified:    %04u-%02u-%02u %2u:%02u:%02u\n",
             time->tm_year + 1900, time->tm_mon + 1, time->tm_mday,
             time->tm_hour, time->tm_min, time->tm_sec);
-          if (verbosity() > 1) {
+          if (verbosity() > 2) {
             time = localtime(&db_data->date_in);
-            printf(" -> Seen first: %04u-%02u-%02u %2u:%02u:%02u\n",
+            printf(" --> Seen first: %04u-%02u-%02u %2u:%02u:%02u\n",
               time->tm_year + 1900, time->tm_mon + 1, time->tm_mday,
               time->tm_hour, time->tm_min, time->tm_sec);
             if (db_data->date_out != 0) {
               time = localtime(&db_data->date_out);
-              printf(" -> Seen gone:  %04u-%02u-%02u %2u:%02u:%02u\n",
+              printf(" --> Seen gone:  %04u-%02u-%02u %2u:%02u:%02u\n",
                 time->tm_year + 1900, time->tm_mon + 1, time->tm_mday,
                 time->tm_hour, time->tm_min, time->tm_sec);
             }
