@@ -269,6 +269,30 @@ static int add_filter(list_t handle, const char *type, const char *string) {
   return 0;
 }
 
+static int add_parser(list_t handle, const char *type, const char *string) {
+  parser_mode_t mode;
+
+  /* Determine mode */
+  if (! strcmp(type, "mod")) {
+    mode = parser_modified;
+  } else if (! strcmp(type, "mod+oth")) {
+    mode = parser_modifiedandothers;
+  } else if (! strcmp(type, "oth")) {
+    mode = parser_others;
+  } else {
+    /* Default */
+    mode = parser_controlled;
+  }
+
+  /* Add specified parser */
+  if (! strcmp(string, "cvs")) {
+    parsers_add(handle, mode, cvs_parser_new());
+  } else {
+    return 1;
+  }
+  return 0;
+}
+
 static int read_listfile(const char *listfilename, list_t backups) {
   FILE     *listfile;
   char     *buffer = NULL;
@@ -301,16 +325,12 @@ static int read_listfile(const char *listfilename, list_t backups) {
       } else if (! strcmp(keyword, "ignore")) {
         if (add_filter(backup->ignore_handle, type, string)) {
           fprintf(stderr,
-            "clients: backup: unsupported filter type in list file %s, line %u\n",
+            "clients: backup: unsupported filter in list file %s, line %u\n",
             listfilename, line);
         }
       } else if (! strcmp(keyword, "parser")) {
-        /* TODO Add keyword: all (add all controlled files), mod (only
-        modified files), not (only non-controlled files) */
         strtolower(string);
-        if (! strcmp(string, "cvs")) {
-          parsers_add(backup->parsers_handle, cvs_parser_new());
-        } else {
+        if (add_parser(backup->parsers_handle, type, string)) {
           fprintf(stderr,
             "clients: backup: unsupported parser in list file %s, line %u\n",
             listfilename, line);

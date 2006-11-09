@@ -62,7 +62,7 @@ int main(int argc, char *argv[]) {
   list_free(files);
 
   printf("as previous with CVS parser\n");
-  parsers_add(test_parsers_handle, cvs_parser_new());
+  parsers_add(test_parsers_handle, parser_controlled, cvs_parser_new());
   files = list_new(filedata_get);
   if (! iterate_directory("test", NULL)) {
     printf(">List %u file(s):\n", list_size(files));
