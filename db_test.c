@@ -82,7 +82,7 @@ int main(void) {
   printf("Copied %u -> %u bytes: %s -> %s\n",
     size, zsize, checksum, zchecksum);
 
-  zcopy("test_db/testfile.gz", "test/testfile", &size, &zsize, checksum,
+  zcopy("test_db/testfile.gz", "/dev/null", &size, &zsize, checksum,
     zchecksum, -1);
   printf("Copied %u -> %u bytes: %s -> %s\n",
     size, zsize, checksum, zchecksum);
@@ -259,6 +259,22 @@ int main(void) {
       return 0;
     }
   }
+
+  verbose = 1;
+  remove("test_db/data/59ca0efa9f5633cb0371bbc0355478d8-1/data");
+  if ((status = db_scan(NULL))) {
+    printf("db_scan (full) error status %u\n", status);
+  }
+
+  if ((status = db_check(NULL))) {
+    printf("db_check (full) error status %u\n", status);
+  }
+
+  testfile("test_db/data/59ca0efa9f5633cb0371bbc0355478d8-1/data", 1);
+  if ((status = db_check(NULL))) {
+    printf("db_check (full) error status %u\n", status);
+  }
+  verbose = 3;
 
   db_close();
 
