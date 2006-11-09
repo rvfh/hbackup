@@ -545,8 +545,8 @@ static int db_write(const char *mount_path, const char *path,
   asprintf(&temp_path, "%s/filedata", db_path);
 
   /* Copy file locally */
-  if (zcopy(source_path, temp_path, &size_source, &size_dest, checksum_source,
-      checksum_dest, compress)) {
+  if (zcopy(source_path, temp_path, &size_source, &size_dest,
+      checksum_source, checksum_dest, compress)) {
     if (! terminating()) {
       /* Don't signal errors on termination */
       fprintf(stderr, "db: write: failed to copy file: %s\n", path);
@@ -563,7 +563,8 @@ static int db_write(const char *mount_path, const char *path,
 
   /* Get file final location */
   if (! failed && getdir(checksum_source, &dest_path) == 2) {
-    fprintf(stderr, "db: write: failed to get dir for: %s\n", checksum_source);
+    fprintf(stderr, "db: write: failed to get dir for: %s\n",
+      checksum_source);
     failed = 1;
   }
 
@@ -707,7 +708,7 @@ static int db_obsolete(const char *prefix, const char *path,
   list_t       list;
 
   if (getdir(checksum, &temp_path)) {
-    fprintf(stderr, "db: read: failed to get dir for: %s\n", checksum);
+    fprintf(stderr, "db: obsolete: failed to get dir for: %s\n", checksum);
     return 2;
   }
   asprintf(&listfile, "%s/list", &temp_path[strlen(db_path) + 1]);
@@ -715,7 +716,7 @@ static int db_obsolete(const char *prefix, const char *path,
 
   list = list_new(db_data_get);
   if (db_load(listfile, list) == 2) {
-    fprintf(stderr, "db: write: failed to open data list\n");
+    fprintf(stderr, "db: obsolete: failed to open data list\n");
   } else {
     db_data_t    *db_data;
     list_entry_t entry;
@@ -794,13 +795,14 @@ int db_open(const char *path) {
     db_list = list_new(db_data_get);
     switch (db_load("list", db_list)) {
       case 0:
-        if (verbosity() > 1) {
-          printf(" -> Loaded database list: %u file(s)\n", list_size(db_list));
+        if (verbosity() > 0) {
+          printf("Database opened (contents: %u file(s))\n",
+            list_size(db_list));
         }
         break;
       case 1:
-        if (verbosity() > 1) {
-          printf(" -> Initialized database list\n");
+        if (verbosity() > 0) {
+          printf("Database initialized\n");
         }
         break;
       case 2:
@@ -831,9 +833,6 @@ void db_close(void) {
   struct tm gmt_brokendown;
 
   /* Save list for month day */
-  if (verbosity() > 1) {
-    printf(" -> Saving database list: %u file(s)\n", list_size(db_list));
-  }
   if ((time(&gmt) != -1) && (gmtime_r(&gmt, &gmt_brokendown) != NULL)) {
     char *daily_list = NULL;
 
@@ -844,13 +843,16 @@ void db_close(void) {
 
   /* Save list as main */
   db_save("list", db_list);
-  db_list_free(db_list);
 
   /* Release lock */
   asprintf(&temp_path, "%s/lock", db_path);
   remove(temp_path);
   free(temp_path);
   free(db_path);
+  if (verbosity() > 0) {
+    printf("Database closed (contents: %u file(s))\n", list_size(db_list));
+  }
+  db_list_free(db_list);
 }
 
 static char *parse_select(const void *payload) {
@@ -883,9 +885,9 @@ static int parse_compare(void *db_data_p, void *filedata_p) {
 
   /* If it's a file and size and mtime are the same, copy checksum accross */
   if (S_ISREG(db_data->filedata.metadata.type)) {
-    if (! strcmp(db_data->filedata.checksum, "N")) {
-      /* Checksum missing, add to missing list */
-      return -1;
+    if (db_data->filedata.checksum[0] == 'N') {
+      /* Checksum missing, add to added list */
+      return 1;
     } else
     if ((db_data->filedata.metadata.size == filedata->metadata.size)
      || (db_data->filedata.metadata.mtime == filedata->metadata.mtime)) {
@@ -1008,8 +1010,9 @@ int db_parse(const char *host, const char *real_path,
       db_data->date_out = time(NULL);
 
       /* Update local list */
-      if (S_ISREG(db_data->filedata.metadata.type) &&
-          (db_data->filedata.checksum[0] != '\0')) {
+      if (S_ISREG(db_data->filedata.metadata.type)
+       && (db_data->filedata.checksum[0] != '\0')
+       && (db_data->filedata.checksum[0] != 'N')) {
         db_obsolete(db_data->host, db_data->filedata.path,
           db_data->filedata.checksum);
       }
@@ -1078,8 +1081,8 @@ int db_scan(const char *checksum) {
     list_entry_t entry = NULL;
     int files = list_size(db_list);
 
-    if (verbosity() > 1) {
-      printf(" -> Scanning database list: %u file(s)\n", list_size(db_list));
+    if (verbosity() > 0) {
+      printf("Scanning database (contents: %u file(s))\n", list_size(db_list));
     }
     while ((entry = list_next(db_list, entry)) != NULL) {
       db_data_t *db_data = list_entry_payload(entry);
@@ -1092,12 +1095,33 @@ int db_scan(const char *checksum) {
         failed = 1;
         fprintf(stderr, "File data missing for checksum %s\n",
           db_data->filedata.checksum);
+        if (verbosity() > 0) {
+          struct tm *time;
+          printf(" -> Client:     %s\n", db_data->host);
+          printf(" -> File name:  %s\n", db_data->filedata.path);
+          time = localtime(&db_data->filedata.metadata.mtime);
+          printf(" -> Modified:   %04u-%02u-%02u %2u:%02u:%02u\n",
+            time->tm_year + 1900, time->tm_mon + 1, time->tm_mday,
+            time->tm_hour, time->tm_min, time->tm_sec);
+          if (verbosity() > 1) {
+            time = localtime(&db_data->date_in);
+            printf(" -> Seen first: %04u-%02u-%02u %2u:%02u:%02u\n",
+              time->tm_year + 1900, time->tm_mon + 1, time->tm_mday,
+              time->tm_hour, time->tm_min, time->tm_sec);
+            if (db_data->date_out != 0) {
+              time = localtime(&db_data->date_out);
+              printf(" -> Seen gone:  %04u-%02u-%02u %2u:%02u:%02u\n",
+                time->tm_year + 1900, time->tm_mon + 1, time->tm_mday,
+                time->tm_hour, time->tm_min, time->tm_sec);
+            }
+          }
+        }
       }
       if (terminating()) {
         return 3;
       }
     }
-  } else if ((checksum[0] != '\0') && strcmp(checksum, "N")) {
+  } else if ((checksum[0] != '\0') && (checksum[0] != '\0')) {
     char *path = NULL;
 
     if (getdir(checksum, &path)) {
@@ -1125,7 +1149,8 @@ int db_check(const char *checksum) {
     int          files = list_size(db_list);
 
     if (verbosity() > 1) {
-      printf(" -> Checking database list: %u file(s)\n", list_size(db_list));
+      printf("Checking database (contents: %u file(s))\n",
+        list_size(db_list));
     }
     while ((entry = list_next(db_list, entry)) != NULL) {
       db_data_t *db_data = list_entry_payload(entry);
@@ -1134,18 +1159,7 @@ int db_check(const char *checksum) {
         printf(" --> Files left to go: %u\n", files);
       }
       files--;
-      switch (db_check(db_data->filedata.checksum)) {
-        case 1:
-          failed = 1;
-          fprintf(stderr, "File data missing for checksum %s\n",
-            db_data->filedata.checksum);
-          break;
-        case 2:
-          failed = 1;
-          fprintf(stderr, "File data corrupted for checksum %s\n",
-            db_data->filedata.checksum);
-          break;
-      }
+      failed = db_check(db_data->filedata.checksum);
       if (terminating()) {
         return 3;
       }
@@ -1168,46 +1182,69 @@ int db_check(const char *checksum) {
       if (db_load(listfile, list) == 2) {
         fprintf(stderr, "db: check: failed to open data list\n");
       } else {
-        db_data_t    *db_data;
+        db_data_t    *db_data = NULL;
         list_entry_t entry = list_next(list, NULL);
 
         if (entry == NULL) {
           fprintf(stderr, "db: check: failed to obtain checksum\n");
+          failed = 2;
         } else {
           db_data = list_entry_payload(entry);
           strcpy(checksum_real, db_data->filedata.checksum);
         }
+
+        /* Read file to compute checksum, compare with expected */
+        asprintf(&check_path, "%s/data", path);
+        if ((readfile = fopen(check_path, "r")) == NULL) {
+          failed = 1;
+          fprintf(stderr, "File data missing for checksum %s\n", checksum);
+        } else {
+          char       check[36];
+          EVP_MD_CTX ctx;
+          size_t     rlength;
+
+          EVP_DigestInit(&ctx, EVP_md5());
+          while (! feof(readfile) && ! terminating()) {
+            char buffer[CHUNK];
+
+            rlength = fread(buffer, 1, CHUNK, readfile);
+            EVP_DigestUpdate(&ctx, buffer, rlength);
+          }
+          fclose(readfile);
+          /* Re-use length */
+          EVP_DigestFinal(&ctx, (unsigned char *) check, &rlength);
+          md5sum(check, rlength);
+          if (strncmp(check, checksum_real, rlength)) {
+            failed = 1;
+            fprintf(stderr, "File data corrupted for checksum %s (found to be %s)\n", checksum, check);
+          }
+        }
+        free(check_path);
+        if ((failed == 1) && verbosity() > 0) {
+          struct tm *time;
+
+          printf(" -> Client:     %s\n", db_data->host);
+          printf(" -> File name:  %s\n", db_data->filedata.path);
+          time = localtime(&db_data->filedata.metadata.mtime);
+          printf(" -> Modified:   %04u-%02u-%02u %2u:%02u:%02u\n",
+            time->tm_year + 1900, time->tm_mon + 1, time->tm_mday,
+            time->tm_hour, time->tm_min, time->tm_sec);
+          if (verbosity() > 1) {
+            time = localtime(&db_data->date_in);
+            printf(" -> Seen first: %04u-%02u-%02u %2u:%02u:%02u\n",
+              time->tm_year + 1900, time->tm_mon + 1, time->tm_mday,
+              time->tm_hour, time->tm_min, time->tm_sec);
+            if (db_data->date_out != 0) {
+              time = localtime(&db_data->date_out);
+              printf(" -> Seen gone:  %04u-%02u-%02u %2u:%02u:%02u\n",
+                time->tm_year + 1900, time->tm_mon + 1, time->tm_mday,
+                time->tm_hour, time->tm_min, time->tm_sec);
+            }
+          }
+        }
       }
       list_free(list);
       free(listfile);
-
-      /* Read file to compute checksum, compare with expected */
-      asprintf(&check_path, "%s/data", path);
-      if ((readfile = fopen(check_path, "r")) == NULL) {
-        failed = 1;
-      } else {
-        char       check[36];
-        EVP_MD_CTX ctx;
-        size_t     rlength;
-
-        EVP_DigestInit(&ctx, EVP_md5());
-        while (! feof(readfile) && ! terminating()) {
-          char buffer[CHUNK];
-
-          rlength = fread(buffer, 1, CHUNK, readfile);
-          EVP_DigestUpdate(&ctx, buffer, rlength);
-        }
-        fclose(readfile);
-        /* Re-use length */
-        EVP_DigestFinal(&ctx, (unsigned char *) check, &rlength);
-        md5sum(check, rlength);
-        if (strncmp(check, checksum_real, rlength)) {
-          failed = 1;
-          fprintf(stderr, "db: check: checksum for %s found to be %s\n",
-            checksum, check);
-        }
-      }
-      free(check_path);
     }
     free(path);
   }
