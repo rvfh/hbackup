@@ -27,7 +27,7 @@ static char *parsers_show(const void *payload) {
   return string;
 }
 
-/* TODO parsers_dir_check test */
+/* TODO parsers_dir_check and parsers_file_check test */
 int main(void) {
   parser_t *parser_p = malloc(sizeof(parser_t));
   void *handle1 = NULL;
@@ -37,7 +37,7 @@ int main(void) {
     printf("Failed to create\n");
   }
   *parser_p = parser;
-  if (parsers_add(handle1, parser_p)) {
+  if (parsers_add(handle1, parser_controlled, parser_p)) {
     printf("Failed to add\n");
   }
   list_show(handle1, NULL, parsers_show);

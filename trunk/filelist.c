@@ -83,8 +83,7 @@ static int iterate_directory(const char *path, parser_t *parser) {
       failed = 2;
     } else
     /* Let the parser analyse the file data to know whether to back it up */
-    if ((parser != NULL)
-     && (parser->file_check(handle, &filedata) == parser_file_other)) {
+    if (parsers_file_check(parser, handle, &filedata)) {
       failed = 1;
     } else
     /* Now pass it through the filters */

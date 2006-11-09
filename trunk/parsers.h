@@ -55,7 +55,7 @@ typedef struct {
 extern int parsers_new(void **handle);
 
 /* Add to list of parsers */
-extern int parsers_add(void *handle, parser_t *parser);
+extern int parsers_add(void *handle, parser_mode_t mode, parser_t *parser);
 
 /* Destroy parsers list and all parsers */
 extern void parsers_free(void *handle);
@@ -67,5 +67,12 @@ extern void parsers_free(void *handle);
  */
 extern int parsers_dir_check(const void *parsers_handle,
   parser_t **parser_handle, void **dir_handle, const char *path);
+
+/* Check whether [a] parser matches. Returns:
+ * 0: match (use)
+ * 1: no match (ignore)
+ */
+extern int parsers_file_check(parser_t *parser_handle, void *dir_handle,
+  const filedata_t *filedata);
 
 #endif

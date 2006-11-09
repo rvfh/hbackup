@@ -100,7 +100,8 @@ int main(void) {
     printf("parsers_new error status %u\n", status);
     return 0;
   }
-  if ((status = parsers_add(parsers_handle, cvs_parser_new()))) {
+  if ((status = parsers_add(parsers_handle, parser_controlled,
+      cvs_parser_new()))) {
     printf("parsers_add error status %u\n", status);
     return 0;
   }

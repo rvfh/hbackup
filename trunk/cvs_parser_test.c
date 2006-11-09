@@ -108,7 +108,7 @@ int main(void) {
   cvs_dir_leave(NULL);
 
   parsers_new(&parsers_handle);
-  parsers_add(parsers_handle, cvs_parser_new());
+  parsers_add(parsers_handle, parser_controlled, cvs_parser_new());
   cvs_parser = list_entry_payload(list_next(parsers_handle, NULL));
 
   if (cvs_parser->dir_check(&handle, "test/cvs") == parser_dir_other) {
