@@ -58,18 +58,8 @@ static int iterate_directory(const char *path, parser_t *parser) {
     printf(" --> Dir: %s\n", &path[mount_path_length]);
   }
   /* Check whether directory is under SCM control */
-  if (parser == NULL) {
-    void *parser_handle = NULL;
-
-    while ((parser = parsers_next(parsers_handle, &parser_handle)) != NULL) {
-      if (parser->dir_check(&handle, path) == parser_dir_controlled) {
-        break;
-      }
-    }
-  } else {
-    if (parser->dir_check(&handle, path) != parser_dir_controlled) {
-      return 0;
-    }
+  if (parsers_dir_check(parsers_handle, &parser, &handle, path) == 2) {
+    return 0;
   }
   directory = opendir(path);
   if (directory == NULL) {

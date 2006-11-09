@@ -32,15 +32,15 @@ typedef enum {
 } parser_file_status_t;
 
 /* Type for function to check if a directory is under control and enter it */
-typedef parser_dir_status_t (parsers_dir_check_f) (void **handle,
+typedef parser_dir_status_t (parsers_dir_check_f) (void **dir_handle,
   const char *dir_path);
 
 /* Type for function to leave a directory */
-typedef void (parsers_dir_leave_f) (void *handle);
+typedef void (parsers_dir_leave_f) (void *dir_handle);
 
 /* Type for function to check whether a file is under control */
-typedef parser_file_status_t (parsers_file_check_f) (void *handle,
-  const filedata_t *file_data);
+typedef parser_file_status_t (parsers_file_check_f) (void *dir_handle,
+  const filedata_t *filedata);
 
 /* Our data */
 typedef struct {
@@ -60,7 +60,12 @@ extern int parsers_add(void *handle, parser_t *parser);
 /* Destroy parsers list and all parsers */
 extern void parsers_free(void *handle);
 
-/* Get next parser (first if handle is NULL) */
-extern parser_t *parsers_next(void *handle, void **parser_handle);
+/* Check whether [a] parser matches. Returns:
+ * 0: [a] parser matches (if *parser_handle not null, only test that parser)
+ * 1: no parser matches
+ * 2: *parser_handle not null but does not match
+ */
+extern int parsers_dir_check(const void *parsers_handle,
+  parser_t **parser_handle, void **dir_handle, const char *path);
 
 #endif
