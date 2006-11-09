@@ -7,7 +7,12 @@
 #include <stdio.h>
 #include "parsers.c"
 
-static parser_t parser = { (parsers_dir_check_f *) 0x12345678, (parsers_dir_leave_f *) 0xDEADBEEF, (parsers_file_check_f *) 0x34567890, "test parser" };
+static parser_t parser = {
+  (parsers_dir_check_f *) 0x12345678,
+  (parsers_dir_leave_f *) 0xDEADBEEF,
+  (parsers_file_check_f *) 0x34567890,
+  parser_disabled,
+  "test parser" };
 
 /* Use payload as argument name, cast once and for all */
 static char *parsers_show(const void *payload) {

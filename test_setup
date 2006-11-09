@@ -88,7 +88,7 @@ ignore path_start subdir
 ignore file/path_end ~
 ignore path_end ".o"
 ignore size_above 10
-parser cvs
+parser all cvs
 
 path test2//
 EOF

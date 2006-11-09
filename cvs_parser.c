@@ -24,18 +24,18 @@ static char *cvs_payload_get(const void *payload) {
   return string;
 }
 
-static int cvs_dir_check(void **handle, const char *dir_path) {
-  char    *d_path = NULL;
-  FILE    *entries;
-  int     failed = 0;
+static parser_dir_status_t cvs_dir_check(void **handle, const char *path) {
+  char                *d_path = NULL;
+  FILE                *entries;
+  parser_dir_status_t result = parser_dir_unknown;
 
-  asprintf(&d_path, "%s/CVS/Entries", dir_path);
+  asprintf(&d_path, "%s/CVS/Entries", path);
 
   /* Check that file exists */
   if ((entries = fopen(d_path, "r")) == NULL) {
     /* Directory is not under CVS control */
     *handle = NULL;
-    failed = 1;
+    result = parser_dir_other;
   } else {
     list_t  list = list_new(cvs_payload_get);
     char    *buffer = NULL;
@@ -43,6 +43,7 @@ static int cvs_dir_check(void **handle, const char *dir_path) {
 
     /* Return list */
     *handle = list;
+    result = parser_dir_controlled;
 
     /* Fill in list of controlled files */
     while (getline(&buffer, &size, entries) >= 0) {
@@ -77,7 +78,7 @@ static int cvs_dir_check(void **handle, const char *dir_path) {
     free(buffer);
   }
   free(d_path);
-  return failed;
+  return result;
 }
 
 static void cvs_dir_leave(void *list) {
@@ -94,10 +95,11 @@ static void cvs_dir_leave(void *list) {
 
 /* Ideally, this function should return 0 when the file is added or modified */
 /* For now, it returns 0 for any file under CVS control */
-static int cvs_file_check(void *list, const filedata_t *file_data) {
+static parser_file_status_t cvs_file_check(void *list,
+    const filedata_t *file_data) {
   if (list == NULL) {
     fprintf(stderr, "cvs parser: file check: not initialised\n");
-    return 2;
+    return parser_file_unknown;
   } else {
     const char *file = strrchr(file_data->path, '/');
 
@@ -106,13 +108,17 @@ static int cvs_file_check(void *list, const filedata_t *file_data) {
     } else {
       file = file_data->path;
     }
-    return list_find(list, file, NULL, NULL);
+    if (list_find(list, file, NULL, NULL)) {
+      return parser_file_other;
+    } else {
+      return parser_file_maybemodified;
+   }
   }
 }
 
 /* That's the parser */
 static parser_t cvs_parser = {
-  cvs_dir_check, cvs_dir_leave, cvs_file_check, "cvs"
+  cvs_dir_check, cvs_dir_leave, cvs_file_check, 0, "cvs"
 };
 
 parser_t *cvs_parser_new(void) {

@@ -62,12 +62,12 @@ static int iterate_directory(const char *path, parser_t *parser) {
     void *parser_handle = NULL;
 
     while ((parser = parsers_next(parsers_handle, &parser_handle)) != NULL) {
-      if (! parser->dir_check(&handle, path)) {
+      if (parser->dir_check(&handle, path) == parser_dir_controlled) {
         break;
       }
     }
   } else {
-    if (parser->dir_check(&handle, path)) {
+    if (parser->dir_check(&handle, path) != parser_dir_controlled) {
       return 0;
     }
   }
@@ -93,7 +93,8 @@ static int iterate_directory(const char *path, parser_t *parser) {
       failed = 2;
     } else
     /* Let the parser analyse the file data to know whether to back it up */
-    if ((parser != NULL) && parser->file_check(handle, &filedata)) {
+    if ((parser != NULL)
+     && (parser->file_check(handle, &filedata) == parser_file_other)) {
       failed = 1;
     } else
     /* Now pass it through the filters */
