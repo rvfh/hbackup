@@ -38,6 +38,7 @@ extern list_t filters_rule_new(list_t handle);
 extern int filters_rule_add(list_t rule_handle, mode_t file_type,
   filter_type_t type, ...);
 
-/* Check whether any rule match (a rule matches when all its filters match) */
+/* Check whether any rule matches (i.e. all its filters match) */
 extern int filters_match(void *handle, const filedata_t *filedata);
+
 #endif
