@@ -21,7 +21,6 @@ int main(void) {
   void *handle4;
   filedata_t file_data;
   void *parsers_handle = NULL;
-  void *parser_handle = NULL;
   parser_t *cvs_parser;
 
   /* Need to give this some room */
@@ -110,7 +109,7 @@ int main(void) {
 
   parsers_new(&parsers_handle);
   parsers_add(parsers_handle, cvs_parser_new());
-  cvs_parser = parsers_next(parsers_handle, &parser_handle);
+  cvs_parser = list_entry_payload(list_next(parsers_handle, NULL));
 
   if (cvs_parser->dir_check(&handle, "test/cvs") == parser_dir_other) {
     printf("test/cvs is not under CVS control\n");
