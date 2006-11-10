@@ -103,12 +103,18 @@ extern int list_compare(
 
 /* Select records in list, by matching search_string with the result of
  * payload_get_f. If payload_get_f is NULL, the list default is used
- * On success the function returns 0, otherwise non zero and list will be NULL.
+ * On success the function returns 0, otherwise non zero and
+ * *list_selected_handle and *list_unselected_handle (when the pointers are not
+ * NULL) will be NULL.
  * Important note: the list elements payloads are not copied!!!
- * To delete the returned list, call list_deselect or do a list_remove on each
+ * To delete the returned lists, call list_deselect or do a list_remove on each
  * element before calling list_free. */
-extern int list_select(const list_t list_handle, const char *search_string,
-  list_payload_get_f payload_get_f, list_t *list_selected_handle);
+extern int list_select(
+    const list_t list_handle,
+    const char *search_string,
+    list_payload_get_f payload_get_f,
+    list_t *list_selected_handle,
+    list_t *list_unselected_handle);
 
 /* Free list and its elements without freeing the payloads
  * Returns the number of elements not freed */

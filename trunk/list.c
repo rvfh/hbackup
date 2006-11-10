@@ -423,14 +423,23 @@ int list_compare(
   return 0;
 }
 
-int list_select(const list_t list_handle, const char *search_string,
-    list_payload_get_f payload_get, list_t *list_selected_handle) {
+int list_select(
+    const list_t list_handle,
+    const char *search_string,
+    list_payload_get_f payload_get,
+    list_t *list_selected_handle,
+    list_t *list_unselected_handle) {
   const __list_t  *list = list_handle;
   __list_entry_t  *entry = NULL;
   int             length = strlen(search_string);
 
   /* Note: list_find does not garantee to find the first element */
-  *list_selected_handle = NULL;
+  if (list_selected_handle != NULL) {
+    *list_selected_handle   = NULL;
+  }
+  if (list_unselected_handle != NULL) {
+    *list_unselected_handle = NULL;
+  }
 
   /* Impossible to search without interpreting the payload */
   if (payload_get == NULL) {
@@ -443,26 +452,33 @@ int list_select(const list_t list_handle, const char *search_string,
   }
 
   /* Search the complete list, but stop when no more match is found */
-  *list_selected_handle = list_new(list->payload_get);
+  if (list_selected_handle != NULL) {
+    *list_selected_handle   = list_new(list->payload_get);
+  }
+  if (list_unselected_handle != NULL) {
+    *list_unselected_handle = list_new(list->payload_get);
+  }
   while ((entry = list_next(list_handle, entry)) != NULL) {
     void *payload = list_entry_payload(entry);
 
     if (payload != NULL) {
       char *string = NULL;
+      int  result;
 
       string = payload_get(payload);
       /* Only compare the portion of string of search_string's length */
-      switch (strncmp(string, search_string, length)) {
-        case 1:
-          /* When using the default payload function, time can be saved */
-          if (payload_get == list->payload_get) {
-            /* A bit of a hack that really */
-            entry = list->last;
-          }
-          break;
-        case 0:
-          /* Match! */
+      result = strncmp(string, search_string, length);
+      if (result == 0) {
+        /* Portions of strings match */
+        if (list_selected_handle != NULL) {
           list_append(*list_selected_handle, payload);
+        }
+      } else if (list_unselected_handle != NULL) {
+        /* Portions of strings do not match */
+        list_append(*list_unselected_handle, payload);
+      } else if ((result == 1) && (payload_get == list->payload_get)) {
+        /* When using the default payload function, time can be saved */
+        break;
       }
       free(string);
     } else {

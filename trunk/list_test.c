@@ -72,6 +72,7 @@ int main() {
   payload2_t   payload2;
   list_t       list    = list_new(payload_get);
   list_t       list2   = list_new(payload2_get);
+  list_t       list3   = list_new(payload2_get);
   list_t       added   = NULL;
   list_t       missing = NULL;
   char         *string = NULL;
@@ -179,18 +180,43 @@ int main() {
   list_free(list2);
 
   printf("\nSelect part of list\n");
-  printf("List %u element(s):\n", list_size(list));
+  printf("List %u element(s) of original list:\n", list_size(list));
   list_show(list, NULL, payload_get);
-  if (list_select(list, "test/subdir/", NULL, list2)) {
+  list2 = NULL;
+  list3 = NULL;
+  if (list_select(list, "test/subdir/", NULL, &list2, &list3)) {
     printf("Select failed\n");
   } else {
-    printf("List %u element(s):\n", list_size(list2));
+    printf("List %u element(s) of selected list:\n", list_size(list2));
+    list_show(list2, NULL, NULL);
+    if (list_deselect(list2) != 0) {
+      printf("Selected list not freed\n");
+    }
+    printf("List %u element(s) of unselected list:\n", list_size(list3));
+    list_show(list3, NULL, NULL);
+    if (list_deselect(list3) != 0) {
+      printf("Selected list not freed\n");
+    }
+  }
+  if (list_select(list, "test/subdir/", NULL, &list2, NULL)) {
+    printf("Select failed\n");
+  } else {
+    printf("List %u element(s) of selected list:\n", list_size(list2));
     list_show(list2, NULL, NULL);
     if (list_deselect(list2) != 0) {
       printf("Selected list not freed\n");
     }
   }
-  printf("List %u element(s):\n", list_size(list));
+  if (list_select(list, "test/subdir/", NULL, NULL, &list3)) {
+    printf("Select failed\n");
+  } else {
+    printf("List %u element(s) of unselected list:\n", list_size(list3));
+    list_show(list3, NULL, NULL);
+    if (list_deselect(list3) != 0) {
+      printf("Selected list not freed\n");
+    }
+  }
+  printf("List %u element(s) of original list:\n", list_size(list));
   list_show(list, NULL, payload_get);
 
   printf("\nEmpty list\n");
