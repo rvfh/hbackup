@@ -56,8 +56,8 @@ Database initialized
 -> 'file://host' '/home/user/testdir' d 0 1 1000 1000 0755 ''  1 0 -
 -> 'file://host' '/home/user/testfile' f 13 1 1000 1000 0644 '' 59ca0efa9f5633cb0371bbc0355478d8-1 1 0 -
 -> 'file://host' '/home/user/testlink' l 8 1 1000 1000 0777 'testfile'  1 0 -
-Database closed (contents: 12 file(s))
-Database opened (contents: 12 file(s))
+Database closed (total contents: 12 file(s))
+Database opened (active contents: 12 file(s))
 >List 12 element(s):
 -> 'file://host' '/home/user/cvs' d 0 1 1000 1000 0755 ''  1 0 -
 -> 'file://host' '/home/user/cvs/dirbad' d 0 1 1000 1000 0755 ''  1 0 -
@@ -105,6 +105,7 @@ Database opened (contents: 12 file(s))
 -> 'file://host' '/home/user2/testdir' d 0 1 1000 1000 0755 ''  1 0 -
 -> 'file://host' '/home/user2/testfile' f 15 1 1000 1000 0644 '' fcacc0dea4134dc0b9da49c1a9603196-0 1 0 -
 -> 'file://host' '/home/user2/testlink' l 8 1 1000 1000 0777 'testfile'  1 0 -
+Database closed (total contents: 15 file(s))
 Scanning database (contents: 15 file(s))
 Checking database (contents: 15 file(s))
 Scanning database (contents: 15 file(s))
@@ -120,8 +121,7 @@ Checking database (contents: 15 file(s))
  -> Client:      file://host
  -> File name:   /home/user/testfile
  -> Modified:    2006-10-22  0:00:00
-Database closed (contents: 15 file(s))
-Database opened (contents: 15 file(s))
+Database opened (active contents: 15 file(s))
 >List 15 element(s):
 -> 'file://host' '/home/user/cvs' d 0 1 1000 1000 0755 ''  1 0 -
 -> 'file://host' '/home/user/cvs/dirbad' d 0 1 1000 1000 0755 ''  1 0 -
@@ -232,8 +232,8 @@ Database opened (contents: 15 file(s))
 -> 'file://host' '/home/user2/testfile' f 15 1 1000 1000 0644 '' fcacc0dea4134dc0b9da49c1a9603196-0 1 0 -
 -> 'file://host' '/home/user2/testlink' l 8 1 1000 1000 0777 'testfile'  1 0 -
  --> Reorganizing db in: 'test_db/data' ... done
-Database closed (contents: 15 file(s))
-Database opened (contents: 14 file(s))
+Database closed (total contents: 15 file(s))
+Database opened (active contents: 14 file(s))
 >List 14 element(s):
 -> 'file://host' '/home/user/cvs' d 0 1 1000 1000 0755 ''  1 0 -
 -> 'file://host' '/home/user/cvs/dirbad' d 0 1 1000 1000 0755 ''  1 0 -
@@ -249,4 +249,4 @@ Database opened (contents: 14 file(s))
 -> 'file://host' '/home/user2/testdir' d 0 1 1000 1000 0755 ''  1 0 -
 -> 'file://host' '/home/user2/testfile' f 15 1 1000 1000 0644 '' fcacc0dea4134dc0b9da49c1a9603196-0 1 0 -
 -> 'file://host' '/home/user2/testlink' l 8 1 1000 1000 0777 'testfile'  1 0 -
-Database closed (contents: 15 file(s))
+Database closed (total contents: 15 file(s))

@@ -153,6 +153,7 @@ int main(void) {
   printf(">List %u file(s):\n", list_size(filelist_get()));
   list_show(filelist_get(), NULL, file_data_show);
 
+
   /* Test database */
   if ((status = db_open("test_db"))) {
     printf("db_open error status %u\n", status);
@@ -246,28 +247,31 @@ int main(void) {
   list_show(db_list, NULL, db_data_show);
   filelist_free();
 
-  if ((status = db_scan("59ca0efa9f5633cb0371bbc0355478d8-0"))) {
+  if ((status = db_scan(NULL, "59ca0efa9f5633cb0371bbc0355478d8-0"))) {
     printf("db_scan error status %u\n", status);
     if (status) {
       return 0;
     }
   }
 
-  if ((status = db_scan(NULL))) {
-    printf("db_scan (full) error status %u\n", status);
-    if (status) {
-      return 0;
-    }
-  }
-
-  if ((status = db_check("59ca0efa9f5633cb0371bbc0355478d8-0"))) {
+  if ((status = db_check(NULL, "59ca0efa9f5633cb0371bbc0355478d8-0"))) {
     printf("db_check error status %u\n", status);
     if (status) {
       return 0;
     }
   }
 
-  if ((status = db_check(NULL))) {
+  db_close();
+
+
+  if ((status = db_scan("test_db", NULL))) {
+    printf("db_scan (full) error status %u\n", status);
+    if (status) {
+      return 0;
+    }
+  }
+
+  if ((status = db_check("test_db", NULL))) {
     printf("db_check (full) error status %u\n", status);
     if (status) {
       return 0;
@@ -276,22 +280,19 @@ int main(void) {
 
   verbose = 2;
   remove("test_db/data/59ca0efa9f5633cb0371bbc0355478d8-1/data");
-  if ((status = db_scan(NULL))) {
+  if ((status = db_scan("test_db", NULL))) {
     printf("db_scan (full) error status %u\n", status);
   }
 
-  if ((status = db_check(NULL))) {
+  if ((status = db_check("test_db", NULL))) {
     printf("db_check (full) error status %u\n", status);
   }
 
   testfile("test_db/data/59ca0efa9f5633cb0371bbc0355478d8-1/data", 1);
-  if ((status = db_check(NULL))) {
+  if ((status = db_check("test_db", NULL))) {
     printf("db_check (full) error status %u\n", status);
   }
   verbose = 3;
-
-  db_close();
-
 
 
   /* Re-open database => remove some files */
