@@ -860,14 +860,15 @@ void db_close(void) {
   list_t    active_list;
   list_t    removed_list;
   char      *temp_path  = NULL;
-  time_t    gmt;
-  struct tm gmt_brokendown;
+  time_t    localtime;
+  struct tm localtime_brokendown;
 
   /* Save list for month day */
-  if ((time(&gmt) != -1) && (gmtime_r(&gmt, &gmt_brokendown) != NULL)) {
+  if ((time(&localtime) != -1)
+   && (localtime_r(&localtime, &localtime_brokendown) != NULL)) {
     char *daily_list = NULL;
 
-    asprintf(&daily_list, "list_%02u", gmt_brokendown.tm_mday);
+    asprintf(&daily_list, "list_%02u", localtime_brokendown.tm_mday);
     db_save(daily_list, db_list);
     free(daily_list);
   }
