@@ -370,6 +370,19 @@ int main(void) {
   db_close();
 
 
+  /* Re-open database => one less active item */
+  if ((status = db_open("test_db"))) {
+    printf("db_open error status %u\n", status);
+    if (status == 2) {
+      return 0;
+    }
+  }
+  printf(">List %u element(s):\n", list_size(db_list));
+  list_show(db_list, NULL, db_data_show);
+
+  db_close();
+
+
   filters_free(filters_handle);
   parsers_free(parsers_handle);
 

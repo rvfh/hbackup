@@ -60,15 +60,27 @@ List 4 element(s):
 -> test/testfile
 
 Select part of list
-List 5 element(s):
+List 5 element(s) of original list:
 -> test
 -> test/subdir
 -> test/subdir/testfile1
 -> test/testfile
 -> test/testfile
-List 1 element(s):
+List 1 element(s) of selected list:
 -> test/subdir/testfile1
-List 5 element(s):
+List 4 element(s) of unselected list:
+-> test
+-> test/subdir
+-> test/testfile
+-> test/testfile
+List 1 element(s) of selected list:
+-> test/subdir/testfile1
+List 4 element(s) of unselected list:
+-> test
+-> test/subdir
+-> test/testfile
+-> test/testfile
+List 5 element(s) of original list:
 -> test
 -> test/subdir
 -> test/subdir/testfile1

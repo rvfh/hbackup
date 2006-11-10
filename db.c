@@ -65,7 +65,7 @@ typedef struct {
   time_t      date_out;
 } db_data_t;
 
-static list_t *db_list = NULL;
+static list_t db_list = NULL;
 static char   *db_path = NULL;
 
 /* Size of path being backed up */
@@ -500,8 +500,10 @@ static int db_organize(char *path, int number) {
       if (metadata_get(source_path, &metadata)) {
         fprintf(stderr, "db: organize: cannot get metadata: %s\n", source_path);
         failed = 2;
-      } else if (S_ISDIR(metadata.type) && (dir_entry->d_name[2] != '-')) {
-        /* Add 2: '\0' and '/' */
+      } else if (S_ISDIR(metadata.type) && (dir_entry->d_name[2] != '\0')
+        /* If we crashed, we might have some two-letter dirs already */
+              && (dir_entry->d_name[2] != '-')) {
+        /* If we've reached the point where the dir is ??-?, stop! */
         char *dir_path = NULL;
 
         /* Create two-letter directory */
@@ -819,9 +821,11 @@ int db_open(const char *path) {
         }
         break;
       case 2:
-        remove(lock_path);
         status = 2;
     }
+  }
+  if (status == 2) {
+    remove(lock_path);
   }
   free(lock_path);
   return status;
@@ -840,7 +844,21 @@ static void db_list_free(list_t list) {
   list_free(list);
 }
 
+static char *close_select(const void *payload) {
+  const db_data_t *db_data = payload;
+  char *string = NULL;
+
+  if (db_data->date_out == 0) {
+    asprintf(&string, "@");
+  } else {
+    asprintf(&string, "#");
+  }
+  return string;
+}
+
 void db_close(void) {
+  list_t    active_list;
+  list_t    removed_list;
   char      *temp_path  = NULL;
   time_t    gmt;
   struct tm gmt_brokendown;
@@ -849,13 +867,29 @@ void db_close(void) {
   if ((time(&gmt) != -1) && (gmtime_r(&gmt, &gmt_brokendown) != NULL)) {
     char *daily_list = NULL;
 
-    asprintf(&daily_list, "list_%2u", gmt_brokendown.tm_mday);
+    asprintf(&daily_list, "list_%02u", gmt_brokendown.tm_mday);
     db_save(daily_list, db_list);
     free(daily_list);
   }
 
-  /* Save list as main */
-  db_save("list", db_list);
+  /* Also load previously removed items into list */
+  /* TODO What do we do if this fails? Recover? */
+  db_load("removed", db_list);
+
+  /* Split list into active and removed records */
+  list_select(db_list, "@", close_select, &active_list, &removed_list);
+
+  /* Save active list */
+  if (db_save("list", active_list)) {
+    fprintf(stderr, "db: close: failed to save active items list\n");
+  }
+  list_deselect(active_list);
+
+  /* Save removed list */
+  if (db_save("removed", removed_list)) {
+    fprintf(stderr, "db: close: failed to save removed items list\n");
+  }
+  list_deselect(removed_list);
 
   /* Release lock */
   asprintf(&temp_path, "%s/lock", db_path);
@@ -912,18 +946,18 @@ static int parse_compare(void *db_data_p, void *filedata_p) {
 
 int db_parse(const char *host, const char *real_path,
     const char *mount_path, list_t file_list, size_t compress_min) {
-  char          *select_string = NULL;
   list_t        selected_files_list;
   list_t        added_files_list;
   list_t        removed_files_list;
-  list_entry_t  entry  = NULL;
-  int           failed = 0;
+  list_entry_t  entry   = NULL;
+  char          *string = NULL;
+  int           failed  = 0;
 
   /* Compare list with db list for matching host */
-  asprintf(&select_string, "%s/", real_path);
-  backup_path_length = strlen(select_string);
-  list_select(db_list, select_string, parse_select, &selected_files_list);
-  free(select_string);
+  asprintf(&string, "%s/", real_path);
+  backup_path_length = strlen(string);
+  list_select(db_list, string, parse_select, &selected_files_list, NULL);
+  free(string);
   list_compare(selected_files_list, file_list, &added_files_list,
     &removed_files_list, parse_compare);
   list_deselect(selected_files_list);
