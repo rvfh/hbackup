@@ -65,7 +65,7 @@ typedef struct {
   time_t      date_out;
 } db_data_t;
 
-static list_t db_list = NULL;
+static list_t db_list  = NULL;
 static char   *db_path = NULL;
 
 /* Size of path being backed up */
@@ -753,25 +753,17 @@ static int db_obsolete(const char *prefix, const char *path,
   return failed;
 }
 
-int db_open(const char *path) {
-  char *data_path = NULL;
+static int db_lock(const char *path) {
   char *lock_path = NULL;
   FILE *file;
   int  status = 0;
 
+  /* Set the database path that we just locked as default */
   asprintf(&db_path, "%s", path);
 
-  /* Check that data dir exists, create it (no need to lock) */
-  asprintf(&data_path, "%s/data", db_path);
-  status = testdir(data_path, 1);
-  free(data_path);
-  if (status == 2) {
-    return 2;
-  }
-  status = 0;
+  asprintf(&lock_path, "%s/lock", path);
 
-  /* Take lock */
-  asprintf(&lock_path, "%s/lock", db_path);
+  /* Try to open lock file for reading: check who's holding the lock */
   if ((file = fopen(lock_path, "r")) != NULL) {
     pid_t pid;
 
@@ -782,17 +774,19 @@ int db_open(const char *path) {
       /* Find out whether process is still running, if not, reset lock */
       kill(pid, 0);
       if (errno == ESRCH) {
-        fprintf(stderr, "db: open: lock reset\n");
+        fprintf(stderr, "db: lock: lock reset\n");
         remove(lock_path);
       } else {
-        fprintf(stderr, "db: open: lock taken by process with pid %d\n", pid);
+        fprintf(stderr, "db: lock: lock taken by process with pid %d\n", pid);
         status = 2;
       }
     } else {
-      fprintf(stderr, "db: open: lock taken by an unidentified process!\n");
+      fprintf(stderr, "db: lock: lock taken by an unidentified process!\n");
       status = 2;
     }
   }
+
+  /* Try to open lock file for writing: lock */
   if (! status) {
     if ((file = fopen(lock_path, "w")) != NULL) {
       /* Lock taken */
@@ -800,18 +794,49 @@ int db_open(const char *path) {
       fclose(file);
     } else {
       /* Lock cannot be taken */
-      fprintf(stderr, "db: open: cannot take lock\n");
+      fprintf(stderr, "db: lock: cannot take lock\n");
       status = 2;
     }
   }
+  free(lock_path);
+  return status;
+}
 
-  /* Read database list */
-  if (! status) {
+static void db_unlock(const char *path) {
+  char *lock_path = NULL;
+
+  asprintf(&lock_path, "%s/lock", db_path);
+  free(db_path);
+  db_path = NULL;
+  remove(lock_path);
+  free(lock_path);
+}
+
+
+int db_open(const char *path) {
+  int status;
+
+  /* Take lock */
+  if (db_lock(path)) {
+    return 2;
+  }
+
+  /* Check that data dir exists, if not create it */
+  {
+    char *data_path = NULL;
+
+    asprintf(&data_path, "%s/data", db_path);
+    status = testdir(data_path, 1);
+    free(data_path);
+  }
+
+  /* Read database active items list */
+  if (status != 2) {
     db_list = list_new(db_data_get);
     switch (db_load("list", db_list)) {
       case 0:
         if (verbosity() > 0) {
-          printf("Database opened (contents: %u file(s))\n",
+          printf("Database opened (active contents: %u file(s))\n",
             list_size(db_list));
         }
         break;
@@ -820,15 +845,16 @@ int db_open(const char *path) {
           printf("Database initialized\n");
         }
         break;
-      case 2:
+      default:
         status = 2;
     }
   }
+
   if (status == 2) {
-    remove(lock_path);
+    db_unlock(path);
+    return 2;
   }
-  free(lock_path);
-  return status;
+  return 0;
 }
 
 static void db_list_free(list_t list) {
@@ -859,7 +885,6 @@ static char *close_select(const void *payload) {
 void db_close(void) {
   list_t    active_list;
   list_t    removed_list;
-  char      *temp_path  = NULL;
   time_t    localtime;
   struct tm localtime_brokendown;
 
@@ -893,12 +918,10 @@ void db_close(void) {
   list_deselect(removed_list);
 
   /* Release lock */
-  asprintf(&temp_path, "%s/lock", db_path);
-  remove(temp_path);
-  free(temp_path);
-  free(db_path);
+  db_unlock(db_path);
   if (verbosity() > 0) {
-    printf("Database closed (contents: %u file(s))\n", list_size(db_list));
+    printf("Database closed (total contents: %u file(s))\n",
+      list_size(db_list));
   }
   db_list_free(db_list);
 }
@@ -1122,179 +1145,220 @@ int db_read(const char *path, const char *checksum) {
   return failed;
 }
 
-int db_scan(const char *checksum) {
+int db_scan(const char *local_db_path, const char *checksum) {
   int failed = 0;
 
-  if (checksum == NULL) {
-    list_entry_t entry = NULL;
-    int files = list_size(db_list);
-
-    if (verbosity() > 0) {
-      printf("Scanning database (contents: %u file(s))\n", list_size(db_list));
+  if (local_db_path != NULL) {
+    if (db_lock(local_db_path)) {
+      fprintf(stderr, "db: scan: failed to lock\n");
+      return 2;
     }
-    while ((entry = list_next(db_list, entry)) != NULL) {
-      db_data_t *db_data = list_entry_payload(entry);
+    db_list = list_new(db_data_get);
+    failed = db_load("list", db_list) | db_load("removed", db_list);
+    if (failed) {
+      fprintf(stderr, "db: scan: failed to read lists\n");
+      failed = 2;
+    }
+  }
+  if (! failed) {
+    if (checksum == NULL) {
+      list_entry_t entry = NULL;
+      int          files = list_size(db_list);
 
-      if ((verbosity() > 2) && ((files & 0x3FF) == 0)) {
-        printf(" --> Files left to go: %u\n", files);
+      if (verbosity() > 0) {
+        printf("Scanning database (contents: %u file(s))\n", files);
       }
-      files--;
-      if (db_scan(db_data->filedata.checksum)) {
-        failed = 1;
-        fprintf(stderr, "File data missing for checksum %s\n",
-          db_data->filedata.checksum);
-        if (verbosity() > 1) {
-          struct tm *time;
-          printf(" -> Client:      %s\n", db_data->host);
-          printf(" -> File name:   %s\n", db_data->filedata.path);
-          time = localtime(&db_data->filedata.metadata.mtime);
-          printf(" -> Modified:    %04u-%02u-%02u %2u:%02u:%02u\n",
-            time->tm_year + 1900, time->tm_mon + 1, time->tm_mday,
-            time->tm_hour, time->tm_min, time->tm_sec);
-          if (verbosity() > 2) {
-            time = localtime(&db_data->date_in);
-            printf(" --> Seen first: %04u-%02u-%02u %2u:%02u:%02u\n",
+      while ((entry = list_next(db_list, entry)) != NULL) {
+        db_data_t *db_data = list_entry_payload(entry);
+
+        if ((verbosity() > 2) && ((files & 0xFF) == 0)) {
+          printf(" --> Files left to go: %u\n", files);
+        }
+        files--;
+        if (db_scan(NULL, db_data->filedata.checksum)) {
+          failed = 1;
+          fprintf(stderr, "File data missing for checksum %s\n",
+            db_data->filedata.checksum);
+          if (! terminating() && verbosity() > 1) {
+            struct tm *time;
+            printf(" -> Client:      %s\n", db_data->host);
+            printf(" -> File name:   %s\n", db_data->filedata.path);
+            time = localtime(&db_data->filedata.metadata.mtime);
+            printf(" -> Modified:    %04u-%02u-%02u %2u:%02u:%02u\n",
               time->tm_year + 1900, time->tm_mon + 1, time->tm_mday,
               time->tm_hour, time->tm_min, time->tm_sec);
-            if (db_data->date_out != 0) {
-              time = localtime(&db_data->date_out);
-              printf(" --> Seen gone:  %04u-%02u-%02u %2u:%02u:%02u\n",
+            if (verbosity() > 2) {
+              time = localtime(&db_data->date_in);
+              printf(" --> Seen first: %04u-%02u-%02u %2u:%02u:%02u\n",
                 time->tm_year + 1900, time->tm_mon + 1, time->tm_mday,
                 time->tm_hour, time->tm_min, time->tm_sec);
+              if (db_data->date_out != 0) {
+                time = localtime(&db_data->date_out);
+                printf(" --> Seen gone:  %04u-%02u-%02u %2u:%02u:%02u\n",
+                  time->tm_year + 1900, time->tm_mon + 1, time->tm_mday,
+                  time->tm_hour, time->tm_min, time->tm_sec);
+              }
             }
           }
         }
+        if (terminating()) {
+          failed = 3;
+          break;
+        }
       }
-      if (terminating()) {
-        return 3;
-      }
-    }
-  } else if ((checksum[0] != '\0') && (checksum[0] != '\0')) {
-    char *path = NULL;
+    } else if ((checksum[0] != 'N') && (checksum[0] != '\0')) {
+      char *path = NULL;
 
-    if (getdir(checksum, &path)) {
-      failed = 1;
-    } else {
-      char *test_path = NULL;
+      if (getdir(checksum, &path)) {
+        failed = 1;
+      } else {
+        char *test_path = NULL;
 
-      asprintf(&test_path, "%s/data", path);
-      if (testfile(test_path, 0)) {
-        failed = 2;
+        asprintf(&test_path, "%s/data", path);
+        if (testfile(test_path, 0)) {
+          failed = 2;
+        }
+        free(test_path);
       }
-      free(test_path);
+      free(path);
     }
-    free(path);
+  }
+  if (local_db_path != NULL) {
+    db_list_free(db_list);
+    db_unlock(local_db_path);
   }
   return failed;
 }
 
-int db_check(const char *checksum) {
+int db_check(const char *local_db_path, const char *checksum) {
   int failed = 0;
   char checksum_real[256];
 
-  if (checksum == NULL) {
-    list_entry_t entry = NULL;
-    int          files = list_size(db_list);
-
-    if (verbosity() > 0) {
-      printf("Checking database (contents: %u file(s))\n",
-        list_size(db_list));
+  if (local_db_path != NULL) {
+    if (db_lock(local_db_path)) {
+      fprintf(stderr, "db: check: failed to lock\n");
+      return 2;
     }
-    while ((entry = list_next(db_list, entry)) != NULL) {
-      db_data_t *db_data = list_entry_payload(entry);
-
-      if ((verbosity() > 2) && ((files & 0xFF) == 0)) {
-        printf(" --> Files left to go: %u\n", files);
-      }
-      files--;
-      failed = db_check(db_data->filedata.checksum);
-      if (terminating()) {
-        return 3;
-      }
-    }
-    return failed;
-  } else if (strlen(checksum)) {
-    char       *path = NULL;
-
-    strcpy(checksum_real, checksum);
-    if (getdir(checksum, &path)) {
+    db_list = list_new(db_data_get);
+    failed = db_load("list", db_list) | db_load("removed", db_list);
+    if (failed) {
+      fprintf(stderr, "db: check: failed to read lists\n");
       failed = 2;
-    } else {
-      FILE    *readfile;
-      char    *check_path = NULL;
-      char    *listfile   = NULL;
-      list_t  list;
+    }
+  }
+  if (! failed) {
+    if (checksum == NULL) {
+      list_entry_t entry = NULL;
+      int          files = list_size(db_list);
 
-      asprintf(&listfile, "%s/list", &path[strlen(db_path) + 1]);
-      list = list_new(db_data_get);
-      if (db_load(listfile, list) == 2) {
-        fprintf(stderr, "db: check: failed to open data list\n");
+      if (verbosity() > 0) {
+        printf("Checking database (contents: %u file(s))\n",
+          list_size(db_list));
+      }
+      while ((entry = list_next(db_list, entry)) != NULL) {
+        db_data_t *db_data = list_entry_payload(entry);
+
+        if ((verbosity() > 2) && ((files & 0xFF) == 0)) {
+          printf(" --> Files left to go: %u\n", files);
+        }
+        files--;
+        failed = db_check(NULL, db_data->filedata.checksum);
+        if (terminating()) {
+          failed = 3;
+          break;
+        }
+      }
+    } else if ((checksum[0] != 'N') && (checksum[0] != '\0')) {
+      char       *path = NULL;
+
+      strcpy(checksum_real, checksum);
+      if (getdir(checksum, &path)) {
+        failed = 2;
       } else {
-        db_data_t    *db_data = NULL;
-        list_entry_t entry = list_next(list, NULL);
+        FILE    *readfile;
+        char    *check_path = NULL;
+        char    *listfile   = NULL;
+        list_t  list;
 
-        if (entry == NULL) {
-          fprintf(stderr, "db: check: failed to obtain checksum\n");
-          failed = 2;
+        asprintf(&listfile, "%s/list", &path[strlen(db_path) + 1]);
+        list = list_new(db_data_get);
+        if (db_load(listfile, list) == 2) {
+          fprintf(stderr, "db: check: failed to open data list\n");
         } else {
-          db_data = list_entry_payload(entry);
-          strcpy(checksum_real, db_data->filedata.checksum);
-        }
+          db_data_t    *db_data = NULL;
+          list_entry_t entry = list_next(list, NULL);
 
-        /* Read file to compute checksum, compare with expected */
-        asprintf(&check_path, "%s/data", path);
-        if ((readfile = fopen(check_path, "r")) == NULL) {
-          failed = 1;
-          fprintf(stderr, "File data missing for checksum %s\n", checksum);
-        } else {
-          char       check[36];
-          EVP_MD_CTX ctx;
-          size_t     rlength;
-
-          EVP_DigestInit(&ctx, EVP_md5());
-          while (! feof(readfile) && ! terminating()) {
-            char buffer[CHUNK];
-
-            rlength = fread(buffer, 1, CHUNK, readfile);
-            EVP_DigestUpdate(&ctx, buffer, rlength);
+          if (entry == NULL) {
+            fprintf(stderr, "db: check: failed to obtain checksum\n");
+            failed = 2;
+          } else {
+            db_data = list_entry_payload(entry);
+            strcpy(checksum_real, db_data->filedata.checksum);
           }
-          fclose(readfile);
-          /* Re-use length */
-          EVP_DigestFinal(&ctx, (unsigned char *) check, &rlength);
-          md5sum(check, rlength);
-          if (strncmp(check, checksum_real, rlength)) {
+
+          /* Read file to compute checksum, compare with expected */
+          asprintf(&check_path, "%s/data", path);
+          if ((readfile = fopen(check_path, "r")) == NULL) {
             failed = 1;
-            fprintf(stderr, "File data corrupted for checksum %s (found to be %s)\n", checksum, check);
-          }
-        }
-        free(check_path);
-        if ((failed == 1) && verbosity() > 1) {
-          struct tm *time;
+            fprintf(stderr, "File data missing for checksum %s\n", checksum);
+          } else {
+            char       check[36];
+            EVP_MD_CTX ctx;
+            size_t     rlength;
 
-          printf(" -> Client:      %s\n", db_data->host);
-          printf(" -> File name:   %s\n", db_data->filedata.path);
-          time = localtime(&db_data->filedata.metadata.mtime);
-          printf(" -> Modified:    %04u-%02u-%02u %2u:%02u:%02u\n",
-            time->tm_year + 1900, time->tm_mon + 1, time->tm_mday,
-            time->tm_hour, time->tm_min, time->tm_sec);
-          if (verbosity() > 2) {
-            time = localtime(&db_data->date_in);
-            printf(" --> Seen first: %04u-%02u-%02u %2u:%02u:%02u\n",
+            EVP_DigestInit(&ctx, EVP_md5());
+            while (! feof(readfile) && ! terminating()) {
+              char buffer[CHUNK];
+
+              rlength = fread(buffer, 1, CHUNK, readfile);
+              EVP_DigestUpdate(&ctx, buffer, rlength);
+            }
+            fclose(readfile);
+            /* Re-use length */
+            EVP_DigestFinal(&ctx, (unsigned char *) check, &rlength);
+            md5sum(check, rlength);
+            if (strncmp(check, checksum_real, rlength)) {
+              failed = 1;
+              if (! terminating()) {
+                fprintf(stderr,
+                  "File data corrupted for checksum %s (found to be %s)\n",
+                  checksum, check);
+              }
+            }
+          }
+          free(check_path);
+          if (! terminating() && (failed == 1) && verbosity() > 1) {
+            struct tm *time;
+
+            printf(" -> Client:      %s\n", db_data->host);
+            printf(" -> File name:   %s\n", db_data->filedata.path);
+            time = localtime(&db_data->filedata.metadata.mtime);
+            printf(" -> Modified:    %04u-%02u-%02u %2u:%02u:%02u\n",
               time->tm_year + 1900, time->tm_mon + 1, time->tm_mday,
               time->tm_hour, time->tm_min, time->tm_sec);
-            if (db_data->date_out != 0) {
-              time = localtime(&db_data->date_out);
-              printf(" --> Seen gone:  %04u-%02u-%02u %2u:%02u:%02u\n",
+            if (verbosity() > 2) {
+              time = localtime(&db_data->date_in);
+              printf(" --> Seen first: %04u-%02u-%02u %2u:%02u:%02u\n",
                 time->tm_year + 1900, time->tm_mon + 1, time->tm_mday,
                 time->tm_hour, time->tm_min, time->tm_sec);
+              if (db_data->date_out != 0) {
+                time = localtime(&db_data->date_out);
+                printf(" --> Seen gone:  %04u-%02u-%02u %2u:%02u:%02u\n",
+                  time->tm_year + 1900, time->tm_mon + 1, time->tm_mday,
+                  time->tm_hour, time->tm_min, time->tm_sec);
+              }
             }
           }
         }
+        list_free(list);
+        free(listfile);
       }
-      list_free(list);
-      free(listfile);
+      free(path);
     }
-    free(path);
+  }
+  if (local_db_path != NULL) {
+    db_list_free(db_list);
+    db_unlock(local_db_path);
   }
   return failed;
 }

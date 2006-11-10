@@ -222,32 +222,31 @@ int main(int argc, char **argv) {
           asprintf(&db_path, "%s", default_db_path);
         }
         /* Open backup database */
+        if (check) {
+          db_check(db_path, NULL);
+        } else
+        if (scan) {
+          db_scan(db_path, NULL);
+        } else
         if (db_open(db_path) == 2) {
           fprintf(stderr, "Failed to open database in '%s'\n", db_path);
           failed = 2;
         } else {
-          if (check) {
-            db_check(NULL);
-          } else if (scan) {
-            db_scan(NULL);
-          } else {
-            char *mount_path = NULL;
+          char *mount_path = NULL;
 
-            /* Make sure we have a mount path */
-            asprintf(&mount_path, "%s/mount", db_path);
-            if (testdir(mount_path, 1) == 2) {
-              fprintf(stderr, "Failed to create mount point\n");
-              failed = 2;
-            } else
+          /* Make sure we have a mount path */
+          asprintf(&mount_path, "%s/mount", db_path);
+          if (testdir(mount_path, 1) == 2) {
+            fprintf(stderr, "Failed to create mount point\n");
+            failed = 2;
+          } else
 
-            /* Backup */
-            if (clients_backup(mount_path)) {
-              fprintf(stderr, "Failed to backup\n");
-              failed = 1;
-            }
-            free(mount_path);
+          /* Backup */
+          if (clients_backup(mount_path)) {
+            fprintf(stderr, "Failed to backup\n");
+            failed = 1;
           }
-
+          free(mount_path);
           db_close();
         }
       }

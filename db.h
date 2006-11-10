@@ -33,9 +33,9 @@ extern int db_parse(const char *prefix, const char *real_path,
 extern int db_read(const char *path, const char *checksum);
 
 /* Check that data for given checksum exists (if NULL, scan all) */
-extern int db_scan(const char *checksum);
+extern int db_scan(const char *db_path, const char *checksum);
 
 /* Check that data for given checksum is not corrupted (if NULL, check all) */
-extern int db_check(const char *checksum);
+extern int db_check(const char *db_path, const char *checksum);
 
 #endif

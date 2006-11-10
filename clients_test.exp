@@ -58,8 +58,8 @@ Database initialized
  --> Issuing command: mount -t smbfs -o ro,nocase,username=user //client/c$ test_db/mount
  --> Issuing command: mount -t smbfs -o ro,nocase //client/c$ test_db/mount
  --> Issuing command: mount -t smbfs -o ro,nocase //client/c$ test_db/mount
-Database closed (contents: 0 file(s))
-Database opened (contents: 0 file(s))
+Database closed (total contents: 0 file(s))
+Database opened (active contents: 0 file(s))
 Backup client 'localhost' using protocol 'file'
 Backup path 'test'
  -> Building list of files
@@ -67,8 +67,8 @@ Backup path 'test'
 Backup path 'test2'
  -> Building list of files
  -> Parsing list of files
-Database closed (contents: 15 file(s))
-Database opened (contents: 15 file(s))
+Database closed (total contents: 15 file(s))
+Database opened (active contents: 15 file(s))
 Backup client 'localhost' using protocol 'file'
 Backup path 'test'
  -> Building list of files
@@ -76,4 +76,4 @@ Backup path 'test'
 Backup path 'test2'
  -> Building list of files
  -> Parsing list of files
-Database closed (contents: 15 file(s))
+Database closed (total contents: 15 file(s))
