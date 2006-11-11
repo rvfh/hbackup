@@ -538,6 +538,19 @@ static int db_organize(char *path, int number) {
   return failed;
 }
 
+static void db_list_free(list_t list) {
+  list_entry_t entry = NULL;
+
+  while ((entry = list_next(list, entry)) != NULL) {
+    db_data_t *db_data = list_entry_payload(entry);
+
+    free(db_data->host);
+    free(db_data->link);
+    free(db_data->filedata.path);
+  }
+  list_free(list);
+}
+
 static int db_write(const char *mount_path, const char *path,
     const db_data_t *db_data, char *checksum, int compress) {
   char    *source_path = NULL;
@@ -695,7 +708,7 @@ static int db_write(const char *mount_path, const char *path,
         db_save(listfile, list);
         list_remove(list, entry);
       }
-      list_free(list);
+      db_list_free(list);
       free(listfile);
     }
   }
@@ -746,7 +759,7 @@ static int db_obsolete(const char *prefix, const char *path,
     }
     free(string);
   }
-  list_free(list);
+  db_list_free(list);
 
 
   free(listfile);
@@ -855,19 +868,6 @@ int db_open(const char *path) {
     return 2;
   }
   return 0;
-}
-
-static void db_list_free(list_t list) {
-  list_entry_t entry = NULL;
-
-  while ((entry = list_next(list, entry)) != NULL) {
-    db_data_t *db_data = list_entry_payload(entry);
-
-    free(db_data->host);
-    free(db_data->link);
-    free(db_data->filedata.path);
-  }
-  list_free(list);
 }
 
 static char *close_select(const void *payload) {
@@ -1350,7 +1350,7 @@ int db_check(const char *local_db_path, const char *checksum) {
             }
           }
         }
-        list_free(list);
+        db_list_free(list);
         free(listfile);
       }
       free(path);
