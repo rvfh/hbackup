@@ -48,16 +48,17 @@ clients_test: clients.a db.a filelist.a cvs_parser.a parsers.a filters.a list.a 
 hbackup: clients.a db.a filelist.a cvs_parser.a parsers.a filters.a list.a \
 	metadata.a params.a tools.a
 
-hbackup.o: version.h
+hbackup.o: hbackup.h version.h
 
+tools.a: hbackup.h tools.h
 metadata.a: metadata.h
 list.a: list.h
-db.a: db.h list.h metadata.h
+db.a: db.h list.h metadata.h tools.h hbackup.h
 filters.a: filters.h list.h
 parsers.a: parsers.h list.h
 cvs_parser.a: cvs_parser.h parsers.h list.h metadata.h
-filelist.a: filelist.h parsers.h list.h metadata.h
-clients.a: clients.h list.h
+filelist.a: filelist.h parsers.h list.h metadata.h tools.h hbackup.h
+clients.a: clients.h list.h tools.h hbackup.h
 
 # Rules
 version.h: Makefile

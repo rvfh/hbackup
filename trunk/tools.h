@@ -19,6 +19,8 @@
 #ifndef TOOLS_H
 #define TOOLS_H
 
+#include <sys/types.h>
+
 /* Make sure string finishes without slash */
 extern void no_trailing_slash(char *string);
 
@@ -33,5 +35,22 @@ extern int testdir(const char *path, int create);
 
 /* Test whether file exists, create it if requested */
 extern int testfile(const char *path, int create);
+
+extern char type_letter(mode_t mode);
+
+extern mode_t type_mode(char letter);
+
+extern void md5sum(char *checksum, int bytes);
+
+extern int getdir(const char *db_path, const char *checksum, char **path_p);
+
+extern int zcopy(
+  const char *source_path,
+  const char *dest_path,
+  size_t *size_in,
+  size_t *size_out,
+  char *checksum_in,
+  char *checksum_out,
+  int compress);
 
 #endif
