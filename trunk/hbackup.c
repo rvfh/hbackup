@@ -76,14 +76,15 @@ void sighandler(int signal) {
 }
 
 int main(int argc, char **argv) {
-  const char *config_path = NULL;
-  char *db_path     = NULL;
-  FILE *config;
-  int failed = 0;
-  int expect_configpath = 0;
-  int argn = 0;
-  int check = 0;
-  int scan = 0;
+  const char       *config_path      = NULL;
+  char             *db_path          = NULL;
+  FILE             *config;
+  int              failed            = 0;
+  int              expect_configpath = 0;
+  int              argn              = 0;
+  int              scan              = 0;
+  int              check             = 0;
+  int              configcheck       = 0;
   struct sigaction action;
 
   /* Set signal catcher */
@@ -112,6 +113,14 @@ int main(int argc, char **argv) {
           letter = 'c';
         } else if (! strcmp(&argv[argn][2], "help")) {
           letter = 'h';
+        } else if (! strcmp(&argv[argn][2], "restore")) {
+          letter = 'r';
+        } else if (! strcmp(&argv[argn][2], "scan")) {
+          letter = 's';
+        } else if (! strcmp(&argv[argn][2], "check")) {
+          letter = 't';
+        } else if (! strcmp(&argv[argn][2], "configcheck")) {
+          letter = 'u';
         } else if (! strcmp(&argv[argn][2], "verbose")) {
           letter = 'v';
         } else if (! strcmp(&argv[argn][2], "version")) {
@@ -148,6 +157,9 @@ int main(int argc, char **argv) {
           break;
         case 't':
           check = 1;
+          break;
+        case 'u':
+          configcheck = 1;
           break;
         case 'v':
           verbose++;
@@ -217,7 +229,7 @@ int main(int argc, char **argv) {
       fclose(config);
       free(buffer);
 
-      if (! failed) {
+      if (! failed && ! configcheck) {
         if (db_path == NULL) {
           asprintf(&db_path, "%s", default_db_path);
         }
@@ -242,7 +254,7 @@ int main(int argc, char **argv) {
           } else
 
           /* Backup */
-          if (clients_backup(mount_path)) {
+          if (clients_backup(mount_path, configcheck)) {
             fprintf(stderr, "Failed to backup\n");
             failed = 1;
           }

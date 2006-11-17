@@ -63,7 +63,7 @@ int main(void) {
   clients_add("file://localhost", "etc/doesnotexist");
   printf(">List %u client(s):\n", list_size(clients));
   list_show(clients, NULL, client_show);
-  clients_backup("test_db/mount");
+  clients_backup("test_db/mount", 0);
   clients_free();
 
   if (clients_new()) {
@@ -94,7 +94,7 @@ int main(void) {
   printf(">List %u client(s):\n", list_size(clients));
   list_show(clients, NULL, client_show);
   db_open("test_db");
-  clients_backup("test_db/mount");
+  clients_backup("test_db/mount", 0);
   db_close();
   clients_free();
 
@@ -105,7 +105,7 @@ int main(void) {
   clients_add("file://localhost", "etc/localhost.list");
   db_open("test_db");
   verbose = 2;
-  clients_backup("test_db/mount");
+  clients_backup("test_db/mount", 0);
   verbose = 3;
   db_close();
   clients_free();
@@ -117,7 +117,7 @@ int main(void) {
   clients_add("file://localhost", "etc/localhost.list");
   db_open("test_db");
   verbose = 2;
-  clients_backup("test_db/mount");
+  clients_backup("test_db/mount", 0);
   verbose = 3;
   db_close();
   clients_free();
