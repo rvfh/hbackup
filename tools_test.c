@@ -18,6 +18,10 @@
 
 #include "tools.c"
 
+int terminating(void) {
+  return 0;
+}
+
 int main(void) {
   char line[256] = "";
 
