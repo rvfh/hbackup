@@ -16,6 +16,8 @@
      Boston, MA 02111-1307, USA.
 */
 
+/* TODO Not all functions are tested */
+
 #include "tools.c"
 
 int terminating(void) {

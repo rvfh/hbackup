@@ -40,8 +40,6 @@ extern char type_letter(mode_t mode);
 
 extern mode_t type_mode(char letter);
 
-extern void md5sum(char *checksum, int bytes);
-
 extern int getdir(const char *db_path, const char *checksum, char **path_p);
 
 extern int zcopy(
@@ -52,5 +50,7 @@ extern int zcopy(
   char *checksum_in,
   char *checksum_out,
   int compress);
+
+extern int getchecksum(const char *path, const char *checksum);
 
 #endif
