@@ -418,7 +418,7 @@ static int prepare_share(client_t *client, const char *mount_point,
   return failed;
 }
 
-int clients_backup(const char *mount_point) {
+int clients_backup(const char *mount_point, int configcheck) {
   list_entry_t *entry = NULL;
   int failed = 0;
 
@@ -439,7 +439,7 @@ int clients_backup(const char *mount_point) {
       if (list_size(backups) == 0) {
         fprintf(stderr, "clients: backup: empty list!\n");
         failed = 1;
-      } else {
+      } else if (! configcheck) {
         list_entry_t entry = NULL;
 
         while ((entry = list_next(backups, entry)) != NULL) {
