@@ -11,57 +11,54 @@ PREFIX := /usr/local/bin
 all: test hbackup
 
 install: hbackup
+	@echo "INSTALL	$<"
 	@strip $^
 	@mkdir -p ${PREFIX}
 	@cp $^ ${PREFIX}
 
-test:	params_test.done \
-	list_test.done \
-	tools_test.done \
-	metadata_test.done \
-	filters_test.done \
-	parsers_test.done \
-	cvs_parser_test.done \
-	filelist_test.done \
-	db_test.done \
-	clients_test.done
+test:	params.done \
+	list.done \
+	tools.done \
+	metadata.done \
+	filters.done \
+	parsers.done \
+	cvs_parser.done \
+	filelist.done \
+	db.done \
+	clients.done
 
 clean:
-	rm -f *.[oa] *~ *.out *.done *_test version.h hbackup
+	@rm -f *.[oa] *~ *.out *.done *_test version.h hbackup
 	@./test_setup clean
-	@echo "Cleaning test environment"
 
 # Dependencies
-metadata_test: metadata.a
-params_test: params.a
 list_test: list.a
-tools_test: tools.a
-filters_test: filters.a list.a
-parsers_test: parsers.a list.a
-cvs_parser_test: cvs_parser.a parsers.a list.a
-filelist_test: filelist.a cvs_parser.a parsers.a filters.a list.a metadata.a \
+filters_test: list.a
+parsers_test: list.a
+cvs_parser_test: list.a parsers.a
+filelist_test: cvs_parser.a parsers.a filters.a list.a metadata.a params.a \
+	tools.a
+db_test: filelist.a cvs_parser.a parsers.a filters.a list.a metadata.a \
 	params.a tools.a
-db_test: db.a filelist.a cvs_parser.a parsers.a filters.a list.a metadata.a \
-	params.a tools.a
-clients_test: clients.a db.a filelist.a cvs_parser.a parsers.a filters.a list.a \
+clients_test: db.a filelist.a cvs_parser.a parsers.a filters.a list.a \
 	metadata.a params.a tools.a
 hbackup: clients.a db.a filelist.a cvs_parser.a parsers.a filters.a list.a \
 	metadata.a params.a tools.a
 
+tools.o: hbackup.h tools.h
+metadata.o: metadata.h
+list.o: list.h
+db.o: db.h list.h metadata.h tools.h hbackup.h
+filters.o: filters.h list.h
+parsers.o: parsers.h list.h
+cvs_parser.o: cvs_parser.h parsers.h list.h metadata.h
+filelist.o: filelist.h parsers.h list.h metadata.h tools.h hbackup.h
+clients.o: clients.h list.h tools.h hbackup.h
 hbackup.o: hbackup.h version.h
-
-tools.a: hbackup.h tools.h
-metadata.a: metadata.h
-list.a: list.h
-db.a: db.h list.h metadata.h tools.h hbackup.h
-filters.a: filters.h list.h
-parsers.a: parsers.h list.h
-cvs_parser.a: cvs_parser.h parsers.h list.h metadata.h
-filelist.a: filelist.h parsers.h list.h metadata.h tools.h hbackup.h
-clients.a: clients.h list.h tools.h hbackup.h
 
 # Rules
 version.h: Makefile
+	@echo "CREATE	$@"
 	@echo "/* This file is auto-generated, do not edit. */" > version.h
 	@echo "\n#ifndef VERSION_H\n#define VERSION_H\n" >> version.h
 	@echo "#define VERSION_MAJOR $(MAJOR)" >> version.h
@@ -75,17 +72,28 @@ version.h: Makefile
 	fi
 	@echo "\n#endif" >> version.h
 
+%o: %c
+	@echo "CC	$<"
+	@$(CC) $(CFLAGS) -c -o $@ $<
 
 %.a: %.o
-	$(AR) cru $@ $^
-	$(RANLIB) $@
+	@echo "AR	$^"
+	@$(AR) cru $@ $^
+	@echo "RANLIB	$@"
+	@$(RANLIB) $@
 
-%.out: % test_setup
-	@./test_setup
-	./$< > $@ 2>&1
+%: %.o
+	@echo "BUILD	$@"
+	@$(CC) $(LDFLAGS) -o $@ $^
 
-%.done: % %.exp test_setup
+%_test: %_test.o
+	@echo "BUILD	$@"
+	@$(CC) $(LDFLAGS) -o $@ $^
+
+%.done: %_test %.exp test_setup
+	@echo "RUN	$<"
 	@./test_setup
-	./$< > $<.out 2>&1
-	@diff -q $<.exp $<.out
+	@./$< > `basename $@ .done`.out 2>&1
+	@diff -q `basename $@ .done`.exp `basename $@ .done`.out
 	@touch $@
+	@rm -f `basename $@ .done`.out
