@@ -115,7 +115,7 @@ mode_t type_mode(char letter) {
   return 0;
 }
 
-void md5sum(char *checksum, int bytes) {
+static void md5sum(const char *checksum, int bytes) {
   char *hex            = "0123456789abcdef";
   unsigned char *copy  = malloc(bytes);
   unsigned char *read  = copy;
@@ -306,5 +306,34 @@ int zcopy(const char *source_path, const char *dest_path,
       }
     }
   }
+  return 0;
+}
+
+int getchecksum(const char *path, const char *checksum) {
+  FILE       *readfile;
+  EVP_MD_CTX ctx;
+  size_t     rlength;
+
+  /* Open file */
+  if ((readfile = fopen(path, "r")) == NULL) {
+    return 2;
+  }
+
+  /* Initialize checksum calculation */
+  EVP_DigestInit(&ctx, EVP_md5());
+
+  /* Read file, updating checksum */
+  while (! feof(readfile) && ! terminating()) {
+    char buffer[CHUNK];
+
+    rlength = fread(buffer, 1, CHUNK, readfile);
+    EVP_DigestUpdate(&ctx, buffer, rlength);
+  }
+  fclose(readfile);
+
+  /* Get checksum */
+  EVP_DigestFinal(&ctx, (unsigned char *) checksum, &rlength);
+  md5sum(checksum, rlength);
+
   return 0;
 }

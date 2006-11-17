@@ -46,8 +46,6 @@
 #include <dirent.h>
 #include <unistd.h>
 #include <errno.h>
-#include <openssl/md5.h>
-#include <openssl/evp.h>
 #include "filelist.h"
 #include "list.h"
 #include "tools.h"
@@ -1055,11 +1053,9 @@ int db_check(const char *local_db_path, const char *checksum) {
     } else if ((checksum[0] != 'N') && (checksum[0] != '\0')) {
       char       *path = NULL;
 
-      strcpy(checksum_real, checksum);
       if (getdir(db_path, checksum, &path)) {
         failed = 2;
       } else {
-        FILE    *readfile;
         char    *check_path = NULL;
         char    *listfile   = NULL;
         list_t  list;
@@ -1069,67 +1065,51 @@ int db_check(const char *local_db_path, const char *checksum) {
         if (db_load(listfile, list) == 2) {
           fprintf(stderr, "db: check: failed to open data list\n");
         } else {
-          db_data_t    *db_data = NULL;
           list_entry_t entry = list_next(list, NULL);
 
           if (entry == NULL) {
             fprintf(stderr, "db: check: failed to obtain checksum\n");
             failed = 2;
           } else {
-            db_data = list_entry_payload(entry);
-            strcpy(checksum_real, db_data->filedata.checksum);
-          }
+            db_data_t *db_data = list_entry_payload(entry);
 
-          /* Read file to compute checksum, compare with expected */
-          asprintf(&check_path, "%s/data", path);
-          if ((readfile = fopen(check_path, "r")) == NULL) {
-            failed = 1;
-            fprintf(stderr, "File data missing for checksum %s\n", checksum);
-          } else {
-            char       check[36];
-            EVP_MD_CTX ctx;
-            size_t     rlength;
-
-            EVP_DigestInit(&ctx, EVP_md5());
-            while (! feof(readfile) && ! terminating()) {
-              char buffer[CHUNK];
-
-              rlength = fread(buffer, 1, CHUNK, readfile);
-              EVP_DigestUpdate(&ctx, buffer, rlength);
-            }
-            fclose(readfile);
-            /* Re-use length */
-            EVP_DigestFinal(&ctx, (unsigned char *) check, &rlength);
-            md5sum(check, rlength);
-            if (strncmp(check, checksum_real, rlength)) {
+            /* Read file to compute checksum, compare with expected */
+            asprintf(&check_path, "%s/data", path);
+            if (getchecksum(check_path, checksum_real) == 2) {
+              fprintf(stderr, "File data missing for checksum %s\n", checksum);
               failed = 1;
+            } else
+            if (strncmp(db_data->filedata.checksum, checksum_real,
+                  strlen(checksum_real)) != 0) {
               if (! terminating()) {
                 fprintf(stderr,
                   "File data corrupted for checksum %s (found to be %s)\n",
-                  checksum, check);
+                  checksum, checksum_real);
               }
+              failed = 1;
             }
-          }
-          free(check_path);
-          if (! terminating() && (failed == 1) && verbosity() > 1) {
-            struct tm *time;
+            free(check_path);
 
-            printf(" -> Client:      %s\n", db_data->host);
-            printf(" -> File name:   %s\n", db_data->filedata.path);
-            time = localtime(&db_data->filedata.metadata.mtime);
-            printf(" -> Modified:    %04u-%02u-%02u %2u:%02u:%02u\n",
-              time->tm_year + 1900, time->tm_mon + 1, time->tm_mday,
-              time->tm_hour, time->tm_min, time->tm_sec);
-            if (verbosity() > 2) {
-              time = localtime(&db_data->date_in);
-              printf(" --> Seen first: %04u-%02u-%02u %2u:%02u:%02u\n",
+            if (! terminating() && (failed == 1) && verbosity() > 1) {
+              struct tm *time;
+
+              printf(" -> Client:      %s\n", db_data->host);
+              printf(" -> File name:   %s\n", db_data->filedata.path);
+              time = localtime(&db_data->filedata.metadata.mtime);
+              printf(" -> Modified:    %04u-%02u-%02u %2u:%02u:%02u\n",
                 time->tm_year + 1900, time->tm_mon + 1, time->tm_mday,
                 time->tm_hour, time->tm_min, time->tm_sec);
-              if (db_data->date_out != 0) {
-                time = localtime(&db_data->date_out);
-                printf(" --> Seen gone:  %04u-%02u-%02u %2u:%02u:%02u\n",
+              if (verbosity() > 2) {
+                time = localtime(&db_data->date_in);
+                printf(" --> Seen first: %04u-%02u-%02u %2u:%02u:%02u\n",
                   time->tm_year + 1900, time->tm_mon + 1, time->tm_mday,
                   time->tm_hour, time->tm_min, time->tm_sec);
+                if (db_data->date_out != 0) {
+                  time = localtime(&db_data->date_out);
+                  printf(" --> Seen gone:  %04u-%02u-%02u %2u:%02u:%02u\n",
+                    time->tm_year + 1900, time->tm_mon + 1, time->tm_mday,
+                    time->tm_hour, time->tm_min, time->tm_sec);
+                }
               }
             }
           }
