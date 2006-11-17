@@ -31,6 +31,7 @@
 #include "db.h"
 #include "clients.h"
 #include "hbackup.h"
+#include "version.h"
 
 /* DEFAULTS */
 
@@ -48,7 +49,14 @@ static const char default_db_path[] = "/hbackup";
 static int killed = 0;
 
 static void show_version(void) {
-  printf("(c) 2006 Hervé Fache, version 0.1.\n");
+  printf("(c) 2006 Hervé Fache, version %u.%u", VERSION_MAJOR, VERSION_MINOR);
+  if (VERSION_BUGFIX != 0) {
+    printf(".%u", VERSION_BUGFIX);
+  }
+  if (BUILD != 0) {
+    printf(" (build %u)", BUILD);
+  }
+  printf("\n");
 }
 
 static void show_help(void) {

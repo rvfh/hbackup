@@ -1,3 +1,7 @@
+MAJOR = 0
+MINOR = 1
+BUGFIX = 0
+
 AR := ar
 RANLIB := ranlib
 CFLAGS := -Wall -O2 -ansi -pedantic
@@ -23,7 +27,7 @@ test:	params_test.dif \
 	clients_test.dif
 
 clean:
-	rm -f *.[oa] *~ *.out *.out.failed *.dif *_test hbackup
+	rm -f *.[oa] *~ *.out *.out.failed *.dif *_test version.h hbackup
 	@./test_setup clean
 	@echo "Cleaning test environment"
 
@@ -44,6 +48,8 @@ clients_test: clients.a db.a filelist.a cvs_parser.a parsers.a filters.a list.a 
 hbackup: clients.a db.a filelist.a cvs_parser.a parsers.a filters.a list.a \
 	metadata.a params.a tools.a
 
+hbackup.o: version.h
+
 metadata.a: metadata.h
 list.a: list.h
 db.a: db.h list.h metadata.h
@@ -54,6 +60,21 @@ filelist.a: filelist.h parsers.h list.h metadata.h
 clients.a: clients.h list.h
 
 # Rules
+version.h: Makefile
+	@echo "/* This file is auto-generated, do not edit. */" > version.h
+	@echo "\n#ifndef VERSION_H\n#define VERSION_H\n" >> version.h
+	@echo "#define VERSION_MAJOR $(MAJOR)" >> version.h
+	@echo "#define VERSION_MINOR $(MINOR)" >> version.h
+	@echo "#define VERSION_BUGFIX $(BUGFIX)" >> version.h
+	@echo -n "#define BUILD " >> version.h
+	@if [ -d .svn ]; then \
+	  svn info | grep "Last Changed Rev:" | sed "s/.*: *//" >> version.h; \
+	else \
+	  echo "0" >> version.h; \
+	fi
+	@echo "\n#endif" >> version.h
+
+
 %.a: %.o
 	$(AR) cru $@ $^
 	$(RANLIB) $@
