@@ -15,19 +15,19 @@ install: hbackup
 	@mkdir -p ${PREFIX}
 	@cp $^ ${PREFIX}
 
-test:	params_test.dif \
-	list_test.dif \
-	tools_test.dif \
-	metadata_test.dif \
-	filters_test.dif \
-	parsers_test.dif \
-	cvs_parser_test.dif \
-	filelist_test.dif \
-	db_test.dif \
-	clients_test.dif
+test:	params_test.done \
+	list_test.done \
+	tools_test.done \
+	metadata_test.done \
+	filters_test.done \
+	parsers_test.done \
+	cvs_parser_test.done \
+	filelist_test.done \
+	db_test.done \
+	clients_test.done
 
 clean:
-	rm -f *.[oa] *~ *.out *.out.failed *.dif *_test version.h hbackup
+	rm -f *.[oa] *~ *.out *.done *_test version.h hbackup
 	@./test_setup clean
 	@echo "Cleaning test environment"
 
@@ -84,13 +84,8 @@ version.h: Makefile
 	@./test_setup
 	./$< > $@ 2>&1
 
-%.dif: %.out %.exp
-	@echo "diff $^ > $@"
-	@if ! diff $^ > $@; then \
-	  mv -f $< $<.failed; \
-	  echo "Failed output file is $<.failed"; \
-	  rm -f $@; \
-	  false; \
-	else \
-	  rm -f $<.failed; \
-	fi
+%.done: % %.exp test_setup
+	@./test_setup
+	./$< > $<.out 2>&1
+	@diff -q $<.exp $<.out
+	@touch $@
