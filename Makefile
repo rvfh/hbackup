@@ -3,6 +3,7 @@ MINOR = 1
 BUGFIX = 0
 
 AR := ar
+CC := gcc
 RANLIB := ranlib
 CFLAGS := -Wall -O2 -ansi -pedantic
 LDFLAGS := -lssl -lz
@@ -93,7 +94,8 @@ version.h: Makefile
 %.done: %_test %.exp test_setup
 	@echo "RUN	$<"
 	@./test_setup
-	@./$< > `basename $@ .done`.out 2>&1
-	@diff -q `basename $@ .done`.exp `basename $@ .done`.out
+	@./$< > `basename $@ .done`.out 2>`basename $@ .done`.err
+	@cat `basename $@ .done`.err `basename $@ .done`.out > `basename $@ .done`.all
+	@diff -q `basename $@ .done`.exp `basename $@ .done`.all
 	@touch $@
-	@rm -f `basename $@ .done`.out
+	@rm -f `basename $@ .done`.out `basename $@ .done`.err `basename $@ .done`.all
