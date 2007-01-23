@@ -19,9 +19,6 @@
 #ifndef CLIENT_H
 #define CLIENT_H
 
-#define _GNU_SOURCE
-#include <stdio.h>
-
 /* Create clients management */
 extern int clients_new(void);
 

@@ -16,7 +16,7 @@
      Boston, MA 02111-1307, USA.
 */
 
-#include "params.c"
+#include "params.cpp"
 
 int main(void) {
   char line[256] = "";

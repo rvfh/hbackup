@@ -16,7 +16,9 @@
      Boston, MA 02111-1307, USA.
 */
 
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -211,7 +213,7 @@ int main(int argc, char **argv) {
       while (getline(&buffer, &size, config) >= 0) {
         char keyword[256];
         char type[256];
-        char *string = malloc(size);
+        char *string = (char *) (malloc(size));
         int params = params_readline(buffer, keyword, type, string);
 
         line++;

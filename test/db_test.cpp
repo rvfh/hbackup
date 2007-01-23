@@ -19,7 +19,7 @@
 #include "filters.h"
 #include "cvs_parser.h"
 /* Yes, include C file */
-#include "db.c"
+#include "db.cpp"
 
 static int verbose = 3;
 
@@ -31,7 +31,7 @@ static char *file_data_show(const void *payload) {
 }
 
 static char *db_data_show(const void *payload) {
-  const db_data_t *db_data = payload;
+  const db_data_t *db_data = (db_data_t *) payload;
   char  *link = "";
   char *string = NULL;
 
@@ -64,8 +64,8 @@ int main(void) {
   char      checksum[40];
   char      zchecksum[40];
   db_data_t db_data;
-  size_t    size;
-  size_t    zsize;
+  off_t     size;
+  off_t     zsize;
   list_t    *filelist;
   int       status;
 
@@ -92,21 +92,21 @@ int main(void) {
 
   zcopy("test/testfile", "test_db/testfile.gz", &size, &zsize, checksum,
     zchecksum, 5);
-  printf("Copied %u -> %u bytes: %s -> %s\n",
+  printf("Copied %ld -> %ld bytes: %s -> %s\n",
     size, zsize, checksum, zchecksum);
 
   zcopy("test_db/testfile.gz", "/dev/null", &size, &zsize, checksum,
     zchecksum, -1);
-  printf("Copied %u -> %u bytes: %s -> %s\n",
+  printf("Copied %ld -> %ld bytes: %s -> %s\n",
     size, zsize, checksum, zchecksum);
 
   zcopy("test2/testfile~", "test_db/testfile.gz", &size, NULL, checksum,
     NULL, 5);
-  printf("Copied %u -> ? bytes %s -> ?\n", size, checksum);
+  printf("Copied %ld -> ? bytes %s -> ?\n", size, checksum);
 
   zcopy("test2/testfile~", "test_db/testfile.gz", NULL, &zsize, NULL,
     zchecksum, 9);
-  printf("Copied ? -> %u bytes ? -> %s\n", zsize, zchecksum);
+  printf("Copied ? -> %ld bytes ? -> %s\n", zsize, zchecksum);
 
   /* Use other modules */
   if ((status = parsers_new(&parsers_handle))) {

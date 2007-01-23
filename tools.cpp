@@ -16,7 +16,9 @@
      Boston, MA 02111-1307, USA.
 */
 
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -117,7 +119,7 @@ mode_t type_mode(char letter) {
 
 static void md5sum(const char *checksum, int bytes) {
   char *hex            = "0123456789abcdef";
-  unsigned char *copy  = malloc(bytes);
+  unsigned char *copy  = (unsigned char *) (malloc(bytes));
   unsigned char *read  = copy;
   unsigned char *write = (unsigned char *) checksum;
 
@@ -168,7 +170,7 @@ int getdir(const char *db_path, const char *checksum, char **path_p) {
 }
 
 int zcopy(const char *source_path, const char *dest_path,
-    size_t *size_in, size_t *size_out, char *checksum_in, char *checksum_out,
+    off_t *size_in, off_t *size_out, char *checksum_in, char *checksum_out,
     int compress) {
   FILE          *writefile;
   FILE          *readfile;

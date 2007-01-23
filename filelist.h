@@ -19,7 +19,9 @@
 #ifndef FILE_LIST_H
 #define FILE_LIST_H
 
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 #include <stdio.h>
 #include <sys/types.h>
 /* Declare lstat and S_* macros */

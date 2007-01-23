@@ -3,9 +3,8 @@ MINOR = 1
 BUGFIX = 0
 
 AR := ar
-CC := gcc
 RANLIB := ranlib
-CFLAGS := -Wall -O2 -ansi -pedantic
+CXXFLAGS := -Wall -O2 -ansi -pedantic
 LDFLAGS := -lssl -lz
 PREFIX := /usr/local/bin
 
@@ -53,9 +52,9 @@ version.h:
 	@date -u +"%s" >> version.h
 	@echo "\n#endif" >> version.h
 
-%o: %c
-	@echo "CC	$<"
-	@$(CC) $(CFLAGS) -c -o $@ $<
+%o: %cpp
+	@echo "CXX	$<"
+	@$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 %.a: %.o
 	@echo "AR	$^"
@@ -65,4 +64,4 @@ version.h:
 
 %: %.o
 	@echo "BUILD	$@"
-	@$(CC) $(LDFLAGS) -o $@ $^
+	@$(CXX) $(LDFLAGS) -o $@ $^

@@ -31,7 +31,9 @@ Algorithm for temporary list creation:
      no: add to temporary list of files to be backed up
 */
 
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -48,12 +50,12 @@ Algorithm for temporary list creation:
 /* Mount point string length */
 static int mount_path_length = 0;
 
-static list_t *files          = NULL;
-static const void   *filters_handle = NULL;
-static const void   *parsers_handle = NULL;
+static list_t       *files          = NULL;
+static const list_t *filters_handle = NULL;
+static const list_t *parsers_handle = NULL;
 
 static char *filedata_get(const void *payload) {
-  const filedata_t *filedata = payload;
+  const filedata_t *filedata = (const filedata_t *) (payload);
   char *string = NULL;
 
   asprintf(&string, "%s", filedata->path);
@@ -118,7 +120,7 @@ static int iterate_directory(const char *path, parser_t *parser) {
     if (failed) {
       free(filedata.path);
     } else {
-      filedata_p = malloc(sizeof(filedata_t));
+      filedata_p = (filedata_t *) (malloc(sizeof(filedata_t)));
       *filedata_p = filedata;
       list_add(files, filedata_p);
     }
@@ -150,7 +152,7 @@ void filelist_free(void) {
   list_entry_t *entry = NULL;
 
   while ((entry = list_next(files, entry)) != NULL) {
-    filedata_t *filedata = list_entry_payload(entry);
+    filedata_t *filedata = (filedata_t *) (list_entry_payload(entry));
 
     free(filedata->path);
   }

@@ -16,7 +16,9 @@
      Boston, MA 02111-1307, USA.
 */
 
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -151,7 +153,7 @@ void clients_free(void) {
   list_entry_t *entry = NULL;
 
   while ((entry = list_next(clients, entry)) != NULL) {
-    client_t *client = list_entry_payload(entry);
+    client_t *client = (client_t *) (list_entry_payload(entry));
 
     free(client->protocol);
     free(client->username);
@@ -163,7 +165,7 @@ void clients_free(void) {
 }
 
 int clients_add(const char *info, const char *listfile) {
-  client_t *client = malloc(sizeof(client_t));
+  client_t *client = (client_t *) (malloc(sizeof(client_t)));
   char     *linecopy = NULL;
   char     *start;
   char     *delim;
@@ -324,7 +326,7 @@ static int read_listfile(const char *listfilename, list_t *backups) {
     while (getline(&buffer, &size, listfile) >= 0) {
       char keyword[256];
       char type[256];
-      char *string = malloc(size);
+      char *string = (char *) (malloc(size));
       int params = params_readline(buffer, keyword, type, string);
 
       line++;
@@ -350,7 +352,7 @@ static int read_listfile(const char *listfilename, list_t *backups) {
         }
       } else if (! strcmp(keyword, "path")) {
         /* New backup entry */
-        backup = malloc(sizeof(backup_t));
+        backup = (backup_t *) (malloc(sizeof(backup_t)));
         filters_new(&backup->ignore_handle);
         parsers_new(&backup->parsers_handle);
         asprintf(&backup->path, "%s", string);
@@ -424,7 +426,7 @@ int clients_backup(const char *mount_point, int configcheck) {
 
   /* Walk though the list of clients */
   while ((entry = list_next(clients, entry)) != NULL) {
-    client_t *client        = list_entry_payload(entry);
+    client_t *client        = (client_t *) (list_entry_payload(entry));
     char     *listfilename  = NULL;
     list_t   *backups       = list_new(NULL);
 
@@ -443,7 +445,7 @@ int clients_backup(const char *mount_point, int configcheck) {
         list_entry_t *entry = NULL;
 
         while ((entry = list_next(backups, entry)) != NULL) {
-          backup_t *backup = list_entry_payload(entry);
+          backup_t *backup = (backup_t *) (list_entry_payload(entry));
           char     *backup_path = NULL;
 
           if (! failed) {

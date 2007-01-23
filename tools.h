@@ -43,13 +43,13 @@ extern mode_t type_mode(char letter);
 extern int getdir(const char *db_path, const char *checksum, char **path_p);
 
 extern int zcopy(
-  const char *source_path,
-  const char *dest_path,
-  size_t *size_in,
-  size_t *size_out,
-  char *checksum_in,
-  char *checksum_out,
-  int compress);
+  const char  *source_path,
+  const char  *dest_path,
+  off_t       *size_in,
+  off_t       *size_out,
+  char        *checksum_in,
+  char        *checksum_out,
+  int         compress);
 
 extern int getchecksum(const char *path, const char *checksum);
 

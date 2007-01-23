@@ -1,6 +1,5 @@
 AR := ar
-CC := gcc
-CFLAGS += -I..
+CXXFLAGS := -Wall -O2 -ansi -pedantic -I..
 LDFLAGS := -lssl -lz
 
 all: test
@@ -35,9 +34,9 @@ hbackup: ../clients.a ../db.a ../filelist.a ../cvs_parser.a ../parsers.a \
 	../filters.a ../list.a ../metadata.a ../params.a ../tools.a
 
 # Rules
-%o: %c
-	@echo "CC	$<"
-	@$(CC) $(CFLAGS) -c -o $@ $<
+%o: %cpp
+	@echo "CXX	$<"
+	@$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 %.a: %.o
 	@echo "AR	$^"
@@ -47,11 +46,11 @@ hbackup: ../clients.a ../db.a ../filelist.a ../cvs_parser.a ../parsers.a \
 
 %: %.o
 	@echo "BUILD	$@"
-	@$(CC) $(LDFLAGS) -o $@ $^
+	@$(CXX) $(LDFLAGS) -o $@ $^
 
 %_test: %_test.o
 	@echo "BUILD	$@"
-	@$(CC) $(LDFLAGS) -o $@ $^
+	@$(CXX) $(LDFLAGS) -o $@ $^
 
 %.done: %_test %.exp test_setup
 	@echo "RUN	$<"

@@ -16,12 +16,14 @@
      Boston, MA 02111-1307, USA.
 */
 
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 #include <stdio.h>
-#include "filters.c"
+#include "filters.cpp"
 
 static char *filters_show(const void *payload) {
-  const filter_t     *filter = payload;
+  const filter_t     *filter = (const filter_t *) (payload);
   char               *string = NULL;
 
   switch (filter->type) {
@@ -32,7 +34,7 @@ static char *filters_show(const void *payload) {
       break;
     case filter_size_above:
     case filter_size_below:
-      asprintf(&string, "%u %u", filter->size, filter->type);
+      asprintf(&string, "%ld %u", filter->size, filter->type);
       break;
     default:
       asprintf(&string, "unknown filter type");
