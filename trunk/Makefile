@@ -25,6 +25,8 @@ check: all
 	@${MAKE} -C test
 
 # Dependencies
+version.h: clients.a db.a filelist.a cvs_parser.a parsers.a filters.a list.a \
+	metadata.a params.a tools.a Makefile
 hbackup: clients.a db.a filelist.a cvs_parser.a parsers.a filters.a list.a \
 	metadata.a params.a tools.a
 
@@ -40,7 +42,7 @@ clients.o: clients.h list.h tools.h hbackup.h
 hbackup.o: hbackup.h version.h
 
 # Rules
-version.h: Makefile
+version.h:
 	@echo "CREATE	$@"
 	@echo "/* This file is auto-generated, do not edit. */" > version.h
 	@echo "\n#ifndef VERSION_H\n#define VERSION_H\n" >> version.h
@@ -48,11 +50,7 @@ version.h: Makefile
 	@echo "#define VERSION_MINOR $(MINOR)" >> version.h
 	@echo "#define VERSION_BUGFIX $(BUGFIX)" >> version.h
 	@echo -n "#define BUILD " >> version.h
-	@if [ -d .svn ]; then \
-	  svn info | grep "Last Changed Rev:" | sed "s/.*: *//" >> version.h; \
-	else \
-	  echo "0" >> version.h; \
-	fi
+	@date -u +"%s" >> version.h
 	@echo "\n#endif" >> version.h
 
 %o: %c
