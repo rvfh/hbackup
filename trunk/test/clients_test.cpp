@@ -16,14 +16,14 @@
      Boston, MA 02111-1307, USA.
 */
 
-#include "clients.c"
+#include "clients.cpp"
 
 static int verbose = 3;
 
 static char *client_show(const void *payload) {
-  const client_t *client = payload;
-  char  *credentials       = NULL;
-  char  *string            = NULL;
+  const client_t *client  = (client_t *) payload;
+  char  *credentials      = NULL;
+  char  *string           = NULL;
 
   if (client->username != NULL) {
     char *password = NULL;

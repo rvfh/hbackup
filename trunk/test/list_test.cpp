@@ -16,7 +16,9 @@
      Boston, MA 02111-1307, USA.
 */
 
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -32,7 +34,7 @@ typedef struct {
 } payload2_t;
 
 static char *payload_get(const void *payload_p) {
-  const payload_t *payload = payload_p;
+  const payload_t *payload = (const payload_t *) (payload_p);
   char *string = NULL;
 
   asprintf(&string, "%s", payload->name);
@@ -40,7 +42,7 @@ static char *payload_get(const void *payload_p) {
 }
 
 static char *payload2_get(const void *payload_p) {
-  const payload2_t *payload = payload_p;
+  const payload2_t *payload = (const payload2_t *) (payload_p);
   char *string = NULL;
 
   asprintf(&string, "%s/%s", payload->dir, payload->filename);

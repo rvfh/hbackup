@@ -16,9 +16,11 @@
      Boston, MA 02111-1307, USA.
 */
 
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 #include <stdio.h>
-#include "parsers.c"
+#include "parsers.cpp"
 
 static parser_t parser = {
   (parsers_dir_check_f *) 0x12345678,
@@ -29,7 +31,7 @@ static parser_t parser = {
 
 /* Use payload as argument name, cast once and for all */
 static char *parsers_show(const void *payload) {
-  const parser_t *parser = payload;
+  const parser_t *parser = (const parser_t *) (payload);
   char *string = NULL;
 
   asprintf(&string, "%s [0x%08x, 0x%08x, 0x%08x]",
@@ -42,7 +44,7 @@ static char *parsers_show(const void *payload) {
 
 /* TODO parsers_dir_check and parsers_file_check test */
 int main(void) {
-  parser_t *parser_p = malloc(sizeof(parser_t));
+  parser_t *parser_p = (parser_t *) (malloc(sizeof(parser_t)));
   list_t *handle1 = NULL;
   list_t *handle2 = NULL;
 

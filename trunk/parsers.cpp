@@ -49,7 +49,7 @@ int parsers_dir_check(const void *parsers_handle, parser_t **parser_handle,
     list_entry_t *entry       = NULL;
 
     while ((entry = list_next(parsers_list, entry)) != NULL) {
-      *parser_handle = list_entry_payload(entry);
+      *parser_handle = (parser_t *) (list_entry_payload(entry));
       if ((*parser_handle)->dir_check(dir_handle, path)
           == parser_dir_controlled) {
         return 0;

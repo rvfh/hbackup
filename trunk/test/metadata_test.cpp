@@ -16,7 +16,7 @@
      Boston, MA 02111-1307, USA.
 */
 
-#include "metadata.c"
+#include "metadata.cpp"
 #include <time.h>
 
 int main(void) {

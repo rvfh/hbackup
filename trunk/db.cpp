@@ -36,7 +36,9 @@
 
 /* TODO Re-create main list from local ones in case of catastrophy */
 
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 #include <string.h>
 #include <stdlib.h>
 #include <sys/stat.h>
@@ -85,7 +87,7 @@ static int db_load(const char *filename, list_t *list) {
       db_data_t *db_data_p = NULL;
       char      *start = buffer;
       char      *delim;
-      char      *string = malloc(size);
+      char      *string = (char *) (malloc(size));
       char      letter;
       int       field = 0;
       int       failed = 1;
@@ -173,7 +175,7 @@ static int db_load(const char *filename, list_t *list) {
       if (failed) {
         fprintf(stderr, "db: failed to read list file (%s): wrong format (%d)\n", source_path, field);
       } else {
-        db_data_p = malloc(sizeof(db_data_t));
+        db_data_p = (db_data_t *) (malloc(sizeof(db_data_t)));
         *db_data_p = db_data;
         list_add(list, db_data_p);
       }
@@ -198,7 +200,7 @@ static int db_save(const char *filename, list_t *list) {
     list_entry_t *entry = NULL;
 
     while ((entry = list_next(list, entry)) != NULL) {
-      db_data_t *db_data = list_entry_payload(entry);
+      db_data_t *db_data = (db_data_t *) (list_entry_payload(entry));
       char *link = "";
 
       /* The link could also be stored as data... */
@@ -229,7 +231,7 @@ static int db_save(const char *filename, list_t *list) {
 }
 
 static char *db_data_get(const void *payload) {
-  const db_data_t *db_data = payload;
+  const db_data_t *db_data = (const db_data_t *) (payload);
   char *string = NULL;
 
   if (db_data->date_out == 0) {
@@ -324,7 +326,7 @@ static void db_list_free(list_t *list) {
   list_entry_t *entry = NULL;
 
   while ((entry = list_next(list, entry)) != NULL) {
-    db_data_t *db_data = list_entry_payload(entry);
+    db_data_t *db_data = (db_data_t *) (list_entry_payload(entry));
 
     free(db_data->host);
     free(db_data->link);
@@ -343,10 +345,10 @@ static int db_write(const char *mount_path, const char *path,
   FILE    *writefile;
   FILE    *readfile;
   int     index = 0;
-  int     delete = 0;
+  int     deleteit = 0;
   int     failed = 0;
-  size_t  size_source;
-  size_t  size_dest;
+  off_t   size_source;
+  off_t   size_dest;
 
   /* File to read from */
   asprintf(&source_path, "%s/%s", mount_path, path);
@@ -426,7 +428,7 @@ static int db_write(const char *mount_path, const char *path,
                         || fread(buffer2, 1, 1, writefile);
                 }
                 if (! differ) {
-                  delete = 1;
+                  deleteit = 1;
                 }
                 fclose(writefile);
               }
@@ -462,7 +464,7 @@ static int db_write(const char *mount_path, const char *path,
   }
 
   /* If anything failed, delete temporary file */
-  if (failed || delete) {
+  if (failed || deleteit) {
     remove(temp_path);
   }
   free(temp_path);
@@ -535,7 +537,7 @@ static int db_obsolete(const char *prefix, const char *path,
     asprintf(&string, "%s %s %c", prefix, path, '@');
     list_find(list, string, NULL, &entry);
     if (entry != NULL) {
-      db_data = list_entry_payload(entry);
+      db_data = (db_data_t *) (list_entry_payload(entry));
       db_data->date_out = time(NULL);
       db_save(listfile, list);
     }
@@ -653,7 +655,7 @@ int db_open(const char *path) {
 }
 
 static char *close_select(const void *payload) {
-  const db_data_t *db_data = payload;
+  const db_data_t *db_data = (const db_data_t *) (payload);
   char *string = NULL;
 
   if (db_data->date_out == 0) {
@@ -709,7 +711,7 @@ void db_close(void) {
 }
 
 static char *parse_select(const void *payload) {
-  const db_data_t *db_data = payload;
+  const db_data_t *db_data = (const db_data_t *) (payload);
   char *string = NULL;
 
   if (db_data->date_out != 0) {
@@ -723,8 +725,8 @@ static char *parse_select(const void *payload) {
 
 /* Need to compare only for matching paths */
 static int parse_compare(void *db_data_p, void *filedata_p) {
-  const db_data_t *db_data  = db_data_p;
-  filedata_t      *filedata = filedata_p;
+  const db_data_t *db_data  = (const db_data_t *) (db_data_p);
+  filedata_t      *filedata = (filedata_t *) (filedata_p);
   int             result;
 
   /* If paths differ, that's all we want to check */
@@ -751,7 +753,7 @@ static int parse_compare(void *db_data_p, void *filedata_p) {
 }
 
 int db_parse(const char *host, const char *real_path,
-    const char *mount_path, list_t *file_list, size_t compress_min) {
+    const char *mount_path, list_t *file_list, off_t compress_min) {
   list_t        *selected_files_list;
   list_t        *added_files_list;
   list_t        *removed_files_list;
@@ -778,8 +780,8 @@ int db_parse(const char *host, const char *real_path,
     }
     while ((entry = list_next(added_files_list, entry)) != NULL) {
       if (! terminating()) {
-        filedata_t *filedata = list_entry_payload(entry);
-        db_data_t  *db_data  = malloc(sizeof(db_data_t));
+        filedata_t *filedata = (filedata_t *) (list_entry_payload(entry));
+        db_data_t  *db_data  = (db_data_t *) (malloc(sizeof(db_data_t)));
 
         asprintf(&db_data->host, "%s", host);
         db_data->filedata.metadata = filedata->metadata;
@@ -817,7 +819,7 @@ int db_parse(const char *host, const char *real_path,
         }
         if (S_ISLNK(filedata->metadata.type)) {
           char *full_path = NULL;
-          char *string = malloc(FILENAME_MAX);
+          char *string = (char *) (malloc(FILENAME_MAX));
           int size;
 
           asprintf(&full_path, "%s/%s", mount_path, filedata->path);
@@ -857,7 +859,7 @@ int db_parse(const char *host, const char *real_path,
       printf(" --> Files to remove: %u\n", list_size(removed_files_list));
     }
     while ((entry = list_next(removed_files_list, entry)) != NULL) {
-      db_data_t *db_data = list_entry_payload(entry);
+      db_data_t *db_data = (db_data_t *) (list_entry_payload(entry));
 
       /* Same data as in db_list */
       db_data->date_out = time(NULL);
@@ -951,7 +953,7 @@ int db_scan(const char *local_db_path, const char *checksum) {
         printf("Scanning database (contents: %u file(s))\n", files);
       }
       while ((entry = list_next(db_list, entry)) != NULL) {
-        db_data_t *db_data = list_entry_payload(entry);
+        db_data_t *db_data = (db_data_t *) (list_entry_payload(entry));
 
         if ((verbosity() > 2) && ((files & 0xFF) == 0)) {
           printf(" --> Files left to go: %u\n", files);
@@ -1038,7 +1040,7 @@ int db_check(const char *local_db_path, const char *checksum) {
           list_size(db_list));
       }
       while ((entry = list_next(db_list, entry)) != NULL) {
-        db_data_t *db_data = list_entry_payload(entry);
+        db_data_t *db_data = (db_data_t *) (list_entry_payload(entry));
 
         if ((verbosity() > 2) && ((files & 0xFF) == 0)) {
           printf(" --> Files left to go: %u\n", files);
@@ -1071,7 +1073,7 @@ int db_check(const char *local_db_path, const char *checksum) {
             fprintf(stderr, "db: check: failed to obtain checksum\n");
             failed = 2;
           } else {
-            db_data_t *db_data = list_entry_payload(entry);
+            db_data_t *db_data = (db_data_t *) (list_entry_payload(entry));
 
             /* Read file to compute checksum, compare with expected */
             asprintf(&check_path, "%s/data", path);

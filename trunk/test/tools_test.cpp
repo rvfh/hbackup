@@ -18,7 +18,7 @@
 
 /* TODO Not all functions are tested */
 
-#include "tools.c"
+#include "tools.cpp"
 
 int terminating(void) {
   return 0;

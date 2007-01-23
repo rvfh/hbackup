@@ -17,7 +17,7 @@
 */
 
 /* Yes, include C file */
-#include "filelist.c"
+#include "filelist.cpp"
 #include "cvs_parser.h"
 
 int verbosity(void) {

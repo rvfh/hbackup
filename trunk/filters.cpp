@@ -28,7 +28,7 @@
 typedef struct {
   filter_type_t type;
   mode_t        file_type;
-  size_t        size;
+  off_t         size;
   char          string[256];
 } filter_t;
 
@@ -71,7 +71,7 @@ void filters_free(list_t *handle) {
 
   /* List of lists, free each embedded list */
   while ((entry = list_next(handle, NULL)) != NULL) {
-    list_free(list_remove(handle, entry));
+    list_free((list_t *) (list_remove(handle, entry)));
   }
   if (list_size(handle) != 0) {
     fprintf(stderr, "filters: free: failed\n");
@@ -91,7 +91,7 @@ list_t *filters_rule_new(list_t *handle) {
 
 int filters_rule_add(list_t *rule_handle, mode_t file_type,
     filter_type_t type, ...) {
-  filter_t *filter = malloc(sizeof(filter_t));
+  filter_t *filter = (filter_t *) (malloc(sizeof(filter_t)));
   va_list  args;
 
   if (filter == NULL) {
@@ -155,13 +155,13 @@ int filters_match(const list_t *handle, const filedata_t *filedata) {
 
   /* Read through list of rules */
   while ((rule_entry = list_next(handle, rule_entry)) != NULL) {
-    list_t       *rule          = list_entry_payload(rule_entry);
+    list_t       *rule          = (list_t *) (list_entry_payload(rule_entry));
     list_entry_t *filter_entry  = NULL;
     int          match          = 1;
 
     /* Read through list of filters in rule */
     while ((filter_entry = list_next(rule, filter_entry)) != NULL) {
-      filter_t *filter = list_entry_payload(filter_entry);
+      filter_t *filter = (filter_t *) (list_entry_payload(filter_entry));
 
       /* All filters must match for rule to match */
       if (filter_match(filter, filedata)) {
