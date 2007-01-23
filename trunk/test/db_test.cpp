@@ -18,7 +18,6 @@
 
 #include "filters.h"
 #include "cvs_parser.h"
-/* Yes, include C file */
 #include "db.cpp"
 
 static int verbose = 3;
