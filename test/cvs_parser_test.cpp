@@ -16,7 +16,6 @@
      Boston, MA 02111-1307, USA.
 */
 
-/* Yes, include C file */
 #include "cvs_parser.cpp"
 
 static char *cvs_show(const void *payload) {

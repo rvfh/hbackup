@@ -19,7 +19,8 @@
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
 #endif
-#include <stdio.h>
+#include <iostream>
+using namespace std;
 #include "parsers.cpp"
 
 static parser_t parser = {
@@ -49,18 +50,18 @@ int main(void) {
   list_t *handle2 = NULL;
 
   if (parsers_new(&handle1)) {
-    printf("Failed to create\n");
+    cout << "Failed to create\n";
   }
   *parser_p = parser;
   if (parsers_add(handle1, parser_controlled, parser_p)) {
-    printf("Failed to add\n");
+    cout << "Failed to add\n";
   }
   list_show(handle1, NULL, parsers_show);
   if (parser_p != list_entry_payload(list_next(handle1, NULL))) {
-    printf("Parsers differ\n");
+    cout << "Parsers differ\n";
   }
   if (parsers_new(&handle2)) {
-    printf("Failed to create\n");
+    cout << "Failed to create\n";
   }
   list_show(handle2, NULL, parsers_show);
   list_show(handle1, NULL, parsers_show);

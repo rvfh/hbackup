@@ -16,7 +16,6 @@
      Boston, MA 02111-1307, USA.
 */
 
-/* Yes, include C file */
 #include "filelist.cpp"
 #include "cvs_parser.h"
 
