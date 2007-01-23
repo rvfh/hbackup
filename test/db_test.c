@@ -59,14 +59,14 @@ int terminating(void) {
 }
 
 int main(void) {
-  list_t    filters_handle = NULL;
-  list_t    parsers_handle = NULL;
+  list_t    *filters_handle = NULL;
+  list_t    *parsers_handle = NULL;
   char      checksum[40];
   char      zchecksum[40];
   db_data_t db_data;
   size_t    size;
   size_t    zsize;
-  list_t    filelist;
+  list_t    *filelist;
   int       status;
 
   /* Test internal functions */

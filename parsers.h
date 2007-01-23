@@ -19,6 +19,7 @@
 #ifndef PARSERS_H
 #define PARSERS_H
 
+#include "list.h"
 #include "filelist.h"
 
 /* Our enums */
@@ -65,13 +66,13 @@ typedef struct {
 } parser_t;
 
 /* Create parsers list */
-extern int parsers_new(void **handle);
+extern int parsers_new(list_t **handle);
 
 /* Add to list of parsers */
-extern int parsers_add(void *handle, parser_mode_t mode, parser_t *parser);
+extern int parsers_add(list_t *handle, parser_mode_t mode, parser_t *parser);
 
 /* Destroy parsers list and all parsers */
-extern void parsers_free(void *handle);
+extern void parsers_free(list_t *handle);
 
 /* Check whether [a] parser matches. Returns:
  * 0: [a] parser matches (if *parser_handle not null, only test that parser)

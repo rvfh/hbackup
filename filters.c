@@ -55,7 +55,7 @@ static int filter_path_start_check(const char *path, const filter_t *filter) {
   return strncmp(path, filter->string, strlen(filter->string));
 }
 
-int filters_new(list_t *handle) {
+int filters_new(list_t **handle) {
   /* Create new list */
   *handle = list_new(NULL);
   if (*handle == NULL) {
@@ -65,9 +65,9 @@ int filters_new(list_t *handle) {
   return 0;
 }
 
-void filters_free(list_t handle) {
+void filters_free(list_t *handle) {
   /* Note: entry gets free in the loop */
-  list_entry_t entry;
+  list_entry_t *entry;
 
   /* List of lists, free each embedded list */
   while ((entry = list_next(handle, NULL)) != NULL) {
@@ -79,8 +79,8 @@ void filters_free(list_t handle) {
   list_free(handle);
 }
 
-list_t filters_rule_new(list_t handle) {
-  list_t rule = list_new(NULL);
+list_t *filters_rule_new(list_t *handle) {
+  list_t *rule = list_new(NULL);
 
   if (list_append(handle, rule) == NULL) {
     fprintf(stderr, "filters: rule new: failed\n");
@@ -89,7 +89,7 @@ list_t filters_rule_new(list_t handle) {
   return rule;
 }
 
-int filters_rule_add(list_t rule_handle, mode_t file_type,
+int filters_rule_add(list_t *rule_handle, mode_t file_type,
     filter_type_t type, ...) {
   filter_t *filter = malloc(sizeof(filter_t));
   va_list  args;
@@ -150,14 +150,14 @@ static int filter_match(const filter_t *filter, const filedata_t *filedata) {
   return 1;
 }
 
-int filters_match(list_t handle, const filedata_t *filedata) {
+int filters_match(const list_t *handle, const filedata_t *filedata) {
   list_entry_t *rule_entry = NULL;
 
   /* Read through list of rules */
   while ((rule_entry = list_next(handle, rule_entry)) != NULL) {
-    list_t       rule         = list_entry_payload(rule_entry);
-    list_entry_t filter_entry = NULL;
-    int          match        = 1;
+    list_t       *rule          = list_entry_payload(rule_entry);
+    list_entry_t *filter_entry  = NULL;
+    int          match          = 1;
 
     /* Read through list of filters in rule */
     while ((filter_entry = list_next(rule, filter_entry)) != NULL) {

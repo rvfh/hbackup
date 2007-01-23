@@ -17,10 +17,9 @@
 */
 
 #include <stdlib.h>
-#include "list.h"
 #include "parsers.h"
 
-int parsers_new(void **handle) {
+int parsers_new(list_t **handle) {
   /* Create new list */
   *handle = list_new(NULL);
   if (*handle == NULL) {
@@ -30,11 +29,11 @@ int parsers_new(void **handle) {
   return 0;
 }
 
-void parsers_free(void *handle) {
+void parsers_free(list_t *handle) {
   list_free(handle);
 }
 
-int parsers_add(void *handle, parser_mode_t mode, parser_t *parser) {
+int parsers_add(list_t *handle, parser_mode_t mode, parser_t *parser) {
   parser->mode = mode;
   if (list_append(handle, parser) == NULL) {
     fprintf(stderr, "parsers: add: failed\n");
@@ -46,7 +45,7 @@ int parsers_add(void *handle, parser_mode_t mode, parser_t *parser) {
 int parsers_dir_check(const void *parsers_handle, parser_t **parser_handle,
     void **dir_handle, const char *path) {
   if (*parser_handle == NULL) {
-    const list_t parsers_list = (const list_t) parsers_handle;
+    const list_t *parsers_list = (const list_t *) parsers_handle;
     list_entry_t *entry       = NULL;
 
     while ((entry = list_next(parsers_list, entry)) != NULL) {

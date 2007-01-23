@@ -33,7 +33,7 @@ int main(void) {
   void *handle3;
   void *handle4;
   filedata_t file_data;
-  void *parsers_handle = NULL;
+  list_t *parsers_handle = NULL;
   parser_t *cvs_parser;
 
   /* Need to give this some room */

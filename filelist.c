@@ -48,9 +48,9 @@ Algorithm for temporary list creation:
 /* Mount point string length */
 static int mount_path_length = 0;
 
-static list_t files = NULL;
-static void *filters_handle = NULL;
-static void *parsers_handle = NULL;
+static list_t *files          = NULL;
+static const void   *filters_handle = NULL;
+static const void   *parsers_handle = NULL;
 
 static char *filedata_get(const void *payload) {
   const filedata_t *filedata = payload;
@@ -130,7 +130,7 @@ static int iterate_directory(const char *path, parser_t *parser) {
   return 0;
 }
 
-int filelist_new(const char *path, list_t filters, list_t parsers) {
+int filelist_new(const char *path, const list_t *filters, const list_t *parsers) {
   filters_handle = filters;
   parsers_handle = parsers;
   files = list_new(filedata_get);
@@ -147,7 +147,7 @@ int filelist_new(const char *path, list_t filters, list_t parsers) {
 }
 
 void filelist_free(void) {
-  list_entry_t entry = NULL;
+  list_entry_t *entry = NULL;
 
   while ((entry = list_next(files, entry)) != NULL) {
     filedata_t *filedata = list_entry_payload(entry);
@@ -157,7 +157,7 @@ void filelist_free(void) {
   list_free(files);
 }
 
-list_t filelist_get(void) {
+list_t *filelist_get(void) {
   return files;
 }
 

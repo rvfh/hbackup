@@ -41,11 +41,11 @@ typedef struct {
 
 typedef struct {
   char    *path;
-  list_t  ignore_handle;
-  list_t  parsers_handle;
+  list_t  *ignore_handle;
+  list_t  *parsers_handle;
 } backup_t;
 
-static list_t clients  = NULL;
+static list_t *clients = NULL;
 static char   *mounted = NULL;
 
 static int unmount_share(const char *mount_point) {
@@ -148,7 +148,7 @@ int clients_new(void) {
 }
 
 void clients_free(void) {
-  list_entry_t entry = NULL;
+  list_entry_t *entry = NULL;
 
   while ((entry = list_next(clients, entry)) != NULL) {
     client_t *client = list_entry_payload(entry);
@@ -230,7 +230,7 @@ int clients_add(const char *info, const char *listfile) {
   return failed;
 }
 
-static int add_filter(list_t handle, const char *type, const char *string) {
+static int add_filter(list_t *handle, const char *type, const char *string) {
   const char *filter_type;
   const char *delim    = strchr(type, '/');
   mode_t     file_type = 0;
@@ -282,7 +282,7 @@ static int add_filter(list_t handle, const char *type, const char *string) {
   return 0;
 }
 
-static int add_parser(list_t handle, const char *type, const char *string) {
+static int add_parser(list_t *handle, const char *type, const char *string) {
   parser_mode_t mode;
 
   /* Determine mode */
@@ -306,7 +306,7 @@ static int add_parser(list_t handle, const char *type, const char *string) {
   return 0;
 }
 
-static int read_listfile(const char *listfilename, list_t backups) {
+static int read_listfile(const char *listfilename, list_t *backups) {
   FILE     *listfile;
   char     *buffer = NULL;
   size_t   size    = 0;
@@ -424,9 +424,9 @@ int clients_backup(const char *mount_point, int configcheck) {
 
   /* Walk though the list of clients */
   while ((entry = list_next(clients, entry)) != NULL) {
-    client_t *client       = list_entry_payload(entry);
-    char     *listfilename = NULL;
-    list_t   backups       = list_new(NULL);
+    client_t *client        = list_entry_payload(entry);
+    char     *listfilename  = NULL;
+    list_t   *backups       = list_new(NULL);
 
     if (! prepare_share(client, mount_point, client->listfile, &listfilename)
      && ! read_listfile(listfilename, backups)) {
@@ -440,7 +440,7 @@ int clients_backup(const char *mount_point, int configcheck) {
         fprintf(stderr, "clients: backup: empty list!\n");
         failed = 1;
       } else if (! configcheck) {
-        list_entry_t entry = NULL;
+        list_entry_t *entry = NULL;
 
         while ((entry = list_next(backups, entry)) != NULL) {
           backup_t *backup = list_entry_payload(entry);

@@ -21,27 +21,9 @@
 #include <string.h>
 #include "list.h"
 
-/* Data types and structures */
-typedef struct _list_entry_t __list_entry_t;
-
-struct _list_entry_t {
-  void                *payload;
-  __list_entry_t      *previous;
-  __list_entry_t      *next;
-};
-
-typedef struct {
-  __list_entry_t      *first;
-  __list_entry_t      *last;
-  __list_entry_t      *hint;
-  list_payload_get_f  *payload_get;
-  int                 size;
-} __list_t;
-
-static __list_entry_t *list_find_hidden(const list_t list_handle,
+static list_entry_t *list_find_hidden(const list_t *list,
     const char *search_string, list_payload_get_f payload_get) {
-  const __list_t *list = list_handle;
-  __list_entry_t *entry = NULL;
+  list_entry_t *entry = NULL;
 
   /* Search the list  (hint is only null if the list is empty) */
   if (list->size != 0) {
@@ -50,7 +32,7 @@ static __list_entry_t *list_find_hidden(const list_t list_handle,
       int breakme = 0;
 
       /* List is not ordered: search it all */
-      while (((entry = list_next(list_handle, entry)) != NULL) && ! breakme) {
+      while (((entry = list_next(list, entry)) != NULL) && ! breakme) {
         char *string = payload_get(entry->payload);
 
         if (! strcmp(string, search_string)) {
@@ -98,19 +80,17 @@ static __list_entry_t *list_find_hidden(const list_t list_handle,
 }
 
 
-list_entry_t list_entry_new(void) {
-  return malloc(sizeof(__list_entry_t));
+list_entry_t *list_entry_new(void) {
+  return malloc(sizeof(list_entry_t));
 }
 
-void *list_entry_payload(const list_entry_t entry_handle) {
-  const __list_entry_t *entry = entry_handle;
-
+void *list_entry_payload(const list_entry_t *entry) {
   return entry->payload;
 }
 
 
-void *list_new(list_payload_get_f payload_get) {
-  __list_t *list = malloc(sizeof(__list_t));
+list_t *list_new(list_payload_get_f payload_get) {
+  list_t *list = malloc(sizeof(list_t));
 
   if (list != NULL) {
     list->size = 0;
@@ -120,15 +100,13 @@ void *list_new(list_payload_get_f payload_get) {
   return list;
 }
 
-void list_free(list_t list_handle) {
-  __list_t *list = list_handle;
-
+void list_free(list_t *list) {
   if (list != NULL) {
     if (list->size != 0) {
-      __list_entry_t *entry = list->first;
+      list_entry_t *entry = list->first;
 
       while (entry != NULL) {
-        __list_entry_t *dump = entry;
+        list_entry_t *dump = entry;
 
         entry = entry->next;
         free(dump->payload);
@@ -139,11 +117,10 @@ void list_free(list_t list_handle) {
   }
 }
 
-list_entry_t list_append(void *list_handle, void *payload) {
-  __list_t *list = list_handle;
-  __list_entry_t *entry = list_entry_new();
+list_entry_t *list_append(list_t *list, void *payload) {
+  list_entry_t *entry = list_entry_new();
 
-  if ((list_handle == NULL) || (entry == NULL)) {
+  if ((list == NULL) || (entry == NULL)) {
     fprintf(stderr, "list: append: failed\n");
     return NULL;
   }
@@ -161,11 +138,10 @@ list_entry_t list_append(void *list_handle, void *payload) {
   return entry;
 }
 
-list_entry_t list_add(void *list_handle, void *payload) {
-  __list_t *list = list_handle;
-  __list_entry_t *entry = list_entry_new();
+list_entry_t *list_add(list_t *list, void *payload) {
+  list_entry_t *entry = list_entry_new();
 
-  if ((list_handle == NULL) || (entry == NULL)) {
+  if ((list == NULL) || (entry == NULL)) {
     fprintf(stderr, "list: add: failed\n");
     return NULL;
   }
@@ -196,9 +172,7 @@ list_entry_t list_add(void *list_handle, void *payload) {
   return entry;
 }
 
-void *list_remove(void *list_handle, void *entry_handle) {
-  __list_t *list = list_handle;
-  __list_entry_t *entry = entry_handle;
+void *list_remove(list_t *list, list_entry_t *entry) {
   void *payload = entry->payload;
 
   /* The hint must not be null if the list is not empty */
@@ -220,21 +194,18 @@ void *list_remove(void *list_handle, void *entry_handle) {
   return payload;
 }
 
-void list_drop(list_t list_handle, void *entry_handle) {
+void list_drop(list_t *list_handle, list_entry_t *entry_handle) {
   free(list_remove(list_handle, entry_handle));
 }
 
-int list_size(const list_t list_handle) {
+int list_size(const list_t *list_handle) {
   if (list_handle != NULL) {
-    return ((__list_t *) list_handle)->size;
+    return list_handle->size;
   }
   return -1;
 }
 
-list_entry_t list_previous(const list_t list_handle, const list_entry_t entry_handle) {
-  const __list_t *list = list_handle;
-  const __list_entry_t *entry = entry_handle;
-
+list_entry_t *list_previous(const list_t *list, const list_entry_t *entry) {
   if (list == NULL) {
     return NULL;
   } else if (entry == NULL) {
@@ -244,10 +215,7 @@ list_entry_t list_previous(const list_t list_handle, const list_entry_t entry_ha
   }
 }
 
-list_entry_t list_next(const list_t list_handle, const list_entry_t entry_handle) {
-  const __list_t *list = list_handle;
-  const __list_entry_t *entry = entry_handle;
-
+list_entry_t *list_next(const list_t *list, const list_entry_t *entry) {
   if (list == NULL) {
     return NULL;
   } else if (entry == NULL) {
@@ -257,10 +225,9 @@ list_entry_t list_next(const list_t list_handle, const list_entry_t entry_handle
   }
 }
 
-int list_find(const list_t list_handle, const char *search_string,
-    list_payload_get_f payload_get, list_entry_t *entry_handle) {
-  const __list_t  *list = list_handle;
-  __list_entry_t  *entry;
+int list_find(const list_t *list, const char *search_string,
+    list_payload_get_f payload_get, list_entry_t **entry_handle) {
+  list_entry_t    *entry;
   char            *string = NULL;
   int             result;
 
@@ -274,7 +241,7 @@ int list_find(const list_t list_handle, const char *search_string,
     payload_get = list->payload_get;
   }
 
-  entry = list_find_hidden(list_handle, search_string, payload_get);
+  entry = list_find_hidden(list, search_string, payload_get);
   if (entry_handle != NULL) {
     *entry_handle = entry;
   }
@@ -288,13 +255,12 @@ int list_find(const list_t list_handle, const char *search_string,
   return result;
 }
 
-void list_show(const list_t list_handle, list_entry_t *entry_handle,
+void list_show(const list_t *list, list_entry_t *entry_handle,
     list_payload_get_f payload_get) {
   static int level = 0;
 
-  if (list_handle != NULL) {
+  if (list != NULL) {
     if (payload_get == NULL) {
-      const __list_t  *list = list_handle;
 
       /* If no function was given, use the default one, or exit */
       if (list->payload_get == NULL) {
@@ -321,8 +287,8 @@ void list_show(const list_t list_handle, list_entry_t *entry_handle,
       }
     } else {
       level++;
-      while ((entry_handle = list_next(list_handle, entry_handle)) != NULL) {
-        list_show(list_handle, entry_handle, payload_get);
+      while ((entry_handle = list_next(list, entry_handle)) != NULL) {
+        list_show(list, entry_handle, payload_get);
       }
       level--;
     }
@@ -330,20 +296,18 @@ void list_show(const list_t list_handle, list_entry_t *entry_handle,
 }
 
 int list_compare(
-    const list_t            list_left_handle,
-    const list_t            list_right_handle,
-    list_t                  *list_added_handle,
-    list_t                  *list_missing_handle,
+    const list_t            *list_left,
+    const list_t            *list_right,
+    list_t                  **list_added_handle,
+    list_t                  **list_missing_handle,
     list_payloads_compare_f compare_f) {
-  const __list_t  *list_left    = list_left_handle;
-  const __list_t  *list_right   = list_right_handle;
-  __list_t        *list_added   = NULL;
-  __list_t        *list_missing = NULL;
+  list_t        *list_added   = NULL;
+  list_t        *list_missing = NULL;
   /* Point the entries to the start of their respective lists */
-  __list_entry_t  *entry_left   = list_next(list_left_handle, NULL);
-  __list_entry_t  *entry_right  = list_next(list_right_handle, NULL);
+  list_entry_t  *entry_left   = list_next(list_left, NULL);
+  list_entry_t  *entry_right  = list_next(list_right, NULL);
   /* Comparison result */
-  int             differ        = 0;
+  int           differ        = 0;
 
   /* Impossible to compare without interpreting the payloads */
   if (list_left->payload_get == NULL) {
@@ -411,10 +375,10 @@ int list_compare(
       list_append(list_added, payload_right);
     }
     if (result >= 0) {
-      entry_right = list_next(list_right_handle, entry_right);
+      entry_right = list_next(list_right, entry_right);
     }
     if (result <= 0) {
-      entry_left = list_next(list_left_handle, entry_left);
+      entry_left = list_next(list_left, entry_left);
     }
   }
   if (differ) {
@@ -424,13 +388,12 @@ int list_compare(
 }
 
 int list_select(
-    const list_t list_handle,
+    const list_t *list,
     const char *search_string,
     list_payload_get_f payload_get,
-    list_t *list_selected_handle,
-    list_t *list_unselected_handle) {
-  const __list_t  *list = list_handle;
-  __list_entry_t  *entry = NULL;
+    list_t **list_selected_handle,
+    list_t **list_unselected_handle) {
+  list_entry_t  *entry = NULL;
   int             length = strlen(search_string);
 
   /* Note: list_find does not garantee to find the first element */
@@ -458,7 +421,7 @@ int list_select(
   if (list_unselected_handle != NULL) {
     *list_unselected_handle = list_new(list->payload_get);
   }
-  while ((entry = list_next(list_handle, entry)) != NULL) {
+  while ((entry = list_next(list, entry)) != NULL) {
     void *payload = list_entry_payload(entry);
 
     if (payload != NULL) {
@@ -488,17 +451,16 @@ int list_select(
   return 0;
 }
 
-int list_deselect(list_t list_handle) {
-  __list_t     *list  = list_handle;
+int list_deselect(list_t *list) {
   list_entry_t *entry = NULL;
 
-  while ((entry = list_next(list_handle, entry)) != NULL) {
+  while ((entry = list_next(list, entry)) != NULL) {
     free(entry);
     list->size--;
   }
   /* Free list only if empty */
   if (list->size == 0) {
-    free(list_handle);
+    free(list);
   }
   return list->size;
 }

@@ -41,8 +41,8 @@ static char *filters_show(const void *payload) {
 }
 
 static char *filters_rule_show(const void *payload) {
-  const list_t       rule    = (const list_t) payload;
-  char               *string = NULL;
+  const list_t       *rule    = (const list_t *) payload;
+  char               *string  = NULL;
 
   printf("-> List %u filter(s)\n", list_size(rule));
   list_show(rule, NULL, filters_show);
@@ -51,8 +51,8 @@ static char *filters_rule_show(const void *payload) {
 
 /* TODO Test file type check */
 int main(void) {
-  void       *handle = NULL;
-  void       *handle2 = NULL;
+  list_t     *handle = NULL;
+  list_t     *handle2 = NULL;
   filedata_t filedata;
   filter_t   filter;
 
@@ -273,7 +273,7 @@ int main(void) {
   if (filters_new(&handle)) {
     printf("Failed to create\n");
   } else {
-    list_t rule = NULL;
+    list_t *rule = NULL;
 
     printf(">List %u rule(s):\n", list_size(handle));
     list_show(handle, NULL, filters_rule_show);
