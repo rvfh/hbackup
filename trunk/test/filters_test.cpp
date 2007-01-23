@@ -44,18 +44,18 @@ static char *filters_show(const void *payload) {
 }
 
 static char *filters_rule_show(const void *payload) {
-  const list_t       *rule    = (const list_t *) payload;
-  char               *string  = NULL;
+  const List  *rule   = (const List *) payload;
+  char        *string = NULL;
 
-  cout << "-> List " << list_size(rule) << " filter(s)\n";
-  list_show(rule, NULL, filters_show);
+  cout << "-> List " << rule->size() << " filter(s)\n";
+  rule->show(NULL, filters_show);
   return string;
 }
 
 /* TODO Test file type check */
 int main(void) {
-  list_t     *handle = NULL;
-  list_t     *handle2 = NULL;
+  List       *handle = NULL;
+  List       *handle2 = NULL;
   filedata_t filedata;
   filter_t   filter;
 
@@ -118,14 +118,14 @@ int main(void) {
     if (filters_rule_add(filters_rule_new(handle), S_IFREG, filter_path_regexp, "^to a.*\\.txt")) {
       cout << "Failed to add\n";
     } else {
-      cout << ">List " << list_size(handle) << " rule(s):\n";
-      list_show(handle, NULL, filters_rule_show);
+      cout << ">List " << handle->size() << " rule(s):\n";
+      handle->show(NULL, filters_rule_show);
     }
     if (filters_rule_add(filters_rule_new(handle), S_IFREG, filter_path_regexp, "^to a.*\\.t.t")) {
       cout << "Failed to add\n";
     } else {
-      cout << ">List " << list_size(handle) << " rule(s):\n";
-      list_show(handle, NULL, filters_rule_show);
+      cout << ">List " << handle->size() << " rule(s):\n";
+      handle->show(NULL, filters_rule_show);
     }
     filedata.path = "to a file.txt";
     if (filters_match(handle, &filedata)) {
@@ -158,14 +158,14 @@ int main(void) {
       if (filters_rule_add(filters_rule_new(handle2), S_IFREG, filter_path_regexp, "^to a.*\\.txt")) {
         cout << "Failed to add\n";
       } else {
-        cout << ">List " << list_size(handle2) << " rule(s):\n";
-        list_show(handle2, NULL, filters_rule_show);
+        cout << ">List " << handle2->size() << " rule(s):\n";
+        handle2->show(NULL, filters_rule_show);
       }
       if (filters_rule_add(filters_rule_new(handle2), S_IFREG, filter_path_regexp, "^to a.*\\.t.t")) {
         cout << "Failed to add\n";
       } else {
-        cout << ">List " << list_size(handle2) << " rule(s):\n";
-        list_show(handle2, NULL, filters_rule_show);
+        cout << ">List " << handle2->size() << " rule(s):\n";
+        handle2->show(NULL, filters_rule_show);
       }
       filedata.path = "to a file.txt";
       if (filters_match(handle2, &filedata)) {
@@ -222,8 +222,8 @@ int main(void) {
     if (filters_rule_add(filters_rule_new(handle), 0, filter_size_below, 500)) {
       cout << "Failed to add\n";
     } else {
-      cout << ">List " << list_size(handle) << " rule(s):\n";
-      list_show(handle, NULL, filters_rule_show);
+      cout << ">List " << handle->size() << " rule(s):\n";
+      handle->show(NULL, filters_rule_show);
     }
     filedata.metadata.size = 0;
     if (filters_match(handle, &filedata)) {
@@ -247,8 +247,8 @@ int main(void) {
     if (filters_rule_add(filters_rule_new(handle), 0, filter_size_above, 5000)) {
       cout << "Failed to add\n";
     } else {
-      cout << ">List " << list_size(handle) << " rule(s):\n";
-      list_show(handle, NULL, filters_rule_show);
+      cout << ">List " << handle->size() << " rule(s):\n";
+      handle->show(NULL, filters_rule_show);
     }
     filedata.metadata.size = 0;
     if (filters_match(handle, &filedata)) {
@@ -276,23 +276,23 @@ int main(void) {
   if (filters_new(&handle)) {
     cout << "Failed to create\n";
   } else {
-    list_t *rule = NULL;
+    List *rule = NULL;
 
-    cout << ">List " << list_size(handle) << " rule(s):\n";
-    list_show(handle, NULL, filters_rule_show);
+    cout << ">List " << handle->size() << " rule(s):\n";
+    handle->show(NULL, filters_rule_show);
 
     rule = filters_rule_new(handle);
     if (filters_rule_add(rule, 0, filter_size_below, 500)) {
       cout << "Failed to add\n";
     } else {
-      cout << ">List " << list_size(handle) << " rule(s):\n";
-      list_show(handle, NULL, filters_rule_show);
+      cout << ">List " << handle->size() << " rule(s):\n";
+      handle->show(NULL, filters_rule_show);
     }
     if (filters_rule_add(rule, 0, filter_size_above, 400)) {
       cout << "Failed to add\n";
     } else {
-      cout << ">List " << list_size(handle) << " rule(s):\n";
-      list_show(handle, NULL, filters_rule_show);
+      cout << ">List " << handle->size() << " rule(s):\n";
+      handle->show(NULL, filters_rule_show);
     }
     filedata.metadata.size = 600;
     if (filters_match(handle, &filedata)) {

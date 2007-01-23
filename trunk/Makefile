@@ -24,8 +24,8 @@ check: all
 	@${MAKE} -C test
 
 # Dependencies
-version.h: clients.a db.a filelist.a cvs_parser.a parsers.a filters.a list.a \
-	metadata.a params.a tools.a Makefile
+version.h:tools.a params.a metadata.a list.a filters.a parsers.a cvs_parser.a \
+	filelist.a db.a clients.a Makefile
 hbackup: clients.a db.a filelist.a cvs_parser.a parsers.a filters.a list.a \
 	metadata.a params.a tools.a
 

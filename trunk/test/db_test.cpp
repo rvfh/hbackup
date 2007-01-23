@@ -16,9 +16,8 @@
      Boston, MA 02111-1307, USA.
 */
 
-#include "filters.h"
-#include "cvs_parser.h"
 #include "db.cpp"
+#include "cvs_parser.h"
 
 static int verbose = 3;
 
@@ -58,14 +57,14 @@ int terminating(void) {
 }
 
 int main(void) {
-  list_t    *filters_handle = NULL;
-  list_t    *parsers_handle = NULL;
+  List    *filters_handle = NULL;
+  List    *parsers_handle = NULL;
   char      checksum[40];
   char      zchecksum[40];
   db_data_t db_data;
   off_t     size;
   off_t     zsize;
-  list_t    *filelist;
+  List    *filelist;
   int       status;
 
   /* Test internal functions */
@@ -149,8 +148,8 @@ int main(void) {
     return 0;
   }
   verbose = 3;
-  printf(">List %u file(s):\n", list_size(filelist_get()));
-  list_show(filelist_get(), NULL, file_data_show);
+  printf(">List %u file(s):\n", filelist_get()->size());
+  filelist_get()->show(NULL, file_data_show);
 
 
   /* Test database */
@@ -174,19 +173,19 @@ int main(void) {
     return 0;
   }
   printf("%s  test/testfile\n", checksum);
-  filelist = list_new(db_data_show);
+  filelist = new List(db_data_show);
   db_load("data/59ca0efa9f5633cb0371bbc0355478d8-0/list", filelist);
-  printf(">List %u element(s):\n", list_size(filelist));
-  list_show(filelist, NULL, db_data_show);
-  list_free(filelist);
+  cout << ">List " << filelist->size() << " element(s):\n";
+  filelist->show(NULL, db_data_show);
+  delete filelist;
 
   /* Obsolete check */
   db_obsolete(db_data.host, db_data.filedata.path, checksum);
-  filelist = list_new(db_data_show);
+  filelist = new List(db_data_show);
   db_load("data/59ca0efa9f5633cb0371bbc0355478d8-0/list", filelist);
-  printf(">List %u element(s):\n", list_size(filelist));
-  list_show(filelist, NULL, db_data_show);
-  list_free(filelist);
+  cout << ">List " << filelist->size() << " element(s):\n";
+  filelist->show(NULL, db_data_show);
+  delete filelist;
 
   /* Read check */
   if ((status = db_read("test_db/blah", checksum))) {
@@ -201,8 +200,8 @@ int main(void) {
     db_close();
     return 0;
   }
-  printf(">List %u element(s):\n", list_size(db_list));
-  list_show(db_list, NULL, db_data_show);
+  cout << ">List " << db_list->size() << " element(s):\n";
+  db_list->show(NULL, db_data_show);
 
   db_close();
 
@@ -214,8 +213,8 @@ int main(void) {
       return 0;
     }
   }
-  printf(">List %u element(s):\n", list_size(db_list));
-  list_show(db_list, NULL, db_data_show);
+  cout << ">List " << db_list->size() << " element(s):\n";
+  db_list->show(NULL, db_data_show);
 
   if ((status = db_parse("file://host", "/home/user", "test",
       filelist_get(), 1))) {
@@ -223,8 +222,8 @@ int main(void) {
     db_close();
     return 0;
   }
-  printf(">List %u element(s):\n", list_size(db_list));
-  list_show(db_list, NULL, db_data_show);
+  cout << ">List " << db_list->size() << " element(s):\n";
+  db_list->show(NULL, db_data_show);
   filelist_free();
 
   verbose = 2;
@@ -233,8 +232,8 @@ int main(void) {
     return 0;
   }
   verbose = 3;
-  printf(">List %u file(s):\n", list_size(filelist_get()));
-  list_show(filelist_get(), NULL, file_data_show);
+  cout << ">List " << filelist_get()->size() << " file(s):\n";
+  filelist_get()->show(NULL, file_data_show);
 
   if ((status = db_parse("file://host", "/home/user2", "test2",
       filelist_get(), 1))) {
@@ -242,8 +241,8 @@ int main(void) {
     db_close();
     return 0;
   }
-  printf(">List %u element(s):\n", list_size(db_list));
-  list_show(db_list, NULL, db_data_show);
+  cout << ">List " << db_list->size() << " element(s):\n";
+  db_list->show(NULL, db_data_show);
   filelist_free();
 
   if ((status = db_scan(NULL, "59ca0efa9f5633cb0371bbc0355478d8-0"))) {
@@ -301,8 +300,8 @@ int main(void) {
       return 0;
     }
   }
-  printf(">List %u element(s):\n", list_size(db_list));
-  list_show(db_list, NULL, db_data_show);
+  cout << ">List " << db_list->size() << " element(s):\n";
+  db_list->show(NULL, db_data_show);
 
   remove("test/testfile");
 
@@ -312,8 +311,8 @@ int main(void) {
     return 0;
   }
   verbose = 3;
-  printf(">List %u file(s):\n", list_size(filelist_get()));
-  list_show(filelist_get(), NULL, file_data_show);
+  cout << ">List " << filelist_get()->size() << " file(s):\n";
+  filelist_get()->show(NULL, file_data_show);
 
   if ((status = db_parse("file://host", "/home/user", "test",
       filelist_get(), 1))) {
@@ -321,10 +320,10 @@ int main(void) {
     db_close();
     return 0;
   }
-  printf(">List %u element(s):\n", list_size(db_list));
-  list_show(db_list, NULL, db_data_show);
-  printf(">List %u element(s):\n", list_size(db_list));
-  list_show(db_list, NULL, parse_select);
+  cout << ">List " << db_list->size() << " element(s):\n";
+  db_list->show(NULL, db_data_show);
+  cout << ">List " << db_list->size() << " element(s):\n";
+  db_list->show(NULL, parse_select);
   filelist_free();
 
   verbose = 2;
@@ -333,8 +332,8 @@ int main(void) {
     return 0;
   }
   verbose = 3;
-  printf(">List %u file(s):\n", list_size(filelist_get()));
-  list_show(filelist_get(), NULL, file_data_show);
+  cout << ">List " << filelist_get()->size() << " file(s):\n";
+  filelist_get()->show(NULL, file_data_show);
 
   if ((status = db_parse("file://host", "/home/user", "test",
       filelist_get(), 1))) {
@@ -342,8 +341,8 @@ int main(void) {
     db_close();
     return 0;
   }
-  printf(">List %u element(s):\n", list_size(db_list));
-  list_show(db_list, NULL, db_data_show);
+  cout << ">List " << db_list->size() << " element(s):\n";
+  db_list->show(NULL, db_data_show);
   filelist_free();
 
   verbose = 2;
@@ -352,8 +351,8 @@ int main(void) {
     return 0;
   }
   verbose = 3;
-  printf(">List %u file(s):\n", list_size(filelist_get()));
-  list_show(filelist_get(), NULL, file_data_show);
+  cout << ">List " << filelist_get()->size() << " file(s):\n";
+  filelist_get()->show(NULL, file_data_show);
 
   if ((status = db_parse("file://host", "/home/user2", "test2",
       filelist_get(), 1))) {
@@ -361,8 +360,8 @@ int main(void) {
     db_close();
     return 0;
   }
-  printf(">List %u element(s):\n", list_size(db_list));
-  list_show(db_list, NULL, db_data_show);
+  cout << ">List " << db_list->size() << " element(s):\n";
+  db_list->show(NULL, db_data_show);
   filelist_free();
 
   db_organize("test_db/data", 2);
@@ -377,8 +376,8 @@ int main(void) {
       return 0;
     }
   }
-  printf(">List %u element(s):\n", list_size(db_list));
-  list_show(db_list, NULL, db_data_show);
+  cout << ">List " << db_list->size() << " element(s):\n";
+  db_list->show(NULL, db_data_show);
 
   db_close();
 

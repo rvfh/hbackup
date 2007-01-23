@@ -42,96 +42,52 @@ struct _list_entry_t {
   list_entry_t        *next;
 };
 
-typedef struct {
-  list_entry_t        *first;
-  list_entry_t        *last;
-  list_entry_t        *hint;
-  list_payload_get_f  *payload_get;
-  int                 size;
-} list_t;
-
 /* Functions */
 
 /* Create empty list entry, return it */
-extern list_entry_t *list_entry_new(void);
+extern list_entry_t *list_entry_new();
 
 /* Get list entry payload */
-extern void *list_entry_payload(const list_entry_t *entry_handle);
+extern void *list_entry_payload(const list_entry_t *entry);
 
-/* Create empty list, return it */
-extern list_t *list_new(list_payload_get_f payload_get_f);
+/* Classes */
 
-/* Destroy list and its contents */
-extern void list_free(list_t *list_handle);
-
-/* Append given entry to list */
-extern list_entry_t *list_append(list_t *list_handle, void *payload);
-
-/* Add new list entry with given payload, return pointer to entry or NULL */
-extern list_entry_t *list_add(list_t *list_handle, void *payload);
-
-/* Remove entry from list and destroy it, return its contents */
-extern void *list_remove(list_t *list_handle, list_entry_t *entry_handle);
-
-/* Remove entry from list, destroy it and its contents */
-extern void list_drop(list_t *list_handle, list_entry_t *entry_handle);
-
-/* Get list size */
-extern int list_size(const list_t *list_handle);
-
-/* Get previous entry */
-extern list_entry_t *list_previous(const list_t *list_handle,
-  const list_entry_t *entry_handle);
-
-/* Get next entry */
-extern list_entry_t *list_next(const list_t *list_handle,
-  const list_entry_t *entry_handle);
-
-/* Find record in ordered list, or its next neighbour, by matching
- * search_string with the result of payload_get_f
- * If payload_get_f is NULL, the list default is used
- * If entry_handle is not NULL, it will contain the closest entry found
- * If an exact match is found, the function returns 0, non zero otherwise */
-extern int list_find(const list_t *list_handle, const char *search_string,
-  list_payload_get_f payload_get_f, list_entry_t **entry_handle);
-
-/* Show list contents (payload contents can be included) */
-/* If payload_get_f is NULL, the list default is used */
-extern void list_show(const list_t *list_handle, list_entry_t *entry,
-  list_payload_get_f payload_get_f);
-
-/* Compare two lists, using compare function
- * if compare_f is NULL, the default payload functions and strcmp are used
- * If list_added_handle is not NULL, it will contain the list of added entries
- * If list_missing_handle is not NULL, it will contain the list of removed e.
- * Important note: the lists elements payloads are not copied!!!
- * To delete the added and removed elements lists, call list_deselect or do a
- * list_remove on each element before calling list_free. */
-extern int list_compare(
-    const list_t            *list_left_handle,
-    const list_t            *list_right_handle,
-    list_t                  **list_added_handle,
-    list_t                  **list_missing_handle,
-    list_payloads_compare_f compare_f);
-
-/* Select records in list, by matching search_string with the result of
- * payload_get_f. If payload_get_f is NULL, the list default is used
- * On success the function returns 0, otherwise non zero and
- * *list_selected_handle and *list_unselected_handle (when the pointers are not
- * NULL) will be NULL.
- * Important note: the list elements payloads are not copied!!!
- * To delete the returned lists, call list_deselect or do a list_remove on each
- * element before calling list_free. */
-extern int list_select(
-    const list_t            *list_handle,
+class List {
+  list_entry_t        *_first;
+  list_entry_t        *_last;
+  list_entry_t        *_hint;
+  list_payload_get_f  *_payload_get_f;
+  int                 _size;
+  list_entry_t        *find_hidden(
+    const char              *search_string,
+    list_payload_get_f      payload_get = NULL);
+public:
+  List(list_payload_get_f payload_get_f = NULL);
+  ~List();
+  bool ordered() const;
+  char *payloadString(const void *payload) const;
+  list_entry_t *append(void *payload);
+  list_entry_t *add(void *payload);
+  void *remove(list_entry_t *entry);
+  void drop(list_entry_t *entry);
+  int size() const;
+  list_entry_t *previous(const list_entry_t *entry) const;
+  list_entry_t *next(const list_entry_t *entry) const;
+  int find(const char *search_string, list_payload_get_f payload_get_f, list_entry_t **entry_handle);
+  void show(
+    list_entry_t            *entry                = NULL,
+    list_payload_get_f      payload_get_f         = NULL) const;
+  int compare(
+    const List              *other_list,
+    List                    *list_added_handle    = NULL,
+    List                    *list_missing_handle  = NULL,
+    list_payloads_compare_f compare_f             = NULL) const;
+  int select(
     const char              *search_string,
     list_payload_get_f      payload_get_f,
-    list_t                  **list_selected_handle,
-    list_t                  **list_unselected_handle);
-
-/* Free list and its elements without freeing the payloads
- * Returns the number of elements not freed */
-extern int list_deselect(
-    list_t                  *list_handle);
+    List                    *list_selected_handle,
+    List                    *list_unselected_handle) const;
+  int deselect();
+};
 
 #endif

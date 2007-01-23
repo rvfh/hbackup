@@ -39,8 +39,9 @@
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
 #endif
-#include <string.h>
+#include <iostream>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <signal.h>
@@ -54,6 +55,7 @@
 #include "hbackup.h"
 #include "filters.h"
 #include "db.h"
+using namespace std;
 
 #define CHUNK 10240
 
@@ -65,13 +67,13 @@ typedef struct {
   time_t      date_out;
 } db_data_t;
 
-static list_t *db_list = NULL;
+static List   *db_list = NULL;
 static char   *db_path = NULL;
 
 /* Size of path being backed up */
 static int    backup_path_length = 0;
 
-static int db_load(const char *filename, list_t *list) {
+static int db_load(const char *filename, List *list) {
   char *source_path;
   FILE *readfile;
   int  failed = 0;
@@ -177,7 +179,7 @@ static int db_load(const char *filename, list_t *list) {
       } else {
         db_data_p = new db_data_t;
         *db_data_p = db_data;
-        list_add(list, db_data_p);
+        list->add(db_data_p);
       }
     }
     free(buffer);
@@ -189,7 +191,7 @@ static int db_load(const char *filename, list_t *list) {
   return failed;
 }
 
-static int db_save(const char *filename, list_t *list) {
+static int db_save(const char *filename, List *list) {
   char *temp_path;
   FILE *writefile;
   int  failed = 0;
@@ -199,7 +201,7 @@ static int db_save(const char *filename, list_t *list) {
     char *dest_path = NULL;
     list_entry_t *entry = NULL;
 
-    while ((entry = list_next(list, entry)) != NULL) {
+    while ((entry = list->next(entry)) != NULL) {
       db_data_t *db_data = (db_data_t *) (list_entry_payload(entry));
       char *link = "";
 
@@ -322,17 +324,17 @@ static int db_organize(char *path, int number) {
   return failed;
 }
 
-static void db_list_free(list_t *list) {
+static void db_list_free(List *list) {
   list_entry_t *entry = NULL;
 
-  while ((entry = list_next(list, entry)) != NULL) {
+  while ((entry = list->next(entry)) != NULL) {
     db_data_t *db_data = (db_data_t *) (list_entry_payload(entry));
 
     free(db_data->host);
     free(db_data->link);
     free(db_data->filedata.path);
   }
-  list_free(list);
+  delete list;
 }
 
 static int db_write(const char *mount_path, const char *path,
@@ -476,21 +478,21 @@ static int db_write(const char *mount_path, const char *path,
 
     if (delim != NULL) {
       char         *listfile = NULL;
-      list_t       *list;
+      List       *list;
       list_entry_t *entry;
       db_data_t    new_db_data = *db_data;
 
       *delim = '\0';
       /* Now dest_path is /path/to/checksum */
       asprintf(&listfile, "%s/%s", &dest_path[strlen(db_path) + 1], "list");
-      list = list_new(db_data_get);
+      list = new List(db_data_get);
       if (db_load(listfile, list) == 2) {
         fprintf(stderr, "db: write: failed to open data list\n");
       } else {
         strcpy(new_db_data.filedata.checksum, checksum_dest);
-        entry = list_add(list, &new_db_data);
+        entry = list->add(&new_db_data);
         db_save(listfile, list);
-        list_remove(list, entry);
+        list->remove(entry);
       }
       db_list_free(list);
       free(listfile);
@@ -517,7 +519,7 @@ static int db_obsolete(const char *prefix, const char *path,
   char         *listfile  = NULL;
   char         *temp_path = NULL;
   int          failed = 0;
-  list_t       *list;
+  List       *list;
 
   if (getdir(db_path, checksum, &temp_path)) {
     fprintf(stderr, "db: obsolete: failed to get dir for: %s\n", checksum);
@@ -526,7 +528,7 @@ static int db_obsolete(const char *prefix, const char *path,
   asprintf(&listfile, "%s/list", &temp_path[strlen(db_path) + 1]);
   free(temp_path);
 
-  list = list_new(db_data_get);
+  list = new List(db_data_get);
   if (db_load(listfile, list) == 2) {
     fprintf(stderr, "db: obsolete: failed to open data list\n");
   } else {
@@ -535,7 +537,7 @@ static int db_obsolete(const char *prefix, const char *path,
     char         *string = NULL;
 
     asprintf(&string, "%s %s %c", prefix, path, '@');
-    list_find(list, string, NULL, &entry);
+    list->find(string, NULL, &entry);
     if (entry != NULL) {
       db_data = (db_data_t *) (list_entry_payload(entry));
       db_data->date_out = time(NULL);
@@ -629,12 +631,12 @@ int db_open(const char *path) {
 
   /* Read database active items list */
   if (status != 2) {
-    db_list = list_new(db_data_get);
+    db_list = new List(db_data_get);
     switch (db_load("list", db_list)) {
       case 0:
         if (verbosity() > 0) {
           printf("Database opened (active contents: %u file(s))\n",
-            list_size(db_list));
+            db_list->size());
         }
         break;
       case 1:
@@ -667,8 +669,8 @@ static char *close_select(const void *payload) {
 }
 
 void db_close(void) {
-  list_t    *active_list;
-  list_t    *removed_list;
+  List      *active_list = new List();
+  List      *removed_list = new List();
   time_t    localtime;
   struct tm localtime_brokendown;
 
@@ -687,25 +689,27 @@ void db_close(void) {
   db_load("removed", db_list);
 
   /* Split list into active and removed records */
-  list_select(db_list, "@", close_select, &active_list, &removed_list);
+  db_list->select("@", close_select, active_list, removed_list);
 
   /* Save active list */
   if (db_save("list", active_list)) {
     fprintf(stderr, "db: close: failed to save active items list\n");
   }
-  list_deselect(active_list);
+  active_list->deselect();
+  delete active_list;
 
   /* Save removed list */
   if (db_save("removed", removed_list)) {
     fprintf(stderr, "db: close: failed to save removed items list\n");
   }
-  list_deselect(removed_list);
+  removed_list->deselect();
+  delete removed_list;
 
   /* Release lock */
   db_unlock(db_path);
   if (verbosity() > 0) {
     printf("Database closed (total contents: %u file(s))\n",
-      list_size(db_list));
+      db_list->size());
   }
   db_list_free(db_list);
 }
@@ -753,10 +757,10 @@ static int parse_compare(void *db_data_p, void *filedata_p) {
 }
 
 int db_parse(const char *host, const char *real_path,
-    const char *mount_path, list_t *file_list, off_t compress_min) {
-  list_t        *selected_files_list;
-  list_t        *added_files_list;
-  list_t        *removed_files_list;
+    const char *mount_path, List *file_list, off_t compress_min) {
+  List          *selected_files_list = new List(db_data_get);
+  List          *added_files_list = new List();
+  List          *removed_files_list = new List();
   list_entry_t  *entry   = NULL;
   char          *string = NULL;
   int           failed  = 0;
@@ -764,21 +768,21 @@ int db_parse(const char *host, const char *real_path,
   /* Compare list with db list for matching host */
   asprintf(&string, "%s/", real_path);
   backup_path_length = strlen(string);
-  list_select(db_list, string, parse_select, &selected_files_list, NULL);
+  db_list->select(string, parse_select, selected_files_list, NULL);
   free(string);
-  list_compare(selected_files_list, file_list, &added_files_list,
-    &removed_files_list, parse_compare);
-  list_deselect(selected_files_list);
+  selected_files_list->compare(file_list, added_files_list,
+    removed_files_list, parse_compare);
+  selected_files_list->deselect();
 
   /* Deal with new/modified data first */
-  if (list_size(added_files_list) != 0) {
+  if (added_files_list->size() != 0) {
     static int   copied = 0;
     static off_t volume = 0;
 
     if (verbosity() > 2) {
-      printf(" --> Files to add: %u\n", list_size(added_files_list));
+      cout << " --> Files to add: " << added_files_list->size() << "\n";
     }
-    while ((entry = list_next(added_files_list, entry)) != NULL) {
+    while ((entry = added_files_list->next(entry)) != NULL) {
       if (! terminating()) {
         filedata_t *filedata = (filedata_t *) (list_entry_payload(entry));
         db_data_t  *db_data  = new db_data_t;
@@ -834,16 +838,16 @@ int db_parse(const char *host, const char *real_path,
           free(full_path);
           free(string);
         }
-        list_add(db_list, db_data);
+        db_list->add(db_data);
         if ((++copied >= 1000)
          || ((volume += db_data->filedata.metadata.size) >= 10000000)) {
           copied = 0;
           volume = 0;
           if (verbosity() > 2) {
             printf(" --> Files left to add: %u\n",
-              list_size(added_files_list));
+              added_files_list->size());
             printf(" --> Saving database list: %u file(s)\n",
-              list_size(db_list));
+              db_list->size());
           }
           db_save("list", db_list);
         }
@@ -851,14 +855,15 @@ int db_parse(const char *host, const char *real_path,
     }
   }
   /* This only unlists the data */
-  list_deselect(added_files_list);
+  added_files_list->deselect();
+  delete added_files_list;
 
   /* Deal with removed/modified data */
-  if (list_size(removed_files_list) != 0) {
+  if (removed_files_list->size() != 0) {
     if (verbosity() > 2) {
-      printf(" --> Files to remove: %u\n", list_size(removed_files_list));
+      printf(" --> Files to remove: %u\n", removed_files_list->size());
     }
-    while ((entry = list_next(removed_files_list, entry)) != NULL) {
+    while ((entry = removed_files_list->next(entry)) != NULL) {
       db_data_t *db_data = (db_data_t *) (list_entry_payload(entry));
 
       /* Same data as in db_list */
@@ -874,7 +879,8 @@ int db_parse(const char *host, const char *real_path,
     }
   }
   /* This only unlists the data */
-  list_deselect(removed_files_list);
+  removed_files_list->deselect();
+  delete removed_files_list;
 
   /* Report errors */
   if (failed) {
@@ -937,7 +943,7 @@ int db_scan(const char *local_db_path, const char *checksum) {
       fprintf(stderr, "db: scan: failed to lock\n");
       return 2;
     }
-    db_list = list_new(db_data_get);
+    db_list = new List(db_data_get);
     failed = db_load("list", db_list) | db_load("removed", db_list);
     if (failed) {
       fprintf(stderr, "db: scan: failed to read lists\n");
@@ -947,12 +953,12 @@ int db_scan(const char *local_db_path, const char *checksum) {
   if (! failed) {
     if (checksum == NULL) {
       list_entry_t *entry = NULL;
-      int          files = list_size(db_list);
+      int          files = db_list->size();
 
       if (verbosity() > 0) {
         printf("Scanning database (contents: %u file(s))\n", files);
       }
-      while ((entry = list_next(db_list, entry)) != NULL) {
+      while ((entry = db_list->next(entry)) != NULL) {
         db_data_t *db_data = (db_data_t *) (list_entry_payload(entry));
 
         if ((verbosity() > 2) && ((files & 0xFF) == 0)) {
@@ -1023,7 +1029,7 @@ int db_check(const char *local_db_path, const char *checksum) {
       fprintf(stderr, "db: check: failed to lock\n");
       return 2;
     }
-    db_list = list_new(db_data_get);
+    db_list = new List(db_data_get);
     failed = db_load("list", db_list) | db_load("removed", db_list);
     if (failed) {
       fprintf(stderr, "db: check: failed to read lists\n");
@@ -1033,13 +1039,13 @@ int db_check(const char *local_db_path, const char *checksum) {
   if (! failed) {
     if (checksum == NULL) {
       list_entry_t *entry = NULL;
-      int          files = list_size(db_list);
+      int          files = db_list->size();
 
       if (verbosity() > 0) {
         printf("Checking database (contents: %u file(s))\n",
-          list_size(db_list));
+          db_list->size());
       }
-      while ((entry = list_next(db_list, entry)) != NULL) {
+      while ((entry = db_list->next(entry)) != NULL) {
         db_data_t *db_data = (db_data_t *) (list_entry_payload(entry));
 
         if ((verbosity() > 2) && ((files & 0xFF) == 0)) {
@@ -1060,14 +1066,14 @@ int db_check(const char *local_db_path, const char *checksum) {
       } else {
         char    *check_path = NULL;
         char    *listfile   = NULL;
-        list_t  *list;
+        List  *list;
 
         asprintf(&listfile, "%s/list", &path[strlen(db_path) + 1]);
-        list = list_new(db_data_get);
+        list = new List(db_data_get);
         if (db_load(listfile, list) == 2) {
           fprintf(stderr, "db: check: failed to open data list\n");
         } else {
-          list_entry_t *entry = list_next(list, NULL);
+          list_entry_t *entry = list->next(NULL);
 
           if (entry == NULL) {
             fprintf(stderr, "db: check: failed to obtain checksum\n");

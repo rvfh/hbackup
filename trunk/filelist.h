@@ -39,12 +39,15 @@ typedef struct {
 } filedata_t;
 
 /* Create list of files from path, using filters */
-extern int filelist_new(const char *path, const list_t *filters, const list_t *parsers);
+extern int filelist_new(
+  const char  *path,
+  const List  *filters,
+  const List  *parsers);
 
 /* Destroy list of files */
 extern void filelist_free(void);
 
 /* Obtain list of files */
-extern list_t *filelist_get(void);
+extern List *filelist_get(void);
 
 #endif

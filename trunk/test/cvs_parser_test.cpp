@@ -32,7 +32,7 @@ int main(void) {
   void *handle3;
   void *handle4;
   filedata_t file_data;
-  list_t *parsers_handle = NULL;
+  List *parsers_handle = NULL;
   parser_t *cvs_parser;
 
   /* Need to give this some room */
@@ -45,7 +45,7 @@ int main(void) {
   if (cvs_dir_check(&handle1, "test/") == parser_dir_other) {
     printf("test is not under CVS control\n");
   } else {
-    list_show((list_t *) (handle1), NULL, cvs_show);
+    ((List *) handle1)->show(NULL, cvs_show);
     cvs_dir_leave(handle1);
   }
 
@@ -53,7 +53,7 @@ int main(void) {
   if (cvs_dir_check(&handle2, "test/cvs") == parser_dir_other) {
     printf("test/cvs is not under CVS control\n");
   } else {
-    list_show((list_t *) (handle2), NULL, cvs_show);
+    ((List *) handle2)->show(NULL, cvs_show);
     /* Files */
     strcpy(file_data.path, "test/cvs/nofile");
     if (cvs_file_check(handle2, &file_data) == parser_file_other) {
@@ -89,7 +89,7 @@ int main(void) {
   if (cvs_dir_check(&handle3, "test/cvs/dirutd") == parser_dir_other) {
     printf("test/cvs/dirutd is not under CVS control\n");
   } else {
-    list_show((list_t *) (handle3), NULL, cvs_show);
+    ((List *) handle3)->show(NULL, cvs_show);
     strcpy(file_data.path, "test/cvs/dirutd/fileutd");
     if (cvs_file_check(handle3, &file_data) == parser_file_other) {
       printf("%s is not under CVS control\n", file_data.path);
@@ -104,7 +104,7 @@ int main(void) {
   if (cvs_dir_check(&handle4, "test/cvs/dirbad") == parser_dir_other) {
     printf("test/cvs/dirbad is not under CVS control\n");
   } else {
-    list_show((list_t *) (handle4), NULL, cvs_show);
+    ((List *) handle4)->show(NULL, cvs_show);
     strcpy(file_data.path, "test/cvs/dirbad/fileutd");
     if (cvs_file_check(handle4, &file_data) == parser_file_other) {
       printf("%s is not under CVS control\n", file_data.path);
@@ -121,12 +121,12 @@ int main(void) {
 
   parsers_new(&parsers_handle);
   parsers_add(parsers_handle, parser_controlled, cvs_parser_new());
-  cvs_parser = (parser_t *) (list_entry_payload(list_next(parsers_handle, NULL)));
+  cvs_parser = (parser_t *) (list_entry_payload(parsers_handle->next(NULL)));
 
   if (cvs_parser->dir_check(&handle, "test/cvs") == parser_dir_other) {
     printf("test/cvs is not under CVS control\n");
   } else {
-    list_show((list_t *) (handle), NULL, cvs_show);
+    ((List *) handle)->show(NULL, cvs_show);
     strcpy(file_data.path, "test/cvs/fileutd");
     if (cvs_parser->file_check(handle, &file_data) == parser_file_other) {
       printf("%s is not under CVS control\n", file_data.path);

@@ -40,19 +40,19 @@ typedef enum {
 } filter_type_t;
 
 /* Create rules list */
-extern int filters_new(list_t **handle);
+extern int filters_new(List **handle);
 
 /* Destroy rules list and all filters in rules */
-extern void filters_free(list_t *handle);
+extern void filters_free(List *handle);
 
 /* Create new rule (filters list) */
-extern list_t *filters_rule_new(list_t *handle);
+extern List *filters_rule_new(List *handle);
 
 /* Add filter to rule */
-extern int filters_rule_add(list_t *rule_handle, mode_t file_type,
+extern int filters_rule_add(List *rule_handle, mode_t file_type,
   filter_type_t type, ...);
 
 /* Check whether any rule matches (i.e. all its filters match) */
-extern int filters_match(const list_t *handle, const filedata_t *filedata);
+extern int filters_match(const List *handle, const filedata_t *filedata);
 
 #endif

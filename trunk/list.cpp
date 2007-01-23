@@ -21,18 +21,51 @@
 #include <string.h>
 #include "list.h"
 
-static list_entry_t *list_find_hidden(const list_t *list,
-    const char *search_string, list_payload_get_f payload_get) {
+list_entry_t *list_entry_new() {
+  return new list_entry_t;
+}
+
+List::List(list_payload_get_f payload_get) {
+  _size = 0;
+  _payload_get_f = payload_get;
+  _first = _last = _hint = NULL;
+}
+
+List::~List() {
+  if (_size != 0) {
+    list_entry_t *entry = _first;
+
+    while (entry != NULL) {
+      list_entry_t *dump = entry;
+
+      entry = entry->next;
+      free(dump->payload);
+      free(dump);
+    }
+  }
+}
+
+bool List::ordered() const {
+  return _payload_get_f != NULL;
+}
+
+char *List::payloadString(const void *payload) const {
+  return _payload_get_f(payload);
+}
+
+list_entry_t *List::find_hidden(
+    const char *search_string,
+    list_payload_get_f payload_get) {
   list_entry_t *entry = NULL;
 
   /* Search the list  (hint is only null if the list is empty) */
-  if (list->size != 0) {
+  if (_size != 0) {
     /* Which direction to go? */
-    if (list->payload_get == NULL) {
+    if (_payload_get_f == NULL) {
       int breakme = 0;
 
       /* List is not ordered: search it all */
-      while (((entry = list_next(list, entry)) != NULL) && ! breakme) {
+      while (((entry = next(entry)) != NULL) && ! breakme) {
         char *string = payload_get(entry->payload);
 
         if (! strcmp(string, search_string)) {
@@ -44,7 +77,7 @@ static list_entry_t *list_find_hidden(const list_t *list,
       char *string = NULL;
 
       /* List is ordered: search from hint to hopefully save time */
-      entry = list->hint;
+      entry = _hint;
       string = payload_get(entry->payload);
       if (strcmp(string, search_string) < 0) {
         /* List is ordered and hint is before the searched pattern: forward */
@@ -68,7 +101,7 @@ static list_entry_t *list_find_hidden(const list_t *list,
         }
         /* We must always give the next when the record was not found */
         if (entry == NULL) {
-          entry = list->first;
+          entry = _first;
         } else if (strcmp(string, search_string)) {
           entry = entry->next;
         }
@@ -79,154 +112,115 @@ static list_entry_t *list_find_hidden(const list_t *list,
   return entry;
 }
 
-
-list_entry_t *list_entry_new(void) {
-  return new list_entry_t;
-}
-
 void *list_entry_payload(const list_entry_t *entry) {
   return entry->payload;
 }
 
-
-list_t *list_new(list_payload_get_f payload_get) {
-  list_t *list = new list_t;
-
-  if (list != NULL) {
-    list->size = 0;
-    list->payload_get = payload_get;
-    list->first = list->last = list->hint = NULL;
-  }
-  return list;
-}
-
-void list_free(list_t *list) {
-  if (list != NULL) {
-    if (list->size != 0) {
-      list_entry_t *entry = list->first;
-
-      while (entry != NULL) {
-        list_entry_t *dump = entry;
-
-        entry = entry->next;
-        free(dump->payload);
-        free(dump);
-      }
-    }
-    free(list);
-  }
-}
-
-list_entry_t *list_append(list_t *list, void *payload) {
+list_entry_t *List::append(void *payload) {
   list_entry_t *entry = list_entry_new();
 
-  if ((list == NULL) || (entry == NULL)) {
+  if (entry == NULL) {
     fprintf(stderr, "list: append: failed\n");
     return NULL;
   }
   entry->payload = payload;
-  entry->previous = list->last;
+  entry->previous = _last;
   entry->next = NULL;
-  list->last = entry;
+  _last = entry;
   if (entry->previous == NULL) {
-    list->first = entry;
+    _first = entry;
   } else {
     entry->previous->next = entry;
   }
-  list->hint = entry;
-  list->size++;
+  _hint = entry;
+  _size++;
   return entry;
 }
 
-list_entry_t *list_add(list_t *list, void *payload) {
+list_entry_t *List::add(void *payload) {
   list_entry_t *entry = list_entry_new();
 
-  if ((list == NULL) || (entry == NULL)) {
+  if (entry == NULL) {
     fprintf(stderr, "list: add: failed\n");
     return NULL;
   }
   entry->payload = payload;
-  if (list->payload_get == NULL) {
+  if (_payload_get_f == NULL) {
     entry->next = NULL;
   } else {
     char *string = NULL;
 
-    string = list->payload_get(entry->payload);
-    entry->next = list_find_hidden(list, string, list->payload_get);
+    string = _payload_get_f(entry->payload);
+    entry->next = find_hidden(string, _payload_get_f);
     free(string);
   }
   if (entry->next == NULL) {
-    entry->previous = list->last;
-    list->last = entry;
+    entry->previous = _last;
+    _last = entry;
   } else {
     entry->previous = entry->next->previous;
     entry->next->previous = entry;
   }
   if (entry->previous == NULL) {
-    list->first = entry;
+    _first = entry;
   } else {
     entry->previous->next = entry;
   }
-  list->hint = entry;
-  list->size++;
+  _hint = entry;
+  _size++;
   return entry;
 }
 
-void *list_remove(list_t *list, list_entry_t *entry) {
+void *List::remove(list_entry_t *entry) {
   void *payload = entry->payload;
 
   /* The hint must not be null if the list is not empty */
   if (entry->previous != NULL) {
     /* our previous' next becomes our next */
     entry->previous->next = entry->next;
-    list->hint = entry->previous;
+    _hint = entry->previous;
   } else {
     /* removing the first record: point first to our next */
-    list->hint = list->first = entry->next;
+    _hint = _first = entry->next;
   }
   if (entry->next == NULL) {
-    list->last = entry->previous;
+    _last = entry->previous;
   } else {
     entry->next->previous = entry->previous;
   }
   free(entry);
-  list->size--;
+  _size--;
   return payload;
 }
 
-void list_drop(list_t *list_handle, list_entry_t *entry_handle) {
-  free(list_remove(list_handle, entry_handle));
+void List::drop(list_entry_t *entry) {
+  free(remove(entry));
 }
 
-int list_size(const list_t *list_handle) {
-  if (list_handle != NULL) {
-    return list_handle->size;
-  }
-  return -1;
+int List::size() const {
+  return _size;
 }
 
-list_entry_t *list_previous(const list_t *list, const list_entry_t *entry) {
-  if (list == NULL) {
-    return NULL;
-  } else if (entry == NULL) {
-    return list->last;
+list_entry_t *List::previous(const list_entry_t *entry) const {
+  if (entry == NULL) {
+    return _last;
   } else {
     return entry->previous;
   }
 }
 
-list_entry_t *list_next(const list_t *list, const list_entry_t *entry) {
-  if (list == NULL) {
-    return NULL;
-  } else if (entry == NULL) {
-    return list->first;
+list_entry_t *List::next(const list_entry_t *entry) const {
+  if (entry == NULL) {
+    return _first;
   } else {
     return entry->next;
   }
 }
 
-int list_find(const list_t *list, const char *search_string,
-    list_payload_get_f payload_get, list_entry_t **entry_handle) {
+int List::find(
+    const char *search_string,
+    list_payload_get_f payload_get,
+    list_entry_t **entry_handle) {
   list_entry_t    *entry;
   char            *string = NULL;
   int             result;
@@ -234,14 +228,14 @@ int list_find(const list_t *list, const char *search_string,
   /* Impossible to search without interpreting the payload */
   if (payload_get == NULL) {
     /* If no function was given, use the default one, or exit */
-    if (list->payload_get == NULL) {
+    if (_payload_get_f == NULL) {
       fprintf(stderr, "list: find: no way to interpret payload\n");
       return 2;
     }
-    payload_get = list->payload_get;
+    payload_get = _payload_get_f;
   }
 
-  entry = list_find_hidden(list, search_string, payload_get);
+  entry = find_hidden(search_string, payload_get);
   if (entry_handle != NULL) {
     *entry_handle = entry;
   }
@@ -255,130 +249,109 @@ int list_find(const list_t *list, const char *search_string,
   return result;
 }
 
-void list_show(const list_t *list, list_entry_t *entry_handle,
-    list_payload_get_f payload_get) {
+void List::show(list_entry_t *entry, list_payload_get_f payload_get) const {
   static int level = 0;
 
-  if (list != NULL) {
-    if (payload_get == NULL) {
+  if (payload_get == NULL) {
 
-      /* If no function was given, use the default one, or exit */
-      if (list->payload_get == NULL) {
-        fprintf(stderr, "list: show: no way to interpret payload\n");
-        return;
-      }
-      payload_get = list->payload_get;
+    /* If no function was given, use the default one, or exit */
+    if (_payload_get_f == NULL) {
+      fprintf(stderr, "list: show: no way to interpret payload\n");
+      return;
     }
+    payload_get = _payload_get_f;
+  }
 
-    if (entry_handle != NULL) {
-      if (list_entry_payload(entry_handle) != NULL) {
-        char *string = payload_get(list_entry_payload(entry_handle));
-        if (string != NULL) {
-          int i;
+  if (entry != NULL) {
+    if (list_entry_payload(entry) != NULL) {
+      char *string = payload_get(list_entry_payload(entry));
+      if (string != NULL) {
+        int i;
 
-          for (i = 0; i < level; i++) {
-            printf("-");
-          }
-          printf("> %s\n", string);
-          free(string);
+        for (i = 0; i < level; i++) {
+          printf("-");
         }
-      } else {
-        fprintf(stderr, "list: show: no payload!\n");
+        printf("> %s\n", string);
+        free(string);
       }
     } else {
-      level++;
-      while ((entry_handle = list_next(list, entry_handle)) != NULL) {
-        list_show(list, entry_handle, payload_get);
-      }
-      level--;
+      fprintf(stderr, "list: show: no payload!\n");
     }
+  } else {
+    level++;
+    while ((entry = next(entry)) != NULL) {
+      show(entry, payload_get);
+    }
+    level--;
   }
 }
 
-int list_compare(
-    const list_t            *list_left,
-    const list_t            *list_right,
-    list_t                  **list_added_handle,
-    list_t                  **list_missing_handle,
-    list_payloads_compare_f compare_f) {
-  list_t        *list_added   = NULL;
-  list_t        *list_missing = NULL;
-  /* Point the entries to the start of their respective lists */
-  list_entry_t  *entry_left   = list_next(list_left, NULL);
-  list_entry_t  *entry_right  = list_next(list_right, NULL);
+int List::compare(
+    const List              *other,
+    List                    *added,
+    List                    *missing,
+    list_payloads_compare_f compare_f) const {
   /* Comparison result */
   int           differ        = 0;
 
   /* Impossible to compare without interpreting the payloads */
-  if (list_left->payload_get == NULL) {
-    fprintf(stderr, "list: compare: no way to interpret left payload\n");
-    return 2;
-  }
-  if (list_right->payload_get == NULL) {
-    fprintf(stderr, "list: compare: no way to interpret right payload\n");
+  if (! ordered() || ! other->ordered()) {
+    fprintf(stderr, "list: compare: no way to interpret payload\n");
     return 2;
   }
 
-  if (list_added_handle != NULL) {
-    if ((list_added = list_new(list_right->payload_get)) == NULL) {
-      fprintf(stderr, "list: compare: cannot create added list\n");
-      return 2;
-    }
-    *list_added_handle = list_added;
-  }
+  /* Point the entries to the start of their respective lists */
+  list_entry_t  *entry_this   = next(NULL);
+  list_entry_t  *entry_other  = other->next(NULL);
 
-  if (list_missing_handle != NULL) {
-    if ((list_missing = list_new(list_left->payload_get)) == NULL) {
-      fprintf(stderr, "list: compare: cannot create missing list\n");
-      return 2;
-    }
-    *list_missing_handle = list_missing;
-  }
+  while ((entry_this != NULL) || (entry_other != NULL)) {
+    void  *payload_this;
+    void  *payload_other;
+    int   result;
 
-  while ((entry_left != NULL) || (entry_right != NULL)) {
-    int result;
-    void *payload_left  = NULL;
-    void *payload_right = NULL;
-
-    if (entry_left != NULL) {
-      payload_left = list_entry_payload(entry_left);
+    if (entry_this != NULL) {
+      payload_this  = list_entry_payload(entry_this);
+    } else {
+      payload_this  = NULL;
     }
-    if (entry_right != NULL) {
-      payload_right = list_entry_payload(entry_right);
+    if (entry_other != NULL) {
+      payload_other = list_entry_payload(entry_other);
+    } else {
+      payload_other = NULL;
     }
 
-    if (payload_left == NULL) {
+    if (payload_this == NULL) {
       result = 1;
-    } else if (payload_right == NULL) {
+    } else if (payload_other == NULL) {
       result = -1;
     } else if (compare_f != NULL) {
-      result = compare_f(payload_left, payload_right);
+      result = compare_f(payload_this, payload_other);
     } else {
-      char  *string_left  = list_left->payload_get(payload_left);
-      char  *string_right = list_right->payload_get(payload_right);
+      char  *string_this  = payloadString(payload_this);
+      char  *string_other = other->payloadString(payload_other);
 
-      result = strcmp(string_left, string_right);
-      free(string_left);
-      free(string_right);
+      result = strcmp(string_this, string_other);
+      free(string_this);
+      free(string_other);
     }
     differ |= (result != 0);
     /* left < right => element is missing from right list */
-    if ((result < 0) && (list_missing != NULL)) {
+    if ((result < 0) && (missing != NULL)) {
       /* The contents are NOT copied, so the two lists have elements
        * pointing to the same data! */
-      list_append(list_missing, payload_left);
+      missing->append(payload_this);
     }
     /* left > right => element was added in right list */
-    if ((result > 0) && (list_added != NULL)) {
+    if ((result > 0) && (added != NULL)) {
       /* The contents are NOT copied, so the two lists have elements
        * pointing to the same data! */
-      list_append(list_added, payload_right);
+      added->append(payload_other);
     }
     if (result >= 0) {
-      entry_right = list_next(list_right, entry_right);
+      entry_other = other->next(entry_other);
     }
     if (result <= 0) {
-      entry_left = list_next(list_left, entry_left);
+      entry_this = next(entry_this);
     }
   }
   if (differ) {
@@ -387,59 +360,44 @@ int list_compare(
   return 0;
 }
 
-int list_select(
-    const list_t *list,
-    const char *search_string,
-    list_payload_get_f payload_get,
-    list_t **list_selected_handle,
-    list_t **list_unselected_handle) {
+int List::select(
+    const char          *search_string,
+    list_payload_get_f  payload_get,
+    List                *selected_p,
+    List                *unselected_p) const {
   list_entry_t  *entry = NULL;
   int             length = strlen(search_string);
 
   /* Note: list_find does not garantee to find the first element */
-  if (list_selected_handle != NULL) {
-    *list_selected_handle   = NULL;
-  }
-  if (list_unselected_handle != NULL) {
-    *list_unselected_handle = NULL;
-  }
 
   /* Impossible to search without interpreting the payload */
-  if (payload_get == NULL) {
-    /* If no function was given, use the default one, or exit */
-    if (list->payload_get == NULL) {
-      fprintf(stderr, "list: select: no way to interpret payload\n");
-      return 2;
-    }
-    payload_get = list->payload_get;
+  if ((payload_get == NULL) && (_payload_get_f == NULL)) {
+    fprintf(stderr, "list: select: no way to interpret payload\n");
+    return 2;
   }
 
   /* Search the complete list, but stop when no more match is found */
-  if (list_selected_handle != NULL) {
-    *list_selected_handle   = list_new(list->payload_get);
-  }
-  if (list_unselected_handle != NULL) {
-    *list_unselected_handle = list_new(list->payload_get);
-  }
-  while ((entry = list_next(list, entry)) != NULL) {
-    void *payload = list_entry_payload(entry);
-
-    if (payload != NULL) {
+  while ((entry = next(entry)) != NULL) {
+    if (entry->payload != NULL) {
       char *string = NULL;
       int  result;
 
-      string = payload_get(payload);
+      if (payload_get != NULL) {
+        string = payload_get(entry->payload);
+      } else {
+        string = _payload_get_f(entry->payload);
+      }
       /* Only compare the portion of string of search_string's length */
       result = strncmp(string, search_string, length);
       if (result == 0) {
         /* Portions of strings match */
-        if (list_selected_handle != NULL) {
-          list_append(*list_selected_handle, payload);
+        if (selected_p != NULL) {
+          selected_p->append(entry->payload);
         }
-      } else if (list_unselected_handle != NULL) {
+      } else if (unselected_p != NULL) {
         /* Portions of strings do not match */
-        list_append(*list_unselected_handle, payload);
-      } else if ((result == 1) && (payload_get == list->payload_get)) {
+        unselected_p->append(entry->payload);
+      } else if ((result == 1) && (payload_get == NULL)) {
         /* When using the default payload function, time can be saved */
         break;
       }
@@ -451,16 +409,12 @@ int list_select(
   return 0;
 }
 
-int list_deselect(list_t *list) {
+int List::deselect() {
   list_entry_t *entry = NULL;
 
-  while ((entry = list_next(list, entry)) != NULL) {
+  while ((entry = next(entry)) != NULL) {
     free(entry);
-    list->size--;
+    _size--;
   }
-  /* Free list only if empty */
-  if (list->size == 0) {
-    free(list);
-  }
-  return list->size;
+  return _size;
 }
