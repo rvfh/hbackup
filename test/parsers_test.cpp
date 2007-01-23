@@ -44,7 +44,7 @@ static char *parsers_show(const void *payload) {
 
 /* TODO parsers_dir_check and parsers_file_check test */
 int main(void) {
-  parser_t *parser_p = (parser_t *) (malloc(sizeof(parser_t)));
+  parser_t *parser_p = new parser_t;
   list_t *handle1 = NULL;
   list_t *handle2 = NULL;
 

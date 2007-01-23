@@ -119,7 +119,7 @@ mode_t type_mode(char letter) {
 
 static void md5sum(const char *checksum, int bytes) {
   char *hex            = "0123456789abcdef";
-  unsigned char *copy  = (unsigned char *) (malloc(bytes));
+  unsigned char *copy  = new unsigned char[bytes];
   unsigned char *read  = copy;
   unsigned char *write = (unsigned char *) checksum;
 
@@ -131,7 +131,7 @@ static void md5sum(const char *checksum, int bytes) {
     bytes--;
   }
   *write = '\0';
-  free(copy);
+  delete copy;
 }
 
 int getdir(const char *db_path, const char *checksum, char **path_p) {

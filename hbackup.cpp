@@ -213,7 +213,7 @@ int main(int argc, char **argv) {
       while (getline(&buffer, &size, config) >= 0) {
         char keyword[256];
         char type[256];
-        char *string = (char *) (malloc(size));
+        char *string = new char[size];
         int params = params_readline(buffer, keyword, type, string);
 
         line++;

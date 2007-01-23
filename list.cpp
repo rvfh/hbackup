@@ -81,7 +81,7 @@ static list_entry_t *list_find_hidden(const list_t *list,
 
 
 list_entry_t *list_entry_new(void) {
-  return (list_entry_t *) (malloc(sizeof(list_entry_t)));
+  return new list_entry_t;
 }
 
 void *list_entry_payload(const list_entry_t *entry) {
@@ -90,7 +90,7 @@ void *list_entry_payload(const list_entry_t *entry) {
 
 
 list_t *list_new(list_payload_get_f payload_get) {
-  list_t *list = (list_t *) (malloc(sizeof(list_t)));
+  list_t *list = new list_t;
 
   if (list != NULL) {
     list->size = 0;
