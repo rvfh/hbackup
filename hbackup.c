@@ -49,7 +49,7 @@ static const char default_db_path[] = "/hbackup";
 static int killed = 0;
 
 static void show_version(void) {
-  printf("(c) 2006 Hervé Fache, version %u.%u", VERSION_MAJOR, VERSION_MINOR);
+  printf("(c) 2006-2007 Hervé Fache, version %u.%u", VERSION_MAJOR, VERSION_MINOR);
   if (VERSION_BUGFIX != 0) {
     printf(".%u", VERSION_BUGFIX);
   }
