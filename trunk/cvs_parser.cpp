@@ -84,7 +84,7 @@ static parser_dir_status_t cvs_dir_check(void **handle, const char *path) {
       *delim = '\0';
       asprintf(&cvs_entry.name, "%s", start);
 
-      payload = (cvs_entry_t *) (malloc(sizeof(cvs_entry_t)));
+      payload = new cvs_entry_t;
       *payload = cvs_entry;
       list_add(list, payload);
     }
@@ -141,7 +141,7 @@ static parser_t cvs_parser = {
 
 parser_t *cvs_parser_new(void) {
   /* This needs to be dynamic memory */
-  parser_t *parser = (parser_t *) (malloc(sizeof(parser_t)));
+  parser_t *parser = new parser_t;
 
   *parser = cvs_parser;
   return parser;

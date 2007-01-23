@@ -57,13 +57,13 @@ static int payloads_compare(void *payload_left, void *payload_right) {
 }
 
 static payload_t *list_test_new(payload_t payload) {
-  payload_t *payload_p = (payload_t *) malloc(sizeof(payload_t));
+  payload_t *payload_p = new payload_t;
   *payload_p = payload;
   return payload_p;
 }
 
 static payload2_t *list2_test_new(payload2_t payload2) {
-  payload2_t *payload2_p = (payload2_t *) malloc(sizeof(payload2_t));
+  payload2_t *payload2_p = new payload2_t;
   *payload2_p = payload2;
   return payload2_p;
 }

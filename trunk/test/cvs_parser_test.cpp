@@ -37,7 +37,7 @@ int main(void) {
   parser_t *cvs_parser;
 
   /* Need to give this some room */
-  file_data.path = (char *) (malloc(256));
+  file_data.path = new char[256];
 
   /* Creation */
   cvs_parser_new();

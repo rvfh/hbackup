@@ -165,7 +165,7 @@ void clients_free(void) {
 }
 
 int clients_add(const char *info, const char *listfile) {
-  client_t *client = (client_t *) (malloc(sizeof(client_t)));
+  client_t *client = new client_t;
   char     *linecopy = NULL;
   char     *start;
   char     *delim;
@@ -326,7 +326,7 @@ static int read_listfile(const char *listfilename, list_t *backups) {
     while (getline(&buffer, &size, listfile) >= 0) {
       char keyword[256];
       char type[256];
-      char *string = (char *) (malloc(size));
+      char *string = new char[size];
       int params = params_readline(buffer, keyword, type, string);
 
       line++;
@@ -352,7 +352,7 @@ static int read_listfile(const char *listfilename, list_t *backups) {
         }
       } else if (! strcmp(keyword, "path")) {
         /* New backup entry */
-        backup = (backup_t *) (malloc(sizeof(backup_t)));
+        backup = new backup_t;
         filters_new(&backup->ignore_handle);
         parsers_new(&backup->parsers_handle);
         asprintf(&backup->path, "%s", string);

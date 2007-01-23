@@ -87,7 +87,7 @@ static int db_load(const char *filename, list_t *list) {
       db_data_t *db_data_p = NULL;
       char      *start = buffer;
       char      *delim;
-      char      *string = (char *) (malloc(size));
+      char      *string = new char[size];
       char      letter;
       int       field = 0;
       int       failed = 1;
@@ -175,7 +175,7 @@ static int db_load(const char *filename, list_t *list) {
       if (failed) {
         fprintf(stderr, "db: failed to read list file (%s): wrong format (%d)\n", source_path, field);
       } else {
-        db_data_p = (db_data_t *) (malloc(sizeof(db_data_t)));
+        db_data_p = new db_data_t;
         *db_data_p = db_data;
         list_add(list, db_data_p);
       }
@@ -781,7 +781,7 @@ int db_parse(const char *host, const char *real_path,
     while ((entry = list_next(added_files_list, entry)) != NULL) {
       if (! terminating()) {
         filedata_t *filedata = (filedata_t *) (list_entry_payload(entry));
-        db_data_t  *db_data  = (db_data_t *) (malloc(sizeof(db_data_t)));
+        db_data_t  *db_data  = new db_data_t;
 
         asprintf(&db_data->host, "%s", host);
         db_data->filedata.metadata = filedata->metadata;
@@ -819,7 +819,7 @@ int db_parse(const char *host, const char *real_path,
         }
         if (S_ISLNK(filedata->metadata.type)) {
           char *full_path = NULL;
-          char *string = (char *) (malloc(FILENAME_MAX));
+          char *string = new char[FILENAME_MAX];
           int size;
 
           asprintf(&full_path, "%s/%s", mount_path, filedata->path);

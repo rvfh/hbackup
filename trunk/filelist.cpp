@@ -120,7 +120,7 @@ static int iterate_directory(const char *path, parser_t *parser) {
     if (failed) {
       free(filedata.path);
     } else {
-      filedata_p = (filedata_t *) (malloc(sizeof(filedata_t)));
+      filedata_p = new filedata_t;
       *filedata_p = filedata;
       list_add(files, filedata_p);
     }

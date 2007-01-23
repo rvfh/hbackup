@@ -91,7 +91,7 @@ list_t *filters_rule_new(list_t *handle) {
 
 int filters_rule_add(list_t *rule_handle, mode_t file_type,
     filter_type_t type, ...) {
-  filter_t *filter = (filter_t *) (malloc(sizeof(filter_t)));
+  filter_t *filter = new filter_t;
   va_list  args;
 
   if (filter == NULL) {
