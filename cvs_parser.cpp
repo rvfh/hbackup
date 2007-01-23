@@ -52,7 +52,7 @@ static parser_dir_status_t cvs_dir_check(void **handle, const char *path) {
     *handle = NULL;
     result = parser_dir_other;
   } else {
-    list_t  *list   = list_new(cvs_payload_get);
+    List    *list   = new List(cvs_payload_get);
     char    *buffer = NULL;
     size_t  size    = 0;
 
@@ -86,7 +86,7 @@ static parser_dir_status_t cvs_dir_check(void **handle, const char *path) {
 
       payload = new cvs_entry_t;
       *payload = cvs_entry;
-      list_add(list, payload);
+      list->add(payload);
     }
     /* Close file */
     fclose(entries);
@@ -97,15 +97,16 @@ static parser_dir_status_t cvs_dir_check(void **handle, const char *path) {
 }
 
 static void cvs_dir_leave(void *list_handle) {
-  list_t *list = (list_t *) (list_handle);
-  list_entry_t *entry = NULL;
+  if (list_handle != NULL) {
+    List *list = (List *) list_handle;
+    list_entry_t *entry = NULL;
 
-  while ((entry = list_next(list, entry)) != NULL) {
-    cvs_entry_t *cvs_entry = (cvs_entry_t *) (list_entry_payload(entry));
-
-    free(cvs_entry->name);
+    while ((entry = list->next(entry)) != NULL) {
+      cvs_entry_t *cvs_entry = (cvs_entry_t *) list_entry_payload(entry);
+      delete cvs_entry->name;
+    }
+    delete list;
   }
-  list_free(list);
 }
 
 
@@ -113,7 +114,7 @@ static void cvs_dir_leave(void *list_handle) {
 /* For now, it returns 0 for any file under CVS control */
 static parser_file_status_t cvs_file_check(void *list_handle,
     const filedata_t *file_data) {
-  list_t *list = (list_t *) (list_handle);
+  List *list = (List *) (list_handle);
 
   if (list == NULL) {
     fprintf(stderr, "cvs parser: file check: not initialised\n");
@@ -126,7 +127,7 @@ static parser_file_status_t cvs_file_check(void *list_handle,
     } else {
       file = file_data->path;
     }
-    if (list_find(list, file, NULL, NULL)) {
+    if (list->find(file, NULL, NULL)) {
       return parser_file_other;
     } else {
       return parser_file_maybemodified;

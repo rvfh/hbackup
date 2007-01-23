@@ -43,11 +43,11 @@ typedef struct {
 
 typedef struct {
   char    *path;
-  list_t  *ignore_handle;
-  list_t  *parsers_handle;
+  List  *ignore_handle;
+  List  *parsers_handle;
 } backup_t;
 
-static list_t *clients = NULL;
+static List *clients = NULL;
 static char   *mounted = NULL;
 
 static int unmount_share(const char *mount_point) {
@@ -141,7 +141,7 @@ static int mount_share(const char *mount_point, const client_t *client,
 
 int clients_new(void) {
   /* Create new list */
-  clients = list_new(NULL);
+  clients = new List();
   if (clients == NULL) {
     fprintf(stderr, "clients: new: cannot intialise\n");
     return 2;
@@ -152,7 +152,7 @@ int clients_new(void) {
 void clients_free(void) {
   list_entry_t *entry = NULL;
 
-  while ((entry = list_next(clients, entry)) != NULL) {
+  while ((entry = clients->next(entry)) != NULL) {
     client_t *client = (client_t *) (list_entry_payload(entry));
 
     free(client->protocol);
@@ -161,7 +161,7 @@ void clients_free(void) {
     free(client->hostname);
     free(client->listfile);
   }
-  list_free(clients);
+  delete clients;
 }
 
 int clients_add(const char *info, const char *listfile) {
@@ -225,14 +225,14 @@ int clients_add(const char *info, const char *listfile) {
 
       /* List file */
       asprintf(&client->listfile, "%s", listfile);
-      list_append(clients, client);
+      clients->append(client);
     }
   }
   free(linecopy);
   return failed;
 }
 
-static int add_filter(list_t *handle, const char *type, const char *string) {
+static int add_filter(List *handle, const char *type, const char *string) {
   const char *filter_type;
   const char *delim    = strchr(type, '/');
   mode_t     file_type = 0;
@@ -284,7 +284,7 @@ static int add_filter(list_t *handle, const char *type, const char *string) {
   return 0;
 }
 
-static int add_parser(list_t *handle, const char *type, const char *string) {
+static int add_parser(List *handle, const char *type, const char *string) {
   parser_mode_t mode;
 
   /* Determine mode */
@@ -308,7 +308,7 @@ static int add_parser(list_t *handle, const char *type, const char *string) {
   return 0;
 }
 
-static int read_listfile(const char *listfilename, list_t *backups) {
+static int read_listfile(const char *listfilename, List *backups) {
   FILE     *listfile;
   char     *buffer = NULL;
   size_t   size    = 0;
@@ -357,7 +357,7 @@ static int read_listfile(const char *listfilename, list_t *backups) {
         parsers_new(&backup->parsers_handle);
         asprintf(&backup->path, "%s", string);
         no_trailing_slash(backup->path);
-        list_append(backups, backup);
+        backups->append(backup);
       } else {
         fprintf(stderr,
           "clients: backup: syntax error in list file %s, line %u\n",
@@ -425,10 +425,10 @@ int clients_backup(const char *mount_point, int configcheck) {
   int failed = 0;
 
   /* Walk though the list of clients */
-  while ((entry = list_next(clients, entry)) != NULL) {
+  while ((entry = clients->next(entry)) != NULL) {
     client_t *client        = (client_t *) (list_entry_payload(entry));
     char     *listfilename  = NULL;
-    list_t   *backups       = list_new(NULL);
+    List   *backups         = new List();
 
     if (! prepare_share(client, mount_point, client->listfile, &listfilename)
      && ! read_listfile(listfilename, backups)) {
@@ -438,13 +438,13 @@ int clients_backup(const char *mount_point, int configcheck) {
           client->protocol);
       }
 
-      if (list_size(backups) == 0) {
+      if (backups->size() == 0) {
         fprintf(stderr, "clients: backup: empty list!\n");
         failed = 1;
       } else if (! configcheck) {
         list_entry_t *entry = NULL;
 
-        while ((entry = list_next(backups, entry)) != NULL) {
+        while ((entry = backups->next(entry)) != NULL) {
           backup_t *backup = (backup_t *) (list_entry_payload(entry));
           char     *backup_path = NULL;
 
@@ -493,7 +493,7 @@ int clients_backup(const char *mount_point, int configcheck) {
         }
       }
       /* Free backups list */
-      list_free(backups);
+      delete backups;
     } else {
       failed = 1;
     }

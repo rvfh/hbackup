@@ -35,7 +35,7 @@ Algorithm for temporary list creation:
 #define _GNU_SOURCE
 #endif
 #include <stdlib.h>
-#include <stdio.h>
+#include <iostream>
 #include <string.h>
 #include <sys/types.h>
 #include <dirent.h>
@@ -47,12 +47,14 @@ Algorithm for temporary list creation:
 #include "tools.h"
 #include "filelist.h"
 
+using namespace std;
+
 /* Mount point string length */
 static int mount_path_length = 0;
 
-static list_t       *files          = NULL;
-static const list_t *filters_handle = NULL;
-static const list_t *parsers_handle = NULL;
+static List       *files          = NULL;
+static const List *filters_handle = NULL;
+static const List *parsers_handle = NULL;
 
 static char *filedata_get(const void *payload) {
   const filedata_t *filedata = (const filedata_t *) (payload);
@@ -122,7 +124,7 @@ static int iterate_directory(const char *path, parser_t *parser) {
     } else {
       filedata_p = new filedata_t;
       *filedata_p = filedata;
-      list_add(files, filedata_p);
+      files->add(filedata_p);
     }
   }
   closedir(directory);
@@ -132,10 +134,10 @@ static int iterate_directory(const char *path, parser_t *parser) {
   return 0;
 }
 
-int filelist_new(const char *path, const list_t *filters, const list_t *parsers) {
+int filelist_new(const char *path, const List *filters, const List *parsers) {
   filters_handle = filters;
   parsers_handle = parsers;
-  files = list_new(filedata_get);
+  files = new List(filedata_get);
   if (files == NULL) {
     fprintf(stderr, "filelist: new: cannot initialise\n");
     return 2;
@@ -151,15 +153,15 @@ int filelist_new(const char *path, const list_t *filters, const list_t *parsers)
 void filelist_free(void) {
   list_entry_t *entry = NULL;
 
-  while ((entry = list_next(files, entry)) != NULL) {
+  while ((entry = files->next(entry)) != NULL) {
     filedata_t *filedata = (filedata_t *) (list_entry_payload(entry));
 
-    free(filedata->path);
+    delete filedata->path;
   }
-  list_free(files);
+  delete files;
 }
 
-list_t *filelist_get(void) {
+List *filelist_get(void) {
   return files;
 }
 

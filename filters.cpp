@@ -55,9 +55,9 @@ static int filter_path_start_check(const char *path, const filter_t *filter) {
   return strncmp(path, filter->string, strlen(filter->string));
 }
 
-int filters_new(list_t **handle) {
+int filters_new(List **handle) {
   /* Create new list */
-  *handle = list_new(NULL);
+  *handle = new List();
   if (*handle == NULL) {
     fprintf(stderr, "filters: new: failed\n");
     return 2;
@@ -65,31 +65,31 @@ int filters_new(list_t **handle) {
   return 0;
 }
 
-void filters_free(list_t *handle) {
+void filters_free(List *list) {
   /* Note: entry gets free in the loop */
   list_entry_t *entry;
 
   /* List of lists, free each embedded list */
-  while ((entry = list_next(handle, NULL)) != NULL) {
-    list_free((list_t *) (list_remove(handle, entry)));
+  while ((entry = list->next(NULL)) != NULL) {
+    delete (List *) list->remove(entry);
   }
-  if (list_size(handle) != 0) {
+  if (list->size() != 0) {
     fprintf(stderr, "filters: free: failed\n");
   }
-  list_free(handle);
+  delete list;
 }
 
-list_t *filters_rule_new(list_t *handle) {
-  list_t *rule = list_new(NULL);
+List *filters_rule_new(List *list) {
+  List *rule = new List();
 
-  if (list_append(handle, rule) == NULL) {
+  if (list->append(rule) == NULL) {
     fprintf(stderr, "filters: rule new: failed\n");
     return NULL;
   }
   return rule;
 }
 
-int filters_rule_add(list_t *rule_handle, mode_t file_type,
+int filters_rule_add(List *rule, mode_t file_type,
     filter_type_t type, ...) {
   filter_t *filter = new filter_t;
   va_list  args;
@@ -119,7 +119,7 @@ int filters_rule_add(list_t *rule_handle, mode_t file_type,
   }
   va_end(args);
 
-  if (list_append(rule_handle, filter) == NULL) {
+  if (rule->append(filter) == NULL) {
     fprintf(stderr, "filters: add: failed\n");
     return 2;
   }
@@ -150,17 +150,17 @@ static int filter_match(const filter_t *filter, const filedata_t *filedata) {
   return 1;
 }
 
-int filters_match(const list_t *handle, const filedata_t *filedata) {
+int filters_match(const List *list, const filedata_t *filedata) {
   list_entry_t *rule_entry = NULL;
 
   /* Read through list of rules */
-  while ((rule_entry = list_next(handle, rule_entry)) != NULL) {
-    list_t       *rule          = (list_t *) (list_entry_payload(rule_entry));
+  while ((rule_entry = list->next(rule_entry)) != NULL) {
+    List       *rule          = (List *) (list_entry_payload(rule_entry));
     list_entry_t *filter_entry  = NULL;
     int          match          = 1;
 
     /* Read through list of filters in rule */
-    while ((filter_entry = list_next(rule, filter_entry)) != NULL) {
+    while ((filter_entry = rule->next(filter_entry)) != NULL) {
       filter_t *filter = (filter_t *) (list_entry_payload(filter_entry));
 
       /* All filters must match for rule to match */

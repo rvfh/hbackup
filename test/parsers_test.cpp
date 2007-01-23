@@ -46,8 +46,8 @@ static char *parsers_show(const void *payload) {
 /* TODO parsers_dir_check and parsers_file_check test */
 int main(void) {
   parser_t *parser_p = new parser_t;
-  list_t *handle1 = NULL;
-  list_t *handle2 = NULL;
+  List *handle1 = NULL;
+  List *handle2 = NULL;
 
   if (parsers_new(&handle1)) {
     cout << "Failed to create\n";
@@ -56,15 +56,15 @@ int main(void) {
   if (parsers_add(handle1, parser_controlled, parser_p)) {
     cout << "Failed to add\n";
   }
-  list_show(handle1, NULL, parsers_show);
-  if (parser_p != list_entry_payload(list_next(handle1, NULL))) {
+  handle1->show(NULL, parsers_show);
+  if (parser_p != list_entry_payload(handle1->next(NULL))) {
     cout << "Parsers differ\n";
   }
   if (parsers_new(&handle2)) {
     cout << "Failed to create\n";
   }
-  list_show(handle2, NULL, parsers_show);
-  list_show(handle1, NULL, parsers_show);
+  handle2->show(NULL, parsers_show);
+  handle1->show(NULL, parsers_show);
   parsers_free(handle2);
   parsers_free(handle1);
   return 0;

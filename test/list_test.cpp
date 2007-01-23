@@ -19,8 +19,8 @@
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
 #endif
-#include <stdlib.h>
-#include <stdio.h>
+#include <iostream>
+using namespace std;
 #include <string.h>
 #include "list.h"
 
@@ -69,172 +69,188 @@ static payload2_t *list2_test_new(payload2_t payload2) {
 }
 
 int main() {
-  list_entry_t *entry  = NULL;
-  payload_t    payload;
-  payload2_t   payload2;
-  list_t       *list    = list_new(payload_get);
-  list_t       *list2   = list_new(payload2_get);
-  list_t       *list3   = list_new(payload2_get);
-  list_t       *added   = NULL;
-  list_t       *missing = NULL;
-  char         *string = NULL;
+  list_entry_t  *entry              = NULL;
+  payload_t     payload;
+  payload2_t    payload2;
+  List          list(payload_get);
+  List          *list2 = new List(payload2_get);
+  List          list3(payload2_get);
+  List          *added              = NULL;
+  List          *missing            = NULL;
+  char          *string             = NULL;
 
-  printf("Fill in list\n");
+  cout << "Fill in list\n";
   strcpy(payload.name, "test");
-  list_add(list, list_test_new(payload));
-  printf("List %u element(s):\n", list_size(list));
-  list_show(list, NULL, payload_get);
+  list.add(list_test_new(payload));
+  cout << "List " << list.size() << " element(s):\n";
+  list.show(NULL, payload_get);
 
   strcpy(payload.name, "test/testfile");
-  list_add(list, list_test_new(payload));
-  printf("List %u element(s):\n", list_size(list));
-  list_show(list, NULL, payload_get);
-  list_find(list, "test", NULL, &entry);
+  list.add(list_test_new(payload));
+  cout << "List " << list.size() << " element(s):\n";
+  list.show(NULL, payload_get);
+  list.find("test", NULL, &entry);
   string = payload_get(list_entry_payload(entry));
   if (strcmp(string, "test")) {
-    printf("test not found???\n");
+    cout << "test not found???\n";
   }
   free(string);
 
   strcpy(payload.name, "test/subdir/testfile1");
-  list_add(list, list_test_new(payload));
-  printf("List %u element(s):\n", list_size(list));
-  list_show(list, NULL, payload_get);
+  list.add(list_test_new(payload));
+  cout << "List " << list.size() << " element(s):\n";
+  list.show(NULL, payload_get);
 
   strcpy(payload.name, "test/subdir");
-  list_add(list, list_test_new(payload));
-  printf("List %u element(s):\n", list_size(list));
-  list_show(list, NULL, payload_get);
+  list.add(list_test_new(payload));
+  cout << "List " << list.size() << " element(s):\n";
+  list.show(NULL, payload_get);
 
   strcpy(payload.name, "test/testfile");
-  list_add(list, list_test_new(payload));
-  printf("List %u element(s):\n", list_size(list));
-  list_show(list, NULL, payload_get);
-  printf("Reported size: %u\n", list_size(list));
+  list.add(list_test_new(payload));
+  cout << "List " << list.size() << " element(s):\n";
+  list.show(NULL, payload_get);
+  cout << "Reported size: " << list.size() << "\n";
 
-  list_find(list, "test/testfile", NULL, &entry);
+  list.find("test/testfile", NULL, &entry);
 
-  printf("\nFill in list2\n");
+  cout << "\nFill in list2\n";
   strcpy(payload2.dir, "test");
   strcpy(payload2.filename, "testfile");
-  list_add(list2, list2_test_new(payload2));
-  printf("List %u element(s):\n", list_size(list2));
-  list_show(list2, NULL, NULL);
+  list2->add(list2_test_new(payload2));
+  cout << "List " << list2->size() << " element(s):\n";
+  list2->show();
 
   strcpy(payload2.dir, "test/subdir");
   strcpy(payload2.filename, "testfile1");
-  list_add(list2, list2_test_new(payload2));
-  printf("List %u element(s):\n", list_size(list2));
-  list_show(list2, NULL, NULL);
+  list2->add(list2_test_new(payload2));
+  cout << "List " << list2->size() << " element(s):\n";
+  list2->show();
 
   strcpy(payload2.filename, "added");
-  list_add(list2, list2_test_new(payload2));
-  printf("List %u element(s):\n", list_size(list2));
-  list_show(list2, NULL, NULL);
+  list2->add(list2_test_new(payload2));
+  cout << "List " << list2->size() << " element(s):\n";
+  list2->show();
 
-  printf("\nCompare lists\n");
-  if (list_compare(list, list2, NULL, NULL, NULL)) {
-    printf("Lists differ\n");
+  cout << "\nCompare lists\n";
+  if (list.compare(list2)) {
+    cout << "Lists differ\n";
   }
-  if (list_compare(list, list2, &added, NULL, NULL)) {
-    printf("Added list only\n");
-    printf("List %u element(s):\n", list_size(added));
-    list_show(added, NULL, NULL);
-    if (list_deselect(added) != 0) {
-      printf("Added list not freed\n");
-    }
-  }
-  if (list_compare(list, list2, NULL, &missing, NULL)) {
-    printf("Missing list only\n");
-    printf("List %u element(s):\n", list_size(missing));
-    list_show(missing, NULL, NULL);
-    if (list_deselect(missing) != 0) {
-      printf("Missing list not freed\n");
+  added = new List(payload2_get);
+  if (list.compare(list2, added)) {
+    cout << "Added list only\n";
+    cout << "List " << added->size() << " element(s):\n";
+    added->show();
+    if (added->deselect() != 0) {
+      cout << "Added list not empty after deselect\n";
     }
   }
-  if (list_compare(list, list2, &added, &missing, NULL)) {
-    printf("Both lists\n");
-    printf("List %u element(s):\n", list_size(added));
-    list_show(added, NULL, NULL);
-    if (list_deselect(added) != 0) {
-      printf("Added list not freed\n");
-    }
-    printf("List %u element(s):\n", list_size(missing));
-    list_show(missing, NULL, NULL);
-    if (list_deselect(missing) != 0) {
-      printf("Missing list not freed\n");
+  delete added;
+  missing = new List(payload_get);
+  if (list.compare(list2, NULL, missing)) {
+    cout << "Missing list only\n";
+    cout << "List " << missing->size() << " element(s):\n";
+    missing->show();
+    if (missing->deselect() != 0) {
+      cout << "Missing list not freed\n";
     }
   }
-  if (list_compare(list, list2, &added, &missing, payloads_compare)) {
-    printf("Both lists with comparison function\n");
-    printf("List %u element(s):\n", list_size(added));
-    list_show(added, NULL, NULL);
-    if (list_deselect(added) != 0) {
-      printf("Added list not freed\n");
+  delete missing;
+  added = new List(payload2_get);
+  missing = new List(payload_get);
+  if (list.compare(list2, added, missing)) {
+    cout << "Both lists\n";
+    cout << "List " << added->size() << " element(s):\n";
+    added->show();
+    if (added->deselect() != 0) {
+      cout << "Added list not freed\n";
     }
-    printf("List %u element(s):\n", list_size(missing));
-    list_show(missing, NULL, NULL);
-    if (list_deselect(missing) != 0) {
-      printf("Missing list not freed\n");
+    cout << "List " << missing->size() << " element(s):\n";
+    missing->show();
+    if (missing->deselect() != 0) {
+      cout << "Missing list not freed\n";
     }
   }
+  delete added;
+  delete missing;
+  added = new List(payload2_get);
+  missing = new List(payload_get);
+  if (list.compare(list2, added, missing, payloads_compare)) {
+    cout << "Both lists with comparison function\n";
+    cout << "List " << added->size() << " element(s):\n";
+    added->show();
+    if (added->deselect() != 0) {
+      cout << "Added list not freed\n";
+    }
+    cout << "List " << missing->size() << " element(s):\n";
+    missing->show();
+    if (missing->deselect() != 0) {
+      cout << "Missing list not freed\n";
+    }
+  }
+  delete added;
+  delete missing;
+  cout << "List " << list2->size() << " element(s) of original list:\n";
+  list2->show();
 
-  list_free(list2);
-
-  printf("\nSelect part of list\n");
-  printf("List %u element(s) of original list:\n", list_size(list));
-  list_show(list, NULL, payload_get);
-  list2 = NULL;
-  list3 = NULL;
-  if (list_select(list, "test/subdir/", NULL, &list2, &list3)) {
-    printf("Select failed\n");
+  cout << "\nSelect part of list\n";
+  cout << "List " << list.size() << " element(s) of original list:\n";
+  list.show(NULL, payload_get);
+  List *list_s1 = new List(payload_get);
+  List *list_u1 = new List(payload_get);
+  if (list.select("test/subdir/", NULL, list_s1, list_u1)) {
+    cout << "Select failed\n";
   } else {
-    printf("List %u element(s) of selected list:\n", list_size(list2));
-    list_show(list2, NULL, NULL);
-    if (list_deselect(list2) != 0) {
-      printf("Selected list not freed\n");
+    cout << "List " << list_s1->size() << " element(s) of selected list:\n";
+    list_s1->show();
+    if (list_s1->deselect() != 0) {
+      cout << "Selected list not freed\n";
     }
-    printf("List %u element(s) of unselected list:\n", list_size(list3));
-    list_show(list3, NULL, NULL);
-    if (list_deselect(list3) != 0) {
-      printf("Selected list not freed\n");
+    cout << "List " << list_u1->size() << " element(s) of unselected list:\n";
+    list_u1->show();
+    if (list_u1->deselect() != 0) {
+      cout << "Selected list not freed\n";
     }
   }
-  if (list_select(list, "test/subdir/", NULL, &list2, NULL)) {
-    printf("Select failed\n");
+  delete list_s1;
+  delete list_u1;
+  List *list_s2 = new List(payload_get);
+  if (list.select("test/subdir/", NULL, list_s2, NULL)) {
+    cout << "Select failed\n";
   } else {
-    printf("List %u element(s) of selected list:\n", list_size(list2));
-    list_show(list2, NULL, NULL);
-    if (list_deselect(list2) != 0) {
-      printf("Selected list not freed\n");
+    cout << "List " << list_s2->size() << " element(s) of selected list:\n";
+    list_s2->show();
+    if (list_s2->deselect() != 0) {
+      cout << "Selected list not freed\n";
     }
   }
-  if (list_select(list, "test/subdir/", NULL, NULL, &list3)) {
-    printf("Select failed\n");
+  delete list_s2;
+  List *list_u2 = new List(payload_get);
+  if (list.select("test/subdir/", NULL, NULL, list_u2)) {
+    cout << "Select failed\n";
   } else {
-    printf("List %u element(s) of unselected list:\n", list_size(list3));
-    list_show(list3, NULL, NULL);
-    if (list_deselect(list3) != 0) {
-      printf("Selected list not freed\n");
+    cout << "List " << list_u2->size() << " element(s) of unselected list:\n";
+    list_u2->show();
+    if (list_u2->deselect() != 0) {
+      cout << "Selected list not freed\n";
     }
   }
-  printf("List %u element(s) of original list:\n", list_size(list));
-  list_show(list, NULL, payload_get);
+  delete list_u2;
+  cout << "List " << list.size() << " element(s) of original list:\n";
+  list.show(NULL, payload_get);
 
-  printf("\nEmpty list\n");
-  list_drop(list, entry);
-  printf("List %u element(s):\n", list_size(list));
-  list_show(list, NULL, payload_get);
+  cout << "\nEmpty list\n";
+  list.drop(entry);
+  cout << "List " << list.size() << " element(s):\n";
+  list.show(NULL, payload_get);
 
-  list_drop(list, list_previous(list, NULL));
-  printf("List %u element(s):\n", list_size(list));
-  list_show(list, NULL, payload_get);
+  list.drop(list.previous(NULL));
+  cout << "List " << list.size() << " element(s):\n";
+  list.show(NULL, payload_get);
 
-  list_drop(list, list_next(list, NULL));
-  printf("List %u element(s):\n", list_size(list));
-  list_show(list, NULL, payload_get);
-
-  list_free(list);
+  list.drop(list.next(NULL));
+  cout << "List " << list.size() << " element(s):\n";
+  list.show(NULL, payload_get);
 
   return 0;
 }

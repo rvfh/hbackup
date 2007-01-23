@@ -28,14 +28,14 @@ int terminating(void) {
 }
 
 int main(int argc, char *argv[]) {
-  list_t *test_filters_handle = NULL;
-  list_t *test_parsers_handle = NULL;
+  List *test_filters_handle = NULL;
+  List *test_parsers_handle = NULL;
   int status;
 
   if ((status = filters_new(&test_filters_handle))) {
     printf("filters_new error status %u\n", status);
   }
-  /* Make sure filelist_new uses the filters */
+  /* Make sure filenew List uses the filters */
   filters_handle = test_filters_handle;
   if ((status = parsers_new(&test_parsers_handle))) {
     printf("parsers_new error status %u\n", status);
@@ -44,43 +44,43 @@ int main(int argc, char *argv[]) {
   mount_path_length = 4;
 
   printf("iterate_directory\n");
-  files = list_new(filedata_get);
+  files = new List(filedata_get);
   if (! iterate_directory("test", NULL)) {
-    printf(">List %u file(s):\n", list_size(files));
-    list_show(files, NULL, NULL);
+    cout << ">List " << files->size() << " file(s):\n";
+    files->show();
   }
-  list_free(files);
+  delete files;
 
   printf("as previous with subdir in ignore list\n");
   if ((status = filters_rule_add(filters_rule_new(test_filters_handle), S_IFDIR, filter_path_start, "subdir"))) {
     printf("ignore_add error status %u\n", status);
   }
-  files = list_new(filedata_get);
+  files = new List(filedata_get);
   if (! iterate_directory("test", NULL)) {
-    printf(">List %u file(s):\n", list_size(files));
-    list_show(files, NULL, NULL);
+    cout << ">List " << files->size() << " file(s):\n";
+    files->show();
   }
-  list_free(files);
+  delete files;
 
   printf("as previous with testlink in ignore list\n");
   if ((status = filters_rule_add(filters_rule_new(test_filters_handle), S_IFLNK, filter_path_start, "testlink"))) {
     printf("ignore_add error status %u\n", status);
   }
-  files = list_new(filedata_get);
+  files = new List(filedata_get);
   if (! iterate_directory("test", NULL)) {
-    printf(">List %u file(s):\n", list_size(files));
-    list_show(files, NULL, NULL);
+    cout << ">List " << files->size() << " file(s):\n";
+    files->show();
   }
-  list_free(files);
+  delete files;
 
   printf("as previous with CVS parser\n");
   parsers_add(test_parsers_handle, parser_controlled, cvs_parser_new());
-  files = list_new(filedata_get);
+  files = new List(filedata_get);
   if (! iterate_directory("test", NULL)) {
-    printf(">List %u file(s):\n", list_size(files));
-    list_show(files, NULL, NULL);
+    cout << ">List " << files->size() << " file(s):\n";
+    files->show();
   }
-  list_free(files);
+  delete files;
 
   /* Now make sure we don't mess with private data */
   filters_handle = NULL;
@@ -89,8 +89,8 @@ int main(int argc, char *argv[]) {
 
   printf("filelist_new, as previous\n");
   if (! filelist_new("test", test_filters_handle, test_parsers_handle)) {
-    printf(">List %u file(s):\n", list_size(files));
-    list_show(files, NULL, NULL);
+    cout << ">List " << files->size() << " file(s):\n";
+    files->show();
     filelist_free();
   }
 

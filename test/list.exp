@@ -58,6 +58,10 @@ List 4 element(s):
 -> test/subdir
 -> test/testfile
 -> test/testfile
+List 3 element(s) of original list:
+-> test/subdir/added
+-> test/subdir/testfile1
+-> test/testfile
 
 Select part of list
 List 5 element(s) of original list:
