@@ -50,7 +50,7 @@ static parser_dir_status_t cvs_dir_check(void **handle, const char *path) {
     *handle = NULL;
     result = parser_dir_other;
   } else {
-    list_t  list = list_new(cvs_payload_get);
+    list_t  *list   = list_new(cvs_payload_get);
     char    *buffer = NULL;
     size_t  size    = 0;
 
@@ -95,7 +95,7 @@ static parser_dir_status_t cvs_dir_check(void **handle, const char *path) {
 }
 
 static void cvs_dir_leave(void *list) {
-  list_entry_t entry = NULL;
+  list_entry_t *entry = NULL;
 
   while ((entry = list_next(list, entry)) != NULL) {
     cvs_entry_t *cvs_entry = list_entry_payload(entry);

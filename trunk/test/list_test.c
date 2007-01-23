@@ -67,14 +67,14 @@ static payload2_t *list2_test_new(payload2_t payload2) {
 }
 
 int main() {
-  list_entry_t entry  = NULL;
+  list_entry_t *entry  = NULL;
   payload_t    payload;
   payload2_t   payload2;
-  list_t       list    = list_new(payload_get);
-  list_t       list2   = list_new(payload2_get);
-  list_t       list3   = list_new(payload2_get);
-  list_t       added   = NULL;
-  list_t       missing = NULL;
+  list_t       *list    = list_new(payload_get);
+  list_t       *list2   = list_new(payload2_get);
+  list_t       *list3   = list_new(payload2_get);
+  list_t       *added   = NULL;
+  list_t       *missing = NULL;
   char         *string = NULL;
 
   printf("Fill in list\n");

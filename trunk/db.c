@@ -63,13 +63,13 @@ typedef struct {
   time_t      date_out;
 } db_data_t;
 
-static list_t db_list  = NULL;
+static list_t *db_list = NULL;
 static char   *db_path = NULL;
 
 /* Size of path being backed up */
 static int    backup_path_length = 0;
 
-static int db_load(const char *filename, list_t list) {
+static int db_load(const char *filename, list_t *list) {
   char *source_path;
   FILE *readfile;
   int  failed = 0;
@@ -187,7 +187,7 @@ static int db_load(const char *filename, list_t list) {
   return failed;
 }
 
-static int db_save(const char *filename, list_t list) {
+static int db_save(const char *filename, list_t *list) {
   char *temp_path;
   FILE *writefile;
   int  failed = 0;
@@ -195,7 +195,7 @@ static int db_save(const char *filename, list_t list) {
   asprintf(&temp_path, "%s/%s.part", db_path, filename);
   if ((writefile = fopen(temp_path, "w")) != NULL) {
     char *dest_path = NULL;
-    list_entry_t entry = NULL;
+    list_entry_t *entry = NULL;
 
     while ((entry = list_next(list, entry)) != NULL) {
       db_data_t *db_data = list_entry_payload(entry);
@@ -320,8 +320,8 @@ static int db_organize(char *path, int number) {
   return failed;
 }
 
-static void db_list_free(list_t list) {
-  list_entry_t entry = NULL;
+static void db_list_free(list_t *list) {
+  list_entry_t *entry = NULL;
 
   while ((entry = list_next(list, entry)) != NULL) {
     db_data_t *db_data = list_entry_payload(entry);
@@ -474,8 +474,8 @@ static int db_write(const char *mount_path, const char *path,
 
     if (delim != NULL) {
       char         *listfile = NULL;
-      list_t       list;
-      list_entry_t entry;
+      list_t       *list;
+      list_entry_t *entry;
       db_data_t    new_db_data = *db_data;
 
       *delim = '\0';
@@ -515,7 +515,7 @@ static int db_obsolete(const char *prefix, const char *path,
   char         *listfile  = NULL;
   char         *temp_path = NULL;
   int          failed = 0;
-  list_t       list;
+  list_t       *list;
 
   if (getdir(db_path, checksum, &temp_path)) {
     fprintf(stderr, "db: obsolete: failed to get dir for: %s\n", checksum);
@@ -529,7 +529,7 @@ static int db_obsolete(const char *prefix, const char *path,
     fprintf(stderr, "db: obsolete: failed to open data list\n");
   } else {
     db_data_t    *db_data;
-    list_entry_t entry;
+    list_entry_t *entry;
     char         *string = NULL;
 
     asprintf(&string, "%s %s %c", prefix, path, '@');
@@ -665,8 +665,8 @@ static char *close_select(const void *payload) {
 }
 
 void db_close(void) {
-  list_t    active_list;
-  list_t    removed_list;
+  list_t    *active_list;
+  list_t    *removed_list;
   time_t    localtime;
   struct tm localtime_brokendown;
 
@@ -751,11 +751,11 @@ static int parse_compare(void *db_data_p, void *filedata_p) {
 }
 
 int db_parse(const char *host, const char *real_path,
-    const char *mount_path, list_t file_list, size_t compress_min) {
-  list_t        selected_files_list;
-  list_t        added_files_list;
-  list_t        removed_files_list;
-  list_entry_t  entry   = NULL;
+    const char *mount_path, list_t *file_list, size_t compress_min) {
+  list_t        *selected_files_list;
+  list_t        *added_files_list;
+  list_t        *removed_files_list;
+  list_entry_t  *entry   = NULL;
   char          *string = NULL;
   int           failed  = 0;
 
@@ -944,7 +944,7 @@ int db_scan(const char *local_db_path, const char *checksum) {
   }
   if (! failed) {
     if (checksum == NULL) {
-      list_entry_t entry = NULL;
+      list_entry_t *entry = NULL;
       int          files = list_size(db_list);
 
       if (verbosity() > 0) {
@@ -1030,7 +1030,7 @@ int db_check(const char *local_db_path, const char *checksum) {
   }
   if (! failed) {
     if (checksum == NULL) {
-      list_entry_t entry = NULL;
+      list_entry_t *entry = NULL;
       int          files = list_size(db_list);
 
       if (verbosity() > 0) {
@@ -1058,14 +1058,14 @@ int db_check(const char *local_db_path, const char *checksum) {
       } else {
         char    *check_path = NULL;
         char    *listfile   = NULL;
-        list_t  list;
+        list_t  *list;
 
         asprintf(&listfile, "%s/list", &path[strlen(db_path) + 1]);
         list = list_new(db_data_get);
         if (db_load(listfile, list) == 2) {
           fprintf(stderr, "db: check: failed to open data list\n");
         } else {
-          list_entry_t entry = list_next(list, NULL);
+          list_entry_t *entry = list_next(list, NULL);
 
           if (entry == NULL) {
             fprintf(stderr, "db: check: failed to obtain checksum\n");

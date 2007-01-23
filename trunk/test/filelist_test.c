@@ -29,8 +29,8 @@ int terminating(void) {
 }
 
 int main(int argc, char *argv[]) {
-  void *test_filters_handle = NULL;
-  void *test_parsers_handle = NULL;
+  list_t *test_filters_handle = NULL;
+  list_t *test_parsers_handle = NULL;
   int status;
 
   if ((status = filters_new(&test_filters_handle))) {
