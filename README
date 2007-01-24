@@ -27,7 +27,7 @@ Each client must provide its own configuration file. Keywords that may be used:
 
 COMPRESSION
 
-All files above 100 bytes are compressed using a gzip-compatible method.
+No compression is enabled for now.
 
 FILTERS
 

@@ -270,7 +270,7 @@ int main(void) {
   }
 
   verbose = 2;
-  remove("test_db/data/59ca0efa9f5633cb0371bbc0355478d8-1/data");
+  remove("test_db/data/59ca0efa9f5633cb0371bbc0355478d8-0/data");
   if ((status = db_scan("test_db", NULL))) {
     printf("db_scan (full) error status %u\n", status);
   }
@@ -279,7 +279,8 @@ int main(void) {
     printf("db_check (full) error status %u\n", status);
   }
 
-  testfile("test_db/data/59ca0efa9f5633cb0371bbc0355478d8-1/data", 1);
+  testdir("test_db/data/59ca0efa9f5633cb0371bbc0355478d8-0", 1);
+  testfile("test_db/data/59ca0efa9f5633cb0371bbc0355478d8-0/data", 1);
   if ((status = db_check("test_db", NULL))) {
     printf("db_check (full) error status %u\n", status);
   }
