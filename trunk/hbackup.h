@@ -19,6 +19,14 @@
 #ifndef HBACKUP_H
 #define HBACKUP_H
 
+#include "metadata.h"
+
+typedef struct {
+  char        *path;
+  char        checksum[36];
+  metadata_t  metadata;
+} filedata_t;
+
 /* Get verbosity level */
 extern int verbosity(void);
 

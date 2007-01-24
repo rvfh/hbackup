@@ -43,8 +43,8 @@ typedef struct {
 
 typedef struct {
   char    *path;
-  List  *ignore_handle;
-  List  *parsers_handle;
+  Filter  *ignore_handle;
+  List    *parsers_handle;
 } backup_t;
 
 static List *clients = NULL;
@@ -232,7 +232,7 @@ int clients_add(const char *info, const char *listfile) {
   return failed;
 }
 
-static int add_filter(List *handle, const char *type, const char *string) {
+static int add_filter(Filter *handle, const char *type, const char *string) {
   const char *filter_type;
   const char *delim    = strchr(type, '/');
   mode_t     file_type = 0;
@@ -264,20 +264,15 @@ static int add_filter(List *handle, const char *type, const char *string) {
 
   /* Add specified filter */
   if (! strcmp(filter_type, "path_end")) {
-    filters_rule_add(filters_rule_new(handle), file_type, filter_path_end,
-      string);
+    handle->addRule(new Rule(new Condition(file_type, filter_path_end, string)));
   } else if (! strcmp(filter_type, "path_start")) {
-    filters_rule_add(filters_rule_new(handle), file_type, filter_path_start,
-      string);
+    handle->addRule(new Rule(new Condition(file_type, filter_path_start, string)));
   } else if (! strcmp(filter_type, "path_regexp")) {
-    filters_rule_add(filters_rule_new(handle), file_type, filter_path_regexp,
-      string);
+    handle->addRule(new Rule(new Condition(file_type, filter_path_regexp, string)));
   } else if (! strcmp(filter_type, "size_below")) {
-    filters_rule_add(filters_rule_new(handle), 0, filter_size_below,
-      strtoul(string, NULL, 10));
+    handle->addRule(new Rule(new Condition(0, filter_size_below, strtoul(string, NULL, 10))));
   } else if (! strcmp(filter_type, "size_above")) {
-    filters_rule_add(filters_rule_new(handle), 0, filter_size_above,
-      strtoul(string, NULL, 10));
+    handle->addRule(new Rule(new Condition(0, filter_size_above, strtoul(string, NULL, 10))));
   } else {
     return 1;
   }
@@ -353,7 +348,7 @@ static int read_listfile(const char *listfilename, List *backups) {
       } else if (! strcmp(keyword, "path")) {
         /* New backup entry */
         backup = new backup_t;
-        filters_new(&backup->ignore_handle);
+        backup->ignore_handle = new Filter;
         parsers_new(&backup->parsers_handle);
         asprintf(&backup->path, "%s", string);
         no_trailing_slash(backup->path);
@@ -488,7 +483,7 @@ int clients_backup(const char *mount_point, int configcheck) {
 
           /* Free encapsulated data */
           free(backup->path);
-          filters_free(backup->ignore_handle);
+          delete backup->ignore_handle;
           parsers_free(backup->parsers_handle);
         }
       }

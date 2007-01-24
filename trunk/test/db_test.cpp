@@ -57,7 +57,7 @@ int terminating(void) {
 }
 
 int main(void) {
-  List    *filters_handle = NULL;
+  Filter  *filter_handle = NULL;
   List    *parsers_handle = NULL;
   char      checksum[40];
   char      zchecksum[40];
@@ -117,33 +117,26 @@ int main(void) {
     return 0;
   }
 
-  if ((status = filters_new(&filters_handle))) {
-    printf("ignore_new error status %u\n", status);
-    return 0;
-  }
-  if ((status = filters_rule_add(filters_rule_new(filters_handle), S_IFDIR,
-      filter_path_start, ".svn"))) {
+  filter_handle = new Filter;
+  if ((status = filter_handle->addRule(new Rule(new Condition(S_IFDIR, filter_path_start, ".svn"))))) {
     printf("ignore_add error status %u\n", status);
     return 0;
   }
-  if ((status = filters_rule_add(filters_rule_new(filters_handle), S_IFDIR,
-      filter_path_start, "subdir"))) {
+  if ((status = filter_handle->addRule(new Rule(new Condition(S_IFDIR, filter_path_start, "subdir"))))) {
     printf("ignore_add error status %u\n", status);
     return 0;
   }
-  if ((status = filters_rule_add(filters_rule_new(filters_handle), S_IFREG,
-      filter_path_end, "~"))) {
+  if ((status = filter_handle->addRule(new Rule(new Condition(S_IFREG, filter_path_end, "~"))))) {
     printf("ignore_add error status %u\n", status);
     return 0;
   }
-  if ((status = filters_rule_add(filters_rule_new(filters_handle), S_IFREG,
-      filter_path_regexp, "\\.o$"))) {
+  if ((status = filter_handle->addRule(new Rule(new Condition(S_IFREG, filter_path_regexp, "\\.o$"))))) {
     printf("ignore_add error status %u\n", status);
     return 0;
   }
 
   verbose = 2;
-  if ((status = filelist_new("test////", filters_handle, parsers_handle))) {
+  if ((status = filelist_new("test////", filter_handle, parsers_handle))) {
     printf("file_list_new error status %u\n", status);
     return 0;
   }
@@ -227,7 +220,7 @@ int main(void) {
   filelist_free();
 
   verbose = 2;
-  if ((status = filelist_new("test2", filters_handle, parsers_handle))) {
+  if ((status = filelist_new("test2", filter_handle, parsers_handle))) {
     printf("file_list_new error status %u\n", status);
     return 0;
   }
@@ -306,7 +299,7 @@ int main(void) {
   remove("test/testfile");
 
   verbose = 2;
-  if ((status = filelist_new("test////", filters_handle, parsers_handle))) {
+  if ((status = filelist_new("test////", filter_handle, parsers_handle))) {
     printf("file_list_new error status %u\n", status);
     return 0;
   }
@@ -327,7 +320,7 @@ int main(void) {
   filelist_free();
 
   verbose = 2;
-  if ((status = filelist_new("test////", filters_handle, parsers_handle))) {
+  if ((status = filelist_new("test////", filter_handle, parsers_handle))) {
     printf("file_list_new error status %u\n", status);
     return 0;
   }
@@ -346,7 +339,7 @@ int main(void) {
   filelist_free();
 
   verbose = 2;
-  if ((status = filelist_new("test2", filters_handle, parsers_handle))) {
+  if ((status = filelist_new("test2", filter_handle, parsers_handle))) {
     printf("file_list_new error status %u\n", status);
     return 0;
   }
@@ -382,7 +375,7 @@ int main(void) {
   db_close();
 
 
-  filters_free(filters_handle);
+  delete filter_handle;
   parsers_free(parsers_handle);
 
   return 0;

@@ -52,9 +52,9 @@ using namespace std;
 /* Mount point string length */
 static int mount_path_length = 0;
 
-static List       *files          = NULL;
-static const List *filters_handle = NULL;
-static const List *parsers_handle = NULL;
+static List         *files          = NULL;
+static const Filter *filter_handle = NULL;
+static const List   *parsers_handle = NULL;
 
 static char *filedata_get(const void *payload) {
   const filedata_t *filedata = (const filedata_t *) (payload);
@@ -104,8 +104,7 @@ static int iterate_directory(const char *path, parser_t *parser) {
       failed = 1;
     } else
     /* Now pass it through the filters */
-    if ((filters_handle != NULL) && ! filters_match(filters_handle,
-        &filedata)) {
+    if ((filter_handle != NULL) && ! filter_handle->match(&filedata)) {
       failed = 1;
     } else
     if (S_ISDIR(filedata.metadata.type)) {
@@ -134,8 +133,8 @@ static int iterate_directory(const char *path, parser_t *parser) {
   return 0;
 }
 
-int filelist_new(const char *path, const List *filters, const List *parsers) {
-  filters_handle = filters;
+int filelist_new(const char *path, const Filter *filter, const List *parsers) {
+  filter_handle = filter;
   parsers_handle = parsers;
   files = new List(filedata_get);
   if (files == NULL) {

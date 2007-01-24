@@ -24,23 +24,9 @@ using namespace std;
 #include "filters.cpp"
 
 static char *filters_show(const void *payload) {
-  const filter_t     *filter = (const filter_t *) (payload);
-  char               *string = NULL;
+  const Condition *condition = (const Condition *) (payload);
 
-  switch (filter->type) {
-    case filter_path_end:
-    case filter_path_start:
-    case filter_path_regexp:
-      asprintf(&string, "%s %u", filter->string, filter->type);
-      break;
-    case filter_size_above:
-    case filter_size_below:
-      asprintf(&string, "%ld %u", filter->size, filter->type);
-      break;
-    default:
-      asprintf(&string, "unknown filter type");
-  }
-  return string;
+  return condition->show();
 }
 
 static char *filters_rule_show(const void *payload) {
@@ -54,279 +40,273 @@ static char *filters_rule_show(const void *payload) {
 
 /* TODO Test file type check */
 int main(void) {
-  List       *handle = NULL;
-  List       *handle2 = NULL;
-  filedata_t filedata;
-  filter_t   filter;
+  Filter      *filter = NULL;
+  Filter      *filter2 = NULL;
+  Rule        *rule;
+  Condition   *condition;
+  filedata_t  filedata;
 
   filedata.metadata.type = S_IFREG;
-  filter.file_type = S_IFREG;
 
   cout << "Filters test\n";
-  strcpy(filter.string, ".txt");
   cout << "filter_path_end_check\n";
-  if (! filter_path_end_check("to a file.txt", &filter)) {
+  condition = new Condition(S_IFREG, filter_path_end, ".txt");
+  filedata.path = "to a file.txt";
+  if (! condition->match(&filedata)) {
     cout << "match 1.1\n";
   }
-  if (! filter_path_end_check("to a file.tst", &filter)) {
+  filedata.path = "to a file.tst";
+  if (! condition->match(&filedata)) {
     cout << "match 1.2\n";
   }
+  delete condition;
 
   cout << "filter_path_start_check\n";
-  strcpy(filter.string, "this is/a");
-  if (! filter_path_start_check("this is/a path/to a file.txt", &filter)) {
+  condition = new Condition(S_IFREG, filter_path_start, "this is/a");
+  filedata.path = "this is/a path/to a file.txt";
+  if (! condition->match(&filedata)) {
     cout << "match 2.1\n";
   }
-  strcpy(filter.string, "this was/a");
-  if (! filter_path_start_check("this is/a path/to a file.txt", &filter)) {
+  delete condition;
+  condition = new Condition(S_IFREG, filter_path_start, "this was/a");
+  if (! condition->match(&filedata)) {
     cout << "match 2.2\n";
   }
+  delete condition;
 
   cout << "filter_path_regexp_check\n";
-  strcpy(filter.string, "^this.*path/.*\\.txt");
-  if (! filter_path_regexp_check("this is/a path/to a file.txt", &filter)) {
+  condition = new Condition(S_IFREG, filter_path_regexp, "^this.*path/.*\\.txt");
+  if (! condition->match(&filedata)) {
     cout << "match 3.1\n";
   }
-  strcpy(filter.string, "^this.*path/a.*\\.txt");
-  if (! filter_path_regexp_check("this is/a path/to a file.txt", &filter)) {
+  delete condition;
+  condition = new Condition(S_IFREG, filter_path_regexp, "^this.*path/a.*\\.txt");
+  if (! condition->match(&filedata)) {
     cout << "match 3.2\n";
   }
+  delete condition;
 
   /* No filter check possible for size comparison: not a function */
 
   cout << "\nMatch function test\n";
-  filter.type            = filter_size_below;
-  filter.file_type       = S_IFREG;
-  filter.size            = 5000;
+  condition = new Condition(S_IFREG, filter_size_below, 5000);
   filedata.metadata.size = 4000;
-  if (filter_match(&filter, &filedata)) {
+  if (condition->match(&filedata)) {
     cout << "Not matching " << filedata.metadata.size << "\n";
   } else {
     cout << "Matching " << filedata.metadata.size << "\n";
   }
   filedata.metadata.size = 6000;
-  if (filter_match(&filter, &filedata)) {
+  if (condition->match(&filedata)) {
     cout << "Not matching " << filedata.metadata.size << "\n";
   } else {
     cout << "Matching " << filedata.metadata.size << "\n";
   }
 
   cout << "\nSimple rules test\n";
-  if (filters_new(&handle)) {
-    cout << "Failed to create\n";
+  filter = new Filter;
+  if (filter->addRule(new Rule(new Condition(S_IFREG, filter_path_regexp, "^to a.*\\.txt")))) {
+    cout << "Failed to add\n";
   } else {
-    if (filters_rule_add(filters_rule_new(handle), S_IFREG, filter_path_regexp, "^to a.*\\.txt")) {
-      cout << "Failed to add\n";
-    } else {
-      cout << ">List " << handle->size() << " rule(s):\n";
-      handle->show(NULL, filters_rule_show);
-    }
-    if (filters_rule_add(filters_rule_new(handle), S_IFREG, filter_path_regexp, "^to a.*\\.t.t")) {
-      cout << "Failed to add\n";
-    } else {
-      cout << ">List " << handle->size() << " rule(s):\n";
-      handle->show(NULL, filters_rule_show);
-    }
-    filedata.path = "to a file.txt";
-    if (filters_match(handle, &filedata)) {
-      cout << "Not matching 1\n";
-    }
-    filedata.path = "to a file.tst";
-    if (filters_match(handle, &filedata)) {
-      cout << "Not matching 2\n";
-    }
-    filedata.path = "to a file.tsu";
-    if (filters_match(handle, &filedata)) {
-      cout << "Not matching 3\n";
-    }
-
-    if (filters_new(&handle2)) {
-      cout << "Failed to create\n";
-    } else {
-      filedata.path = "to a file.txt";
-      if (filters_match(handle2, &filedata)) {
-        cout << "Not matching +1\n";
-      }
-      filedata.path = "to a file.tst";
-      if (filters_match(handle2, &filedata)) {
-        cout << "Not matching +2\n";
-      }
-      filedata.path = "to a file.tsu";
-      if (filters_match(handle2, &filedata)) {
-        cout << "Not matching +3\n";
-      }
-      if (filters_rule_add(filters_rule_new(handle2), S_IFREG, filter_path_regexp, "^to a.*\\.txt")) {
-        cout << "Failed to add\n";
-      } else {
-        cout << ">List " << handle2->size() << " rule(s):\n";
-        handle2->show(NULL, filters_rule_show);
-      }
-      if (filters_rule_add(filters_rule_new(handle2), S_IFREG, filter_path_regexp, "^to a.*\\.t.t")) {
-        cout << "Failed to add\n";
-      } else {
-        cout << ">List " << handle2->size() << " rule(s):\n";
-        handle2->show(NULL, filters_rule_show);
-      }
-      filedata.path = "to a file.txt";
-      if (filters_match(handle2, &filedata)) {
-        cout << "Not matching +1\n";
-      }
-      filedata.path = "to a file.tst";
-      if (filters_match(handle2, &filedata)) {
-        cout << "Not matching +2\n";
-      }
-      filedata.path = "to a file.tsu";
-      if (filters_match(handle2, &filedata)) {
-        cout << "Not matching +3\n";
-      }
-      filters_free(handle2);
-    }
-
-    filedata.path = "to a file.txt";
-    if (filters_match(handle, &filedata)) {
-      cout << "Not matching 1\n";
-    }
-    filedata.path = "to a file.tst";
-    if (filters_match(handle, &filedata)) {
-      cout << "Not matching 2\n";
-    }
-    filedata.path = "to a file.tsu";
-    if (filters_match(handle, &filedata)) {
-      cout << "Not matching 3\n";
-    }
-    filters_free(handle);
+    cout << ">List " << filter->size() << " rule(s):\n";
+    filter->show(NULL, filters_rule_show);
+  }
+  if (filter->addRule(new Rule(new Condition(S_IFREG, filter_path_regexp, "^to a.*\\.t.t")))) {
+    cout << "Failed to add\n";
+  } else {
+    cout << ">List " << filter->size() << " rule(s):\n";
+    filter->show(NULL, filters_rule_show);
+  }
+  filedata.path = "to a file.txt";
+  if (filter->match(&filedata)) {
+    cout << "Not matching 1\n";
+  }
+  filedata.path = "to a file.tst";
+  if (filter->match(&filedata)) {
+    cout << "Not matching 2\n";
+  }
+  filedata.path = "to a file.tsu";
+  if (filter->match(&filedata)) {
+    cout << "Not matching 3\n";
   }
 
-  if (filters_new(&handle)) {
-    cout << "Failed to create\n";
-  } else {
-    filedata.metadata.size = 0;
-    if (filters_match(handle, &filedata)) {
-      cout << "Not matching " << filedata.metadata.size << "\n";
-    } else {
-      cout << "Matching " << filedata.metadata.size << "\n";
-    }
-    filedata.metadata.size = 1000;
-    if (filters_match(handle, &filedata)) {
-      cout << "Not matching " << filedata.metadata.size << "\n";
-    } else {
-      cout << "Matching " << filedata.metadata.size << "\n";
-    }
-    filedata.metadata.size = 1000000;
-    if (filters_match(handle, &filedata)) {
-      cout << "Not matching " << filedata.metadata.size << "\n";
-    } else {
-      cout << "Matching " << filedata.metadata.size << "\n";
-    }
-    /* File type is always S_IFREG */
-    if (filters_rule_add(filters_rule_new(handle), 0, filter_size_below, 500)) {
-      cout << "Failed to add\n";
-    } else {
-      cout << ">List " << handle->size() << " rule(s):\n";
-      handle->show(NULL, filters_rule_show);
-    }
-    filedata.metadata.size = 0;
-    if (filters_match(handle, &filedata)) {
-      cout << "Not matching " << filedata.metadata.size << "\n";
-    } else {
-      cout << "Matching " << filedata.metadata.size << "\n";
-    }
-    filedata.metadata.size = 1000;
-    if (filters_match(handle, &filedata)) {
-      cout << "Not matching " << filedata.metadata.size << "\n";
-    } else {
-      cout << "Matching " << filedata.metadata.size << "\n";
-    }
-    filedata.metadata.size = 1000000;
-    if (filters_match(handle, &filedata)) {
-      cout << "Not matching " << filedata.metadata.size << "\n";
-    } else {
-      cout << "Matching " << filedata.metadata.size << "\n";
-    }
-    /* File type is always S_IFREG */
-    if (filters_rule_add(filters_rule_new(handle), 0, filter_size_above, 5000)) {
-      cout << "Failed to add\n";
-    } else {
-      cout << ">List " << handle->size() << " rule(s):\n";
-      handle->show(NULL, filters_rule_show);
-    }
-    filedata.metadata.size = 0;
-    if (filters_match(handle, &filedata)) {
-      cout << "Not matching " << filedata.metadata.size << "\n";
-    } else {
-      cout << "Matching " << filedata.metadata.size << "\n";
-    }
-    filedata.metadata.size = 1000;
-    if (filters_match(handle, &filedata)) {
-      cout << "Not matching " << filedata.metadata.size << "\n";
-    } else {
-      cout << "Matching " << filedata.metadata.size << "\n";
-    }
-    filedata.metadata.size = 1000000;
-    if (filters_match(handle, &filedata)) {
-      cout << "Not matching " << filedata.metadata.size << "\n";
-    } else {
-      cout << "Matching " << filedata.metadata.size << "\n";
-    }
-    filters_free(handle);
+  filter2 = new Filter;
+  filedata.path = "to a file.txt";
+  if (filter2->match(&filedata)) {
+    cout << "Not matching +1\n";
   }
+  filedata.path = "to a file.tst";
+  if (filter2->match(&filedata)) {
+    cout << "Not matching +2\n";
+  }
+  filedata.path = "to a file.tsu";
+  if (filter2->match(&filedata)) {
+    cout << "Not matching +3\n";
+  }
+  if (filter2->addRule(new Rule(new Condition(S_IFREG, filter_path_regexp, "^to a.*\\.txt")))) {
+    cout << "Failed to add\n";
+  } else {
+    cout << ">List " << filter2->size() << " rule(s):\n";
+    filter2->show(NULL, filters_rule_show);
+  }
+  if (filter2->addRule(new Rule(new Condition(S_IFREG, filter_path_regexp, "^to a.*\\.t.t")))) {
+    cout << "Failed to add\n";
+  } else {
+    cout << ">List " << filter2->size() << " rule(s):\n";
+    filter2->show(NULL, filters_rule_show);
+  }
+  filedata.path = "to a file.txt";
+  if (filter2->match(&filedata)) {
+    cout << "Not matching +1\n";
+  }
+  filedata.path = "to a file.tst";
+  if (filter2->match(&filedata)) {
+    cout << "Not matching +2\n";
+  }
+  filedata.path = "to a file.tsu";
+  if (filter2->match(&filedata)) {
+    cout << "Not matching +3\n";
+  }
+  delete filter2;
+
+  filedata.path = "to a file.txt";
+  if (filter->match(&filedata)) {
+    cout << "Not matching 1\n";
+  }
+  filedata.path = "to a file.tst";
+  if (filter->match(&filedata)) {
+    cout << "Not matching 2\n";
+  }
+  filedata.path = "to a file.tsu";
+  if (filter->match(&filedata)) {
+    cout << "Not matching 3\n";
+  }
+  delete filter;
+
+  filter = new Filter;
+  filedata.metadata.size = 0;
+  if (filter->match(&filedata)) {
+    cout << "Not matching " << filedata.metadata.size << "\n";
+  } else {
+    cout << "Matching " << filedata.metadata.size << "\n";
+  }
+  filedata.metadata.size = 1000;
+  if (filter->match(&filedata)) {
+    cout << "Not matching " << filedata.metadata.size << "\n";
+  } else {
+    cout << "Matching " << filedata.metadata.size << "\n";
+  }
+  filedata.metadata.size = 1000000;
+  if (filter->match(&filedata)) {
+    cout << "Not matching " << filedata.metadata.size << "\n";
+  } else {
+    cout << "Matching " << filedata.metadata.size << "\n";
+  }
+  /* File type is always S_IFREG */
+  if (filter->addRule(new Rule(new Condition(0, filter_size_below, 500)))) {
+    cout << "Failed to add\n";
+  } else {
+    cout << ">List " << filter->size() << " rule(s):\n";
+    filter->show(NULL, filters_rule_show);
+  }
+  filedata.metadata.size = 0;
+  if (filter->match(&filedata)) {
+    cout << "Not matching " << filedata.metadata.size << "\n";
+  } else {
+    cout << "Matching " << filedata.metadata.size << "\n";
+  }
+  filedata.metadata.size = 1000;
+  if (filter->match(&filedata)) {
+    cout << "Not matching " << filedata.metadata.size << "\n";
+  } else {
+    cout << "Matching " << filedata.metadata.size << "\n";
+  }
+  filedata.metadata.size = 1000000;
+  if (filter->match(&filedata)) {
+    cout << "Not matching " << filedata.metadata.size << "\n";
+  } else {
+    cout << "Matching " << filedata.metadata.size << "\n";
+  }
+  /* File type is always S_IFREG */
+  if (filter->addRule(new Rule(new Condition(0, filter_size_above, 5000)))) {
+    cout << "Failed to add\n";
+  } else {
+    cout << ">List " << filter->size() << " rule(s):\n";
+    filter->show(NULL, filters_rule_show);
+  }
+  filedata.metadata.size = 0;
+  if (filter->match(&filedata)) {
+    cout << "Not matching " << filedata.metadata.size << "\n";
+  } else {
+    cout << "Matching " << filedata.metadata.size << "\n";
+  }
+  filedata.metadata.size = 1000;
+  if (filter->match(&filedata)) {
+    cout << "Not matching " << filedata.metadata.size << "\n";
+  } else {
+    cout << "Matching " << filedata.metadata.size << "\n";
+  }
+  filedata.metadata.size = 1000000;
+  if (filter->match(&filedata)) {
+    cout << "Not matching " << filedata.metadata.size << "\n";
+  } else {
+    cout << "Matching " << filedata.metadata.size << "\n";
+  }
+  delete filter;
 
   /* Test complex rules */
   cout << "\nComplex rules test\n";
-  if (filters_new(&handle)) {
-    cout << "Failed to create\n";
+  filter = new Filter;
+  rule   = new Rule;
+
+  cout << ">List " << filter->size() << " rule(s):\n";
+  filter->show(NULL, filters_rule_show);
+
+  filter->addRule(rule);
+  if (rule->addCondition(new Condition(0, filter_size_below, 500))) {
+    cout << "Failed to add\n";
   } else {
-    List *rule = NULL;
-
-    cout << ">List " << handle->size() << " rule(s):\n";
-    handle->show(NULL, filters_rule_show);
-
-    rule = filters_rule_new(handle);
-    if (filters_rule_add(rule, 0, filter_size_below, 500)) {
-      cout << "Failed to add\n";
-    } else {
-      cout << ">List " << handle->size() << " rule(s):\n";
-      handle->show(NULL, filters_rule_show);
-    }
-    if (filters_rule_add(rule, 0, filter_size_above, 400)) {
-      cout << "Failed to add\n";
-    } else {
-      cout << ">List " << handle->size() << " rule(s):\n";
-      handle->show(NULL, filters_rule_show);
-    }
-    filedata.metadata.size = 600;
-    if (filters_match(handle, &filedata)) {
-      cout << "Not matching " << filedata.metadata.size << "\n";
-    } else {
-      cout << "Matching " << filedata.metadata.size << "\n";
-    }
-    filedata.metadata.size = 500;
-    if (filters_match(handle, &filedata)) {
-      cout << "Not matching " << filedata.metadata.size << "\n";
-    } else {
-      cout << "Matching " << filedata.metadata.size << "\n";
-    }
-    filedata.metadata.size = 450;
-    if (filters_match(handle, &filedata)) {
-      cout << "Not matching " << filedata.metadata.size << "\n";
-    } else {
-      cout << "Matching " << filedata.metadata.size << "\n";
-    }
-    filedata.metadata.size = 400;
-    if (filters_match(handle, &filedata)) {
-      cout << "Not matching " << filedata.metadata.size << "\n";
-    } else {
-      cout << "Matching " << filedata.metadata.size << "\n";
-    }
-    filedata.metadata.size = 300;
-    if (filters_match(handle, &filedata)) {
-      cout << "Not matching " << filedata.metadata.size << "\n";
-    } else {
-      cout << "Matching " << filedata.metadata.size << "\n";
-    }
-
-    filters_free(handle);
+    cout << ">List " << filter->size() << " rule(s):\n";
+    filter->show(NULL, filters_rule_show);
   }
+  if (rule->addCondition(new Condition(0, filter_size_above, 400))) {
+    cout << "Failed to add\n";
+  } else {
+    cout << ">List " << filter->size() << " rule(s):\n";
+    filter->show(NULL, filters_rule_show);
+  }
+  filedata.metadata.size = 600;
+  if (filter->match(&filedata)) {
+    cout << "Not matching " << filedata.metadata.size << "\n";
+  } else {
+    cout << "Matching " << filedata.metadata.size << "\n";
+  }
+  filedata.metadata.size = 500;
+  if (filter->match(&filedata)) {
+    cout << "Not matching " << filedata.metadata.size << "\n";
+  } else {
+    cout << "Matching " << filedata.metadata.size << "\n";
+  }
+  filedata.metadata.size = 450;
+  if (filter->match(&filedata)) {
+    cout << "Not matching " << filedata.metadata.size << "\n";
+  } else {
+    cout << "Matching " << filedata.metadata.size << "\n";
+  }
+  filedata.metadata.size = 400;
+  if (filter->match(&filedata)) {
+    cout << "Not matching " << filedata.metadata.size << "\n";
+  } else {
+    cout << "Matching " << filedata.metadata.size << "\n";
+  }
+  filedata.metadata.size = 300;
+  if (filter->match(&filedata)) {
+    cout << "Not matching " << filedata.metadata.size << "\n";
+  } else {
+    cout << "Matching " << filedata.metadata.size << "\n";
+  }
+
+  delete filter;
 
   return 0;
 }
