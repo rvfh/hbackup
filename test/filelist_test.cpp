@@ -28,15 +28,13 @@ int terminating(void) {
 }
 
 int main(int argc, char *argv[]) {
-  List *test_filters_handle = NULL;
+  Filter *test_filter_handle = NULL;
   List *test_parsers_handle = NULL;
   int status;
 
-  if ((status = filters_new(&test_filters_handle))) {
-    printf("filters_new error status %u\n", status);
-  }
+  test_filter_handle = new Filter;
   /* Make sure filenew List uses the filters */
-  filters_handle = test_filters_handle;
+  filter_handle = test_filter_handle;
   if ((status = parsers_new(&test_parsers_handle))) {
     printf("parsers_new error status %u\n", status);
   }
@@ -52,7 +50,7 @@ int main(int argc, char *argv[]) {
   delete files;
 
   printf("as previous with subdir in ignore list\n");
-  if ((status = filters_rule_add(filters_rule_new(test_filters_handle), S_IFDIR, filter_path_start, "subdir"))) {
+  if ((status = test_filter_handle->addRule(new Rule(new Condition(S_IFDIR, filter_path_start, "subdir"))))) {
     printf("ignore_add error status %u\n", status);
   }
   files = new List(filedata_get);
@@ -63,7 +61,7 @@ int main(int argc, char *argv[]) {
   delete files;
 
   printf("as previous with testlink in ignore list\n");
-  if ((status = filters_rule_add(filters_rule_new(test_filters_handle), S_IFLNK, filter_path_start, "testlink"))) {
+  if ((status = test_filter_handle->addRule(new Rule(new Condition(S_IFLNK, filter_path_start, "testlink"))))) {
     printf("ignore_add error status %u\n", status);
   }
   files = new List(filedata_get);
@@ -83,18 +81,18 @@ int main(int argc, char *argv[]) {
   delete files;
 
   /* Now make sure we don't mess with private data */
-  filters_handle = NULL;
+  filter_handle = NULL;
   parsers_handle = NULL;
   mount_path_length = 0;
 
   printf("filelist_new, as previous\n");
-  if (! filelist_new("test", test_filters_handle, test_parsers_handle)) {
+  if (! filelist_new("test", test_filter_handle, test_parsers_handle)) {
     cout << ">List " << files->size() << " file(s):\n";
     files->show();
     filelist_free();
   }
 
-  filters_free(test_filters_handle);
+  delete test_filter_handle;
   parsers_free(test_parsers_handle);
 
   return 0;

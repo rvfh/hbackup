@@ -19,8 +19,8 @@
 #ifndef FILTERS_H
 #define FILTERS_H
 
+#include "hbackup.h"
 #include "list.h"
-#include "filelist.h"
 
 /* The filter stores a list of rules, each containing a list of filters.
  * A rule matches if all filters in it match (AND)
@@ -39,20 +39,33 @@ typedef enum {
   filter_size_below   /* Maximum size (only applies to regular files) */
 } filter_type_t;
 
-/* Create rules list */
-extern int filters_new(List **handle);
+class Condition {
+  filter_type_t _type;
+  mode_t        _file_type;
+  off_t         _size;
+  char          _string[256];
+public:
+  Condition(
+    mode_t file_type,
+    filter_type_t type,
+    ...);
+  int  match(const filedata_t *filedata) const;
+  /* Debug only */
+  char *show() const;
+};
 
-/* Destroy rules list and all filters in rules */
-extern void filters_free(List *handle);
+class Rule: public List {
+public:
+  Rule(Condition *condition = NULL);
+  ~Rule();
+  int addCondition(Condition *);
+};
 
-/* Create new rule (filters list) */
-extern List *filters_rule_new(List *handle);
-
-/* Add filter to rule */
-extern int filters_rule_add(List *rule_handle, mode_t file_type,
-  filter_type_t type, ...);
-
-/* Check whether any rule matches (i.e. all its filters match) */
-extern int filters_match(const List *handle, const filedata_t *filedata);
+class Filter: public List {
+public:
+  ~Filter();
+  int addRule(Rule *);
+  int match(const filedata_t *filedata) const;
+};
 
 #endif

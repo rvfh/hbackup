@@ -31,18 +31,13 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include "metadata.h"
-
-typedef struct {
-  char        *path;
-  char        checksum[36];
-  metadata_t  metadata;
-} filedata_t;
+#include "filters.h"
 
 /* Create list of files from path, using filters */
 extern int filelist_new(
-  const char  *path,
-  const List  *filters,
-  const List  *parsers);
+  const char    *path,
+  const Filter  *filter,
+  const List    *parsers);
 
 /* Destroy list of files */
 extern void filelist_free(void);
