@@ -1,6 +1,6 @@
-File data missing for checksum 59ca0efa9f5633cb0371bbc0355478d8-1
-File data missing for checksum 59ca0efa9f5633cb0371bbc0355478d8-1
-File data corrupted for checksum 59ca0efa9f5633cb0371bbc0355478d8-1 (found to be d41d8cd98f00b204e9800998ecf8427e)
+File data missing for checksum 59ca0efa9f5633cb0371bbc0355478d8-0
+File data missing for checksum 59ca0efa9f5633cb0371bbc0355478d8-0
+File data corrupted for checksum 59ca0efa9f5633cb0371bbc0355478d8-0 (found to be d41d8cd98f00b204e9800998ecf8427e)
 type_letter
 File   : f
 Dir    : d
@@ -54,7 +54,7 @@ Database initialized
 -> 'file://host' '/home/user/dir space/file space' f 0 1 1000 1000 0644 '' d41d8cd98f00b204e9800998ecf8427e-0 1 0 -
 -> 'file://host' '/home/user/test space' f 0 1 1000 1000 0644 '' d41d8cd98f00b204e9800998ecf8427e-0 1 0 -
 -> 'file://host' '/home/user/testdir' d 0 1 1000 1000 0755 ''  1 0 -
--> 'file://host' '/home/user/testfile' f 13 1 1000 1000 0644 '' 59ca0efa9f5633cb0371bbc0355478d8-1 1 0 -
+-> 'file://host' '/home/user/testfile' f 13 1 1000 1000 0644 '' 59ca0efa9f5633cb0371bbc0355478d8-0 1 0 -
 -> 'file://host' '/home/user/testlink' l 8 1 1000 1000 0777 'testfile'  1 0 -
 Database closed (total contents: 12 file(s))
 Database opened (active contents: 12 file(s))
@@ -69,7 +69,7 @@ Database opened (active contents: 12 file(s))
 -> 'file://host' '/home/user/dir space/file space' f 0 1 1000 1000 0644 '' d41d8cd98f00b204e9800998ecf8427e-0 1 0 -
 -> 'file://host' '/home/user/test space' f 0 1 1000 1000 0644 '' d41d8cd98f00b204e9800998ecf8427e-0 1 0 -
 -> 'file://host' '/home/user/testdir' d 0 1 1000 1000 0755 ''  1 0 -
--> 'file://host' '/home/user/testfile' f 13 1 1000 1000 0644 '' 59ca0efa9f5633cb0371bbc0355478d8-1 1 0 -
+-> 'file://host' '/home/user/testfile' f 13 1 1000 1000 0644 '' 59ca0efa9f5633cb0371bbc0355478d8-0 1 0 -
 -> 'file://host' '/home/user/testlink' l 8 1 1000 1000 0777 'testfile'  1 0 -
 >List 12 element(s):
 -> 'file://host' '/home/user/cvs' d 0 1 1000 1000 0755 ''  1 0 -
@@ -82,7 +82,7 @@ Database opened (active contents: 12 file(s))
 -> 'file://host' '/home/user/dir space/file space' f 0 1 1000 1000 0644 '' d41d8cd98f00b204e9800998ecf8427e-0 1 0 -
 -> 'file://host' '/home/user/test space' f 0 1 1000 1000 0644 '' d41d8cd98f00b204e9800998ecf8427e-0 1 0 -
 -> 'file://host' '/home/user/testdir' d 0 1 1000 1000 0755 ''  1 0 -
--> 'file://host' '/home/user/testfile' f 13 1 1000 1000 0644 '' 59ca0efa9f5633cb0371bbc0355478d8-1 1 0 -
+-> 'file://host' '/home/user/testfile' f 13 1 1000 1000 0644 '' 59ca0efa9f5633cb0371bbc0355478d8-0 1 0 -
 -> 'file://host' '/home/user/testlink' l 8 1 1000 1000 0777 'testfile'  1 0 -
 >List 3 file(s):
 -> testdir
@@ -100,7 +100,7 @@ Database opened (active contents: 12 file(s))
 -> 'file://host' '/home/user/dir space/file space' f 0 1 1000 1000 0644 '' d41d8cd98f00b204e9800998ecf8427e-0 1 0 -
 -> 'file://host' '/home/user/test space' f 0 1 1000 1000 0644 '' d41d8cd98f00b204e9800998ecf8427e-0 1 0 -
 -> 'file://host' '/home/user/testdir' d 0 1 1000 1000 0755 ''  1 0 -
--> 'file://host' '/home/user/testfile' f 13 1 1000 1000 0644 '' 59ca0efa9f5633cb0371bbc0355478d8-1 1 0 -
+-> 'file://host' '/home/user/testfile' f 13 1 1000 1000 0644 '' 59ca0efa9f5633cb0371bbc0355478d8-0 1 0 -
 -> 'file://host' '/home/user/testlink' l 8 1 1000 1000 0777 'testfile'  1 0 -
 -> 'file://host' '/home/user2/testdir' d 0 1 1000 1000 0755 ''  1 0 -
 -> 'file://host' '/home/user2/testfile' f 15 1 1000 1000 0644 '' fcacc0dea4134dc0b9da49c1a9603196-0 1 0 -
@@ -133,7 +133,7 @@ Database opened (active contents: 15 file(s))
 -> 'file://host' '/home/user/dir space/file space' f 0 1 1000 1000 0644 '' d41d8cd98f00b204e9800998ecf8427e-0 1 0 -
 -> 'file://host' '/home/user/test space' f 0 1 1000 1000 0644 '' d41d8cd98f00b204e9800998ecf8427e-0 1 0 -
 -> 'file://host' '/home/user/testdir' d 0 1 1000 1000 0755 ''  1 0 -
--> 'file://host' '/home/user/testfile' f 13 1 1000 1000 0644 '' 59ca0efa9f5633cb0371bbc0355478d8-1 1 0 -
+-> 'file://host' '/home/user/testfile' f 13 1 1000 1000 0644 '' 59ca0efa9f5633cb0371bbc0355478d8-0 1 0 -
 -> 'file://host' '/home/user/testlink' l 8 1 1000 1000 0777 'testfile'  1 0 -
 -> 'file://host' '/home/user2/testdir' d 0 1 1000 1000 0755 ''  1 0 -
 -> 'file://host' '/home/user2/testfile' f 15 1 1000 1000 0644 '' fcacc0dea4134dc0b9da49c1a9603196-0 1 0 -
@@ -162,7 +162,7 @@ Database opened (active contents: 15 file(s))
 -> 'file://host' '/home/user/dir space/file space' f 0 1 1000 1000 0644 '' d41d8cd98f00b204e9800998ecf8427e-0 1 0 -
 -> 'file://host' '/home/user/test space' f 0 1 1000 1000 0644 '' d41d8cd98f00b204e9800998ecf8427e-0 1 0 -
 -> 'file://host' '/home/user/testdir' d 0 1 1000 1000 0755 ''  1 0 -
--> 'file://host' '/home/user/testfile' f 13 1 1000 1000 0644 '' 59ca0efa9f5633cb0371bbc0355478d8-1 1 1 -
+-> 'file://host' '/home/user/testfile' f 13 1 1000 1000 0644 '' 59ca0efa9f5633cb0371bbc0355478d8-0 1 1 -
 -> 'file://host' '/home/user/testlink' l 8 1 1000 1000 0777 'testfile'  1 0 -
 -> 'file://host' '/home/user2/testdir' d 0 1 1000 1000 0755 ''  1 0 -
 -> 'file://host' '/home/user2/testfile' f 15 1 1000 1000 0644 '' fcacc0dea4134dc0b9da49c1a9603196-0 1 0 -
@@ -206,7 +206,7 @@ Database opened (active contents: 15 file(s))
 -> 'file://host' '/home/user/dir space/file space' f 0 1 1000 1000 0644 '' d41d8cd98f00b204e9800998ecf8427e-0 1 0 -
 -> 'file://host' '/home/user/test space' f 0 1 1000 1000 0644 '' d41d8cd98f00b204e9800998ecf8427e-0 1 0 -
 -> 'file://host' '/home/user/testdir' d 0 1 1000 1000 0755 ''  1 0 -
--> 'file://host' '/home/user/testfile' f 13 1 1000 1000 0644 '' 59ca0efa9f5633cb0371bbc0355478d8-1 1 1 -
+-> 'file://host' '/home/user/testfile' f 13 1 1000 1000 0644 '' 59ca0efa9f5633cb0371bbc0355478d8-0 1 1 -
 -> 'file://host' '/home/user/testlink' l 8 1 1000 1000 0777 'testfile'  1 0 -
 -> 'file://host' '/home/user2/testdir' d 0 1 1000 1000 0755 ''  1 0 -
 -> 'file://host' '/home/user2/testfile' f 15 1 1000 1000 0644 '' fcacc0dea4134dc0b9da49c1a9603196-0 1 0 -
@@ -226,7 +226,7 @@ Database opened (active contents: 15 file(s))
 -> 'file://host' '/home/user/dir space/file space' f 0 1 1000 1000 0644 '' d41d8cd98f00b204e9800998ecf8427e-0 1 0 -
 -> 'file://host' '/home/user/test space' f 0 1 1000 1000 0644 '' d41d8cd98f00b204e9800998ecf8427e-0 1 0 -
 -> 'file://host' '/home/user/testdir' d 0 1 1000 1000 0755 ''  1 0 -
--> 'file://host' '/home/user/testfile' f 13 1 1000 1000 0644 '' 59ca0efa9f5633cb0371bbc0355478d8-1 1 1 -
+-> 'file://host' '/home/user/testfile' f 13 1 1000 1000 0644 '' 59ca0efa9f5633cb0371bbc0355478d8-0 1 1 -
 -> 'file://host' '/home/user/testlink' l 8 1 1000 1000 0777 'testfile'  1 0 -
 -> 'file://host' '/home/user2/testdir' d 0 1 1000 1000 0755 ''  1 0 -
 -> 'file://host' '/home/user2/testfile' f 15 1 1000 1000 0644 '' fcacc0dea4134dc0b9da49c1a9603196-0 1 0 -
