@@ -800,14 +800,8 @@ int db_parse(const char *host, const char *real_path,
             /* Checksum given by the compare function */
             strcpy(db_data->filedata.checksum, filedata->checksum);
           } else {
-            int compress = 0;
-
-            /* Really new file, compress? */
-            if (filedata->metadata.size >= compress_min) {
-              compress = 5;
-            }
             if (db_write(mount_path, filedata->path, db_data,
-                db_data->filedata.checksum, compress)) {
+                db_data->filedata.checksum, 0)) {
               /* Write failed, need to go on */
               failed = 1;
               if (! terminating()) {
