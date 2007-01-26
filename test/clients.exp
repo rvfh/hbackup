@@ -15,6 +15,7 @@ clients: backup: could not mount smb share
 >List 0 client(s):
 >List 1 client(s):
 -> file://localhost etc/doesnotexist
+ -> Reading list file
 >List 0 client(s):
 >List 1 client(s):
 -> nfs://myclient /home/User/devel
@@ -53,13 +54,14 @@ clients: backup: could not mount smb share
 -> smb://client c:/home/BlaH/Backup.list
 Database initialized
  --> Issuing command: mount -t nfs -o ro,nolock myclient:/home/User/devel test_db/mount
- --> Issuing command: mount -t smbfs -o ro,nocase,username=Myself,password=flesyM //myclient/C$ test_db/mount
+ --> Issuing command: mount -t smbfs -o ro,nocase,username=Myself,password=flesyM //myclient/c$ test_db/mount
  --> Issuing command: mount -t smbfs -o ro,nocase,username=user //client/c$ test_db/mount
  --> Issuing command: mount -t smbfs -o ro,nocase,username=user //client/c$ test_db/mount
  --> Issuing command: mount -t smbfs -o ro,nocase //client/c$ test_db/mount
  --> Issuing command: mount -t smbfs -o ro,nocase //client/c$ test_db/mount
 Database closed (total contents: 0 file(s))
 Database opened (active contents: 0 file(s))
+ -> Reading list file
 Backup client 'localhost' using protocol 'file'
 Backup path 'test'
  -> Building list of files
@@ -69,6 +71,7 @@ Backup path 'test2'
  -> Parsing list of files
 Database closed (total contents: 15 file(s))
 Database opened (active contents: 15 file(s))
+ -> Reading list file
 Backup client 'localhost' using protocol 'file'
 Backup path 'test'
  -> Building list of files
