@@ -42,7 +42,9 @@ Database initialized
 -> 'this is a host' 'test/testfile' f 13 1 1000 1000 0644 'this is a link' 59ca0efa9f5633cb0371bbc0355478d8 1 0 -
 >List 1 element(s):
 -> 'this is a host' 'test/testfile' f 13 1 1000 1000 0644 'this is a link' 59ca0efa9f5633cb0371bbc0355478d8 1 1 -
- --> Files to add: 12
+ --> Files to add: 12 (13 bytes)
+ --> Copied: 100 %
+ --> No files to remove
 >List 12 element(s):
 -> 'file://host' '/home/user/cvs' d 0 1 1000 1000 0755 ''  1 0 -
 -> 'file://host' '/home/user/cvs/dirbad' d 0 1 1000 1000 0755 ''  1 0 -
@@ -71,6 +73,8 @@ Database opened (active contents: 12 file(s))
 -> 'file://host' '/home/user/testdir' d 0 1 1000 1000 0755 ''  1 0 -
 -> 'file://host' '/home/user/testfile' f 13 1 1000 1000 0644 '' 59ca0efa9f5633cb0371bbc0355478d8-0 1 0 -
 -> 'file://host' '/home/user/testlink' l 8 1 1000 1000 0777 'testfile'  1 0 -
+ --> No files to add
+ --> No files to remove
 >List 12 element(s):
 -> 'file://host' '/home/user/cvs' d 0 1 1000 1000 0755 ''  1 0 -
 -> 'file://host' '/home/user/cvs/dirbad' d 0 1 1000 1000 0755 ''  1 0 -
@@ -88,7 +92,9 @@ Database opened (active contents: 12 file(s))
 -> testdir
 -> testfile
 -> testlink
- --> Files to add: 3
+ --> Files to add: 3 (15 bytes)
+ --> Copied: 100 %
+ --> No files to remove
 >List 15 element(s):
 -> 'file://host' '/home/user/cvs' d 0 1 1000 1000 0755 ''  1 0 -
 -> 'file://host' '/home/user/cvs/dirbad' d 0 1 1000 1000 0755 ''  1 0 -
@@ -150,6 +156,7 @@ Database opened (active contents: 15 file(s))
 -> test space
 -> testdir
 -> testlink
+ --> No files to add
  --> Files to remove: 1
 >List 15 element(s):
 -> 'file://host' '/home/user/cvs' d 0 1 1000 1000 0755 ''  1 0 -
@@ -195,6 +202,8 @@ Database opened (active contents: 15 file(s))
 -> test space
 -> testdir
 -> testlink
+ --> No files to add
+ --> No files to remove
 >List 15 element(s):
 -> 'file://host' '/home/user/cvs' d 0 1 1000 1000 0755 ''  1 0 -
 -> 'file://host' '/home/user/cvs/dirbad' d 0 1 1000 1000 0755 ''  1 0 -
@@ -215,6 +224,8 @@ Database opened (active contents: 15 file(s))
 -> testdir
 -> testfile
 -> testlink
+ --> No files to add
+ --> No files to remove
 >List 15 element(s):
 -> 'file://host' '/home/user/cvs' d 0 1 1000 1000 0755 ''  1 0 -
 -> 'file://host' '/home/user/cvs/dirbad' d 0 1 1000 1000 0755 ''  1 0 -

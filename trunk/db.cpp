@@ -776,12 +776,33 @@ int db_parse(const char *host, const char *real_path,
 
   /* Deal with new/modified data first */
   if (added_files_list->size() != 0) {
-    static int   copied = 0;
-    static off_t volume = 0;
+    /* Static to be global to all shares */
+    static int    copied        = 0;
+    static off_t  volume        = 0;
+    off_t         sizetobackup  = 0;
+    off_t         sizebackedup  = 0;
+    /* Percents display stuff */
+    off_t         step          = 0;
+    off_t         nextstep      = 0;
 
+    /* Determine volume to be copied */
     if (verbosity() > 2) {
-      cout << " --> Files to add: " << added_files_list->size() << "\n";
+      while ((entry = added_files_list->next(entry)) != NULL) {
+        filedata_t *filedata = (filedata_t *) (list_entry_payload(entry));
+
+        if (S_ISREG(filedata->metadata.type)) {
+          sizetobackup += filedata->metadata.size;
+        }
+      }
+      if (sizetobackup > 100) {
+        nextstep = step = sizetobackup / 100;
+      } else {
+        nextstep = step = 1;
+      }
+      cout << " --> Files to add: " << added_files_list->size() << " ("
+        << sizetobackup << " bytes)\n";
     }
+
     while ((entry = added_files_list->next(entry)) != NULL) {
       if (! terminating()) {
         filedata_t *filedata = (filedata_t *) (list_entry_payload(entry));
@@ -796,6 +817,9 @@ int db_parse(const char *host, const char *real_path,
         db_data->date_out = 0;
         /* Save new data */
         if (S_ISREG(filedata->metadata.type)) {
+          if (verbosity() > 2) {
+            sizebackedup += filedata->metadata.size;
+          }
           if (filedata->checksum[0] != '\0') {
             /* Checksum given by the compare function */
             strcpy(db_data->filedata.checksum, filedata->checksum);
@@ -837,17 +861,20 @@ int db_parse(const char *host, const char *real_path,
          || ((volume += db_data->filedata.metadata.size) >= 10000000)) {
           copied = 0;
           volume = 0;
-          if (verbosity() > 2) {
-            printf(" --> Files left to add: %u\n",
-              added_files_list->size());
-            printf(" --> Saving database list: %u file(s)\n",
-              db_list->size());
-          }
           db_save("list", db_list);
+        }
+        if ((verbosity() > 2) && (sizebackedup >= nextstep)) {
+          // Any chance to save a division? Or not worth the effort?
+          cout << " --> Copied: " << (100 * sizebackedup) / sizetobackup << " %\n";
+          /* Align nextstep to percent (step 2) */
+          nextstep = sizebackedup + step;
         }
       }
     }
+  } else if (verbosity() > 2) {
+    cout << " --> No files to add\n";
   }
+
   /* This only unlists the data */
   added_files_list->deselect();
   delete added_files_list;
@@ -871,6 +898,8 @@ int db_parse(const char *host, const char *real_path,
           db_data->filedata.checksum);
       }
     }
+  } else if (verbosity() > 2) {
+    cout << " --> No files to remove\n";
   }
   /* This only unlists the data */
   removed_files_list->deselect();
