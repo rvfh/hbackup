@@ -312,6 +312,9 @@ static int read_listfile(const char *listfilename, List *backups) {
   int      failed  = 0;
 
   /* Open list file */
+  if (verbosity() > 1) {
+    printf(" -> Reading list file\n");
+  }
   if ((listfile = fopen(listfilename, "r")) == NULL) {
     fprintf(stderr, "clients: backup: list file not found %s\n",
       listfilename);
@@ -351,6 +354,9 @@ static int read_listfile(const char *listfilename, List *backups) {
         backup->ignore_handle = new Filter;
         parsers_new(&backup->parsers_handle);
         asprintf(&backup->path, "%s", string);
+        if (verbosity() > 2) {
+          printf(" --> Path: %s\n", string);
+        }
         no_trailing_slash(backup->path);
         backups->append(backup);
       } else {
@@ -380,6 +386,7 @@ static int get_paths(const char *protocol, const char *backup_path,
   } else
   if (! strcmp(protocol, "smb")) {
     asprintf(share, "%c$", backup_path[0]);
+    strtolower(*share);
     asprintf(path, "%s/%s", mount_point, &backup_path[3]);
     /* Lower case */
     strtolower(*path);
@@ -421,9 +428,10 @@ int clients_backup(const char *mount_point, int configcheck) {
 
   /* Walk though the list of clients */
   while ((entry = clients->next(entry)) != NULL) {
-    client_t *client        = (client_t *) (list_entry_payload(entry));
-    char     *listfilename  = NULL;
-    List   *backups         = new List();
+    client_t  *client       = (client_t *) (list_entry_payload(entry));
+    char      *listfilename = NULL;
+    List      *backups      = new List();
+    int       clientfailed  = 0;
 
     if (! prepare_share(client, mount_point, client->listfile, &listfilename)
      && ! read_listfile(listfilename, backups)) {
@@ -443,7 +451,7 @@ int clients_backup(const char *mount_point, int configcheck) {
           backup_t *backup = (backup_t *) (list_entry_payload(entry));
           char     *backup_path = NULL;
 
-          if (! failed) {
+          if (! clientfailed) {
             if (verbosity() > 0) {
               printf("Backup path '%s'\n", backup->path);
               if (verbosity() > 1) {
@@ -468,7 +476,8 @@ int clients_backup(const char *mount_point, int configcheck) {
                 if (! terminating()) {
                   fprintf(stderr, "clients: backup: parsing failed\n");
                 }
-                failed = 1;
+                failed        = 1;
+                clientfailed  = 1;
               }
               free(prefix);
               filelist_free();
@@ -477,6 +486,7 @@ int clients_backup(const char *mount_point, int configcheck) {
                 fprintf(stderr, "clients: backup: list creation failed\n");
               }
               failed = 1;
+              clientfailed  = 1;
             }
             free(backup_path);
           }
