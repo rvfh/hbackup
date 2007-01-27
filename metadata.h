@@ -32,7 +32,7 @@
 #include <unistd.h>
 #include "list.h"
 
-/* Our data */
+/* File metadata */
 typedef struct {
   mode_t type;    /* type */
   time_t mtime;   /* time of last modification */
@@ -41,6 +41,13 @@ typedef struct {
   gid_t  gid;     /* group ID of owner */
   mode_t mode;    /* permissions */
 } metadata_t;
+
+/* File data */
+typedef struct {
+  char        *path;
+  char        checksum[36];
+  metadata_t  metadata;
+} filedata_t;
 
 extern int metadata_get(const char *path, metadata_t *metadata);
 

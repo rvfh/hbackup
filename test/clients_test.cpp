@@ -18,8 +18,6 @@
 
 #include "clients.cpp"
 
-static int verbose = 3;
-
 static char *client_show(const void *payload) {
   const client_t *client  = (client_t *) payload;
   char  *credentials      = NULL;
@@ -45,7 +43,7 @@ static char *client_show(const void *payload) {
 }
 
 int verbosity(void) {
-  return verbose;
+  return 3;
 }
 
 int terminating(void) {
@@ -104,9 +102,7 @@ int main(void) {
   }
   clients_add("file://localhost", "etc/localhost.list");
   db_open("test_db");
-  verbose = 2;
   clients_backup("test_db/mount", 0);
-  verbose = 3;
   db_close();
   clients_free();
 
@@ -116,9 +112,7 @@ int main(void) {
   }
   clients_add("file://localhost", "etc/localhost.list");
   db_open("test_db");
-  verbose = 2;
   clients_backup("test_db/mount", 0);
-  verbose = 3;
   db_close();
   clients_free();
 

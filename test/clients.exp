@@ -1,42 +1,45 @@
 clients: backup: list file not found etc/doesnotexist
 mount: only root can do that
 clients: backup: could not mount nfs share
-mount: only root can do that
 clients: backup: could not mount smb share
 clients: backup: ssh protocol not supported
-mount: only root can do that
 clients: backup: could not mount smb share
-mount: only root can do that
 clients: backup: could not mount smb share
-mount: only root can do that
 clients: backup: could not mount smb share
-mount: only root can do that
 clients: backup: could not mount smb share
 >List 0 client(s):
+ --> Client: localhost
 >List 1 client(s):
 -> file://localhost etc/doesnotexist
- -> Reading list file
+Backup client 'localhost' using protocol 'file'
+ -> Reading backup list
 >List 0 client(s):
+ --> Client: myclient
 >List 1 client(s):
 -> nfs://myclient /home/User/devel
+ --> Client: myclient
 >List 2 client(s):
 -> nfs://myclient /home/User/devel
 -> smb://Myself:flesyM@myclient C:\Backup\Backup.LST
+ --> Client: otherclient
 >List 3 client(s):
 -> nfs://myclient /home/User/devel
 -> smb://Myself:flesyM@myclient C:\Backup\Backup.LST
 -> ssh://otherclient c:/home/backup/Backup.list
+ --> Client: client
 >List 4 client(s):
 -> nfs://myclient /home/User/devel
 -> smb://Myself:flesyM@myclient C:\Backup\Backup.LST
 -> ssh://otherclient c:/home/backup/Backup.list
 -> smb://user@client c:/home/BlaH/Backup.list
+ --> Client: client
 >List 5 client(s):
 -> nfs://myclient /home/User/devel
 -> smb://Myself:flesyM@myclient C:\Backup\Backup.LST
 -> ssh://otherclient c:/home/backup/Backup.list
 -> smb://user@client c:/home/BlaH/Backup.list
 -> smb://user@client c:/home/BlaH/Backup.list
+ --> Client: client
 >List 6 client(s):
 -> nfs://myclient /home/User/devel
 -> smb://Myself:flesyM@myclient C:\Backup\Backup.LST
@@ -44,6 +47,7 @@ clients: backup: could not mount smb share
 -> smb://user@client c:/home/BlaH/Backup.list
 -> smb://user@client c:/home/BlaH/Backup.list
 -> smb://client c:/home/BlaH/Backup.list
+ --> Client: client
 >List 7 client(s):
 -> nfs://myclient /home/User/devel
 -> smb://Myself:flesyM@myclient C:\Backup\Backup.LST
@@ -53,30 +57,48 @@ clients: backup: could not mount smb share
 -> smb://client c:/home/BlaH/Backup.list
 -> smb://client c:/home/BlaH/Backup.list
 Database initialized
- --> Issuing command: mount -t nfs -o ro,nolock myclient:/home/User/devel test_db/mount
- --> Issuing command: mount -t smbfs -o ro,nocase,username=Myself,password=flesyM //myclient/c$ test_db/mount
- --> Issuing command: mount -t smbfs -o ro,nocase,username=user //client/c$ test_db/mount
- --> Issuing command: mount -t smbfs -o ro,nocase,username=user //client/c$ test_db/mount
- --> Issuing command: mount -t smbfs -o ro,nocase //client/c$ test_db/mount
- --> Issuing command: mount -t smbfs -o ro,nocase //client/c$ test_db/mount
+Backup client 'myclient' using protocol 'nfs'
+Backup client 'myclient' using protocol 'smb'
+Backup client 'otherclient' using protocol 'ssh'
+Backup client 'client' using protocol 'smb'
+Backup client 'client' using protocol 'smb'
+Backup client 'client' using protocol 'smb'
+Backup client 'client' using protocol 'smb'
 Database closed (total contents: 0 file(s))
+ --> Client: localhost
 Database opened (active contents: 0 file(s))
- -> Reading list file
 Backup client 'localhost' using protocol 'file'
+ -> Reading backup list
+ --> Path: test
+ --> Path: test2//
 Backup path 'test'
  -> Building list of files
  -> Parsing list of files
+ --> Files to add: 11 (0 bytes)
+ --> No files to remove
 Backup path 'test2'
  -> Building list of files
  -> Parsing list of files
-Database closed (total contents: 15 file(s))
-Database opened (active contents: 15 file(s))
- -> Reading list file
+ --> Files to add: 5 (928768 bytes)
+ --> Copied: 145408 / 928768 (15%)
+ --> Copied: 404480 / 928768 (43%)
+ --> Copied: 928768 / 928768 (100%)
+ --> No files to remove
+Database closed (total contents: 16 file(s))
+ --> Client: localhost
+Database opened (active contents: 16 file(s))
 Backup client 'localhost' using protocol 'file'
+ -> Reading backup list
+ --> Path: test
+ --> Path: test2//
 Backup path 'test'
  -> Building list of files
  -> Parsing list of files
+ --> No files to add
+ --> No files to remove
 Backup path 'test2'
  -> Building list of files
  -> Parsing list of files
-Database closed (total contents: 15 file(s))
+ --> No files to add
+ --> No files to remove
+Database closed (total contents: 16 file(s))

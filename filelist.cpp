@@ -71,7 +71,7 @@ static int iterate_directory(const char *path, parser_t *parser) {
   DIR           *directory;
   struct dirent *dir_entry;
 
-  if (verbosity() > 2) {
+  if (verbosity() > 3) {
     printf(" --> Dir: %s\n", &path[mount_path_length]);
   }
   /* Check whether directory is under SCM control */
