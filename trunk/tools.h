@@ -21,6 +21,13 @@
 
 #include <sys/types.h>
 
+
+/* Verbosity level */
+extern int verbosity(void);
+
+/* Termination required */
+extern int terminating(void);
+
 /* Make sure string finishes without slash */
 extern void no_trailing_slash(char *string);
 

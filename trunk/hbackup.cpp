@@ -193,10 +193,6 @@ int main(int argc, char **argv) {
     config_path = default_config_path;
   }
 
-  if (verbosity() > 2) {
-    printf("Verbosity level: %u\n", verbosity());
-  }
-
   /* Open configuration file */
   if ((config = fopen(config_path, "r")) == NULL) {
     fprintf(stderr, "Configuration file not found %s\n", config_path);
@@ -210,6 +206,10 @@ int main(int argc, char **argv) {
     if (clients_new()) {
       fprintf(stderr, "Failed to create clients list\n");
     } else {
+      if (verbosity() > 1) {
+        printf(" -> Reading configuration file\n");
+      }
+
       while (getline(&buffer, &size, config) >= 0) {
         char keyword[256];
         char type[256];

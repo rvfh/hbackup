@@ -33,8 +33,8 @@ tools.o: hbackup.h tools.h
 metadata.o: metadata.h
 list.o: list.h
 db.o: db.h list.h metadata.h tools.h hbackup.h
-filters.o: filters.h list.h
-parsers.o: parsers.h list.h
+filters.o: filters.h list.h metadata.h
+parsers.o: parsers.h list.h metadata.h
 cvs_parser.o: cvs_parser.h parsers.h list.h metadata.h
 filelist.o: filelist.h parsers.h list.h metadata.h tools.h hbackup.h
 clients.o: clients.h list.h tools.h hbackup.h

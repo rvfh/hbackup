@@ -34,8 +34,6 @@
  *  mark
  */
 
-/* TODO Re-create main list from local ones in case of catastrophy */
-
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
 #endif
@@ -361,10 +359,6 @@ static int db_write(const char *mount_path, const char *path,
   /* Copy file locally */
   if (zcopy(source_path, temp_path, &size_source, &size_dest,
       checksum_source, checksum_dest, compress)) {
-    if (! terminating()) {
-      /* Don't signal errors on termination */
-      fprintf(stderr, "db: write: failed to copy file: %s\n", path);
-    }
     failed = 1;
   }
   free(source_path);
@@ -640,7 +634,9 @@ int db_open(const char *path) {
         }
         break;
       case 1:
-        if (verbosity() > 0) {
+        if (! status) {
+          /* TODO There was a data directory, but no list. Attempt recovery */
+        } else if (verbosity() > 0) {
           printf("Database initialized\n");
         }
         break;
@@ -794,13 +790,13 @@ int db_parse(const char *host, const char *real_path,
           sizetobackup += filedata->metadata.size;
         }
       }
-      if (sizetobackup > 100) {
+      if (sizetobackup >= 100000) {
         nextstep = step = sizetobackup / 100;
       } else {
-        nextstep = step = 1;
+        nextstep = step = 0;
       }
-      cout << " --> Files to add: " << added_files_list->size() << " ("
-        << sizetobackup << " bytes)\n";
+      printf(" --> Files to add: %u (%lu bytes)\n",
+        added_files_list->size(), sizetobackup);
     }
 
     while ((entry = added_files_list->next(entry)) != NULL) {
@@ -832,6 +828,12 @@ int db_parse(const char *host, const char *real_path,
                 /* Don't signal errors on termination */
                 fprintf(stderr, "db: parse: %s: %s, ignoring\n",
                     strerror(errno), db_data->filedata.path);
+                if ((verbosity() > 2) && (step != 0)) {
+                  sizebackedup -= filedata->metadata.size;
+                  sizetobackup -= filedata->metadata.size;
+                  step          = sizetobackup / 100;
+                  nextstep      = sizebackedup + step;
+                }
               }
               strcpy(db_data->filedata.checksum, "N");
             }
@@ -863,11 +865,12 @@ int db_parse(const char *host, const char *real_path,
           volume = 0;
           db_save("list", db_list);
         }
-        if ((verbosity() > 2) && (sizebackedup >= nextstep)) {
-          // Any chance to save a division? Or not worth the effort?
-          cout << " --> Copied: " << (100 * sizebackedup) / sizetobackup << " %\n";
+        if ((verbosity() > 2) && (step != 0) && (sizebackedup >= nextstep)) {
+          off_t percents = sizebackedup / step;
+          printf(" --> Copied: %lu / %lu (%lu%%)\n", sizebackedup,
+            sizetobackup, percents);
           /* Align nextstep to percent (step 2) */
-          nextstep = sizebackedup + step;
+          nextstep = step * (percents + 1 );
         }
       }
     }

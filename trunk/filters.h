@@ -19,7 +19,7 @@
 #ifndef FILTERS_H
 #define FILTERS_H
 
-#include "hbackup.h"
+#include "metadata.h"
 #include "list.h"
 
 /* The filter stores a list of rules, each containing a list of filters.

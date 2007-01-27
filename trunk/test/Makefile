@@ -34,7 +34,7 @@ hbackup: ../clients.a ../db.a ../filelist.a ../cvs_parser.a ../parsers.a \
 	../filters.a ../list.a ../metadata.a ../params.a ../tools.a
 
 # Rules
-%o: %cpp
+%_test.o: %_test.cpp ../%.a
 	@echo "CXX	$<"
 	@$(CXX) $(CXXFLAGS) -c -o $@ $<
 

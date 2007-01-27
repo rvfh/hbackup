@@ -135,12 +135,10 @@ int main(void) {
     return 0;
   }
 
-  verbose = 2;
   if ((status = filelist_new("test////", filter_handle, parsers_handle))) {
     printf("file_list_new error status %u\n", status);
     return 0;
   }
-  verbose = 3;
   printf(">List %u file(s):\n", filelist_get()->size());
   filelist_get()->show(NULL, file_data_show);
 
@@ -219,12 +217,10 @@ int main(void) {
   db_list->show(NULL, db_data_show);
   filelist_free();
 
-  verbose = 2;
   if ((status = filelist_new("test2", filter_handle, parsers_handle))) {
     printf("file_list_new error status %u\n", status);
     return 0;
   }
-  verbose = 3;
   cout << ">List " << filelist_get()->size() << " file(s):\n";
   filelist_get()->show(NULL, file_data_show);
 
@@ -238,6 +234,7 @@ int main(void) {
   db_list->show(NULL, db_data_show);
   filelist_free();
 
+  verbose = 2;
   if ((status = db_scan(NULL, "59ca0efa9f5633cb0371bbc0355478d8-0"))) {
     printf("db_scan error status %u\n", status);
     if (status) {
@@ -269,7 +266,6 @@ int main(void) {
     }
   }
 
-  verbose = 2;
   remove("test_db/data/59ca0efa9f5633cb0371bbc0355478d8-0/data");
   if ((status = db_scan("test_db", NULL))) {
     printf("db_scan (full) error status %u\n", status);
@@ -287,6 +283,7 @@ int main(void) {
   verbose = 3;
 
 
+
   /* Re-open database => remove some files */
   if ((status = db_open("test_db"))) {
     printf("db_open error status %u\n", status);
@@ -299,12 +296,10 @@ int main(void) {
 
   remove("test/testfile");
 
-  verbose = 2;
   if ((status = filelist_new("test////", filter_handle, parsers_handle))) {
     printf("file_list_new error status %u\n", status);
     return 0;
   }
-  verbose = 3;
   cout << ">List " << filelist_get()->size() << " file(s):\n";
   filelist_get()->show(NULL, file_data_show);
 
@@ -320,12 +315,10 @@ int main(void) {
   db_list->show(NULL, parse_select);
   filelist_free();
 
-  verbose = 2;
   if ((status = filelist_new("test////", filter_handle, parsers_handle))) {
     printf("file_list_new error status %u\n", status);
     return 0;
   }
-  verbose = 3;
   cout << ">List " << filelist_get()->size() << " file(s):\n";
   filelist_get()->show(NULL, file_data_show);
 
@@ -339,12 +332,10 @@ int main(void) {
   db_list->show(NULL, db_data_show);
   filelist_free();
 
-  verbose = 2;
   if ((status = filelist_new("test2", filter_handle, parsers_handle))) {
     printf("file_list_new error status %u\n", status);
     return 0;
   }
-  verbose = 3;
   cout << ">List " << filelist_get()->size() << " file(s):\n";
   filelist_get()->show(NULL, file_data_show);
 
