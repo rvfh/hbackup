@@ -55,5 +55,15 @@ int main(void) {
   strtolower(line);
   printf("-> gives '%s'\n", line);
 
+  printf("Check zcopy\n");
+  system("dd if=/dev/zero of=zcopy_test bs=1M count=100 status=noxfer 2> /dev/null");
+  off_t size_in;
+  off_t size_out;
+  char  check_in[36];
+  char  check_out[36];
+  zcopy("zcopy_test", "zcopied", &size_in, &size_out, check_in, check_out, 5);
+  cout << "In: " << size_in << " bytes, checksum: " << check_in << endl;
+  cout << "Out: " << size_out << " bytes, checksum: " << check_out << endl;
+
   return 0;
 }

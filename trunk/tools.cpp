@@ -19,6 +19,7 @@
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
 #endif
+#include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -33,7 +34,9 @@
 #include "common.h"
 #include "tools.h"
 
-#define CHUNK 10240
+using namespace std;
+
+#define CHUNK 10240000
 
 void no_trailing_slash(char *string) {
   char *last = &string[strlen(string) - 1];
@@ -170,8 +173,13 @@ int getdir(const char *db_path, const char *checksum, char **path_p) {
   return failed;
 }
 
-int zcopy(const char *source_path, const char *dest_path,
-    off_t *size_in, off_t *size_out, char *checksum_in, char *checksum_out,
+int zcopy(
+    const char *source_path,
+    const char *dest_path,
+    off_t *size_in,
+    off_t *size_out,
+    char *checksum_in,
+    char *checksum_out,
     int compress) {
   FILE          *writefile;
   FILE          *readfile;
@@ -227,6 +235,7 @@ int zcopy(const char *source_path, const char *dest_path,
 
   /* We shall copy, (de-)compress and compute the checksum in one go */
   while (! feof(readfile) && ! terminating()) {
+    /* TODO: A ring buffer may be faster */
     size_t rlength = fread(buffer_in, 1, CHUNK, readfile);
     size_t wlength;
 
