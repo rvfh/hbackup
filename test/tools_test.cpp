@@ -55,7 +55,25 @@ int main(void) {
   strtolower(line);
   printf("-> gives '%s'\n", line);
 
-  printf("Check zcopy\n");
+  printf("Test: RingBuffer\n");
+  char  read_buffer[15];
+  int   read_size;
+  RingBuffer<char> ring_buffer(10);
+  cout << "Buffer size used: " << ring_buffer.size() << endl;
+  cout << "Wrote: " << ring_buffer.write("1234567890", 5) << endl;
+  cout << "Buffer size used: " << ring_buffer.size() << endl;
+  cout << "Wrote: " << ring_buffer.write("ABCDEFGHIJKLM", 7) << endl;
+  cout << "Buffer size used: " << ring_buffer.size() << endl;
+  read_size = ring_buffer.read(read_buffer, 7);
+  read_buffer[read_size] = '\0';
+  cout << "Read: " << read_size << ", " << read_buffer << endl;
+  cout << "Buffer size used: " << ring_buffer.size() << endl;
+  read_size = ring_buffer.read(read_buffer, 7);
+  read_buffer[read_size] = '\0';
+  cout << "Read: " << read_size << ", " << read_buffer << endl;
+  cout << "Buffer size used: " << ring_buffer.size() << endl;
+
+  printf("Test: zcopy\n");
   system("dd if=/dev/zero of=zcopy_test bs=1M count=100 status=noxfer 2> /dev/null");
   off_t size_in;
   off_t size_out;
