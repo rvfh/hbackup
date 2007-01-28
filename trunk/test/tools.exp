@@ -7,6 +7,16 @@ Converting 'C:\Program Files\HBackup\hbackup.EXE' to linux style
 -> gives 'C$/Program Files/HBackup/hbackup.EXE'
 Then to lower case
 -> gives 'c$/program files/hbackup/hbackup.exe'
-Check zcopy
+Test: RingBuffer
+Buffer size used: 0
+Wrote: 5
+Buffer size used: 5
+Wrote: 5
+Buffer size used: 10
+Read: 7, 12345AB
+Buffer size used: 3
+Read: 3, CDE
+Buffer size used: 0
+Test: zcopy
 In: 104857600 bytes, checksum: 2f282b84e7e608d5852449ed940bfc51
 Out: 101791 bytes, checksum: 5e36777cbb0731fd79bbfa75abc9f0ca

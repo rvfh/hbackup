@@ -34,9 +34,53 @@
 #include "common.h"
 #include "tools.h"
 
+#define CHUNK 10240000
+
 using namespace std;
 
-#define CHUNK 10240000
+template<class T>
+RingBuffer<T>::RingBuffer(int size) {
+  _write = _read = _start = new T[size];
+  _end   = _start + size;
+  _size  = size;
+  _free  = size;
+}
+
+template<class T>
+RingBuffer<T>::~RingBuffer() {
+  delete _start;
+}
+
+template<class T>
+int RingBuffer<T>::size() {
+  return _size - _free;
+}
+
+template<class T>
+int RingBuffer<T>::write(const T *data, int size) {
+  int count = 0;
+
+  while (size-- && _free) {
+    *_write++ = *data++;
+    if (_write >= _end) _write = _start;
+    _free--;
+    count++;
+  }
+  return count;
+}
+
+template<class T>
+int RingBuffer<T>::read(T *data, int size){
+  int count = 0;
+
+  while (size-- && (_size > _free)) {
+    *data++ = *_read++;
+    if (_read >= _end) _read = _start;
+    _free++;
+    count++;
+  }
+  return count;
+}
 
 void no_trailing_slash(char *string) {
   char *last = &string[strlen(string) - 1];
@@ -235,7 +279,6 @@ int zcopy(
 
   /* We shall copy, (de-)compress and compute the checksum in one go */
   while (! feof(readfile) && ! terminating()) {
-    /* TODO: A ring buffer may be faster */
     size_t rlength = fread(buffer_in, 1, CHUNK, readfile);
     size_t wlength;
 

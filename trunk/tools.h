@@ -21,6 +21,30 @@
 
 #include <sys/types.h>
 
+// Ring buffer with simultaneous read and write operations support
+template<class T>
+class RingBuffer {
+  T   *_start;
+  T   *_end;
+  T   *_read;
+  T   *_write;
+  int _size;
+  int _free;
+public:
+  // Create a buffer of given size
+  RingBuffer(int size = 512);
+  // Destroy buffer
+  ~RingBuffer();
+  // Write size elements contained in data.
+  // Returns actual size written
+  int write(const T *data, int size);
+  // Read size elements into data.
+  // Returns actual size read
+  int read(T *data, int size);
+  // Returns buffer used size
+  int size();
+};
+
 /* Make sure string finishes without slash */
 extern void no_trailing_slash(char *string);
 
