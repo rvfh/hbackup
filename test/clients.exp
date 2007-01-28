@@ -1,12 +1,12 @@
 clients: backup: list file not found etc/doesnotexist
 mount: only root can do that
-clients: backup: could not mount nfs share
-clients: backup: could not mount smb share
+clients: backup: client unreachable
+clients: backup: client unreachable
 clients: backup: ssh protocol not supported
-clients: backup: could not mount smb share
-clients: backup: could not mount smb share
-clients: backup: could not mount smb share
-clients: backup: could not mount smb share
+clients: backup: client unreachable
+clients: backup: client unreachable
+clients: backup: client unreachable
+clients: backup: client unreachable
 >List 0 client(s):
  --> Client: localhost
 >List 1 client(s):

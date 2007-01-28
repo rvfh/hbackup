@@ -23,8 +23,8 @@ int metadata_get(const char *path, metadata_t *metadata_p) {
   struct stat metadata;
 
   if (lstat(path, &metadata)) {
-    fprintf(stderr, "metadata: cannot get file info: %s\n", path);
-    return 1;
+    // errno set by lstat
+    return 2;
   }
   /* Fill in file information */
   metadata_p->type  = metadata.st_mode & S_IFMT;
