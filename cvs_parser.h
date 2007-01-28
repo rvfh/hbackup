@@ -19,7 +19,9 @@
 #ifndef CVS_PARSER_H
 #define CVS_PARSER_H
 
-#include "parsers.h"
+#ifndef PARSERS_H
+#error You must include parsers.h before cvs_parser.h
+#endif
 
 /* Create CVS parser and get info */
 extern parser_t *cvs_parser_new(void);

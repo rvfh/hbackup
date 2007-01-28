@@ -47,11 +47,12 @@
 #include <dirent.h>
 #include <unistd.h>
 #include <errno.h>
-#include "filelist.h"
 #include "list.h"
 #include "tools.h"
-#include "hbackup.h"
+#include "metadata.h"
+#include "common.h"
 #include "filters.h"
+#include "filelist.h"
 #include "db.h"
 using namespace std;
 

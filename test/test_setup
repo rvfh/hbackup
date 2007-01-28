@@ -7,7 +7,10 @@ TESTDIR2="test2"
 CONFIGDIR="etc"
 
 # Clean
-chmod u+w "$TESTDBDIR" && rm -rf "$TESTDBDIR"
+if [ -d "$TESTDBDIR" ]; then
+  chmod u+w "$TESTDBDIR"
+fi
+rm -rf "$TESTDBDIR"
 rm -rf "$TESTDIR"
 rm -rf "$TESTDIR2"
 rm -rf "$CONFIGDIR"

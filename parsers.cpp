@@ -17,6 +17,9 @@
 */
 
 #include <stdlib.h>
+#include "list.h"
+#include "metadata.h"
+#include "common.h"
 #include "parsers.h"
 
 int parsers_new(List **list) {

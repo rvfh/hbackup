@@ -29,7 +29,8 @@
 #include <openssl/md5.h>
 #include <openssl/evp.h>
 #include <zlib.h>
-#include "hbackup.h"
+#include "metadata.h"
+#include "common.h"
 #include "tools.h"
 
 #define CHUNK 10240

@@ -21,8 +21,9 @@
 #include <stdarg.h>
 #include <sys/types.h>
 #include <regex.h>
-#include "metadata.h"
 #include "list.h"
+#include "metadata.h"
+#include "common.h"
 #include "filters.h"
 
 Condition::Condition(

@@ -17,6 +17,7 @@
 */
 
 #include "db.cpp"
+#include "parsers.h"
 #include "cvs_parser.h"
 
 static int verbose = 3;

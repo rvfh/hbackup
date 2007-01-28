@@ -23,6 +23,7 @@
 #include <string.h>
 #include "list.h"
 #include "metadata.h"
+#include "common.h"
 #include "parsers.h"
 #include "cvs_parser.h"
 
