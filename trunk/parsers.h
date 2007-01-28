@@ -19,8 +19,13 @@
 #ifndef PARSERS_H
 #define PARSERS_H
 
-#include "list.h"
-#include "filelist.h"
+#ifndef LIST_H
+#error You must include list.h before parsers.h
+#endif
+
+#ifndef COMMON_H
+#error You must include common.h before parsers.h
+#endif
 
 /* Our enums */
 typedef enum {

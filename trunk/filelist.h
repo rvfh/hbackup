@@ -30,8 +30,14 @@
 #endif
 #include <sys/stat.h>
 #include <unistd.h>
-#include "metadata.h"
-#include "filters.h"
+
+#ifndef LIST_H
+#error You must include list.h before filelist.h
+#endif
+
+#ifndef FILTERS_H
+#error You must include filters.h before filelist.h
+#endif
 
 /* Create list of files from path, using filters */
 extern int filelist_new(

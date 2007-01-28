@@ -16,31 +16,24 @@
      Boston, MA 02111-1307, USA.
 */
 
+#ifndef COMMON_H
+#define COMMON_H
+
 #ifndef METADATA_H
-#define METADATA_H
-
-#ifndef _GNU_SOURCE
-#define _GNU_SOURCE
+#error You must include metadata.h before common.h
 #endif
-#include <stdio.h>
-#include <sys/types.h>
-/* Declare lstat and S_* macros */
-#ifndef __USE_BSD
-#define __USE_BSD
-#endif
-#include <sys/stat.h>
-#include <unistd.h>
 
-/* File metadata */
+/* File data */
 typedef struct {
-  mode_t type;    /* type */
-  time_t mtime;   /* time of last modification */
-  off_t  size;    /* total size, in bytes */
-  uid_t  uid;     /* user ID of owner */
-  gid_t  gid;     /* group ID of owner */
-  mode_t mode;    /* permissions */
-} metadata_t;
+  char        *path;
+  char        checksum[36];
+  metadata_t  metadata;
+} filedata_t;
 
-extern int metadata_get(const char *path, metadata_t *metadata);
+/* Verbosity level */
+extern int verbosity(void);
+
+/* Termination required */
+extern int terminating(void);
 
 #endif

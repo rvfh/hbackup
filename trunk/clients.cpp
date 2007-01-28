@@ -24,6 +24,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#include "metadata.h"
+#include "common.h"
 #include "params.h"
 #include "tools.h"
 #include "list.h"

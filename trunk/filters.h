@@ -19,8 +19,13 @@
 #ifndef FILTERS_H
 #define FILTERS_H
 
-#include "metadata.h"
-#include "list.h"
+#ifndef COMMON_H
+#error You must include common.h before filters.h
+#endif
+
+#ifndef LIST_H
+#error You must include list.h before filters.h
+#endif
 
 /* The filter stores a list of rules, each containing a list of filters.
  * A rule matches if all filters in it match (AND)

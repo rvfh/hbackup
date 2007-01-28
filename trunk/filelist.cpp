@@ -42,6 +42,7 @@ Algorithm for temporary list creation:
 #include "hbackup.h"
 #include "list.h"
 #include "metadata.h"
+#include "common.h"
 #include "filters.h"
 #include "parsers.h"
 #include "tools.h"

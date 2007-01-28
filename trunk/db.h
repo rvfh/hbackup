@@ -19,6 +19,10 @@
 #ifndef DB_H
 #define DB_H
 
+#ifndef LIST_H
+#error You must include list.h before db.h
+#endif
+
 /* Open database */
 extern int db_open(const char *db_path);
 
