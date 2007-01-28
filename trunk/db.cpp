@@ -68,6 +68,7 @@ typedef struct {
 
 static List   *db_list = NULL;
 static char   *db_path = NULL;
+static char   blankline[] = "                 ";
 
 /* Size of path being backed up */
 static int    backup_path_length = 0;
@@ -842,6 +843,7 @@ int db_parse(const char *host, const char *real_path,
               failed = 1;
               if (! terminating()) {
                 /* Don't signal errors on termination */
+                cout << '\r' << blankline << '\r';
                 fprintf(stderr, "db: parse: %s: %s, ignoring\n",
                     strerror(errno), db_data->filedata.path);
                 if ((verbosity() > 2) && (step != 0)) {
@@ -865,6 +867,7 @@ int db_parse(const char *host, const char *real_path,
           asprintf(&full_path, "%s/%s", mount_path, filedata->path);
           if ((size = readlink(full_path, string, FILENAME_MAX)) < 0) {
             failed = 1;
+            cout << '\r' << blankline << '\r';
             fprintf(stderr, "db: parse: %s: %s, ignoring\n",
               strerror(errno), db_data->filedata.path);
           } else {
@@ -882,14 +885,16 @@ int db_parse(const char *host, const char *real_path,
           db_save("list", db_list);
         }
         if ((verbosity() > 2) && (step != 0) && (sizebackedup >= nextstep)) {
-          off_t percents = sizebackedup / step;
-          printf(" --> Copied: %lu / %lu (%lu%%)\n", sizebackedup,
-            sizetobackup, percents);
+          off_t percents = long(double(sizebackedup * 100.0) / double(sizetobackup));
+
+          cout << '\r' << blankline << '\r';
+          printf(" --> Copied: %lu%%", percents);
           /* Align nextstep to percent (step 2) */
           nextstep = step * (percents + 1 );
         }
       }
     }
+    cout << '\r' << blankline << '\r';
   } else if (verbosity() > 2) {
     cout << " --> No files to add\n";
   }
