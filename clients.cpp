@@ -433,13 +433,26 @@ int clients_backup(const char *mount_point, int configcheck) {
     List      *backups      = new List();
     int       clientfailed  = 0;
 
-    if (verbosity() > 0) {
-      printf("Backup client '%s' using protocol '%s'\n", client->hostname,
-        client->protocol);
+    if (prepare_share(client, mount_point, client->listfile, &listfilename)) {
+      switch (errno) {
+        case EPROTONOSUPPORT:
+          fprintf(stderr, "clients: backup: %s protocol not supported\n",
+            client->protocol);
+        case ETIMEDOUT:
+          if (verbosity() > 0) {
+            printf("Client unreachable '%s' using protocol '%s'\n",
+              client->hostname, client->protocol);
+          }
+      }
+      continue;
     }
 
-    if (! prepare_share(client, mount_point, client->listfile, &listfilename)
-     && ! read_listfile(listfilename, backups)) {
+    if (verbosity() > 0) {
+      printf("Backup client '%s' using protocol '%s'\n",
+        client->hostname, client->protocol);
+    }
+
+    if (! read_listfile(listfilename, backups)) {
       /* Backup */
       if (backups->size() == 0) {
         failed = 1;
@@ -504,13 +517,6 @@ int clients_backup(const char *mount_point, int configcheck) {
         case EUCLEAN:
           fprintf(stderr, "clients: backup: list file corrupted %s\n",
             listfilename);
-          break;
-        case EPROTONOSUPPORT:
-          fprintf(stderr, "clients: backup: %s protocol not supported\n",
-            client->protocol);
-          break;
-        case ETIMEDOUT:
-          fprintf(stderr, "clients: backup: client unreachable\n");
       }
       failed = 1;
     }
