@@ -76,6 +76,7 @@ static int db_load(const char *filename, List *list) {
   FILE *readfile;
   int  failed = 0;
 
+  errno = 0;
   asprintf(&source_path, "%s/%s", db_path, filename);
   if ((readfile = fopen(source_path, "r")) != NULL) {
     /* Read the file into memory */
@@ -173,7 +174,7 @@ static int db_load(const char *filename, List *list) {
       }
       free(string);
       if (failed) {
-        fprintf(stderr, "db: failed to read list file (%s): wrong format (%d)\n", source_path, field);
+        errno = EUCLEAN;
       } else {
         db_data_p = new db_data_t;
         *db_data_p = db_data;
@@ -183,6 +184,7 @@ static int db_load(const char *filename, List *list) {
     free(buffer);
     fclose(readfile);
   } else {
+    // errno set by fopen
     failed = 1;
   }
   free(source_path);
@@ -223,7 +225,6 @@ static int db_save(const char *filename, List *list) {
     failed = rename(temp_path, dest_path);
     free(dest_path);
   } else {
-    fprintf(stderr, "db: failed to write list file: %s\n", filename);
     failed = 2;
   }
   free(temp_path);
@@ -611,33 +612,47 @@ int db_open(const char *path) {
 
   /* Take lock */
   if (db_lock(path)) {
+    errno = ENOLCK;
     return 2;
   }
 
-  /* Check that data dir exists, if not create it */
+  /* Check that data dir and list file exist, if not create them */
   {
     char *data_path = NULL;
 
     asprintf(&data_path, "%s/data", db_path);
     status = testdir(data_path, 1);
     free(data_path);
+    if (status == 1) {
+      asprintf(&data_path, "%s/list", db_path);
+      if (testfile(data_path, 1) == 2) {
+        status = 2;
+      } else if (verbosity() > 0) {
+        printf("Database initialized\n");
+      }
+      free(data_path);
+    }
+    /* status = 0 => data was there */
+    /* status = 1 => initialized db */
+    /* status = 2 => error */
   }
 
   /* Read database active items list */
   if (status != 2) {
     db_list = new List(db_data_get);
-    switch (db_load("list", db_list)) {
+    db_load("list", db_list);
+    switch (errno) {
       case 0:
-        if (verbosity() > 0) {
+        if ((verbosity() > 0) && (status == 0)) {
           printf("Database opened (active contents: %u file(s))\n",
             db_list->size());
         }
         break;
-      case 1:
+      case ENOENT:
         if (! status) {
           /* TODO There was a data directory, but no list. Attempt recovery */
-        } else if (verbosity() > 0) {
-          printf("Database initialized\n");
+          fprintf(stderr, "db: open: list missing\n");
+          status = 2;
         }
         break;
       default:

@@ -265,7 +265,6 @@ int main(int argc, char **argv) {
 
           /* Backup */
           if (clients_backup(mount_path, configcheck)) {
-            fprintf(stderr, "Failed to backup\n");
             failed = 1;
           }
           free(mount_path);

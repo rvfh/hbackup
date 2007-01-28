@@ -1,6 +1,9 @@
 File data missing for checksum 59ca0efa9f5633cb0371bbc0355478d8-0
 File data missing for checksum 59ca0efa9f5633cb0371bbc0355478d8-0
 File data corrupted for checksum 59ca0efa9f5633cb0371bbc0355478d8-0 (found to be d41d8cd98f00b204e9800998ecf8427e)
+db: close: failed to save active items list
+db: close: failed to save removed items list
+db: open: list missing
 type_letter
 File   : f
 Dir    : d
@@ -270,3 +273,9 @@ Database opened (active contents: 15 file(s))
 -> 'file://host' '/home/user2/testfile2' f 259072 1 1000 1000 0644 '' fb00cd74a5f35e89a7fbdd3c1d05375a-0 1 0 -
 -> 'file://host' '/home/user2/testlink' l 8 1 1000 1000 0777 'testfile'  1 0 -
 Database closed (total contents: 16 file(s))
+Database opened (active contents: 15 file(s))
+Database closed (total contents: 16 file(s))
+Error: Permission denied
+Error: Permission denied
+Error: Structure needs cleaning
+Error: No such file or directory

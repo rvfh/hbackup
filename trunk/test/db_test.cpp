@@ -370,5 +370,38 @@ int main(void) {
   delete filter_handle;
   parsers_free(parsers_handle);
 
+
+  /* List cannot be saved */
+  if ((status = db_open("test_db"))) {
+    printf("db_open error status %u\n", status);
+    if (status == 2) {
+      return 0;
+    }
+  }
+  system("chmod ugo-w test_db");
+  db_close();
+  printf("Error: %s\n", strerror(errno));
+  system("chmod u+w test_db");
+  system("rm -f test_db/lock");
+
+  /* List cannot be read */
+  system("chmod ugo-r test_db/list");
+  if ((status = db_open("test_db"))) {
+    printf("Error: %s\n", strerror(errno));
+  }
+
+  /* List is garbaged */
+  system("chmod u+r test_db/list");
+  system("echo blah >> test_db/list");
+  if ((status = db_open("test_db"))) {
+    printf("Error: %s\n", strerror(errno));
+  }
+
+  /* List is gone */
+  remove("test_db/list");
+  if ((status = db_open("test_db"))) {
+    printf("Error: %s\n", strerror(errno));
+  }
+
   return 0;
 }
