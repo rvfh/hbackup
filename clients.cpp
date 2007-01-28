@@ -484,9 +484,6 @@ int clients_backup(const char *mount_point, int configcheck) {
             pathtolinux(backup->path);
             if (db_parse(prefix, backup->path, backup_path,
                 filelist_get(), 100)) {
-              if (! terminating()) {
-                fprintf(stderr, "clients: backup: parsing failed\n");
-              }
               failed        = 1;
             }
             free(prefix);

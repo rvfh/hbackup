@@ -338,8 +338,12 @@ static void db_list_free(List *list) {
   delete list;
 }
 
-static int db_write(const char *mount_path, const char *path,
-    const db_data_t *db_data, char *checksum, int compress) {
+static int db_write(
+    const char *mount_path,
+    const char *path,
+    const db_data_t *db_data,
+    char *checksum,
+    int compress) {
   char    *source_path = NULL;
   char    *temp_path   = NULL;
   char    *dest_path   = NULL;
@@ -814,84 +818,77 @@ int db_parse(const char *host, const char *real_path,
       }
       printf(" --> Files to add: %u (%lu bytes)\n",
         added_files_list->size(), sizetobackup);
+      cout << " --> Copied: " << 0 << "%";
     }
 
-    while ((entry = added_files_list->next(entry)) != NULL) {
-      if (! terminating()) {
-        filedata_t *filedata = (filedata_t *) (list_entry_payload(entry));
-        db_data_t  *db_data  = new db_data_t;
+    while (((entry = added_files_list->next(entry)) != NULL) && ! terminating()) {
+      filedata_t *filedata = (filedata_t *) (list_entry_payload(entry));
+      db_data_t  *db_data  = new db_data_t;
 
-        asprintf(&db_data->host, "%s", host);
-        db_data->filedata.metadata = filedata->metadata;
-        asprintf(&db_data->filedata.path, "%s/%s", real_path,
-          filedata->path);
-        db_data->link = NULL;
-        db_data->date_in = time(NULL);
-        db_data->date_out = 0;
-        /* Save new data */
-        if (S_ISREG(filedata->metadata.type)) {
-          if (verbosity() > 2) {
-            sizebackedup += filedata->metadata.size;
-          }
-          if (filedata->checksum[0] != '\0') {
-            /* Checksum given by the compare function */
-            strcpy(db_data->filedata.checksum, filedata->checksum);
-          } else {
-            if (db_write(mount_path, filedata->path, db_data,
-                db_data->filedata.checksum, 0)) {
-              /* Write failed, need to go on */
-              failed = 1;
-              if (! terminating()) {
-                /* Don't signal errors on termination */
-                cout << '\r' << blankline << '\r';
-                fprintf(stderr, "db: parse: %s: %s, ignoring\n",
-                    strerror(errno), db_data->filedata.path);
-                if ((verbosity() > 2) && (step != 0)) {
-                  sizebackedup -= filedata->metadata.size;
-                  sizetobackup -= filedata->metadata.size;
-                  step          = sizetobackup / 100;
-                  nextstep      = sizebackedup + step;
-                }
-              }
-              strcpy(db_data->filedata.checksum, "N");
-            }
-          }
+      asprintf(&db_data->host, "%s", host);
+      db_data->filedata.metadata = filedata->metadata;
+      asprintf(&db_data->filedata.path, "%s/%s", real_path, filedata->path);
+      db_data->link = NULL;
+      db_data->date_in = time(NULL);
+      db_data->date_out = 0;
+      /* Save new data */
+      if (S_ISREG(filedata->metadata.type)) {
+        if (verbosity() > 2) {
+          sizebackedup += filedata->metadata.size;
+        }
+        if (filedata->checksum[0] != '\0') {
+          /* Checksum given by the compare function */
+          strcpy(db_data->filedata.checksum, filedata->checksum);
         } else {
-          strcpy(db_data->filedata.checksum, "");
-        }
-        if (S_ISLNK(filedata->metadata.type)) {
-          char *full_path = NULL;
-          char *string = new char[FILENAME_MAX];
-          int size;
-
-          asprintf(&full_path, "%s/%s", mount_path, filedata->path);
-          if ((size = readlink(full_path, string, FILENAME_MAX)) < 0) {
+          if (db_write(mount_path, filedata->path, db_data,
+              db_data->filedata.checksum, 0)) {
+            /* Write failed, need to go on */
             failed = 1;
-            cout << '\r' << blankline << '\r';
-            fprintf(stderr, "db: parse: %s: %s, ignoring\n",
-              strerror(errno), db_data->filedata.path);
-          } else {
-            string[size] = '\0';
-            asprintf(&db_data->link, "%s", string);
+            if (! terminating()) {
+              /* Don't signal errors on termination */
+              cout << '\r' << blankline << '\r';
+              fprintf(stderr, "%s: %s, ignoring\n",
+                  strerror(errno), db_data->filedata.path);
+            }
+            strcpy(db_data->filedata.checksum, "N");
           }
-          free(full_path);
-          free(string);
         }
-        db_list->add(db_data);
-        if ((++copied >= 1000)
-         || ((volume += db_data->filedata.metadata.size) >= 10000000)) {
-          copied = 0;
-          volume = 0;
-          db_save("list", db_list);
-        }
-        if ((verbosity() > 2) && (step != 0) && (sizebackedup >= nextstep)) {
-          off_t percents = long(double(sizebackedup * 100.0) / double(sizetobackup));
+      } else {
+        strcpy(db_data->filedata.checksum, "");
+      }
+      if (S_ISLNK(filedata->metadata.type)) {
+        char *full_path = NULL;
+        char *string = new char[FILENAME_MAX];
+        int size;
 
+        asprintf(&full_path, "%s/%s", mount_path, filedata->path);
+        if ((size = readlink(full_path, string, FILENAME_MAX)) < 0) {
+          failed = 1;
           cout << '\r' << blankline << '\r';
-          printf(" --> Copied: %lu%%", percents);
-          /* Align nextstep to percent (step 2) */
-          nextstep = step * (percents + 1 );
+          fprintf(stderr, "db: parse: %s: %s, ignoring\n",
+            strerror(errno), db_data->filedata.path);
+        } else {
+          string[size] = '\0';
+          asprintf(&db_data->link, "%s", string);
         }
+        free(full_path);
+        free(string);
+      }
+      db_list->add(db_data);
+      if ((++copied >= 1000)
+      || ((volume += db_data->filedata.metadata.size) >= 10000000)) {
+        copied = 0;
+        volume = 0;
+        db_save("list", db_list);
+      }
+//         if ((verbosity() > 2) && (step != 0) && (sizebackedup >= nextstep)) {
+      if (verbosity() > 2) {
+        long percents = long(double(sizebackedup * 100.0) / double(sizetobackup));
+
+        cout << '\r' << blankline << '\r';
+        cout << " --> Copied: " << percents << "%";
+        /* Align nextstep to percent (step 2) */
+        nextstep = step * (percents + 1 );
       }
     }
     cout << '\r' << blankline << '\r';

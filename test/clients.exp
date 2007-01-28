@@ -69,12 +69,12 @@ Backup path 'test'
  -> Building list of files
  -> Parsing list of files
  --> Files to add: 11 (0 bytes)
-                  --> No files to remove
+ --> Copied: 0%                  --> Copied: -2147483648%                  --> Copied: -2147483648%                  --> Copied: -2147483648%                  --> Copied: -2147483648%                  --> Copied: -2147483648%                  --> Copied: -2147483648%                  --> Copied: -2147483648%                  --> Copied: -2147483648%                  --> Copied: -2147483648%                  --> Copied: -2147483648%                  --> Copied: -2147483648%                  --> No files to remove
 Backup path 'test2'
  -> Building list of files
  -> Parsing list of files
  --> Files to add: 5 (928768 bytes)
-                  --> Copied: 15%                  --> Copied: 43%                  --> Copied: 100%                  --> No files to remove
+ --> Copied: 0%                  --> Copied: 0%                  --> Copied: 15%                  --> Copied: 43%                  --> Copied: 100%                  --> Copied: 100%                  --> No files to remove
 Database closed (total contents: 16 file(s))
  --> Client: localhost
 Database opened (active contents: 16 file(s))
