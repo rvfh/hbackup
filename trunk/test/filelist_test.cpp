@@ -50,9 +50,7 @@ int main(int argc, char *argv[]) {
   delete files;
 
   printf("as previous with subdir in ignore list\n");
-  if ((status = test_filter_handle->addRule(new Rule(new Condition(S_IFDIR, filter_path_start, "subdir"))))) {
-    printf("ignore_add error status %u\n", status);
-  }
+  test_filter_handle->push_back(new Rule(new Condition(S_IFDIR, filter_path_start, "subdir")));
   files = new List(filedata_get);
   if (! iterate_directory("test", NULL)) {
     cout << ">List " << files->size() << " file(s):\n";
@@ -61,9 +59,7 @@ int main(int argc, char *argv[]) {
   delete files;
 
   printf("as previous with testlink in ignore list\n");
-  if ((status = test_filter_handle->addRule(new Rule(new Condition(S_IFLNK, filter_path_start, "testlink"))))) {
-    printf("ignore_add error status %u\n", status);
-  }
+  test_filter_handle->push_back(new Rule(new Condition(S_IFLNK, filter_path_start, "testlink")));
   files = new List(filedata_get);
   if (! iterate_directory("test", NULL)) {
     cout << ">List " << files->size() << " file(s):\n";

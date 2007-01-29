@@ -19,17 +19,17 @@
 #ifndef FILTERS_H
 #define FILTERS_H
 
+#include <vector>
+
 #ifndef COMMON_H
 #error You must include common.h before filters.h
 #endif
 
-#ifndef LIST_H
-#error You must include list.h before filters.h
-#endif
+using namespace std;
 
-/* The filter stores a list of rules, each containing a list of filters.
- * A rule matches if all filters in it match (AND)
- *    rule = filter AND filter AND ... AND filter
+/* The filter stores a list of rules, each containing a list of conditions.
+ * A rule matches if all conditions in it match (AND)
+ *    rule = condition AND condition AND ... AND condition
  * A match is obtained if any rule matches (OR)
  *    result = rule OR rule OR ... OR rule
  * Zero is returned when a match was found, non-zero otherwise (a la strcmp).
@@ -56,20 +56,17 @@ public:
     ...);
   int  match(const filedata_t *filedata) const;
   /* Debug only */
-  char *show() const;
+  void show() const;
 };
 
-class Rule: public List {
+class Rule: public vector<Condition*> {
 public:
-  Rule(Condition *condition = NULL);
-  ~Rule();
-  int addCondition(Condition *);
+  Rule() {}
+  Rule(Condition *condition);
 };
 
-class Filter: public List {
+class Filter: public vector<Rule*> {
 public:
-  ~Filter();
-  int addRule(Rule *);
   int match(const filedata_t *filedata) const;
 };
 

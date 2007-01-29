@@ -16,12 +16,12 @@
      Boston, MA 02111-1307, USA.
 */
 
+#include <iostream>
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
 #include <sys/types.h>
 #include <regex.h>
-#include "list.h"
 #include "metadata.h"
 #include "common.h"
 #include "filters.h"
@@ -57,7 +57,7 @@ int Condition::match(const filedata_t *filedata) const {
   if ((_file_type & filedata->metadata.type) == 0) {
     return 1;
   }
-  /* Run filters */
+  /* Run conditions */
   switch(_type) {
   case filter_path_end: {
     signed int diff = strlen(filedata->path) - strlen(_string);
@@ -79,93 +79,49 @@ int Condition::match(const filedata_t *filedata) const {
   case filter_size_below:
     return filedata->metadata.size > _size;
   default:
-    fprintf(stderr, "filters: match: unknown filter type\n");
+    fprintf(stderr, "filters: match: unknown condition type\n");
     return 2;
   }
   return 1;
 }
 
-char *Condition::show() const {
-  char  *string = NULL;
-
+void Condition::show() const {
   switch (_type) {
     case filter_path_end:
     case filter_path_start:
     case filter_path_regexp:
-      asprintf(&string, "%s %u", _string, _type);
+      cout << "--> " << _string << " " << _type << endl;
       break;
     case filter_size_above:
     case filter_size_below:
-      asprintf(&string, "%ld %u", _size, _type);
+      cout << "--> " << _size << " " << _type << endl;
       break;
     default:
-      asprintf(&string, "unknown filter type");
+      cout << "--> unknown condition type " << _type << endl;
   }
-  return string;
 }
 
 Rule::Rule(Condition *condition) {
-  if (condition != NULL) {
-    addCondition(condition);
-  }
-}
-
-Rule::~Rule() {
-  /* Note: entry gets free in the loop */
-  list_entry_t *condition;
-
-  /* List of lists, free each embedded list */
-  while ((condition = next(NULL)) != NULL) {
-    delete (Condition *) remove(condition);
-  }
-}
-
-int Rule::addCondition(Condition *condition) {
-  if (this->append(condition) == NULL) {
-    fprintf(stderr, "filters: addCondition: failed\n");
-    return -1;
-  }
-  return 0;
-}
-
-Filter::~Filter() {
-  /* Note: entry gets free in the loop */
-  list_entry_t *rule;
-
-  /* List of lists, free each embedded list */
-  while ((rule = next(NULL)) != NULL) {
-    delete (Rule *) remove(rule);
-  }
-}
-
-int Filter::addRule(Rule *rule) {
-  if (this->append(rule) == NULL) {
-    fprintf(stderr, "filters: addRule: failed\n");
-    return -1;
-  }
-  return 0;
+  push_back(condition);
 }
 
 int Filter::match(const filedata_t *filedata) const {
-  list_entry_t *rule_entry = NULL;
-
   /* Read through list of rules */
-  while ((rule_entry = this->next(rule_entry)) != NULL) {
-    Rule          *rule         = (Rule *) (list_entry_payload(rule_entry));
-    list_entry_t  *filter_entry = NULL;
-    int           match         = 1;
+  for (unsigned int i = 0; i < size(); i++) {
+    Rule  *rule = (*this)[i];
+    int   match = 1;
 
-    /* Read through list of filters in rule */
-    while ((filter_entry = rule->next(filter_entry)) != NULL) {
-      Condition *filter = (Condition *) (list_entry_payload(filter_entry));
+    /* Read through list of conditions in rule */
+    for (unsigned int j = 0; j < rule->size(); j++) {
+      Condition *condition = (*rule)[j];
 
       /* All filters must match for rule to match */
-      if (filter->match(filedata)) {
+      if (condition->match(filedata)) {
         match = 0;
         break;
       }
     }
-    /* If all filters matched (or the rule is empty!), we have a rule match */
+    /* If all conditions matched, or the rule is empty, we have a rule match */
     if (match) {
       return 0;
     }
