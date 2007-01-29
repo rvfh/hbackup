@@ -105,6 +105,18 @@ Rule::Rule(Condition *condition) {
   push_back(condition);
 }
 
+Rule::~Rule() {
+  for (unsigned int i = 0; i < size(); i++) {
+    delete (*this)[i];
+  }
+}
+
+Filter::~Filter() {
+  for (unsigned int i = 0; i < size(); i++) {
+    delete (*this)[i];
+  }
+}
+
 int Filter::match(const filedata_t *filedata) const {
   /* Read through list of rules */
   for (unsigned int i = 0; i < size(); i++) {
