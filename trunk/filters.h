@@ -63,10 +63,12 @@ class Rule: public vector<Condition*> {
 public:
   Rule() {}
   Rule(Condition *condition);
+  ~Rule();
 };
 
 class Filter: public vector<Rule*> {
 public:
+  ~Filter();
   int match(const filedata_t *filedata) const;
 };
 
