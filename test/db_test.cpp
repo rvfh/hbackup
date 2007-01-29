@@ -119,22 +119,10 @@ int main(void) {
   }
 
   filter_handle = new Filter;
-  if ((status = filter_handle->addRule(new Rule(new Condition(S_IFDIR, filter_path_start, ".svn"))))) {
-    printf("ignore_add error status %u\n", status);
-    return 0;
-  }
-  if ((status = filter_handle->addRule(new Rule(new Condition(S_IFDIR, filter_path_start, "subdir"))))) {
-    printf("ignore_add error status %u\n", status);
-    return 0;
-  }
-  if ((status = filter_handle->addRule(new Rule(new Condition(S_IFREG, filter_path_end, "~"))))) {
-    printf("ignore_add error status %u\n", status);
-    return 0;
-  }
-  if ((status = filter_handle->addRule(new Rule(new Condition(S_IFREG, filter_path_regexp, "\\.o$"))))) {
-    printf("ignore_add error status %u\n", status);
-    return 0;
-  }
+  filter_handle->push_back(new Rule(new Condition(S_IFDIR, filter_path_start, ".svn")));
+  filter_handle->push_back(new Rule(new Condition(S_IFDIR, filter_path_start, "subdir")));
+  filter_handle->push_back(new Rule(new Condition(S_IFREG, filter_path_end, "~")));
+  filter_handle->push_back(new Rule(new Condition(S_IFREG, filter_path_regexp, "\\.o$")));
 
   if ((status = filelist_new("test////", filter_handle, parsers_handle))) {
     printf("file_list_new error status %u\n", status);

@@ -267,15 +267,15 @@ static int add_filter(Filter *handle, const char *type, const char *string) {
 
   /* Add specified filter */
   if (! strcmp(filter_type, "path_end")) {
-    handle->addRule(new Rule(new Condition(file_type, filter_path_end, string)));
+    handle->push_back(new Rule(new Condition(file_type, filter_path_end, string)));
   } else if (! strcmp(filter_type, "path_start")) {
-    handle->addRule(new Rule(new Condition(file_type, filter_path_start, string)));
+    handle->push_back(new Rule(new Condition(file_type, filter_path_start, string)));
   } else if (! strcmp(filter_type, "path_regexp")) {
-    handle->addRule(new Rule(new Condition(file_type, filter_path_regexp, string)));
+    handle->push_back(new Rule(new Condition(file_type, filter_path_regexp, string)));
   } else if (! strcmp(filter_type, "size_below")) {
-    handle->addRule(new Rule(new Condition(0, filter_size_below, strtoul(string, NULL, 10))));
+    handle->push_back(new Rule(new Condition(0, filter_size_below, strtoul(string, NULL, 10))));
   } else if (! strcmp(filter_type, "size_above")) {
-    handle->addRule(new Rule(new Condition(0, filter_size_above, strtoul(string, NULL, 10))));
+    handle->push_back(new Rule(new Condition(0, filter_size_above, strtoul(string, NULL, 10))));
   } else {
     return 1;
   }

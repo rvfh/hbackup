@@ -23,32 +23,31 @@
 using namespace std;
 #include "filters.cpp"
 
-static char *filters_show(const void *payload) {
-  const Condition *condition = (const Condition *) (payload);
+void filter_show(const Filter& filter) {
+  /* Read through list of rules */
+  for (unsigned int i = 0; i < filter.size(); i++) {
+    Rule *rule = filter[i];
 
-  return condition->show();
-}
+    cout << "-> List " << rule->size() << " condition(s)\n";
+    /* Read through list of conditions in rule */
+    for (unsigned int j = 0; j < rule->size(); j++) {
+      Condition *condition = (*rule)[j];
 
-static char *filters_rule_show(const void *payload) {
-  const List  *rule   = (const List *) payload;
-  char        *string = NULL;
-
-  cout << "-> List " << rule->size() << " filter(s)\n";
-  rule->show(NULL, filters_show);
-  return string;
+      condition->show();
+    }
+  }
 }
 
 /* TODO Test file type check */
 int main(void) {
   Filter      *filter = NULL;
   Filter      *filter2 = NULL;
-  Rule        *rule;
   Condition   *condition;
   filedata_t  filedata;
 
   filedata.metadata.type = S_IFREG;
 
-  cout << "Filters test\n";
+  cout << "Conditions test\n";
   cout << "filter_path_end_check\n";
   condition = new Condition(S_IFREG, filter_path_end, ".txt");
   filedata.path = "to a file.txt";
@@ -105,18 +104,14 @@ int main(void) {
 
   cout << "\nSimple rules test\n";
   filter = new Filter;
-  if (filter->addRule(new Rule(new Condition(S_IFREG, filter_path_regexp, "^to a.*\\.txt")))) {
-    cout << "Failed to add\n";
-  } else {
-    cout << ">List " << filter->size() << " rule(s):\n";
-    filter->show(NULL, filters_rule_show);
-  }
-  if (filter->addRule(new Rule(new Condition(S_IFREG, filter_path_regexp, "^to a.*\\.t.t")))) {
-    cout << "Failed to add\n";
-  } else {
-    cout << ">List " << filter->size() << " rule(s):\n";
-    filter->show(NULL, filters_rule_show);
-  }
+  filter->push_back(new Rule(new Condition(S_IFREG, filter_path_regexp, "^to a.*\\.txt")));
+  cout << ">List " << filter->size() << " rule(s):\n";
+  filter_show(*filter);
+
+  filter->push_back(new Rule(new Condition(S_IFREG, filter_path_regexp, "^to a.*\\.t.t")));
+  cout << ">List " << filter->size() << " rule(s):\n";
+  filter_show(*filter);
+
   filedata.path = "to a file.txt";
   if (filter->match(&filedata)) {
     cout << "Not matching 1\n";
@@ -143,18 +138,14 @@ int main(void) {
   if (filter2->match(&filedata)) {
     cout << "Not matching +3\n";
   }
-  if (filter2->addRule(new Rule(new Condition(S_IFREG, filter_path_regexp, "^to a.*\\.txt")))) {
-    cout << "Failed to add\n";
-  } else {
-    cout << ">List " << filter2->size() << " rule(s):\n";
-    filter2->show(NULL, filters_rule_show);
-  }
-  if (filter2->addRule(new Rule(new Condition(S_IFREG, filter_path_regexp, "^to a.*\\.t.t")))) {
-    cout << "Failed to add\n";
-  } else {
-    cout << ">List " << filter2->size() << " rule(s):\n";
-    filter2->show(NULL, filters_rule_show);
-  }
+  filter2->push_back(new Rule(new Condition(S_IFREG, filter_path_regexp, "^to a.*\\.txt")));
+  cout << ">List " << filter2->size() << " rule(s):\n";
+  filter_show(*filter2);
+
+  filter2->push_back(new Rule(new Condition(S_IFREG, filter_path_regexp, "^to a.*\\.t.t")));
+  cout << ">List " << filter2->size() << " rule(s):\n";
+  filter_show(*filter2);
+
   filedata.path = "to a file.txt";
   if (filter2->match(&filedata)) {
     cout << "Not matching +1\n";
@@ -203,12 +194,10 @@ int main(void) {
     cout << "Matching " << filedata.metadata.size << "\n";
   }
   /* File type is always S_IFREG */
-  if (filter->addRule(new Rule(new Condition(0, filter_size_below, 500)))) {
-    cout << "Failed to add\n";
-  } else {
-    cout << ">List " << filter->size() << " rule(s):\n";
-    filter->show(NULL, filters_rule_show);
-  }
+  filter->push_back(new Rule(new Condition(0, filter_size_below, 500)));
+  cout << ">List " << filter->size() << " rule(s):\n";
+  filter_show(*filter);
+
   filedata.metadata.size = 0;
   if (filter->match(&filedata)) {
     cout << "Not matching " << filedata.metadata.size << "\n";
@@ -228,12 +217,10 @@ int main(void) {
     cout << "Matching " << filedata.metadata.size << "\n";
   }
   /* File type is always S_IFREG */
-  if (filter->addRule(new Rule(new Condition(0, filter_size_above, 5000)))) {
-    cout << "Failed to add\n";
-  } else {
-    cout << ">List " << filter->size() << " rule(s):\n";
-    filter->show(NULL, filters_rule_show);
-  }
+  filter->push_back(new Rule(new Condition(0, filter_size_above, 5000)));
+  cout << ">List " << filter->size() << " rule(s):\n";
+  filter_show(*filter);
+
   filedata.metadata.size = 0;
   if (filter->match(&filedata)) {
     cout << "Not matching " << filedata.metadata.size << "\n";
@@ -257,24 +244,21 @@ int main(void) {
   /* Test complex rules */
   cout << "\nComplex rules test\n";
   filter = new Filter;
-  rule   = new Rule;
+  Rule *rule = new Rule;
 
   cout << ">List " << filter->size() << " rule(s):\n";
-  filter->show(NULL, filters_rule_show);
+  filter_show(*filter);
 
-  filter->addRule(rule);
-  if (rule->addCondition(new Condition(0, filter_size_below, 500))) {
-    cout << "Failed to add\n";
-  } else {
-    cout << ">List " << filter->size() << " rule(s):\n";
-    filter->show(NULL, filters_rule_show);
-  }
-  if (rule->addCondition(new Condition(0, filter_size_above, 400))) {
-    cout << "Failed to add\n";
-  } else {
-    cout << ">List " << filter->size() << " rule(s):\n";
-    filter->show(NULL, filters_rule_show);
-  }
+  filter->push_back(rule);
+
+  rule->push_back(new Condition(0, filter_size_below, 500));
+  cout << ">List " << filter->size() << " rule(s):\n";
+  filter_show(*filter);
+
+  rule->push_back(new Condition(0, filter_size_above, 400));
+  cout << ">List " << filter->size() << " rule(s):\n";
+  filter_show(*filter);
+
   filedata.metadata.size = 600;
   if (filter->match(&filedata)) {
     cout << "Not matching " << filedata.metadata.size << "\n";
