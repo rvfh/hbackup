@@ -34,7 +34,7 @@
 #include "common.h"
 #include "tools.h"
 
-#define CHUNK 10240000
+#define CHUNK 409600
 
 using namespace std;
 

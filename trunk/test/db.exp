@@ -46,7 +46,7 @@ Database initialized
 >List 1 element(s):
 -> 'this is a host' 'test/testfile' f 13 1 1000 1000 0644 'this is a link' 59ca0efa9f5633cb0371bbc0355478d8 1 1 -
  --> Files to add: 12 (13 bytes)
- --> Copied: 0%                  --> Copied: 0%                  --> Copied: 0%                  --> Copied: 0%                  --> Copied: 0%                  --> Copied: 0%                  --> Copied: 0%                  --> Copied: 0%                  --> Copied: 0%                  --> Copied: 0%                  --> Copied: 0%                  --> Copied: 100%                  --> Copied: 100%                  --> No files to remove
+ --> Copied: 0% --> Copied: 0% --> Copied: 0% --> Copied: 0% --> Copied: 0% --> Copied: 0% --> Copied: 0% --> Copied: 0% --> Copied: 0% --> Copied: 0% --> Copied: 0% --> Copied: 100% --> Copied: 100%                  --> No files to remove
 >List 12 element(s):
 -> 'file://host' '/home/user/cvs' d 0 1 1000 1000 0755 ''  1 0 -
 -> 'file://host' '/home/user/cvs/dirbad' d 0 1 1000 1000 0755 ''  1 0 -
@@ -96,7 +96,7 @@ Database opened (active contents: 12 file(s))
 -> testfile2
 -> testlink
  --> Files to add: 4 (404480 bytes)
- --> Copied: 0%                  --> Copied: 0%                  --> Copied: 35%                  --> Copied: 100%                  --> Copied: 100%                  --> No files to remove
+ --> Copied: 0% --> Copied: 0% --> Copied: 35% --> Copied: 100% --> Copied: 100%                  --> No files to remove
 >List 16 element(s):
 -> 'file://host' '/home/user/cvs' d 0 1 1000 1000 0755 ''  1 0 -
 -> 'file://host' '/home/user/cvs/dirbad' d 0 1 1000 1000 0755 ''  1 0 -
@@ -251,7 +251,6 @@ Database opened (active contents: 16 file(s))
 -> 'file://host' '/home/user2/testfile' f 145408 1 1000 1000 0644 '' 3d546a1ce46c6ae10ad34ab8a81c542e-0 1 0 -
 -> 'file://host' '/home/user2/testfile2' f 259072 1 1000 1000 0644 '' fb00cd74a5f35e89a7fbdd3c1d05375a-0 1 0 -
 -> 'file://host' '/home/user2/testlink' l 8 1 1000 1000 0777 'testfile'  1 0 -
- --> Reorganizing db in: 'test_db/data' ... done
 Database closed (total contents: 16 file(s))
 Database opened (active contents: 15 file(s))
 >List 15 element(s):
