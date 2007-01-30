@@ -315,12 +315,13 @@ static int read_listfile(const char *listfilename, List *backups) {
   int      failed  = 0;
 
   /* Open list file */
-  if (verbosity() > 1) {
-    printf(" -> Reading backup list\n");
-  }
   if ((listfile = fopen(listfilename, "r")) == NULL) {
     failed = 2;
   } else {
+    if (verbosity() > 1) {
+      printf(" -> Reading backup list\n");
+    }
+
     /* Read list file */
     while (getline(&buffer, &size, listfile) >= 0) {
       char keyword[256];

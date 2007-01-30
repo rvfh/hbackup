@@ -270,9 +270,6 @@ static int db_organize(char *path, int number) {
   }
   /* Decide what to do */
   if (number == 0) {
-    if (verbosity() > 2) {
-      printf(" --> Reorganizing db in: '%s' ...", path);
-    }
     rewinddir(directory);
     while ((dir_entry = readdir(directory)) != NULL) {
       metadata_t  metadata;
@@ -315,9 +312,6 @@ static int db_organize(char *path, int number) {
     }
     if (! failed) {
       testfile(nofiles, 1);
-    }
-    if (verbosity() > 2) {
-      printf(" done\n");
     }
   }
   closedir(directory);
@@ -798,9 +792,6 @@ int db_parse(const char *host, const char *real_path,
     static off_t  volume        = 0;
     off_t         sizetobackup  = 0;
     off_t         sizebackedup  = 0;
-    /* Percents display stuff */
-    off_t         step          = 0;
-    off_t         nextstep      = 0;
 
     /* Determine volume to be copied */
     if (verbosity() > 2) {
@@ -810,11 +801,6 @@ int db_parse(const char *host, const char *real_path,
         if (S_ISREG(filedata->metadata.type)) {
           sizetobackup += filedata->metadata.size;
         }
-      }
-      if (sizetobackup >= 100000) {
-        nextstep = step = sizetobackup / 100;
-      } else {
-        nextstep = step = 0;
       }
       printf(" --> Files to add: %u (%lu bytes)\n",
         added_files_list->size(), sizetobackup);
@@ -881,14 +867,10 @@ int db_parse(const char *host, const char *real_path,
         volume = 0;
         db_save("list", db_list);
       }
-//         if ((verbosity() > 2) && (step != 0) && (sizebackedup >= nextstep)) {
       if (verbosity() > 2) {
         long percents = long(double(sizebackedup * 100.0) / double(sizetobackup));
 
-        cout << '\r' << blankline << '\r';
-        cout << " --> Copied: " << percents << "%";
-        /* Align nextstep to percent (step 2) */
-        nextstep = step * (percents + 1 );
+        cout << '\r' << " --> Copied: " << percents << "%";
       }
     }
     cout << '\r' << blankline << '\r';
