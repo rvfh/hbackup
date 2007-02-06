@@ -464,6 +464,7 @@ int clients_backup(const char *mount_point, int configcheck) {
           path_t *backup = (path_t *) (list_entry_payload(entry));
           char     *backup_path = NULL;
 
+          /* TODO Stop when terminating (=> backup destructor) */
           if (verbosity() > 0) {
             printf("Backup path '%s'\n", backup->path);
             if (verbosity() > 1) {
