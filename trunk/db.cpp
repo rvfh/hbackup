@@ -343,8 +343,6 @@ static int db_write(
   char    *dest_path   = NULL;
   char    checksum_source[36];
   char    checksum_dest[36];
-  FILE    *writefile;
-  FILE    *readfile;
   int     index = 0;
   int     deleteit = 0;
   int     failed = 0;
@@ -361,24 +359,21 @@ static int db_write(
   if (zcopy(source_path, temp_path, &size_source, &size_dest,
       checksum_source, checksum_dest, compress)) {
     failed = 1;
-  }
-  free(source_path);
+  } else
 
   /* Check size_source size */
   if (size_source != db_data->filedata.metadata.size) {
     fprintf(stderr, "db: write: file copy incomplete: %s\n", path);
     failed = 1;
-  }
+  } else
 
   /* Get file final location */
-  if (! failed && getdir(db_path, checksum_source, &dest_path) == 2) {
+  if (getdir(db_path, checksum_source, &dest_path) == 2) {
     fprintf(stderr, "db: write: failed to get dir for: %s\n",
       checksum_source);
     failed = 1;
-  }
-
-  /* Make sure our checksum is unique */
-  if (! failed) {
+  } else {
+    /* Make sure our checksum is unique */
     do {
       char  *final_path = NULL;
       int   differ = 0;
@@ -398,39 +393,11 @@ static int db_write(
 
           differ = 1;
 
-          /* Compare sizes first */
+          /* Compare sizes only */
           if (! metadata_get(try_path, &try_md)
           && ! metadata_get(temp_path, &temp_md)
           && (try_md.size == temp_md.size)) {
-            /* Compare try_path to temp_path */
-            if ((readfile = fopen(try_path, "r")) != NULL) {
-              if ((writefile = fopen(temp_path, "r")) != NULL) {
-                char    buffer1[CHUNK];
-                char    buffer2[CHUNK];
-                differ = 0;
-
-                do {
-                  size_t length = fread(buffer1, 1, CHUNK, readfile);
-
-                  /* Does fread read as much as possible? */
-                  if ((fread(buffer2, 1, length, writefile) != length)
-                   || strncmp(buffer1, buffer2, length)) {
-                    differ = 1;
-                    break;
-                  }
-                } while (! feof(readfile) && ! feof(writefile));
-                /* Is there more data in one of the files? */
-                if (!differ) {
-                  differ = fread(buffer1, 1, 1, readfile)
-                        || fread(buffer2, 1, 1, writefile);
-                }
-                if (! differ) {
-                  deleteit = 1;
-                }
-                fclose(writefile);
-              }
-              fclose(readfile);
-            }
+            differ = 0;
           }
         }
         free(try_path);
@@ -444,26 +411,27 @@ static int db_write(
       }
       index++;
     } while (1);
-  }
 
-  /* Now move the file in its place */
-  {
-    char *data_path = NULL;
+    /* Now move the file in its place */
+    {
+      char *data_path = NULL;
 
-    asprintf(&data_path, "%s/data", dest_path);
-    free(dest_path);
-    dest_path = data_path;
-  }
-  if (! failed && rename(temp_path, dest_path)) {
-    fprintf(stderr, "db: write: failed to move file %s to %s: %s\n",
-      strerror(errno), temp_path, dest_path);
-    failed = 1;
+      asprintf(&data_path, "%s/data", dest_path);
+      free(dest_path);
+      dest_path = data_path;
+    }
+    if (rename(temp_path, dest_path)) {
+      fprintf(stderr, "db: write: failed to move file %s to %s: %s\n",
+        strerror(errno), temp_path, dest_path);
+      failed = 1;
+    }
   }
 
   /* If anything failed, delete temporary file */
   if (failed || deleteit) {
     remove(temp_path);
   }
+  free(source_path);
   free(temp_path);
 
   /* Save redundant information together with data */
@@ -790,8 +758,10 @@ int db_parse(const char *host, const char *real_path,
     /* Static to be global to all shares */
     static int    copied        = 0;
     static off_t  volume        = 0;
-    off_t         sizetobackup  = 0;
-    off_t         sizebackedup  = 0;
+    double        sizetobackup  = 0.0;
+    double        sizebackedup  = 0.0;
+    int           filestobackup = 0;
+    int           filesbackedup = 0;
 
     /* Determine volume to be copied */
     if (verbosity() > 2) {
@@ -799,12 +769,12 @@ int db_parse(const char *host, const char *real_path,
         filedata_t *filedata = (filedata_t *) (list_entry_payload(entry));
 
         if (S_ISREG(filedata->metadata.type)) {
-          sizetobackup += filedata->metadata.size;
+          filestobackup++;
+          sizetobackup += double(filedata->metadata.size);
         }
       }
-      printf(" --> Files to add: %u (%lu bytes)\n",
+      printf(" --> Files to add: %u (%0.f bytes)\n",
         added_files_list->size(), sizetobackup);
-      cout << " --> Copied: " << 0 << "%";
     }
 
     while (((entry = added_files_list->next(entry)) != NULL) && ! terminating()) {
@@ -819,9 +789,6 @@ int db_parse(const char *host, const char *real_path,
       db_data->date_out = 0;
       /* Save new data */
       if (S_ISREG(filedata->metadata.type)) {
-        if (verbosity() > 2) {
-          sizebackedup += filedata->metadata.size;
-        }
         if (filedata->checksum[0] != '\0') {
           /* Checksum given by the compare function */
           strcpy(db_data->filedata.checksum, filedata->checksum);
@@ -837,6 +804,15 @@ int db_parse(const char *host, const char *real_path,
                   strerror(errno), db_data->filedata.path);
             }
             strcpy(db_data->filedata.checksum, "N");
+          }
+        }
+        if (verbosity() > 2) {
+          filesbackedup++;
+          if (sizetobackup != 0) {
+            sizebackedup += double(filedata->metadata.size);
+            printf("\r --> Done: %d/%d (%5.1f%%)", filesbackedup, filestobackup, (sizebackedup / sizetobackup) * 100.0);
+          } else {
+            printf("\r --> Done: %d/%d", filesbackedup, filestobackup);
           }
         }
       } else {
@@ -866,11 +842,6 @@ int db_parse(const char *host, const char *real_path,
         copied = 0;
         volume = 0;
         db_save("list", db_list);
-      }
-      if (verbosity() > 2) {
-        long percents = long(double(sizebackedup * 100.0) / double(sizetobackup));
-
-        cout << '\r' << " --> Copied: " << percents << "%";
       }
     }
     cout << '\r' << blankline << '\r';

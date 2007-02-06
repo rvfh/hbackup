@@ -46,7 +46,7 @@ Database initialized
 >List 1 element(s):
 -> 'this is a host' 'test/testfile' f 13 1 1000 1000 0644 'this is a link' 59ca0efa9f5633cb0371bbc0355478d8 1 1 -
  --> Files to add: 12 (13 bytes)
- --> Copied: 0% --> Copied: 0% --> Copied: 0% --> Copied: 0% --> Copied: 0% --> Copied: 0% --> Copied: 0% --> Copied: 0% --> Copied: 0% --> Copied: 0% --> Copied: 0% --> Copied: 100% --> Copied: 100%                  --> No files to remove
+ --> Done: 1/6 (  0.0%) --> Done: 2/6 (  0.0%) --> Done: 3/6 (  0.0%) --> Done: 4/6 (  0.0%) --> Done: 5/6 (  0.0%) --> Done: 6/6 (100.0%)                  --> No files to remove
 >List 12 element(s):
 -> 'file://host' '/home/user/cvs' d 0 1 1000 1000 0755 ''  1 0 -
 -> 'file://host' '/home/user/cvs/dirbad' d 0 1 1000 1000 0755 ''  1 0 -
@@ -96,7 +96,7 @@ Database opened (active contents: 12 file(s))
 -> testfile2
 -> testlink
  --> Files to add: 4 (404480 bytes)
- --> Copied: 0% --> Copied: 0% --> Copied: 35% --> Copied: 100% --> Copied: 100%                  --> No files to remove
+ --> Done: 1/2 ( 35.9%) --> Done: 2/2 (100.0%)                  --> No files to remove
 >List 16 element(s):
 -> 'file://host' '/home/user/cvs' d 0 1 1000 1000 0755 ''  1 0 -
 -> 'file://host' '/home/user/cvs/dirbad' d 0 1 1000 1000 0755 ''  1 0 -
