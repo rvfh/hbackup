@@ -24,10 +24,10 @@ check: all
 	@${MAKE} -C test
 
 # Dependencies
-version.h:tools.a params.a metadata.a list.a filters.a parsers.a cvs_parser.a \
-	filelist.a db.a clients.a Makefile
-hbackup: clients.a db.a filelist.a cvs_parser.a parsers.a filters.a list.a \
-	metadata.a params.a tools.a
+libhbackup.a: clients.o cvs_parser.o db.o filelist.o filters.o list.o \
+	metadata.o params.o parsers.o tools.o
+version.h: libhbackup.a Makefile
+hbackup: libhbackup.a version.h
 
 tools.o: hbackup.h tools.h
 metadata.o: metadata.h
@@ -56,8 +56,8 @@ version.h:
 	@echo "CXX	$<"
 	@$(CXX) $(CXXFLAGS) -c -o $@ $<
 
-%.a: %.o
-	@echo "AR	$^"
+%.a:
+	@echo "AR	$@"
 	@$(AR) cru $@ $^
 	@echo "RANLIB	$@"
 	@$(RANLIB) $@

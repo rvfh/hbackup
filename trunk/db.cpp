@@ -68,7 +68,6 @@ typedef struct {
 
 static List   *db_list = NULL;
 static char   *db_path = NULL;
-static char   blankline[] = "                 ";
 
 /* Size of path being backed up */
 static int    backup_path_length = 0;
@@ -768,8 +767,8 @@ int db_parse(const char *host, const char *real_path,
       while ((entry = added_files_list->next(entry)) != NULL) {
         filedata_t *filedata = (filedata_t *) (list_entry_payload(entry));
 
+        filestobackup++;
         if (S_ISREG(filedata->metadata.type)) {
-          filestobackup++;
           sizetobackup += double(filedata->metadata.size);
         }
       }
@@ -799,21 +798,14 @@ int db_parse(const char *host, const char *real_path,
             failed = 1;
             if (! terminating()) {
               /* Don't signal errors on termination */
-              cout << '\r' << blankline << '\r';
-              fprintf(stderr, "%s: %s, ignoring\n",
+              fprintf(stderr, "\r%s: %s, ignoring\n",
                   strerror(errno), db_data->filedata.path);
             }
             strcpy(db_data->filedata.checksum, "N");
           }
         }
         if (verbosity() > 2) {
-          filesbackedup++;
-          if (sizetobackup != 0) {
-            sizebackedup += double(filedata->metadata.size);
-            printf("\r --> Done: %d/%d (%5.1f%%)", filesbackedup, filestobackup, (sizebackedup / sizetobackup) * 100.0);
-          } else {
-            printf("\r --> Done: %d/%d", filesbackedup, filestobackup);
-          }
+          sizebackedup += double(filedata->metadata.size);
         }
       } else {
         strcpy(db_data->filedata.checksum, "");
@@ -826,8 +818,7 @@ int db_parse(const char *host, const char *real_path,
         asprintf(&full_path, "%s/%s", mount_path, filedata->path);
         if ((size = readlink(full_path, string, FILENAME_MAX)) < 0) {
           failed = 1;
-          cout << '\r' << blankline << '\r';
-          fprintf(stderr, "db: parse: %s: %s, ignoring\n",
+          fprintf(stderr, "\r%s: %s, ignoring\n",
             strerror(errno), db_data->filedata.path);
         } else {
           string[size] = '\0';
@@ -843,10 +834,17 @@ int db_parse(const char *host, const char *real_path,
         volume = 0;
         db_save("list", db_list);
       }
+      if (verbosity() > 2) {
+        filesbackedup++;
+        if (sizetobackup != 0) {
+          printf(" --> Done: %d/%d (%.1f%%)\r", filesbackedup, filestobackup, (sizebackedup / sizetobackup) * 100.0);
+        } else {
+          printf(" --> Done: %d/%d\r", filesbackedup, filestobackup);
+        }
+      }
     }
-    cout << '\r' << blankline << '\r';
   } else if (verbosity() > 2) {
-    cout << " --> No files to add\n";
+    cout << " --> No files to add" << endl;
   }
 
   /* This only unlists the data */
