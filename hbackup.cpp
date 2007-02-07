@@ -201,79 +201,72 @@ int main(int argc, char **argv) {
     failed = 2;
   } else {
     /* Read configuration file */
-    char *buffer = NULL;
-    size_t size  = 0;
-    int line = 0;
+    char    *buffer = NULL;
+    size_t  size  = 0;
+    int     line = 0;
+    Clients clients;
 
-    if (clients_new()) {
-      fprintf(stderr, "Failed to create clients list\n");
-    } else {
-      if (verbosity() > 1) {
-        printf(" -> Reading configuration file\n");
-      }
+    if (verbosity() > 1) {
+      printf(" -> Reading configuration file\n");
+    }
 
-      while (getline(&buffer, &size, config) >= 0) {
-        char keyword[256];
-        char type[256];
-        char *string = new char[size];
-        int params = params_readline(buffer, keyword, type, string);
+    while (getline(&buffer, &size, config) >= 0) {
+      char keyword[256];
+      char type[256];
+      char *string = new char[size];
+      int params = params_readline(buffer, keyword, type, string);
 
-        line++;
-        if (params > 1) {
-          if (! strcmp(keyword, "db")) {
-            asprintf(&db_path, "%s", string);
-          } else if (! strcmp(keyword, "client")) {
-            if (clients_add(type, string)) {
-              fprintf(stderr,
-                "Syntax error in configuration file %s, line %u\n",
-                config_path, line);
-              failed = 2;
-            }
-          } else {
-            fprintf(stderr,
-              "Unrecognised keyword in configuration file %s, line %u\n",
-              config_path, line);
-            failed = 2;
-          }
-        }
-        free(string);
-      }
-      fclose(config);
-      free(buffer);
+      line++;
+      if (params > 1) {
+        if (! strcmp(keyword, "db")) {
+          asprintf(&db_path, "%s", string);
+        } else if (! strcmp(keyword, "client")) {
+          Client *client = new Client(type, string);
 
-      if (! failed && ! configcheck) {
-        if (db_path == NULL) {
-          asprintf(&db_path, "%s", default_db_path);
-        }
-        /* Open backup database */
-        if (check) {
-          db_check(db_path, NULL);
-        } else
-        if (scan) {
-          db_scan(db_path, NULL);
-        } else
-        if (db_open(db_path) == 2) {
-          fprintf(stderr, "Failed to open database in '%s'\n", db_path);
-          failed = 2;
+          clients.push_back(client);
         } else {
-          char *mount_path = NULL;
-
-          /* Make sure we have a mount path */
-          asprintf(&mount_path, "%s/mount", db_path);
-          if (testdir(mount_path, 1) == 2) {
-            fprintf(stderr, "Failed to create mount point\n");
-            failed = 2;
-          } else
-
-          /* Backup */
-          if (clients_backup(mount_path, configcheck)) {
-            failed = 1;
-          }
-          free(mount_path);
-          db_close();
+          fprintf(stderr,
+            "Unrecognised keyword in configuration file %s, line %u\n",
+            config_path, line);
+          failed = 2;
         }
       }
-      clients_free();
+      free(string);
+    }
+    fclose(config);
+    free(buffer);
+
+    if (! failed && ! configcheck) {
+      if (db_path == NULL) {
+        asprintf(&db_path, "%s", default_db_path);
+      }
+      /* Open backup database */
+      if (check) {
+        db_check(db_path, NULL);
+      } else
+      if (scan) {
+        db_scan(db_path, NULL);
+      } else
+      if (db_open(db_path) == 2) {
+        fprintf(stderr, "Failed to open database in '%s'\n", db_path);
+        failed = 2;
+      } else {
+        char *mount_path = NULL;
+
+        /* Make sure we have a mount path */
+        asprintf(&mount_path, "%s/mount", db_path);
+        if (testdir(mount_path, 1) == 2) {
+          fprintf(stderr, "Failed to create mount point\n");
+          failed = 2;
+        } else
+
+        /* Backup */
+        if (clients.backup(mount_path, configcheck)) {
+          failed = 1;
+        }
+        free(mount_path);
+        db_close();
+      }
     }
   }
   free(db_path);

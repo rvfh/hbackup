@@ -18,7 +18,10 @@
 
 /* TODO Not all functions are tested */
 
+#include <iostream>
 #include "tools.cpp"
+
+using namespace std;
 
 int terminating(void) {
   return 0;
@@ -59,6 +62,7 @@ int main(void) {
   char  read_buffer[15];
   int   read_size;
   RingBuffer<char> ring_buffer(10);
+
   cout << "Buffer size used: " << ring_buffer.size() << endl;
   cout << "Wrote: " << ring_buffer.write("1234567890", 5) << endl;
   cout << "Buffer size used: " << ring_buffer.size() << endl;

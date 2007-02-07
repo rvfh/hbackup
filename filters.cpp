@@ -17,10 +17,7 @@
 */
 
 #include <iostream>
-#include <stdlib.h>
-#include <string.h>
 #include <stdarg.h>
-#include <sys/types.h>
 #include <regex.h>
 #include "metadata.h"
 #include "common.h"

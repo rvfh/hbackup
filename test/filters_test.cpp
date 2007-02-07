@@ -16,12 +16,10 @@
      Boston, MA 02111-1307, USA.
 */
 
-#ifndef _GNU_SOURCE
-#define _GNU_SOURCE
-#endif
 #include <iostream>
-using namespace std;
-#include "filters.cpp"
+#include "metadata.h"
+#include "common.h"
+#include "filters.h"
 
 void filter_show(const Filter& filter) {
   /* Read through list of rules */

@@ -36,8 +36,6 @@
 
 #define CHUNK 409600
 
-using namespace std;
-
 template<class T>
 RingBuffer<T>::RingBuffer(int size) {
   _write = _read = _start = new T[size];

@@ -19,16 +19,62 @@
 #ifndef CLIENT_H
 #define CLIENT_H
 
-/* Create clients management */
-extern int clients_new(void);
+class Client {
+  char *_name;
+  char *_hostname;
+  char *_protocol;
+  char *_username;
+  char *_password;
+  char *_listfile;
+  int mount_share(const char *mount_point, const char *path);
+  int unmount_share(const char *mount_point);
+public:
+  Client(const char *info, const char *listfile);
+  ~Client();
+  void setHostname(
+      char *value) {
+    _hostname = value;
+  }
+  void setProtocol(
+      char *value) {
+    _protocol = value;
+  }
+  void setUsername(
+      char *value) {
+    _username = value;
+  }
+  void setPassword(
+      char *value) {
+    _password = value;
+  }
+  void setListfile(
+      char *value) {
+    _listfile = value;
+  }
+  int  backup(
+    const char *mount_point,
+    bool       configcheck = false);
+  void show();
+};
 
-/* Add client data */
-extern void clients_free(void);
-
-/* Backup all clients */
-extern int clients_backup(const char *mount_point, int configcheck);
-
-/* Destroy clients management */
-extern int clients_add(const char *info, const char *listfile);
+class Clients : public vector<Client *> {
+public:
+  ~Clients() {
+    for (unsigned int i = 0; i < size(); i++) {
+      delete (*this)[i];
+    }
+  }
+  int backup(
+      const char *mount_point,
+      bool       configcheck = false) {
+    int failed = 0;
+    for (unsigned int i = 0; i < size(); i++) {
+      if ((*this)[i]->backup(mount_point, configcheck)) {
+        failed = 1;
+      }
+    }
+    return failed;
+  }
+};
 
 #endif

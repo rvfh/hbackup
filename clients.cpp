@@ -16,13 +16,8 @@
      Boston, MA 02111-1307, USA.
 */
 
-#ifndef _GNU_SOURCE
-#define _GNU_SOURCE
-#endif
 #include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <vector>
 #include <errno.h>
 #include "metadata.h"
 #include "common.h"
@@ -34,18 +29,9 @@
 #include "filelist.h"
 #include "cvs_parser.h"
 #include "db.h"
-#include "hbackup.h"
 #include "clients.h"
 
 using namespace std;
-
-typedef struct {
-  char    *hostname;
-  char    *protocol;
-  char    *username;
-  char    *password;
-  char    *listfile;
-} client_t;
 
 typedef struct {
   char    *path;
@@ -53,10 +39,9 @@ typedef struct {
   List    *parsers_handle;
 } path_t;
 
-static List *clients = NULL;
-static char   *mounted = NULL;
+static char *mounted = NULL;
 
-static int unmount_share(const char *mount_point) {
+int Client::unmount_share(const char *mount_point) {
   int failed = 0;
 
   if (mounted != NULL) {
@@ -73,21 +58,20 @@ static int unmount_share(const char *mount_point) {
   return failed;
 }
 
-static int mount_share(const char *mount_point, const client_t *client,
-    const char *client_share) {
+int Client::mount_share(const char *mount_point, const char *client_path) {
   int  result   = 0;
   char *share   = NULL;
   char *command = NULL;
 
   errno = 0;
   /* Determine share */
-  if (! strcmp(client->protocol, "nfs")) {
+  if (! strcmp(_protocol, "nfs")) {
     /* Mount Network File System share (hostname:share) */
-    asprintf(&share, "%s:%s", client->hostname, client_share);
+    asprintf(&share, "%s:%s", _hostname, client_path);
   } else
-  if (! strcmp(client->protocol, "smb")) {
+  if (! strcmp(_protocol, "smb")) {
     /* Mount SaMBa share (//hostname/share) */
-    asprintf(&share, "//%s/%s", client->hostname, client_share);
+    asprintf(&share, "//%s/%s", _hostname, client_path);
   }
 
   /* Check what is mounted */
@@ -103,27 +87,27 @@ static int mount_share(const char *mount_point, const client_t *client,
   }
 
   /* Build mount command */
-  if (! strcmp(client->protocol, "nfs")) {
-    asprintf(&command, "mount -t nfs -o ro,nolock %s %s", share, mount_point);
+  if (! strcmp(_protocol, "nfs")) {
+    asprintf(&command, "mount -t nfs -o ro,noatime,nolock %s %s", share, mount_point);
   } else
-  if (! strcmp(client->protocol, "smb")) {
+  if (! strcmp(_protocol, "smb")) {
     char  *credentials  = NULL;
 
-    if (client->username != NULL) {
+    if (_username != NULL) {
       char *password = NULL;
 
-      if (client->password != NULL) {
-        asprintf(&password, ",password=%s", client->password);
+      if (_password != NULL) {
+        asprintf(&password, ",password=%s", _password);
       } else {
         asprintf(&password, "%s", "");
       }
-      asprintf(&credentials, ",username=%s%s", client->username, password);
+      asprintf(&credentials, ",username=%s%s", _username, password);
       free(password);
     } else {
       asprintf(&credentials, "%s", "");
     }
-    asprintf(&command, "mount -t smbfs -o ro,nocase%s %s %s > /dev/null 2>&1", credentials,
-      share, mount_point);
+    asprintf(&command, "mount -t smbfs -o ro,noatime,nocase%s %s %s > /dev/null 2>&1",
+      credentials, share, mount_point);
     free(credentials);
   }
 
@@ -139,100 +123,95 @@ static int mount_share(const char *mount_point, const client_t *client,
   return result;
 }
 
-int clients_new(void) {
-  /* Create new list */
-  clients = new List();
-  if (clients == NULL) {
-    fprintf(stderr, "clients: new: cannot intialise\n");
-    return 2;
-  }
-  return 0;
-}
-
-void clients_free(void) {
-  list_entry_t *entry = NULL;
-
-  while ((entry = clients->next(entry)) != NULL) {
-    client_t *client = (client_t *) (list_entry_payload(entry));
-
-    free(client->protocol);
-    free(client->username);
-    free(client->password);
-    free(client->hostname);
-    free(client->listfile);
-  }
-  delete clients;
-}
-
-int clients_add(const char *info, const char *listfile) {
-  client_t *client = new client_t;
+Client::Client(const char *info, const char *listfile) {
   char     *linecopy = NULL;
   char     *start;
   char     *delim;
-  int      failed = 0;
 
+  _name = NULL;
+  _protocol = NULL;
+  _hostname = NULL;
+  _username = NULL;
+  _password = NULL;
+  _listfile = NULL;
   asprintf(&linecopy, "%s", info);
   start = linecopy;
   delim = strchr(start, ':');
-  if (delim == NULL) {
-    failed = 1;
-  } else {
+  if (delim != NULL) {
     /* Protocol */
     *delim = '\0';
-    asprintf(&client->protocol, "%s", start);
+    asprintf(&_protocol, "%s", start);
     /* Lower case */
-    strtolower(client->protocol);
+    strtolower(_protocol);
     start = delim + 1;
     /* There should be two / now */
-    if ((*start++ != '/') || (*start++ != '/')) {
-      failed = 1;
-    } else {
+    if ((*start++ == '/') && (*start++ == '/')) {
       /* Host name */
       delim = strchr(start, '@');
       if (delim == NULL) {
         /* No username/password */
-        client->username = NULL;
-        client->password = NULL;
-        asprintf(&client->hostname, "%s", start);
+        _username = NULL;
+        _password = NULL;
+        asprintf(&_hostname, "%s", start);
         /* Lower case */
-        strtolower(client->hostname);
+        strtolower(_hostname);
       } else {
         char *colon = strchr(start, ':');
 
         *delim = '\0';
         /* Host name */
-        asprintf(&client->hostname, "%s", delim + 1);
-        strtolower(client->hostname);
+        asprintf(&_hostname, "%s", delim + 1);
+        strtolower(_hostname);
         /* Password */
         if (colon == NULL) {
           /* No password */
-          client->password = NULL;
+          _password = NULL;
         } else {
           if (strlen(colon + 1) != 0) {
-            asprintf(&client->password, "%s", colon + 1);
+            asprintf(&_password, "%s", colon + 1);
           } else {
-            client->password = NULL;
+            _password = NULL;
           }
           *colon = '\0';
         }
         /* Username */
         if (strlen(start) != 0) {
-          asprintf(&client->username, "%s", start);
+          asprintf(&_username, "%s", start);
         } else {
-          client->username = NULL;
+          _username = NULL;
         }
       }
 
       /* List file */
-      asprintf(&client->listfile, "%s", listfile);
+      asprintf(&_listfile, "%s", listfile);
       if (verbosity() > 2) {
-        cout << " --> Client: " << client->hostname << "\n";
+        cout << " --> Client: " << _hostname << "\n";
       }
-      clients->append(client);
     }
   }
   free(linecopy);
-  return failed;
+}
+
+Client::~Client() {
+  delete _name;
+  delete _hostname;
+  delete _protocol;
+  delete _username;
+  delete _password;
+  delete _listfile;
+}
+
+void Client::show() {
+  cout << "-> " << _protocol << "://";
+  if (_username != NULL) {
+    cout << _username;
+
+    if (_password != NULL) {
+      cout << ":" << _password;
+    }
+    cout << "@";
+  }
+  cout << _hostname << " " << _listfile << endl;
 }
 
 static int add_filter(Filter *handle, const char *type, const char *string) {
@@ -381,7 +360,6 @@ static int read_listfile(const char *listfilename, List *backups) {
 /* Return 1 to force mount */
 static int get_paths(const char *protocol, const char *backup_path,
     const char *mount_point, char **share, char **path) {
-
   if (! strcmp(protocol, "file")) {
     asprintf(share, "%s", "");
     asprintf(path, "%s", backup_path);
@@ -411,118 +389,120 @@ static int get_paths(const char *protocol, const char *backup_path,
   return 2;
 }
 
-static int prepare_share(client_t *client, const char *mount_point,
-    const char *backup_path, char **path) {
+int Client::backup(
+    const char *mount_point,
+    bool configcheck) {
+  int   failed = 0;
+  List  *backups      = new List();
+  int   clientfailed  = 0;
   char  *share = NULL;
+  char  *listfilename = NULL;
 
-  *path = NULL;
-  if (get_paths(client->protocol, backup_path, mount_point, &share, path) == 1) {
-    mount_share(mount_point, client, share);
+  switch (get_paths(_protocol, _listfile, mount_point, &share, &listfilename)) {
+    case 1:
+      mount_share(mount_point, share);
+      break;
   }
   free(share);
-  return (errno != 0);
-}
-
-int clients_backup(const char *mount_point, int configcheck) {
-  list_entry_t *entry = NULL;
-  int failed = 0;
-
-  /* Walk though the list of clients */
-  while (((entry = clients->next(entry)) != NULL) && ! terminating()) {
-    client_t  *client       = (client_t *) (list_entry_payload(entry));
-    char      *listfilename = NULL;
-    List      *backups      = new List();
-    int       clientfailed  = 0;
-
-    if (prepare_share(client, mount_point, client->listfile, &listfilename)) {
-      switch (errno) {
-        case EPROTONOSUPPORT:
-          fprintf(stderr, "clients: backup: %s protocol not supported\n",
-            client->protocol);
-        case ETIMEDOUT:
-          if (verbosity() > 0) {
-            printf("Client unreachable '%s' using protocol '%s'\n",
-              client->hostname, client->protocol);
-          }
-      }
-      continue;
-    }
-
-    if (verbosity() > 0) {
-      printf("Backup client '%s' using protocol '%s'\n",
-        client->hostname, client->protocol);
-    }
-
-    if (! read_listfile(listfilename, backups)) {
-      /* Backup */
-      if (backups->size() == 0) {
-        failed = 1;
-      } else if (! configcheck) {
-        list_entry_t *entry = NULL;
-
-        while (((entry = backups->next(entry)) != NULL) && ! clientfailed) {
-          path_t *backup = (path_t *) (list_entry_payload(entry));
-          char     *backup_path = NULL;
-
-          /* TODO Stop when terminating (=> backup destructor) */
-          if (verbosity() > 0) {
-            printf("Backup path '%s'\n", backup->path);
-            if (verbosity() > 1) {
-              printf(" -> Building list of files\n");
-            }
-          }
-
-          if (! prepare_share(client, mount_point, backup->path,
-                  &backup_path)
-            && ! filelist_new(backup_path, backup->ignore_handle,
-              backup->parsers_handle)) {
-            char *prefix = NULL;
-
-            if (verbosity() > 1) {
-              printf(" -> Parsing list of files\n");
-            }
-            asprintf(&prefix, "%s://%s", client->protocol, client->hostname);
-            strtolower(backup->path);
-            pathtolinux(backup->path);
-            if (db_parse(prefix, backup->path, backup_path,
-                filelist_get(), 100)) {
-              failed        = 1;
-            }
-            free(prefix);
-            filelist_free();
-          } else {
-            // prepare_share sets errno
-            if (! terminating()) {
-              fprintf(stderr, "clients: backup: list creation failed\n");
-            }
-            failed        = 1;
-            clientfailed  = 1;
-          }
-          free(backup_path);
-
-          /* Free encapsulated data */
-          free(backup->path);
-          delete backup->ignore_handle;
-          parsers_free(backup->parsers_handle);
+  if (errno != 0) {
+    switch (errno) {
+      case EPROTONOSUPPORT:
+        fprintf(stderr, "clients: backup: %s protocol not supported\n",
+          _protocol);
+        return 1;
+      case ETIMEDOUT:
+        if (verbosity() > 0) {
+          printf("Client unreachable '%s' using protocol '%s'\n",
+            _hostname, _protocol);
         }
-      }
-    } else {
-      // errno set by functions called
-      switch (errno) {
-        case ENOENT:
-          fprintf(stderr, "clients: backup: list file not found %s\n",
-            listfilename);
-          break;
-        case EUCLEAN:
-          fprintf(stderr, "clients: backup: list file corrupted %s\n",
-            listfilename);
-      }
-      failed = 1;
+        return 0;
     }
-    /* Free backups list */
-    delete backups;
-    free(listfilename);
   }
+
+  if (verbosity() > 0) {
+    printf("Backup client '%s' using protocol '%s'\n",
+      _hostname, _protocol);
+  }
+
+  if (! read_listfile(listfilename, backups)) {
+    /* Backup */
+    if (backups->size() == 0) {
+      failed = 1;
+    } else if (! configcheck) {
+      list_entry_t *entry = NULL;
+
+      while (((entry = backups->next(entry)) != NULL) && ! clientfailed) {
+        path_t *backup = (path_t *) (list_entry_payload(entry));
+        char     *backup_path = NULL;
+
+        /* TODO Stop when terminating (=> backup destructor) */
+        if (verbosity() > 0) {
+          printf("Backup path '%s'\n", backup->path);
+          if (verbosity() > 1) {
+            printf(" -> Building list of files\n");
+          }
+        }
+
+        switch (get_paths(_protocol, backup->path, mount_point, &share, &backup_path)) {
+          case 1:
+            if (mount_share(mount_point, share)) {
+              clientfailed = 1;
+            }
+            break;
+          case 2:
+            clientfailed = 1;
+        }
+        free(share);
+
+        if ( ! clientfailed
+          && ! filelist_new(backup_path, backup->ignore_handle,
+            backup->parsers_handle)) {
+          char *prefix = NULL;
+
+          if (verbosity() > 1) {
+            printf(" -> Parsing list of files\n");
+          }
+          asprintf(&prefix, "%s://%s", _protocol, _hostname);
+          strtolower(backup->path);
+          pathtolinux(backup->path);
+          if (db_parse(prefix, backup->path, backup_path,
+              filelist_get(), 100)) {
+            failed        = 1;
+          }
+          free(prefix);
+          filelist_free();
+        } else {
+          // prepare_share sets errno
+          if (! terminating()) {
+            fprintf(stderr, "clients: backup: list creation failed\n");
+          }
+          failed        = 1;
+          clientfailed  = 1;
+        }
+        free(backup_path);
+
+        /* Free encapsulated data */
+        free(backup->path);
+        delete backup->ignore_handle;
+        parsers_free(backup->parsers_handle);
+      }
+    }
+  } else {
+    // errno set by functions called
+    switch (errno) {
+      case ENOENT:
+        fprintf(stderr, "clients: backup: list file not found %s\n",
+          listfilename);
+        break;
+      case EUCLEAN:
+        fprintf(stderr, "clients: backup: list file corrupted %s\n",
+          listfilename);
+    }
+    failed = 1;
+  }
+  /* Free backups list */
+  delete backups;
+  free(listfilename);
   unmount_share(mount_point); // does not change errno
   return failed;
 }
