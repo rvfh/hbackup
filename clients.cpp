@@ -18,6 +18,7 @@
 
 #include <iostream>
 #include <vector>
+#include <string.h>
 #include <errno.h>
 #include "metadata.h"
 #include "common.h"
@@ -106,7 +107,7 @@ int Client::mount_share(const char *mount_point, const char *client_path) {
     } else {
       asprintf(&credentials, "%s", "");
     }
-    asprintf(&command, "mount -t smbfs -o ro,noatime,nocase%s %s %s > /dev/null 2>&1",
+    asprintf(&command, "mount -t smbfs -o ro,noatime,nocase,iocharset=utf8,codepage=858%s %s %s > /dev/null 2>&1",
       credentials, share, mount_point);
     free(credentials);
   }
@@ -123,82 +124,58 @@ int Client::mount_share(const char *mount_point, const char *client_path) {
   return result;
 }
 
-Client::Client(const char *info, const char *listfile) {
-  char     *linecopy = NULL;
-  char     *start;
-  char     *delim;
+static char *setAnything(const char *value) {
+  if (strlen(value) != 0) {
+    char *newvalue = new char[strlen(value) + 1];
+    strcpy(newvalue, value);
+    return newvalue;
+  } else {
+    return NULL;
+  }
+}
 
-  _name = NULL;
-  _protocol = NULL;
+Client::Client(const char *value) {
+  _name     = setAnything(value);
   _hostname = NULL;
+  _ip_address = NULL;
+  _protocol = NULL;
   _username = NULL;
   _password = NULL;
   _listfile = NULL;
-  asprintf(&linecopy, "%s", info);
-  start = linecopy;
-  delim = strchr(start, ':');
-  if (delim != NULL) {
-    /* Protocol */
-    *delim = '\0';
-    asprintf(&_protocol, "%s", start);
-    /* Lower case */
-    strtolower(_protocol);
-    start = delim + 1;
-    /* There should be two / now */
-    if ((*start++ == '/') && (*start++ == '/')) {
-      /* Host name */
-      delim = strchr(start, '@');
-      if (delim == NULL) {
-        /* No username/password */
-        _username = NULL;
-        _password = NULL;
-        asprintf(&_hostname, "%s", start);
-        /* Lower case */
-        strtolower(_hostname);
-      } else {
-        char *colon = strchr(start, ':');
-
-        *delim = '\0';
-        /* Host name */
-        asprintf(&_hostname, "%s", delim + 1);
-        strtolower(_hostname);
-        /* Password */
-        if (colon == NULL) {
-          /* No password */
-          _password = NULL;
-        } else {
-          if (strlen(colon + 1) != 0) {
-            asprintf(&_password, "%s", colon + 1);
-          } else {
-            _password = NULL;
-          }
-          *colon = '\0';
-        }
-        /* Username */
-        if (strlen(start) != 0) {
-          asprintf(&_username, "%s", start);
-        } else {
-          _username = NULL;
-        }
-      }
-
-      /* List file */
-      asprintf(&_listfile, "%s", listfile);
-      if (verbosity() > 2) {
-        cout << " --> Client: " << _hostname << "\n";
-      }
-    }
+  if (verbosity() > 2) {
+    cout << " --> Client: " << _name << endl;
   }
-  free(linecopy);
 }
 
 Client::~Client() {
   delete _name;
   delete _hostname;
+  delete _ip_address;
   delete _protocol;
   delete _username;
   delete _password;
   delete _listfile;
+}
+
+void Client::setHostname(const char *value) {
+  _hostname = setAnything(value);
+  strtolower(_hostname);
+}
+
+void Client::setIpAddress(const char *value) {
+  _ip_address = setAnything(value);
+}
+void Client::setProtocol(const char *value) {
+  _protocol = setAnything(value);
+}
+void Client::setUsername(const char *value) {
+  _username = setAnything(value);
+}
+void Client::setPassword(const char *value) {
+  _password = setAnything(value);
+}
+void Client::setListfile(const char *value) {
+  _listfile = setAnything(value);
 }
 
 void Client::show() {
@@ -211,7 +188,11 @@ void Client::show() {
     }
     cout << "@";
   }
-  cout << _hostname << " " << _listfile << endl;
+  cout << _hostname;
+  if (_ip_address != NULL) {
+    cout << "[" << _ip_address << "]";
+  }
+  cout << " " << _listfile << endl;
 }
 
 static int add_filter(Filter *handle, const char *type, const char *string) {
@@ -420,8 +401,7 @@ int Client::backup(
   }
 
   if (verbosity() > 0) {
-    printf("Backup client '%s' using protocol '%s'\n",
-      _hostname, _protocol);
+    printf("Backup client '%s' using protocol '%s'\n", _name, _protocol);
   }
 
   if (! read_listfile(listfilename, backups)) {

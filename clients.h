@@ -22,6 +22,7 @@
 class Client {
   char *_name;
   char *_hostname;
+  char *_ip_address;
   char *_protocol;
   char *_username;
   char *_password;
@@ -29,31 +30,15 @@ class Client {
   int mount_share(const char *mount_point, const char *path);
   int unmount_share(const char *mount_point);
 public:
-  Client(const char *info, const char *listfile);
+  Client(const char *name);
   ~Client();
-  void setHostname(
-      char *value) {
-    _hostname = value;
-  }
-  void setProtocol(
-      char *value) {
-    _protocol = value;
-  }
-  void setUsername(
-      char *value) {
-    _username = value;
-  }
-  void setPassword(
-      char *value) {
-    _password = value;
-  }
-  void setListfile(
-      char *value) {
-    _listfile = value;
-  }
-  int  backup(
-    const char *mount_point,
-    bool       configcheck = false);
+  void setHostname(const char *value);
+  void setIpAddress(const char *value);
+  void setProtocol(const char *value);
+  void setUsername(const char *value);
+  void setPassword(const char *value);
+  void setListfile(const char *value);
+  int  backup(const char *mount_point, bool configcheck = false);
   void show();
 };
 

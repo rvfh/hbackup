@@ -14,10 +14,11 @@ test:	params.done \
 	cvs_parser.done \
 	filelist.done \
 	db.done \
-	clients.done
+	clients.done \
+	hbackup.done
 
 clean:
-	@rm -f *.[oa] *~ *.out *.err *.all *.done *_test
+	@rm -f *.[oa] *~ *.out *.err *.all *.done *_test zcop*
 	@./test_setup clean
 
 # Rules
@@ -37,4 +38,14 @@ clean:
 	@rm -f `basename $@ .done`.err `basename $@ .done`.out
 	@diff -q `basename $@ .done`.exp `basename $@ .done`.all
 	@touch $@
-	@rm -f `basename $@ .done`.out `basename $@ .done`.err `basename $@ .done`.all
+	@rm -f `basename $@ .done`.all
+
+hbackup.done: ../hbackup hbackup.exp test_setup
+	@echo "RUN	$<"
+	@./test_setup
+	@./$< -vvv -c etc/hbackup.conf > hbackup.out 2>hbackup.err || echo -n
+	@cat `basename $@ .done`.err `basename $@ .done`.out > `basename $@ .done`.all
+	@rm -f `basename $@ .done`.err `basename $@ .done`.out
+	@diff -q `basename $@ .done`.exp `basename $@ .done`.all
+	@touch $@
+	@rm -f `basename $@ .done`.all
