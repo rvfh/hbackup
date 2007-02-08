@@ -21,8 +21,7 @@
 
 class Client {
   char *_name;
-  char *_hostname;
-  char *_ip_address;
+  char *_host_or_ip;
   char *_protocol;
   char *_username;
   char *_password;
@@ -32,8 +31,7 @@ class Client {
 public:
   Client(const char *name);
   ~Client();
-  void setHostname(const char *value);
-  void setIpAddress(const char *value);
+  void setHostOrIp(const char *value);
   void setProtocol(const char *value);
   void setUsername(const char *value);
   void setPassword(const char *value);

@@ -735,7 +735,7 @@ static int parse_compare(void *db_data_p, void *filedata_p) {
 }
 
 int db_parse(const char *host, const char *real_path,
-    const char *mount_path, List *file_list, off_t compress_min) {
+    const char *mount_path, List *file_list) {
   List          *selected_files_list = new List(db_data_get);
   List          *added_files_list = new List();
   List          *removed_files_list = new List();

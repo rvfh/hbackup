@@ -227,10 +227,7 @@ int main(int argc, char **argv) {
           clients.push_back(client);
         } else if (client != NULL) {
           if (! strcmp(keyword, "hostname")) {
-            client->setHostname(string);
-          } else
-          if (! strcmp(keyword, "ip")) {
-            client->setIpAddress(string);
+            client->setHostOrIp(string);
           } else
           if (! strcmp(keyword, "protocol")) {
             client->setProtocol(string);

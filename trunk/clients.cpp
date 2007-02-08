@@ -67,12 +67,12 @@ int Client::mount_share(const char *mount_point, const char *client_path) {
   errno = 0;
   /* Determine share */
   if (! strcmp(_protocol, "nfs")) {
-    /* Mount Network File System share (hostname:share) */
-    asprintf(&share, "%s:%s", _hostname, client_path);
+    /* Mount Network File System share (host_or_ip:share) */
+    asprintf(&share, "%s:%s", _host_or_ip, client_path);
   } else
   if (! strcmp(_protocol, "smb")) {
-    /* Mount SaMBa share (//hostname/share) */
-    asprintf(&share, "//%s/%s", _hostname, client_path);
+    /* Mount SaMBa share (//host_or_ip/share) */
+    asprintf(&share, "//%s/%s", _host_or_ip, client_path);
   }
 
   /* Check what is mounted */
@@ -136,8 +136,7 @@ static char *setAnything(const char *value) {
 
 Client::Client(const char *value) {
   _name     = setAnything(value);
-  _hostname = NULL;
-  _ip_address = NULL;
+  _host_or_ip = NULL;
   _protocol = NULL;
   _username = NULL;
   _password = NULL;
@@ -149,22 +148,18 @@ Client::Client(const char *value) {
 
 Client::~Client() {
   delete _name;
-  delete _hostname;
-  delete _ip_address;
+  delete _host_or_ip;
   delete _protocol;
   delete _username;
   delete _password;
   delete _listfile;
 }
 
-void Client::setHostname(const char *value) {
-  _hostname = setAnything(value);
-  strtolower(_hostname);
+void Client::setHostOrIp(const char *value) {
+  _host_or_ip = setAnything(value);
+  strtolower(_host_or_ip);
 }
 
-void Client::setIpAddress(const char *value) {
-  _ip_address = setAnything(value);
-}
 void Client::setProtocol(const char *value) {
   _protocol = setAnything(value);
 }
@@ -180,17 +175,18 @@ void Client::setListfile(const char *value) {
 
 void Client::show() {
   cout << "-> " << _protocol << "://";
-  if (_username != NULL) {
-    cout << _username;
+  if (_host_or_ip != NULL) {
+    if (_username != NULL) {
+      cout << _username;
 
-    if (_password != NULL) {
-      cout << ":" << _password;
+      if (_password != NULL) {
+        cout << ":" << _password;
+      }
+      cout << "@";
     }
-    cout << "@";
-  }
-  cout << _hostname;
-  if (_ip_address != NULL) {
-    cout << "[" << _ip_address << "]";
+    cout << _host_or_ip;
+  } else {
+    cout << "localhost";
   }
   cout << " " << _listfile << endl;
 }
@@ -394,7 +390,7 @@ int Client::backup(
       case ETIMEDOUT:
         if (verbosity() > 0) {
           printf("Client unreachable '%s' using protocol '%s'\n",
-            _hostname, _protocol);
+            _host_or_ip, _protocol);
         }
         return 0;
     }
@@ -442,11 +438,10 @@ int Client::backup(
           if (verbosity() > 1) {
             printf(" -> Parsing list of files\n");
           }
-          asprintf(&prefix, "%s://%s", _protocol, _hostname);
+          asprintf(&prefix, "%s://%s", _protocol, _name);
           strtolower(backup->path);
           pathtolinux(backup->path);
-          if (db_parse(prefix, backup->path, backup_path,
-              filelist_get(), 100)) {
+          if (db_parse(prefix, backup->path, backup_path, filelist_get())) {
             failed        = 1;
           }
           free(prefix);

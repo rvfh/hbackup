@@ -31,7 +31,7 @@ extern void db_close(void);
 
 /* Check what needs to be done for given prefix (protocol://host/share) */
 extern int db_parse(const char *prefix, const char *real_path,
-  const char *mount_path, List *list, off_t compress_min);
+  const char *mount_path, List *list);
 
 /* Read file with given checksum, extract it to path */
 extern int db_read(const char *path, const char *checksum);
