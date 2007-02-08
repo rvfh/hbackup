@@ -7,32 +7,32 @@ clients: backup: ssh protocol not supported
 -> file://localhost etc/doesnotexist
 Backup client 'localhost' using protocol 'file'
 >List 0 client(s):
- --> Client: myclient
+ --> Client: myClient
 >List 1 client(s):
 -> nfs://myclient /home/User/devel
- --> Client: myclient
+ --> Client: myClient2
 >List 2 client(s):
 -> nfs://myclient /home/User/devel
 -> smb://Myself:flesyM@myclient C:\Backup\Backup.LST
- --> Client: otherclient
+ --> Client: otherClient
 >List 3 client(s):
 -> nfs://myclient /home/User/devel
 -> smb://Myself:flesyM@myclient C:\Backup\Backup.LST
 -> ssh://otherclient c:/home/backup/Backup.list
- --> Client: client
+ --> Client: Client
 >List 4 client(s):
 -> nfs://myclient /home/User/devel
 -> smb://Myself:flesyM@myclient C:\Backup\Backup.LST
 -> ssh://otherclient c:/home/backup/Backup.list
 -> smb://user@client c:/home/BlaH/Backup.list
- --> Client: client
+ --> Client: Client2
 >List 5 client(s):
 -> nfs://myclient /home/User/devel
 -> smb://Myself:flesyM@myclient C:\Backup\Backup.LST
 -> ssh://otherclient c:/home/backup/Backup.list
 -> smb://user@client c:/home/BlaH/Backup.list
 -> smb://user@client c:/home/BlaH/Backup.list
- --> Client: client
+ --> Client: Client3
 >List 6 client(s):
 -> nfs://myclient /home/User/devel
 -> smb://Myself:flesyM@myclient C:\Backup\Backup.LST
@@ -40,7 +40,7 @@ Backup client 'localhost' using protocol 'file'
 -> smb://user@client c:/home/BlaH/Backup.list
 -> smb://user@client c:/home/BlaH/Backup.list
 -> smb://client c:/home/BlaH/Backup.list
- --> Client: client
+ --> Client: Client4
 >List 7 client(s):
 -> nfs://myclient /home/User/devel
 -> smb://Myself:flesyM@myclient C:\Backup\Backup.LST
@@ -75,6 +75,8 @@ Backup path 'test2'
  --> Done: 1/5 (0.0%) --> Done: 2/5 (15.7%) --> Done: 3/5 (43.6%) --> Done: 4/5 (100.0%) --> Done: 5/5 (100.0%) --> No files to remove
 Database closed (total contents: 16 file(s))
  --> Client: localhost
+>List 1 client(s):
+-> file://localhost[127.0.0.1] etc/localhost.list
 Database opened (active contents: 16 file(s))
 Backup client 'localhost' using protocol 'file'
  -> Reading backup list

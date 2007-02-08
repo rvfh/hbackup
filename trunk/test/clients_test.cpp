@@ -45,8 +45,11 @@ int main(void) {
   for (unsigned int i = 0; i < clients->size(); i++) {
     (*clients)[i]->show();
   }
-  client = new Client("file://localhost", "etc/doesnotexist");
+  client = new Client("localhost");
   clients->push_back(client);
+  client->setProtocol("file");
+  client->setHostname("localhost");
+  client->setListfile("etc/doesnotexist");
   printf(">List %u client(s):\n", clients->size());
   for (unsigned int i = 0; i < clients->size(); i++) {
     (*clients)[i]->show();
@@ -59,44 +62,73 @@ int main(void) {
   for (unsigned int i = 0; i < clients->size(); i++) {
     (*clients)[i]->show();
   }
-  client = new Client("nFs://myClient", "/home/User/devel");
+  client = new Client("myClient");
   clients->push_back(client);
+  client->setProtocol("nfs");
+  client->setHostname("myClient");
+  client->setListfile("/home/User/devel");
   printf(">List %u client(s):\n", clients->size());
   for (unsigned int i = 0; i < clients->size(); i++) {
     (*clients)[i]->show();
   }
-  client = new Client("Smb://Myself:flesyM@myClient", "C:\\Backup\\Backup.LST");
+  client = new Client("myClient2");
   clients->push_back(client);
+  client->setProtocol("smb");
+  client->setHostname("myClient");
+  client->setUsername("Myself");
+  client->setPassword("flesyM");
+  client->setListfile("C:\\Backup\\Backup.LST");
   printf(">List %u client(s):\n", clients->size());
   for (unsigned int i = 0; i < clients->size(); i++) {
     (*clients)[i]->show();
   }
-  client = new Client("sSh://otherClient", "c:/home/backup/Backup.list");
+  client = new Client("otherClient");
   clients->push_back(client);
+  client->setProtocol("ssh");
+  client->setHostname("otherClient");
+  client->setListfile("c:/home/backup/Backup.list");
   printf(">List %u client(s):\n", clients->size());
   for (unsigned int i = 0; i < clients->size(); i++) {
     (*clients)[i]->show();
   }
-  client = new Client("Smb://user@Client", "c:/home/BlaH/Backup.list");
+  client = new Client("Client");
   clients->push_back(client);
+  client->setProtocol("smb");
+  client->setHostname("Client");
+  client->setUsername("user");
+  client->setListfile("c:/home/BlaH/Backup.list");
   printf(">List %u client(s):\n", clients->size());
   for (unsigned int i = 0; i < clients->size(); i++) {
     (*clients)[i]->show();
   }
-  client = new Client("Smb://user:@Client", "c:/home/BlaH/Backup.list");
+  client = new Client("Client2");
   clients->push_back(client);
+  client->setProtocol("smb");
+  client->setHostname("Client");
+  client->setUsername("user");
+  client->setPassword("");
+  client->setListfile("c:/home/BlaH/Backup.list");
   printf(">List %u client(s):\n", clients->size());
   for (unsigned int i = 0; i < clients->size(); i++) {
     (*clients)[i]->show();
   }
-  client = new Client("Smb://@Client", "c:/home/BlaH/Backup.list");
+  client = new Client("Client3");
   clients->push_back(client);
+  client->setProtocol("smb");
+  client->setHostname("Client");
+  client->setUsername("");
+  client->setListfile("c:/home/BlaH/Backup.list");
   printf(">List %u client(s):\n", clients->size());
   for (unsigned int i = 0; i < clients->size(); i++) {
     (*clients)[i]->show();
   }
-  client = new Client("Smb://:@Client", "c:/home/BlaH/Backup.list");
+  client = new Client("Client4");
   clients->push_back(client);
+  client->setProtocol("smb");
+  client->setHostname("Client");
+  client->setUsername("");
+  client->setPassword("");
+  client->setListfile("c:/home/BlaH/Backup.list");
   printf(">List %u client(s):\n", clients->size());
   for (unsigned int i = 0; i < clients->size(); i++) {
     (*clients)[i]->show();
@@ -107,16 +139,27 @@ int main(void) {
   db_close();
 
   clients = new Clients;
-  client = new Client("file://localhost", "etc/localhost.list");
+  client = new Client("localhost");
   clients->push_back(client);
+  client->setProtocol("file");
+  client->setHostname("localhost");
+  client->setListfile("etc/localhost.list");
   db_open("test_db");
   clients->backup("test_db/mount", 0);
   delete clients;
   db_close();
 
   clients = new Clients;
-  client = new Client("file://localhost", "etc/localhost.list");
+  client = new Client("localhost");
   clients->push_back(client);
+  client->setProtocol("file");
+  client->setHostname("localhost");
+  client->setIpAddress("127.0.0.1");
+  client->setListfile("etc/localhost.list");
+  printf(">List %u client(s):\n", clients->size());
+  for (unsigned int i = 0; i < clients->size(); i++) {
+    (*clients)[i]->show();
+  }
   db_open("test_db");
   clients->backup("test_db/mount", 0);
   delete clients;

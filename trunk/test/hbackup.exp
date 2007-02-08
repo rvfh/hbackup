@@ -1,0 +1,22 @@
+clients: backup: ssh protocol not supported
+ -> Reading configuration file
+ --> Client: cbers11
+ --> Client: myself
+ --> Client: other
+Database initialized
+Backup client 'cbers11' using protocol 'file'
+ -> Reading backup list
+ --> Path: test
+ --> Path: test2//
+Backup path 'test'
+ -> Building list of files
+ -> Parsing list of files
+ --> Files to add: 11 (0 bytes)
+ --> Done: 1/11 --> Done: 2/11 --> Done: 3/11 --> Done: 4/11 --> Done: 5/11 --> Done: 6/11 --> Done: 7/11 --> Done: 8/11 --> Done: 9/11 --> Done: 10/11 --> Done: 11/11 --> No files to remove
+Backup path 'test2'
+ -> Building list of files
+ -> Parsing list of files
+ --> Files to add: 5 (928768 bytes)
+ --> Done: 1/5 (0.0%) --> Done: 2/5 (15.7%) --> Done: 3/5 (43.6%) --> Done: 4/5 (100.0%) --> Done: 5/5 (100.0%) --> No files to remove
+Client unreachable 'myclient' using protocol 'smb'
+Database closed (total contents: 16 file(s))

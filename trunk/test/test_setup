@@ -81,9 +81,25 @@ ln -s "testfile" "$TESTDIR2/testlink"
 mkdir "$CONFIGDIR"
 cat << EOF > "$CONFIGDIR/hbackup.conf"
 db "$TESTDBDIR"
-client file://cbers11 "$CONFIGDIR/localhost.list"
-client Smb://Myself:flesyM@myClient "C:\Backup\Backup.LST"
-client sSh://otherClient /home/backup/Backup.list
+
+client cbers11
+protocol file
+hostname cbers11.dpi.inpe.br
+ip 100.110.120.130
+listfile "$CONFIGDIR/localhost.list"
+
+client myself
+protocol smb
+ip 100.110.120.140
+username Myself
+password flesyM
+hostname myClient
+listfile "C:\Backup\Backup.LST"
+
+client other
+protocol ssh
+hostname otherClient
+listfile /home/backup/Backup.list
 EOF
 cat << EOF > "$CONFIGDIR/localhost.list"
 # Share test

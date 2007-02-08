@@ -19,10 +19,10 @@
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
 #endif
-#include <stdio.h>
-#include <stdlib.h>
+#include <iostream>
 #include <string.h>
 #include <signal.h>
+#include <errno.h>
 #include "params.h"
 #include "list.h"
 #include "db.h"
@@ -205,12 +205,13 @@ int main(int argc, char **argv) {
     size_t  size  = 0;
     int     line = 0;
     Clients clients;
+    Client *client = NULL;
 
     if (verbosity() > 1) {
       printf(" -> Reading configuration file\n");
     }
 
-    while (getline(&buffer, &size, config) >= 0) {
+    while ((getline(&buffer, &size, config) >= 0) && ! failed) {
       char keyword[256];
       char type[256];
       char *string = new char[size];
@@ -221,15 +222,42 @@ int main(int argc, char **argv) {
         if (! strcmp(keyword, "db")) {
           asprintf(&db_path, "%s", string);
         } else if (! strcmp(keyword, "client")) {
-          Client *client = new Client(type, string);
+          client = new Client(string);
 
           clients.push_back(client);
+        } else if (client != NULL) {
+          if (! strcmp(keyword, "hostname")) {
+            client->setHostname(string);
+          } else
+          if (! strcmp(keyword, "ip")) {
+            client->setIpAddress(string);
+          } else
+          if (! strcmp(keyword, "protocol")) {
+            client->setProtocol(string);
+          } else
+          if (! strcmp(keyword, "username")) {
+            client->setUsername(string);
+          } else
+          if (! strcmp(keyword, "password")) {
+            client->setPassword(string);
+          } else
+          if (! strcmp(keyword, "listfile")) {
+            client->setListfile(string);
+          } else {
+            cerr << "Unrecognised keyword '" << keyword
+              << "' in configuration file, line " << line
+              << endl;
+            failed = 2;
+          }
         } else {
-          fprintf(stderr,
-            "Unrecognised keyword in configuration file %s, line %u\n",
-            config_path, line);
+          cerr << "Unrecognised keyword in configuration file, line " << line
+            << endl;
           failed = 2;
         }
+      } else if (params < 0) {
+        errno = EUCLEAN;
+        cerr << "Syntax error in configuration file, line " << line << endl;
+        failed = 2;
       }
       free(string);
     }
