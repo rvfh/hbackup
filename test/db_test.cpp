@@ -175,7 +175,7 @@ int main(void) {
   }
 
   if ((status = db_parse("file://host", "/home/user", "test",
-      filelist_get(), 1))) {
+      filelist_get()))) {
     printf("db_parse error status %u\n", status);
     db_close();
     return 0;
@@ -197,7 +197,7 @@ int main(void) {
   db_list->show(NULL, db_data_show);
 
   if ((status = db_parse("file://host", "/home/user", "test",
-      filelist_get(), 1))) {
+      filelist_get()))) {
     printf("db_parse error status %u\n", status);
     db_close();
     return 0;
@@ -214,7 +214,7 @@ int main(void) {
   filelist_get()->show(NULL, file_data_show);
 
   if ((status = db_parse("file://host", "/home/user2", "test2",
-      filelist_get(), 1))) {
+      filelist_get()))) {
     printf("db_parse error status %u\n", status);
     db_close();
     return 0;
@@ -293,7 +293,7 @@ int main(void) {
   filelist_get()->show(NULL, file_data_show);
 
   if ((status = db_parse("file://host", "/home/user", "test",
-      filelist_get(), 1))) {
+      filelist_get()))) {
     printf("db_parse error status %u\n", status);
     db_close();
     return 0;
@@ -312,7 +312,7 @@ int main(void) {
   filelist_get()->show(NULL, file_data_show);
 
   if ((status = db_parse("file://host", "/home/user", "test",
-      filelist_get(), 1))) {
+      filelist_get()))) {
     printf("db_parse error status %u\n", status);
     db_close();
     return 0;
@@ -329,7 +329,7 @@ int main(void) {
   filelist_get()->show(NULL, file_data_show);
 
   if ((status = db_parse("file://host", "/home/user2", "test2",
-      filelist_get(), 1))) {
+      filelist_get()))) {
     printf("db_parse error status %u\n", status);
     db_close();
     return 0;
