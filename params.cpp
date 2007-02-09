@@ -16,149 +16,141 @@
      Boston, MA 02111-1307, USA.
 */
 
-#ifndef _GNU_SOURCE
-#define _GNU_SOURCE
-#endif
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+using namespace std;
+
+#include <iostream>
+#include <string>
+
 #include "params.h"
 
-static void remove_starting_blanks(char **string) {
-  while (((*string)[0] == ' ') || ((*string)[0] == '\t')) {
-    (*string)++;
-  }
-}
+int params_readline(const char *linein, char *keyword, char *type,
+    string *s) {
+  string        line(linein);
+  unsigned int  pos;
+  unsigned int  minpos;
+  int           param_count = 0;
 
-static void remove_trailing_blanks(char *string) {
-  char *last = &string[strlen(string) - 1];
-
-  while ((last >= string)
-      && ((*last == ' ') || (*last == '\t')
-       || (*last == '\n') || (*last == '\r'))) {
-    *last-- = '\0';
-  }
-}
-
-static char *find_blank(const char *string) {
-  char *space = strchr(string, ' ');
-  char *tab = strchr(string, '\t');
-
-  if (space == NULL) {
-    return tab;
-  } else if (tab == NULL) {
-    return space;
-  } else if (space < tab) {
-    return space;
-  } else {
-    return tab;
-  }
-}
-
-int params_readline(const char *line, char *keyword, char *type,
-    char *string) {
-  char *linecopy = NULL;
-  char *start;
-  char *delim;
-  int param_count = 0;
-
-  /* Reset all */
-  asprintf(&linecopy, "%s", line);
-  start = linecopy;
+  // Reset all
   strcpy(keyword, "");
   strcpy(type, "");
-  strcpy(string, "");
+  *s = "";
 
-  /* Get rid of comments */
-  if ((delim = strchr(start, '#')) != NULL) {
-    *delim = '\0';
+  // Get rid of comments
+  pos = line.find("#");
+  if (pos != string::npos) {
+    line.erase(pos);
   }
 
-  /* Get rid of starting/trailing spaces and tabs */
-  remove_starting_blanks(&start);
-  remove_trailing_blanks(start);
-
-  /* Find next blank */
-  if ((delim = find_blank(start)) == NULL) {
-    delim = &start[strlen(start)];
+  // Remove leading blanks
+  pos = 0;
+  while ((pos < line.size()) && ((line[pos] == ' ') || (line[pos] == '\t'))) {
+    pos++;
   }
+  line.erase(0, pos);
 
-  /* Extract keyword */
-  strncpy(keyword, start, delim - start);
-  keyword[delim - start] = '\0';
-  if (keyword[0] != '\0') {
-    param_count++;
-  } else {
-    free(linecopy);
+  // Make sure there is something left to deal with
+  if (line.size() == 0) {
     return param_count;
   }
 
-  /* Go to next parameter */
-  start = delim;
-  remove_starting_blanks(&start);
+  // Remove trailing blanks
+  pos = line.size() - 1;
+  while ((pos > 0) && ((line[pos] == ' ') || (line[pos] == '\t'))) {
+    pos--;
+  }
+  if (pos < (line.size() - 1)) {
+    line.erase(pos + 1);
+  }
 
-  /* Find next blank or double quote */
-  if (*start == '"') {
-    start++;
-    if ((delim = strchr(start, '"')) == NULL) {
-      /* No matching double quote */
-      free(linecopy);
+  // Make sure there is something left to deal with
+  if (line.size() == 0) {
+    return 0;
+  }
+
+  // Find next blank
+  minpos = line.find(" ");
+  pos = line.find("\t");
+  if (pos == string::npos) {
+    if (minpos == string::npos) {
+      pos = line.size();
+    } else {
+      pos = minpos;
+    }
+  } else
+  if ((minpos != string::npos) && (pos > minpos)) {
+    pos = minpos;
+  }
+
+  // Extract keyword
+  string arg1 = line.substr(0, pos);
+  strcpy(keyword, arg1.c_str());
+  param_count++;
+
+  // Remove keyword and all leading blanks
+  pos++;
+  while ((pos < line.size()) && ((line[pos] == ' ') || (line[pos] == '\t'))) {
+    pos++;
+  }
+  line.erase(0, pos);
+
+  // Make sure there is something left to deal with
+  if (line.size() == 0) {
+    return param_count;
+  }
+
+  // Find last blank or double quote
+  if (line[line.size() - 1] == '\"') {
+    line.erase(line.size() - 1, 1);
+    pos = line.rfind("\"");
+    if (pos == string::npos) {
       return -1;
     } else {
-      /* Make that a space so it gets ignored */
-      *delim = ' ';
+      line.erase(pos, 1);
     }
-  } else if ((delim = find_blank(start)) == NULL) {
-    delim = &start[strlen(start)];
-  }
-
-  /* Extract type or string */
-  strncpy(string, start, delim - start);
-  string[delim - start] = '\0';
-  if (string[0] != '\0') {
-    param_count++;
   } else {
-    free(linecopy);
-    return param_count;
-  }
-
-  /* Go to next parameter */
-  start = delim;
-  remove_starting_blanks(&start);
-
-  /* Do we have more? */
-  if (start[0] == '\0') {
-    free(linecopy);
-    return param_count;
-  } else {
-    strcpy(type, string);
-  }
-
-  /* Find next blank or double quote */
-  if (*start == '"') {
-    start++;
-    if ((delim = strchr(start, '"')) == NULL) {
-      /* No matching double quote */
-      free(linecopy);
-      return -1;
+    minpos = line.rfind(" ");
+    pos = line.rfind("\t");
+    if (pos == string::npos) {
+      if (minpos == string::npos) {
+        pos = 0;
+      } else {
+        pos = minpos + 1;
+      }
     } else {
-      /* Make that a space so it gets ignored */
-      *delim = ' ';
+      if ((minpos != string::npos) && (pos < minpos)) {
+        pos = minpos + 1;
+      } else {
+        pos++;
+      }
     }
-  } else if ((delim = find_blank(start)) == NULL) {
-    delim = &start[strlen(start)];
   }
 
-  /* Extract string */
-  strncpy(string, start, delim - start);
-  string[delim - start] = '\0';
-  if (string[0] != '\0') {
+  // Extract and remove string
+  *s = line.substr(pos);
+
+  // Check string
+  if ((*s)[0] == '\"') {
+    return -1;
+  }
+
+  // Remove string
+  line.erase(pos);
+  param_count++;
+
+  // Remove trailing blanks
+  pos = line.size() - 1;
+  while ((pos > 0) && ((line[pos] == ' ') || (line[pos] == '\t'))) {
+    pos--;
+  }
+  if (pos < (line.size() - 1)) {
+    line.erase(pos + 1);
+  }
+
+  // Extract type
+  if (line.size() != 0) {
+    strcpy(type, line.c_str());
     param_count++;
-  } else {
-    free(linecopy);
-    return param_count;
   }
 
-  free(linecopy);
   return param_count;
 }

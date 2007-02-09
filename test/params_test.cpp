@@ -16,37 +16,67 @@
      Boston, MA 02111-1307, USA.
 */
 
-#include "params.cpp"
+using namespace std;
+
+#include <iostream>
+
+#include "params.h"
 
 int main(void) {
-  char line[256] = "";
-  char keyword[256];
-  char type[256];
-  char string[256];
+  char   line[256] = "";
+  char   keyword[256];
+  char   type[256];
+  string s;
 
   strcpy(line, "");
-  printf("Read %u parameters from %s: '%s' '%s' '%s'\n",
-    params_readline(line, keyword, type, string), line, keyword, type, string);
+  cout << "Read " << params_readline(line, keyword, type, &s)
+    << " parameters from " << line << ": '" << keyword << "' '" << type
+    << "' '" << s << "'" <<  endl;
 
   strcpy(line, "# Normal comment");
-  printf("Read %u parameters from %s: '%s' '%s' '%s'\n",
-    params_readline(line, keyword, type, string), line, keyword, type, string);
+  cout << "Read " << params_readline(line, keyword, type, &s)
+    << " parameters from " << line << ": '" << keyword << "' '" << type
+    << "' '" << s << "'" <<  endl;
 
   strcpy(line, " \t# Displaced comment");
-  printf("Read %u parameters from %s: '%s' '%s' '%s'\n",
-    params_readline(line, keyword, type, string), line, keyword, type, string);
+  cout << "Read " << params_readline(line, keyword, type, &s)
+    << " parameters from " << line << ": '" << keyword << "' '" << type
+    << "' '" << s << "'" <<  endl;
 
   strcpy(line, "\tkey # Comment");
-  printf("Read %u parameters from %s: '%s' '%s' '%s'\n",
-    params_readline(line, keyword, type, string), line, keyword, type, string);
+  cout << "Read " << params_readline(line, keyword, type, &s)
+    << " parameters from " << line << ": '" << keyword << "' '" << type
+    << "' '" << s << "'" <<  endl;
 
   strcpy(line, "key\t \"string\" # Comment");
-  printf("Read %u parameters from %s: '%s' '%s' '%s'\n",
-    params_readline(line, keyword, type, string), line, keyword, type, string);
+  cout << "Read " << params_readline(line, keyword, type, &s)
+    << " parameters from " << line << ": '" << keyword << "' '" << type
+    << "' '" << s << "'" <<  endl;
 
-  strcpy(line, "key \ttype\t \"string\" # Comment");
-  printf("Read %u parameters from %s: '%s' '%s' '%s'\n",
-    params_readline(line, keyword, type, string), line, keyword, type, string);
+  strcpy(line, "key \ttype\t\"string\" # Comment");
+  cout << "Read " << params_readline(line, keyword, type, &s)
+    << " parameters from " << line << ": '" << keyword << "' '" << type
+    << "' '" << s << "'" <<  endl;
+
+  strcpy(line, "key\t string \t# Comment");
+  cout << "Read " << params_readline(line, keyword, type, &s)
+    << " parameters from " << line << ": '" << keyword << "' '" << type
+    << "' '" << s << "'" <<  endl;
+
+  strcpy(line, "key \ttype\t string # Comment");
+  cout << "Read " << params_readline(line, keyword, type, &s)
+    << " parameters from " << line << ": '" << keyword << "' '" << type
+    << "' '" << s << "'" <<  endl;
+
+  strcpy(line, "key \ttype \t\"string # Comment");
+  cout << "Read " << params_readline(line, keyword, type, &s)
+    << " parameters from " << line << ": '" << keyword << "' '" << type
+    << "' '" << s << "'" <<  endl;
+
+  strcpy(line, "key \ttype string\" # Comment");
+  cout << "Read " << params_readline(line, keyword, type, &s)
+    << " parameters from " << line << ": '" << keyword << "' '" << type
+    << "' '" << s << "'" <<  endl;
 
   return 0;
 }

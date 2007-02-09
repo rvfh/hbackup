@@ -20,23 +20,22 @@
 #define CLIENT_H
 
 class Client {
-  char *_name;
-  char *_host_or_ip;
-  char *_protocol;
-  char *_username;
-  char *_password;
-  char *_listfile;
-  int mount_share(const char *mount_point, const char *path);
-  int unmount_share(const char *mount_point);
+  string _name;
+  string _host_or_ip;
+  string _protocol;
+  string _username;
+  string _password;
+  string _listfile;
+  int mount_share(string mount_point, string path);
+  int unmount_share(string mount_point);
 public:
-  Client(const char *name);
-  ~Client();
-  void setHostOrIp(const char *value);
-  void setProtocol(const char *value);
-  void setUsername(const char *value);
-  void setPassword(const char *value);
-  void setListfile(const char *value);
-  int  backup(const char *mount_point, bool configcheck = false);
+  Client(string name);
+  void setHostOrIp(string value);
+  void setProtocol(string value);
+  void setUsername(string value);
+  void setPassword(string value);
+  void setListfile(string value);
+  int  backup(string mount_point, bool configcheck = false);
   void show();
 };
 
@@ -47,9 +46,7 @@ public:
       delete (*this)[i];
     }
   }
-  int backup(
-      const char *mount_point,
-      bool       configcheck = false) {
+  int backup(string mount_point, bool configcheck = false) {
     int failed = 0;
     for (unsigned int i = 0; i < size(); i++) {
       if ((*this)[i]->backup(mount_point, configcheck)) {

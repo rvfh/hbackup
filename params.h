@@ -21,6 +21,6 @@
 
 /* Read parameters from line */
 extern int params_readline(const char *line, char *keyword, char *type,
-  char *string);
+  string *);
 
 #endif
