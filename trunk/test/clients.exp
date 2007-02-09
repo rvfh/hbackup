@@ -1,6 +1,6 @@
-clients: backup: list file not found etc/doesnotexist
+List file not found etc/doesnotexist
 mount: only root can do that
-clients: backup: ssh protocol not supported
+Protocol not supported: ssh
 >List 0 client(s):
  --> Client: localhost
 >List 1 client(s):
@@ -9,53 +9,53 @@ Backup client 'localhost' using protocol 'file'
 >List 0 client(s):
  --> Client: myClient
 >List 1 client(s):
--> nfs://myclient /home/User/devel
+-> nfs://myClient /home/User/devel
  --> Client: myClient2
 >List 2 client(s):
--> nfs://myclient /home/User/devel
--> smb://Myself:flesyM@myclient C:\Backup\Backup.LST
+-> nfs://myClient /home/User/devel
+-> smb://Myself:flesyM@myClient C:\Backup\Backup.LST
  --> Client: otherClient
 >List 3 client(s):
--> nfs://myclient /home/User/devel
--> smb://Myself:flesyM@myclient C:\Backup\Backup.LST
--> ssh://otherclient c:/home/backup/Backup.list
+-> nfs://myClient /home/User/devel
+-> smb://Myself:flesyM@myClient C:\Backup\Backup.LST
+-> ssh://otherClient c:/home/backup/Backup.list
  --> Client: Client
 >List 4 client(s):
--> nfs://myclient /home/User/devel
--> smb://Myself:flesyM@myclient C:\Backup\Backup.LST
--> ssh://otherclient c:/home/backup/Backup.list
--> smb://user@client c:/home/BlaH/Backup.list
+-> nfs://myClient /home/User/devel
+-> smb://Myself:flesyM@myClient C:\Backup\Backup.LST
+-> ssh://otherClient c:/home/backup/Backup.list
+-> smb://user@Client c:/home/BlaH/Backup.list
  --> Client: Client2
 >List 5 client(s):
--> nfs://myclient /home/User/devel
--> smb://Myself:flesyM@myclient C:\Backup\Backup.LST
--> ssh://otherclient c:/home/backup/Backup.list
--> smb://user@client c:/home/BlaH/Backup.list
--> smb://user@client c:/home/BlaH/Backup.list
+-> nfs://myClient /home/User/devel
+-> smb://Myself:flesyM@myClient C:\Backup\Backup.LST
+-> ssh://otherClient c:/home/backup/Backup.list
+-> smb://user@Client c:/home/BlaH/Backup.list
+-> smb://user@Client c:/home/BlaH/Backup.list
  --> Client: Client3
 >List 6 client(s):
--> nfs://myclient /home/User/devel
--> smb://Myself:flesyM@myclient C:\Backup\Backup.LST
--> ssh://otherclient c:/home/backup/Backup.list
--> smb://user@client c:/home/BlaH/Backup.list
--> smb://user@client c:/home/BlaH/Backup.list
--> smb://client c:/home/BlaH/Backup.list
+-> nfs://myClient /home/User/devel
+-> smb://Myself:flesyM@myClient C:\Backup\Backup.LST
+-> ssh://otherClient c:/home/backup/Backup.list
+-> smb://user@Client c:/home/BlaH/Backup.list
+-> smb://user@Client c:/home/BlaH/Backup.list
+-> smb://Client c:/home/BlaH/Backup.list
  --> Client: Client4
 >List 7 client(s):
--> nfs://myclient /home/User/devel
--> smb://Myself:flesyM@myclient C:\Backup\Backup.LST
--> ssh://otherclient c:/home/backup/Backup.list
--> smb://user@client c:/home/BlaH/Backup.list
--> smb://user@client c:/home/BlaH/Backup.list
--> smb://client c:/home/BlaH/Backup.list
--> smb://client c:/home/BlaH/Backup.list
+-> nfs://myClient /home/User/devel
+-> smb://Myself:flesyM@myClient C:\Backup\Backup.LST
+-> ssh://otherClient c:/home/backup/Backup.list
+-> smb://user@Client c:/home/BlaH/Backup.list
+-> smb://user@Client c:/home/BlaH/Backup.list
+-> smb://Client c:/home/BlaH/Backup.list
+-> smb://Client c:/home/BlaH/Backup.list
 Database initialized
-Client unreachable 'myclient' using protocol 'nfs'
-Client unreachable 'myclient' using protocol 'smb'
-Client unreachable 'client' using protocol 'smb'
-Client unreachable 'client' using protocol 'smb'
-Client unreachable 'client' using protocol 'smb'
-Client unreachable 'client' using protocol 'smb'
+Client unreachable 'myClient' using protocol 'nfs'
+Client unreachable 'myClient2' using protocol 'smb'
+Client unreachable 'Client' using protocol 'smb'
+Client unreachable 'Client2' using protocol 'smb'
+Client unreachable 'Client3' using protocol 'smb'
+Client unreachable 'Client4' using protocol 'smb'
 Database closed (total contents: 0 file(s))
  --> Client: testhost
 >List 1 client(s):
@@ -64,7 +64,7 @@ Database opened (active contents: 0 file(s))
 Backup client 'testhost' using protocol 'file'
  -> Reading backup list
  --> Path: test
- --> Path: test2//
+ --> Path: test2
 Backup path 'test'
  -> Building list of files
  -> Parsing list of files
@@ -83,7 +83,7 @@ Database opened (active contents: 16 file(s))
 Backup client 'testhost' using protocol 'file'
  -> Reading backup list
  --> Path: test
- --> Path: test2//
+ --> Path: test2
 Backup path 'test'
  -> Building list of files
  -> Parsing list of files

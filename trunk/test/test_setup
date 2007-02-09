@@ -87,7 +87,7 @@ protocol file
 hostname cbers11.dpi.inpe.br
 listfile "$CONFIGDIR/localhost.list"
 
-client myself
+client client
 protocol smb
 username Myself
 password flesyM

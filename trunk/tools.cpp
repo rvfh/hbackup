@@ -16,20 +16,18 @@
      Boston, MA 02111-1307, USA.
 */
 
-#ifndef _GNU_SOURCE
-#define _GNU_SOURCE
-#endif
+using namespace std;
+
 #include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
+#include <string>
+#include <cctype>
 #include <dirent.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <openssl/md5.h>
 #include <openssl/evp.h>
 #include <zlib.h>
+
 #include "metadata.h"
 #include "common.h"
 #include "tools.h"
@@ -80,33 +78,31 @@ int RingBuffer<T>::read(T *data, int size){
   return count;
 }
 
-void no_trailing_slash(char *string) {
-  char *last = &string[strlen(string) - 1];
+void no_trailing_slash(string *s) {
+  unsigned int pos = s->size() - 1;
 
-  while ((last >= string) && (*last == '/')) {
-    *last-- = '\0';
+  while ((*s)[pos] == '/') {
+    pos--;
+  }
+  if (pos < s->size() - 1) {
+    s->erase(pos + 1);
   }
 }
 
-void strtolower(char *string) {
-  char *letter = string;
-  while (*letter != '\0') {
-    *letter = tolower(*letter);
-    letter++;
+void strtolower(string *s) {
+  for (unsigned int i = 0; i< s->size(); i++) {
+    (*s)[i] = tolower((*s)[i]);
   }
 }
 
-void pathtolinux(char *path) {
-  char *letter = path;
+void pathtolinux(string *s) {
+  unsigned int pos = 0;
 
-  if (path[1] == ':') {
-    path[1] = '$';
+  if ((*s)[1] == ':') {
+    (*s)[1] = '$';
   }
-  while (*letter != '\0') {
-    if (*letter == '\\') {
-      *letter = '/';
-    }
-    letter++;
+  while ((pos = s->find("\\", pos)) != string::npos) {
+    s->replace(pos, 1, "/");
   }
 }
 

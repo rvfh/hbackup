@@ -34,12 +34,10 @@
  *  mark
  */
 
-#ifndef _GNU_SOURCE
-#define _GNU_SOURCE
-#endif
+using namespace std;
+
 #include <iostream>
-#include <stdlib.h>
-#include <string.h>
+#include <string>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <signal.h>
@@ -47,6 +45,7 @@
 #include <dirent.h>
 #include <unistd.h>
 #include <errno.h>
+
 #include "list.h"
 #include "tools.h"
 #include "metadata.h"
@@ -54,7 +53,6 @@
 #include "filters.h"
 #include "filelist.h"
 #include "db.h"
-using namespace std;
 
 #define CHUNK 10240
 

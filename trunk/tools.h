@@ -46,13 +46,13 @@ public:
 };
 
 /* Make sure string finishes without slash */
-extern void no_trailing_slash(char *string);
+extern void no_trailing_slash(string *);
 
 /* Convert string to lower case */
-extern void strtolower(char *string);
+extern void strtolower(string *);
 
 /* Convert path to UNIX style */
-extern void pathtolinux(char *path);
+extern void pathtolinux(string *);
 
 /* Test whether dir exists, create it if requested */
 extern int testdir(const char *path, int create);

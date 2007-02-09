@@ -16,13 +16,13 @@
      Boston, MA 02111-1307, USA.
 */
 
-#ifndef _GNU_SOURCE
-#define _GNU_SOURCE
-#endif
+using namespace std;
+
 #include <iostream>
-#include <string.h>
+#include <string>
 #include <signal.h>
 #include <errno.h>
+
 #include "params.h"
 #include "list.h"
 #include "db.h"
@@ -46,7 +46,7 @@ static int verbose = 0;
 static const char default_config_path[] = "/etc/hbackup.conf";
 
 /* Configuration path */
-static const char default_db_path[] = "/hbackup";
+static string default_db_path = "/hbackup";
 
 
 /* Signal received? */
@@ -89,14 +89,14 @@ void sighandler(int signal) {
 
 int main(int argc, char **argv) {
   const char       *config_path      = NULL;
-  char             *db_path          = NULL;
+  string           db_path           = "";
   FILE             *config;
   int              failed            = 0;
   int              expect_configpath = 0;
   int              argn              = 0;
   int              scan              = 0;
   int              check             = 0;
-  int              configcheck       = 0;
+  bool             configcheck       = false;
   struct sigaction action;
 
   /* Set signal catcher */
@@ -171,7 +171,7 @@ int main(int argc, char **argv) {
           check = 1;
           break;
         case 'u':
-          configcheck = 1;
+          configcheck = true;
           break;
         case 'v':
           verbose++;
@@ -212,34 +212,35 @@ int main(int argc, char **argv) {
     }
 
     while ((getline(&buffer, &size, config) >= 0) && ! failed) {
+      buffer[strlen(buffer) - 1] = '\0';
       char keyword[256];
       char type[256];
-      char *string = new char[size];
-      int params = params_readline(buffer, keyword, type, string);
+      string value;
+      int params = params_readline(buffer, keyword, type, &value);
 
       line++;
       if (params > 1) {
         if (! strcmp(keyword, "db")) {
-          asprintf(&db_path, "%s", string);
+          db_path = value;
         } else if (! strcmp(keyword, "client")) {
-          client = new Client(string);
+          client = new Client(value);
 
           clients.push_back(client);
         } else if (client != NULL) {
           if (! strcmp(keyword, "hostname")) {
-            client->setHostOrIp(string);
+            client->setHostOrIp(value);
           } else
           if (! strcmp(keyword, "protocol")) {
-            client->setProtocol(string);
+            client->setProtocol(value);
           } else
           if (! strcmp(keyword, "username")) {
-            client->setUsername(string);
+            client->setUsername(value);
           } else
           if (! strcmp(keyword, "password")) {
-            client->setPassword(string);
+            client->setPassword(value);
           } else
           if (! strcmp(keyword, "listfile")) {
-            client->setListfile(string);
+            client->setListfile(value);
           } else {
             cerr << "Unrecognised keyword '" << keyword
               << "' in configuration file, line " << line
@@ -256,32 +257,30 @@ int main(int argc, char **argv) {
         cerr << "Syntax error in configuration file, line " << line << endl;
         failed = 2;
       }
-      free(string);
     }
     fclose(config);
     free(buffer);
 
     if (! failed && ! configcheck) {
-      if (db_path == NULL) {
-        asprintf(&db_path, "%s", default_db_path);
+      if (db_path == "") {
+        db_path = default_db_path;
       }
       /* Open backup database */
       if (check) {
-        db_check(db_path, NULL);
+        db_check(db_path.c_str(), NULL);
       } else
       if (scan) {
-        db_scan(db_path, NULL);
+        db_scan(db_path.c_str(), NULL);
       } else
-      if (db_open(db_path) == 2) {
-        fprintf(stderr, "Failed to open database in '%s'\n", db_path);
+      if (db_open(db_path.c_str()) == 2) {
+        cerr << "Failed to open database in '" << db_path << "'" << endl;
         failed = 2;
       } else {
-        char *mount_path = NULL;
+        string mount_path = db_path + "/mount";
 
         /* Make sure we have a mount path */
-        asprintf(&mount_path, "%s/mount", db_path);
-        if (testdir(mount_path, 1) == 2) {
-          fprintf(stderr, "Failed to create mount point\n");
+        if (testdir(mount_path.c_str(), 1) == 2) {
+          cerr << "Failed to create mount point" << endl;
           failed = 2;
         } else
 
@@ -289,12 +288,9 @@ int main(int argc, char **argv) {
         if (clients.backup(mount_path, configcheck)) {
           failed = 1;
         }
-        free(mount_path);
         db_close();
       }
     }
   }
-  free(db_path);
-
   return failed;
 }

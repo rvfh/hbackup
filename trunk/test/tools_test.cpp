@@ -28,35 +28,35 @@ int terminating(void) {
 }
 
 int main(void) {
-  char line[256] = "";
+  string line;
 
-  strcpy(line, "/this/is/a/line");
-  printf("Check slashes to '%s': ", line);
-  no_trailing_slash(line);
-  printf("'%s'\n", line);
+  line = "/this/is/a/line";
+  cout << "Check slashes to '" << line << "': ";
+  no_trailing_slash(&line);
+  cout << "'" << line << "'" << endl;
 
-  strcpy(line, "/this/is/a/line/");
-  printf("Check slashes to '%s': ", line);
-  no_trailing_slash(line);
-  printf("'%s'\n", line);
+  line = "/this/is/a/line/";
+  cout << "Check slashes to '" << line << "': ";
+  no_trailing_slash(&line);
+  cout << "'" << line << "'" << endl;
 
-  strcpy(line, "/this/is/a/line/////////////");
-  printf("Check slashes to '%s': ", line);
-  no_trailing_slash(line);
-  printf("'%s'\n", line);
+  line = "/this/is/a/line/////////////";
+  cout << "Check slashes to '" << line << "': ";
+  no_trailing_slash(&line);
+  cout << "'" << line << "'" << endl;
 
-  strcpy(line, "This is a text which I like");
-  printf("Converting '%s' to lower case\n", line);
-  strtolower(line);
-  printf("-> gives '%s'\n", line);
+  line = "This is a text which I like";
+  cout << "Converting '" << line << "' to lower case" << endl;
+  strtolower(&line);
+  cout << "-> gives '" << line << "'" << endl;
 
-  strcpy(line, "C:\\Program Files\\HBackup\\hbackup.EXE");
-  printf("Converting '%s' to linux style\n", line);
-  pathtolinux(line);
-  printf("-> gives '%s'\n", line);
-  printf("Then to lower case\n");
-  strtolower(line);
-  printf("-> gives '%s'\n", line);
+  line = "C:\\Program Files\\HBackup\\hbackup.EXE";
+  cout << "Converting '" << line << "' to linux style" << endl;
+  pathtolinux(&line);
+  cout << "-> gives '" << line << "'" << endl;
+  cout << "Then to lower case" << endl;
+  strtolower(&line);
+  cout << "-> gives '" << line << "'" << endl;
 
   printf("Test: RingBuffer\n");
   char  read_buffer[15];
