@@ -38,6 +38,7 @@ using namespace std;
 
 #include <iostream>
 #include <string>
+#include <sstream>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <signal.h>
@@ -65,19 +66,19 @@ typedef struct {
 } db_data_t;
 
 static List   *db_list = NULL;
-static char   *db_path = NULL;
+static string _path = "";
 
 /* Size of path being backed up */
 static int    backup_path_length = 0;
 
-static int db_load(const char *filename, List *list) {
-  char *source_path;
-  FILE *readfile;
-  int  failed = 0;
+static int db_load(const string &filename, List *list) {
+  string  source_path;
+  FILE    *readfile;
+  int     failed = 0;
 
   errno = 0;
-  asprintf(&source_path, "%s/%s", db_path, filename);
-  if ((readfile = fopen(source_path, "r")) != NULL) {
+  source_path = _path + "/" + filename;
+  if ((readfile = fopen(source_path.c_str(), "r")) != NULL) {
     /* Read the file into memory */
     char *buffer = NULL;
     size_t size  = 0;
@@ -186,19 +187,18 @@ static int db_load(const char *filename, List *list) {
     // errno set by fopen
     failed = 1;
   }
-  free(source_path);
   return failed;
 }
 
-static int db_save(const char *filename, List *list) {
-  char *temp_path;
-  FILE *writefile;
-  int  failed = 0;
+static int db_save(const string& filename, List *list) {
+  string  temp_path;
+  FILE    *writefile;
+  int     failed = 0;
 
-  asprintf(&temp_path, "%s/%s.part", db_path, filename);
-  if ((writefile = fopen(temp_path, "w")) != NULL) {
-    char *dest_path = NULL;
-    list_entry_t *entry = NULL;
+  temp_path = _path + "/" + filename + ".part";
+  if ((writefile = fopen(temp_path.c_str(), "w")) != NULL) {
+    string        dest_path;
+    list_entry_t  *entry = NULL;
 
     while ((entry = list->next(entry)) != NULL) {
       db_data_t *db_data = (db_data_t *) (list_entry_payload(entry));
@@ -220,13 +220,11 @@ static int db_save(const char *filename, List *list) {
     fclose(writefile);
 
     /* All done */
-    asprintf(&dest_path, "%s/%s", db_path, filename);
-    failed = rename(temp_path, dest_path);
-    free(dest_path);
+    dest_path = _path + "/" + filename;
+    failed = rename(temp_path.c_str(), dest_path.c_str());
   } else {
     failed = 2;
   }
-  free(temp_path);
   return failed;
 }
 
@@ -245,21 +243,19 @@ static char *db_data_get(const void *payload) {
   return string;
 }
 
-static int db_organize(char *path, int number) {
+static int db_organize(const string& path, int number) {
   DIR           *directory;
   struct dirent *dir_entry;
-  char          *nofiles = NULL;
+  string        nofiles;
   int           failed   = 0;
 
   /* Already organized? */
-  asprintf(&nofiles, "%s/.nofiles", path);
+  nofiles = path + "/.nofiles";
   if (! testfile(nofiles, 0)) {
-    free(nofiles);
     return 0;
   }
   /* Find out how many entries */
-  if ((directory = opendir(path)) == NULL) {
-    free(nofiles);
+  if ((directory = opendir(path.c_str())) == NULL) {
     return 1;
   }
   while (((dir_entry = readdir(directory)) != NULL) && (number > 0)) {
@@ -270,49 +266,44 @@ static int db_organize(char *path, int number) {
     rewinddir(directory);
     while ((dir_entry = readdir(directory)) != NULL) {
       metadata_t  metadata;
-      char        *source_path;
+      string      source_path;
 
       /* Ignore . and .. */
       if (! strcmp(dir_entry->d_name, ".")
        || ! strcmp(dir_entry->d_name, "..")) {
         continue;
       }
-      asprintf(&source_path, "%s/%s", path, dir_entry->d_name);
-      if (metadata_get(source_path, &metadata)) {
-        fprintf(stderr, "db: organize: cannot get metadata: %s\n", source_path);
+      source_path = path + "/" + dir_entry->d_name;
+      if (metadata_get(source_path.c_str(), &metadata)) {
+        cerr << "db: organize: cannot get metadata: " << source_path << endl;
         failed = 2;
       } else if (S_ISDIR(metadata.type) && (dir_entry->d_name[2] != '\0')
         /* If we crashed, we might have some two-letter dirs already */
               && (dir_entry->d_name[2] != '-')) {
         /* If we've reached the point where the dir is ??-?, stop! */
-        char *dir_path = NULL;
+        string  dir_path;
 
         /* Create two-letter directory */
-        asprintf(&dir_path, "%s/%c%c", path, dir_entry->d_name[0],
-          dir_entry->d_name[1]);
+        dir_path = string(path) + "/" + dir_entry->d_name[0] + dir_entry->d_name[1];
         if (testdir(dir_path, 1) == 2) {
           failed = 2;
         } else {
-          char *dest_path = NULL;
+          string  dest_path;
 
           /* Create destination path */
-          asprintf(&dest_path, "%s/%s", dir_path, &dir_entry->d_name[2]);
+          dest_path = dir_path + "/" + &dir_entry->d_name[2];
           /* Move directory accross, changing its name */
-          if (rename(source_path, dest_path)) {
+          if (rename(source_path.c_str(), dest_path.c_str())) {
             failed = 1;
           }
-          free(dest_path);
         }
-        free(dir_path);
       }
-      free(source_path);
     }
     if (! failed) {
       testfile(nofiles, 1);
     }
   }
   closedir(directory);
-  free(nofiles);
   return failed;
 }
 
@@ -330,14 +321,14 @@ static void db_list_free(List *list) {
 }
 
 static int db_write(
-    const char *mount_path,
-    const char *path,
+    string          mount_path,
+    const char      *path,
     const db_data_t *db_data,
-    char *checksum,
-    int compress) {
-  char    *source_path = NULL;
-  char    *temp_path   = NULL;
-  char    *dest_path   = NULL;
+    char            *checksum,
+    int             compress) {
+  string  source_path;
+  string  temp_path;
+  string  dest_path;
   char    checksum_source[36];
   char    checksum_dest[36];
   int     index = 0;
@@ -347,10 +338,10 @@ static int db_write(
   off_t   size_dest;
 
   /* File to read from */
-  asprintf(&source_path, "%s/%s", mount_path, path);
+  source_path = mount_path + "/" + path;
 
   /* Temporary file to write to */
-  asprintf(&temp_path, "%s/filedata", db_path);
+  temp_path = _path + "/filedata";
 
   /* Copy file locally */
   if (zcopy(source_path, temp_path, &size_source, &size_dest,
@@ -360,29 +351,32 @@ static int db_write(
 
   /* Check size_source size */
   if (size_source != db_data->filedata.metadata.size) {
-    fprintf(stderr, "db: write: file copy incomplete: %s\n", path);
+    cerr << "db: write: file copy incomplete: " << path << endl;
     failed = 1;
   } else
 
   /* Get file final location */
-  if (getdir(db_path, checksum_source, &dest_path) == 2) {
-    fprintf(stderr, "db: write: failed to get dir for: %s\n",
-      checksum_source);
+  if (getdir(_path, checksum_source, dest_path) == 2) {
+    cerr << "db: write: failed to get dir for: " << checksum_source << endl;
     failed = 1;
   } else {
     /* Make sure our checksum is unique */
     do {
-      char  *final_path = NULL;
-      int   differ = 0;
+      string  final_path = dest_path + "-";
+      bool    differ = false;
 
       /* Complete checksum with index */
       sprintf((char *) checksum, "%s-%u", checksum_source, index);
-      asprintf(&final_path, "%s-%u", dest_path, index);
+      stringstream ss;
+      string str;
+      ss << index;
+      ss >> str;
+      final_path += str;
       if (! testdir(final_path, 1)) {
         /* Directory exists */
-        char  *try_path = NULL;
+        string try_path;
 
-        asprintf(&try_path, "%s/data", final_path);
+        try_path = final_path + "/data";
         if (! testfile(try_path, 0)) {
           /* A file already exists, let's compare */
           metadata_t try_md;
@@ -391,63 +385,51 @@ static int db_write(
           differ = 1;
 
           /* Compare sizes only */
-          if (! metadata_get(try_path, &try_md)
-          && ! metadata_get(temp_path, &temp_md)
+          if (! metadata_get(try_path.c_str(), &try_md)
+          && ! metadata_get(temp_path.c_str(), &temp_md)
           && (try_md.size == temp_md.size)) {
             differ = 0;
           }
         }
-        free(try_path);
       }
       if (! differ) {
-        free(dest_path);
         dest_path = final_path;
         break;
-      } else {
-        free(final_path);
       }
       index++;
-    } while (1);
+    } while (true);
 
     /* Now move the file in its place */
-    {
-      char *data_path = NULL;
-
-      asprintf(&data_path, "%s/data", dest_path);
-      free(dest_path);
-      dest_path = data_path;
-    }
-    if (rename(temp_path, dest_path)) {
-      fprintf(stderr, "db: write: failed to move file %s to %s: %s\n",
-        strerror(errno), temp_path, dest_path);
+    dest_path += "/data";
+    if (rename(temp_path.c_str(), dest_path.c_str())) {
+      cerr << "db: write: failed to move file " << temp_path
+        << " to " << dest_path << ": " << strerror(errno);
       failed = 1;
     }
   }
 
   /* If anything failed, delete temporary file */
   if (failed || deleteit) {
-    remove(temp_path);
+    remove(temp_path.c_str());
   }
-  free(source_path);
-  free(temp_path);
 
   /* Save redundant information together with data */
   if (! failed) {
     /* dest_path is /path/to/checksum/data */
-    char *delim = strrchr(dest_path, '/');
+    unsigned int pos = dest_path.rfind('/');
 
-    if (delim != NULL) {
-      char         *listfile = NULL;
-      List       *list;
-      list_entry_t *entry;
-      db_data_t    new_db_data = *db_data;
+    if (pos != string::npos) {
+      string        listfile;
+      List          *list;
+      list_entry_t  *entry;
+      db_data_t     new_db_data = *db_data;
 
-      *delim = '\0';
+      dest_path.erase(pos);
       /* Now dest_path is /path/to/checksum */
-      asprintf(&listfile, "%s/%s", &dest_path[strlen(db_path) + 1], "list");
+      listfile = dest_path.substr(_path.size() + 1) + "/list";
       list = new List(db_data_get);
       if (db_load(listfile, list) == 2) {
-        fprintf(stderr, "db: write: failed to open data list\n");
+        cerr << "db: write: failed to open data list" << endl;
       } else {
         strcpy(new_db_data.filedata.checksum, checksum_dest);
         entry = list->add(&new_db_data);
@@ -455,75 +437,71 @@ static int db_write(
         list->remove(entry);
       }
       db_list_free(list);
-      free(listfile);
     }
   }
 
   /* Make sure we won't exceed the file number limit */
   if (! failed) {
     /* dest_path is /path/to/checksum */
-    char *delim = strrchr(dest_path, '/');
+    unsigned int pos = dest_path.rfind('/');
 
-    if (delim != NULL) {
-      *delim = '\0';
+    if (pos != string::npos) {
+      dest_path.erase(pos);
       /* Now dest_path is /path/to */
       db_organize(dest_path, 256);
     }
   }
-  free(dest_path);
+
   return failed;
 }
 
-static int db_obsolete(const char *prefix, const char *path,
-    const char *checksum) {
-  char         *listfile  = NULL;
-  char         *temp_path = NULL;
-  int          failed = 0;
-  List       *list;
+static int db_obsolete(
+    const string& prefix,
+    const string& path,
+    const string& checksum) {
+  string  listfile;
+  string  temp_path;
+  int     failed = 0;
+  List    *list;
 
-  if (getdir(db_path, checksum, &temp_path)) {
-    fprintf(stderr, "db: obsolete: failed to get dir for: %s\n", checksum);
+  if (getdir(_path, checksum, temp_path)) {
+    cerr << "db: obsolete: failed to get dir for: " << checksum << endl;
     return 2;
   }
-  asprintf(&listfile, "%s/list", &temp_path[strlen(db_path) + 1]);
-  free(temp_path);
+  listfile = temp_path.substr(_path.size() + 1) + "/list";
 
   list = new List(db_data_get);
-  if (db_load(listfile, list) == 2) {
-    fprintf(stderr, "db: obsolete: failed to open data list\n");
+  if (db_load(listfile.c_str(), list) == 2) {
+    cerr << "db: obsolete: failed to open data list" << endl;
   } else {
-    db_data_t    *db_data;
-    list_entry_t *entry;
-    char         *string = NULL;
+    db_data_t     *db_data;
+    list_entry_t  *entry;
+    string        string;
 
-    asprintf(&string, "%s %s %c", prefix, path, '@');
-    list->find(string, NULL, &entry);
+    string = prefix + " " + path + " @";
+    list->find(string.c_str(), NULL, &entry);
     if (entry != NULL) {
       db_data = (db_data_t *) (list_entry_payload(entry));
       db_data->date_out = time(NULL);
-      db_save(listfile, list);
+      db_save(listfile.c_str(), list);
     }
-    free(string);
   }
   db_list_free(list);
 
-
-  free(listfile);
   return failed;
 }
 
-static int db_lock(const char *path) {
-  char *lock_path = NULL;
-  FILE *file;
-  int  status = 0;
+static int db_lock(const string& path) {
+  string  lock_path;
+  FILE    *file;
+  int     status = 0;
 
   /* Set the database path that we just locked as default */
-  asprintf(&db_path, "%s", path);
-
-  asprintf(&lock_path, "%s/lock", path);
+  _path = path;
+  lock_path = _path + "/lock";
 
   /* Try to open lock file for reading: check who's holding the lock */
-  if ((file = fopen(lock_path, "r")) != NULL) {
+  if ((file = fopen(lock_path.c_str(), "r")) != NULL) {
     pid_t pid;
 
     /* Lock already taken */
@@ -533,46 +511,42 @@ static int db_lock(const char *path) {
       /* Find out whether process is still running, if not, reset lock */
       kill(pid, 0);
       if (errno == ESRCH) {
-        fprintf(stderr, "db: lock: lock reset\n");
-        remove(lock_path);
+        cerr << "db: lock: lock reset" << endl;
+        remove(lock_path.c_str());
       } else {
-        fprintf(stderr, "db: lock: lock taken by process with pid %d\n", pid);
+        cerr << "db: lock: lock taken by process with pid " << pid << endl;
         status = 2;
       }
     } else {
-      fprintf(stderr, "db: lock: lock taken by an unidentified process!\n");
+      cerr << "db: lock: lock taken by an unidentified process!" << endl;
       status = 2;
     }
   }
 
   /* Try to open lock file for writing: lock */
   if (! status) {
-    if ((file = fopen(lock_path, "w")) != NULL) {
+    if ((file = fopen(lock_path.c_str(), "w")) != NULL) {
       /* Lock taken */
       fprintf(file, "%u\n", getpid());
       fclose(file);
     } else {
       /* Lock cannot be taken */
-      fprintf(stderr, "db: lock: cannot take lock\n");
+      cerr << "db: lock: cannot take lock" << endl;
       status = 2;
     }
   }
-  free(lock_path);
   return status;
 }
 
-static void db_unlock(const char *path) {
-  char *lock_path = NULL;
+static void db_unlock(const string& path) {
+  string lock_path = _path + "/lock";
 
-  asprintf(&lock_path, "%s/lock", db_path);
-  free(db_path);
-  db_path = NULL;
-  remove(lock_path);
-  free(lock_path);
+  _path = "";
+  remove(lock_path.c_str());
 }
 
 
-int db_open(const char *path) {
+int db_open(const string& path) {
   int status;
 
   /* Take lock */
@@ -582,25 +556,20 @@ int db_open(const char *path) {
   }
 
   /* Check that data dir and list file exist, if not create them */
-  {
-    char *data_path = NULL;
-
-    asprintf(&data_path, "%s/data", db_path);
-    status = testdir(data_path, 1);
-    free(data_path);
-    if (status == 1) {
-      asprintf(&data_path, "%s/list", db_path);
-      if (testfile(data_path, 1) == 2) {
-        status = 2;
-      } else if (verbosity() > 0) {
-        printf("Database initialized\n");
-      }
-      free(data_path);
+  _path = path;
+  string data_path = _path + "/data";
+  status = testdir(data_path, 1);
+  if (status == 1) {
+    data_path = _path + "/list";
+    if (testfile(data_path, 1) == 2) {
+      status = 2;
+    } else if (verbosity() > 0) {
+      cout << "Database initialized" << endl;
     }
-    /* status = 0 => data was there */
-    /* status = 1 => initialized db */
-    /* status = 2 => error */
   }
+  /* status = 0 => data was there */
+  /* status = 1 => initialized db */
+  /* status = 2 => error */
 
   /* Read database active items list */
   if (status != 2) {
@@ -616,7 +585,7 @@ int db_open(const char *path) {
       case ENOENT:
         if (! status) {
           /* TODO There was a data directory, but no list. Attempt recovery */
-          fprintf(stderr, "db: open: list missing\n");
+          cerr << "db: open: list missing" << endl;
           status = 2;
         }
         break;
@@ -669,20 +638,20 @@ void db_close(void) {
 
   /* Save active list */
   if (db_save("list", active_list)) {
-    fprintf(stderr, "db: close: failed to save active items list\n");
+    cerr << "db: close: failed to save active items list" << endl;
   }
   active_list->deselect();
   delete active_list;
 
   /* Save removed list */
   if (db_save("removed", removed_list)) {
-    fprintf(stderr, "db: close: failed to save removed items list\n");
+    cerr << "db: close: failed to save removed items list" << endl;
   }
   removed_list->deselect();
   delete removed_list;
 
   /* Release lock */
-  db_unlock(db_path);
+  db_unlock(_path);
   if (verbosity() > 0) {
     printf("Database closed (total contents: %u file(s))\n",
       db_list->size());
@@ -732,20 +701,23 @@ static int parse_compare(void *db_data_p, void *filedata_p) {
   return result;
 }
 
-int db_parse(const char *host, const char *real_path,
-    const char *mount_path, List *file_list) {
+int db_parse(
+    const string& host,
+    const string& real_path,
+    const string& mount_path,
+    List          *file_list) {
   List          *selected_files_list = new List(db_data_get);
   List          *added_files_list = new List();
   List          *removed_files_list = new List();
-  list_entry_t  *entry   = NULL;
-  char          *string = NULL;
-  int           failed  = 0;
+  list_entry_t  *entry      = NULL;
+  char          *pathslash  = NULL;
+  int           failed      = 0;
 
   /* Compare list with db list for matching host */
-  asprintf(&string, "%s/", real_path);
-  backup_path_length = strlen(string);
-  db_list->select(string, parse_select, selected_files_list, NULL);
-  free(string);
+  backup_path_length = real_path.size() + 1;
+  asprintf(&pathslash, "%s/", real_path.c_str());
+  db_list->select(pathslash, parse_select, selected_files_list, NULL);
+  free(pathslash);
   selected_files_list->compare(file_list, added_files_list,
     removed_files_list, parse_compare);
   selected_files_list->deselect();
@@ -778,9 +750,9 @@ int db_parse(const char *host, const char *real_path,
       filedata_t *filedata = (filedata_t *) (list_entry_payload(entry));
       db_data_t  *db_data  = new db_data_t;
 
-      asprintf(&db_data->host, "%s", host);
+      asprintf(&db_data->host, "%s", host.c_str());
       db_data->filedata.metadata = filedata->metadata;
-      asprintf(&db_data->filedata.path, "%s/%s", real_path, filedata->path);
+      asprintf(&db_data->filedata.path, "%s/%s", real_path.c_str(), filedata->path);
       db_data->link = NULL;
       db_data->date_in = time(NULL);
       db_data->date_out = 0;
@@ -809,21 +781,19 @@ int db_parse(const char *host, const char *real_path,
         strcpy(db_data->filedata.checksum, "");
       }
       if (S_ISLNK(filedata->metadata.type)) {
-        char *full_path = NULL;
-        char *string = new char[FILENAME_MAX];
-        int size;
+        string  full_path = mount_path + "/" + filedata->path;
+        char    *link     = new char[FILENAME_MAX];
+        int     size;
 
-        asprintf(&full_path, "%s/%s", mount_path, filedata->path);
-        if ((size = readlink(full_path, string, FILENAME_MAX)) < 0) {
+        if ((size = readlink(full_path.c_str(), link, FILENAME_MAX)) < 0) {
           failed = 1;
           fprintf(stderr, "\r%s: %s, ignoring\n",
             strerror(errno), db_data->filedata.path);
         } else {
-          string[size] = '\0';
-          asprintf(&db_data->link, "%s", string);
+          link[size] = '\0';
+          asprintf(&db_data->link, "%s", link);
         }
-        free(full_path);
-        free(string);
+        free(link);
       }
       db_list->add(db_data);
       if ((++copied >= 1000)
@@ -882,60 +852,57 @@ int db_parse(const char *host, const char *real_path,
   return 0;
 }
 
-int db_read(const char *path, const char *checksum) {
-  char *source_path = NULL;
-  char *temp_path   = NULL;
-  char temp_checksum[256];
-  int  failed = 0;
+int db_read(const string& path, const string& checksum) {
+  string  source_path;
+  string  temp_path;
+  char    temp_checksum[256];
+  int     failed = 0;
 
-  if (getdir(db_path, checksum, &temp_path)) {
-    fprintf(stderr, "db: read: failed to get dir for: %s\n", checksum);
+  if (getdir(_path, checksum, source_path)) {
+    cerr << "db: read: failed to get dir for: " << checksum << endl;
     return 2;
   }
-  asprintf(&source_path, "%s/data", temp_path);
-  free(temp_path);
-  temp_path = NULL;
+  source_path += "/data";
 
   /* Open temporary file to write to */
-  asprintf(&temp_path, "%s.part", path);
+  temp_path = path + ".part";
 
   /* Copy file to temporary name (size not checked: checksum suffices) */
-  if (zcopy(source_path, temp_path, NULL, NULL, temp_checksum, NULL, 0)) {
-    fprintf(stderr, "db: read: failed to copy file: %s\n", source_path);
+  if (zcopy(source_path.c_str(), temp_path.c_str(), NULL, NULL, temp_checksum, NULL, 0)) {
+    cerr << "db: read: failed to copy file: " << source_path << endl;
     failed = 2;
   } else
 
   /* Verify that checksums match before overwriting current final destination */
-  if (strncmp(checksum, temp_checksum, strlen(temp_checksum))) {
-    fprintf(stderr, "db: read: checksums don't match: %s %s\n",
-      source_path, temp_checksum);
+  if (checksum.substr(0, strlen(temp_checksum)) != string(temp_checksum)) {
+    cerr << "db: read: checksums don't match: " << source_path
+      << " " << temp_checksum << endl;
     failed = 2;
   } else
 
   /* All done */
-  if (rename(temp_path, path)) {
-    fprintf(stderr, "db: read: failed to rename file to %s: %s\n",
-      strerror(errno), path);
+  if (rename(temp_path.c_str(), path.c_str())) {
+    cerr << "db: read: failed to rename file to " << strerror(errno)
+      << ": " << path << endl;
     failed = 2;
   }
 
   if (failed) {
-    remove(temp_path);
+    remove(temp_path.c_str());
   }
-  free(source_path);
-  free(temp_path);
 
   return failed;
 }
 
-int db_scan(const char *local_db_path, const char *checksum) {
+int db_scan(const string& local_db_path, const string& checksum) {
   int failed = 0;
 
-  if (local_db_path != NULL) {
+  if (local_db_path != "") {
     if (db_lock(local_db_path)) {
       fprintf(stderr, "db: scan: failed to lock\n");
       return 2;
     }
+
     db_list = new List(db_data_get);
     failed = db_load("list", db_list) | db_load("removed", db_list);
     if (failed) {
@@ -943,8 +910,9 @@ int db_scan(const char *local_db_path, const char *checksum) {
       failed = 2;
     }
   }
+
   if (! failed) {
-    if (checksum == NULL) {
+    if (checksum == "") {
       list_entry_t *entry = NULL;
       int          files = db_list->size();
 
@@ -958,7 +926,8 @@ int db_scan(const char *local_db_path, const char *checksum) {
           printf(" --> Files left to go: %u\n", files);
         }
         files--;
-        if (db_scan(NULL, db_data->filedata.checksum)) {
+        if (strlen(db_data->filedata.checksum)
+         && db_scan("", db_data->filedata.checksum)) {
           failed = 1;
           fprintf(stderr, "File data missing for checksum %s\n",
             db_data->filedata.checksum);
@@ -990,38 +959,38 @@ int db_scan(const char *local_db_path, const char *checksum) {
         }
       }
     } else if ((checksum[0] != 'N') && (checksum[0] != '\0')) {
-      char *path = NULL;
+      string  path;
 
-      if (getdir(db_path, checksum, &path)) {
+      if (getdir(_path, checksum, path)) {
         failed = 1;
       } else {
-        char *test_path = NULL;
+        string  test_path = path + "/data";
 
-        asprintf(&test_path, "%s/data", path);
         if (testfile(test_path, 0)) {
           failed = 2;
         }
-        free(test_path);
       }
-      free(path);
     }
   }
-  if (local_db_path != NULL) {
+
+  if (local_db_path != "") {
     db_list_free(db_list);
     db_unlock(local_db_path);
   }
+
   return failed;
 }
 
-int db_check(const char *local_db_path, const char *checksum) {
+int db_check(const string& local_db_path, const string& checksum) {
   int failed = 0;
   char checksum_real[256];
 
-  if (local_db_path != NULL) {
+  if (local_db_path != "") {
     if (db_lock(local_db_path)) {
       fprintf(stderr, "db: check: failed to lock\n");
       return 2;
     }
+
     db_list = new List(db_data_get);
     failed = db_load("list", db_list) | db_load("removed", db_list);
     if (failed) {
@@ -1029,8 +998,9 @@ int db_check(const char *local_db_path, const char *checksum) {
       failed = 2;
     }
   }
+
   if (! failed) {
-    if (checksum == NULL) {
+    if (checksum == "") {
       list_entry_t *entry = NULL;
       int          files = db_list->size();
 
@@ -1045,23 +1015,25 @@ int db_check(const char *local_db_path, const char *checksum) {
           printf(" --> Files left to go: %u\n", files);
         }
         files--;
-        failed = db_check(NULL, db_data->filedata.checksum);
+        if (strlen(db_data->filedata.checksum)) {
+          failed = db_check("", db_data->filedata.checksum);
+        }
         if (terminating()) {
           failed = 3;
           break;
         }
       }
     } else if ((checksum[0] != 'N') && (checksum[0] != '\0')) {
-      char       *path = NULL;
+      string  path;
 
-      if (getdir(db_path, checksum, &path)) {
+      if (getdir(_path, checksum, path)) {
         failed = 2;
       } else {
-        char    *check_path = NULL;
-        char    *listfile   = NULL;
-        List  *list;
+        string  check_path;
+        string  listfile;
+        List    *list;
 
-        asprintf(&listfile, "%s/list", &path[strlen(db_path) + 1]);
+        listfile = path.substr(_path.size() + 1) + "/list";
         list = new List(db_data_get);
         if (db_load(listfile, list) == 2) {
           fprintf(stderr, "db: check: failed to open data list\n");
@@ -1075,21 +1047,19 @@ int db_check(const char *local_db_path, const char *checksum) {
             db_data_t *db_data = (db_data_t *) (list_entry_payload(entry));
 
             /* Read file to compute checksum, compare with expected */
-            asprintf(&check_path, "%s/data", path);
-            if (getchecksum(check_path, checksum_real) == 2) {
-              fprintf(stderr, "File data missing for checksum %s\n", checksum);
+            check_path = path + "/data";
+            if (getchecksum(check_path.c_str(), checksum_real) == 2) {
+              cerr << "File data missing for checksum " << checksum << endl;
               failed = 1;
             } else
             if (strncmp(db_data->filedata.checksum, checksum_real,
                   strlen(checksum_real)) != 0) {
               if (! terminating()) {
-                fprintf(stderr,
-                  "File data corrupted for checksum %s (found to be %s)\n",
-                  checksum, checksum_real);
+                cerr << "File data corrupted for checksum " << checksum
+                  << " (found to be " << checksum_real << ")" << endl;
               }
               failed = 1;
             }
-            free(check_path);
 
             if (! terminating() && (failed == 1) && verbosity() > 1) {
               struct tm *time;
@@ -1116,14 +1086,14 @@ int db_check(const char *local_db_path, const char *checksum) {
           }
         }
         db_list_free(list);
-        free(listfile);
       }
-      free(path);
     }
   }
-  if (local_db_path != NULL) {
+
+  if (local_db_path != "") {
     db_list_free(db_list);
     db_unlock(local_db_path);
   }
+
   return failed;
 }

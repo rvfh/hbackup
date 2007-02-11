@@ -20,7 +20,7 @@
 #define PARAMS_H
 
 /* Read parameters from line */
-extern int params_readline(const char *line, char *keyword, char *type,
+extern int params_readline(string line, char *keyword, char *type,
   string *);
 
 #endif

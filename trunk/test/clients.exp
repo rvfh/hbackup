@@ -62,7 +62,7 @@ Database closed (total contents: 0 file(s))
 -> file://localhost etc/localhost.list
 Database opened (active contents: 0 file(s))
 Backup client 'testhost' using protocol 'file'
- -> Reading backup list
+ -> Reading backup list file
  --> Path: test
  --> Path: test2
 Backup path 'test'
@@ -81,7 +81,7 @@ Database closed (total contents: 16 file(s))
 -> file://localhost etc/localhost.list
 Database opened (active contents: 16 file(s))
 Backup client 'testhost' using protocol 'file'
- -> Reading backup list
+ -> Reading backup list file
  --> Path: test
  --> Path: test2
 Backup path 'test'

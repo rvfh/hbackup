@@ -19,8 +19,9 @@
 using namespace std;
 
 #include <iostream>
-#include <vector>
+#include <fstream>
 #include <string>
+#include <vector>
 #include <errno.h>
 
 #include "metadata.h"
@@ -43,7 +44,7 @@ typedef struct {
 
 static string mounted = "";
 
-int Client::unmount_share(string mount_point) {
+int Client::unmount_share(const string& mount_point) {
   if (mounted != "") {
     string command = "umount ";
 
@@ -54,7 +55,7 @@ int Client::unmount_share(string mount_point) {
   return 0;
 }
 
-int Client::mount_share(string mount_point, string client_path) {
+int Client::mount_share(const string& mount_point, const string& client_path) {
   int    result   = 0;
   string share;
   string command = "mount ";
@@ -106,6 +107,7 @@ int Client::mount_share(string mount_point, string client_path) {
 
   /* Issue mount command */
   result = system(command.c_str());
+//cout << "Mount: " << command.c_str() << endl;
   if (result != 0) {
     errno = ETIMEDOUT;
   } else {
@@ -227,48 +229,54 @@ static int add_parser(List *handle, const char *type, const char *string) {
   return 0;
 }
 
-static int read_listfile(string listfilename, List *backups) {
-  FILE     *listfile;
-  char     *buffer = NULL;
-  size_t   size    = 0;
-  int      line    = 0;
-  path_t *backup = NULL;
-  int      failed  = 0;
+static int read_listfile(string list_path, List *backups) {
+  string  buffer;
+  int     line    = 0;
+  path_t  *backup = NULL;
+  int     failed  = 0;
 
   /* Open list file */
-  if ((listfile = fopen(listfilename.c_str(), "r")) == NULL) {
+  ifstream list_file(list_path.c_str());
+
+  /* Open list file */
+  if (! list_file.is_open()) {
+//     cerr << "List file not found " << list_path << endl;
     failed = 2;
   } else {
     if (verbosity() > 1) {
-      printf(" -> Reading backup list\n");
+      printf(" -> Reading backup list file\n");
     }
 
     /* Read list file */
-    while (getline(&buffer, &size, listfile) >= 0) {
-      buffer[strlen(buffer) - 1] = '\0';
-      char keyword[256];
-      char type[256];
-      string value;
-      int params = params_readline(buffer, keyword, type, &value);
+    while (! list_file.eof() && ! failed) {
+      getline(list_file, buffer);
+      unsigned int pos = buffer.find("\r");
+      if (pos != string::npos) {
+        buffer.erase(pos);
+      }
+      char    keyword[256];
+      char    type[256];
+      string  value;
+      int     params = params_readline(buffer, keyword, type, &value);
 
       line++;
       if (params <= 0) {
         if (params < 0) {
           errno = EUCLEAN;
           cerr << "clients: backup: syntax error in list file "
-            << listfilename << " line " << line << endl;
+            << list_path << " line " << line << endl;
           failed = 1;
         }
       } else if (! strcmp(keyword, "ignore")) {
         if (add_filter(backup->ignore_handle, type, value.c_str())) {
           cerr << "clients: backup: unsupported filter in list file "
-            << listfilename << " line " << line << endl;
+            << list_path << " line " << line << endl;
         }
       } else if (! strcmp(keyword, "parser")) {
-        strtolower(&value);
+        strtolower(value);
         if (add_parser(backup->parsers_handle, type, value.c_str())) {
           cerr << "clients: backup: unsupported parser '" << value
-            << "'in list file " << listfilename << " line " << line << endl;
+            << "'in list file " << list_path << " line " << line << endl;
         }
       } else if (! strcmp(keyword, "path")) {
         /* New backup entry */
@@ -276,7 +284,7 @@ static int read_listfile(string listfilename, List *backups) {
         backup->ignore_handle = new Filter;
         parsers_new(&backup->parsers_handle);
         backup->path = value;
-        no_trailing_slash(&backup->path);
+        no_trailing_slash(backup->path);
         if (verbosity() > 2) {
           cout << " --> Path: " << backup->path << endl;
         }
@@ -284,14 +292,13 @@ static int read_listfile(string listfilename, List *backups) {
       } else {
         errno = EUCLEAN;
         cerr << "clients: backup: syntax error in list file "
-          << listfilename << " line " << line << endl;
+          << list_path << " line " << line << endl;
         failed = 1;
       }
     }
     /* Close list file */
-    fclose(listfile);
+    list_file.close();
   }
-  free(buffer);
   return failed;
 }
 
@@ -317,12 +324,12 @@ static int get_paths(
   } else
 
   if (protocol == "smb") {
-    *share = backup_path[0] + "$";
-    strtolower(share);
+    *share = backup_path.substr(0,1) + "$";
+    strtolower(*share);
     *path  = mount_point + "/" +  backup_path.substr(3);
     /* Lower case */
-    strtolower(path);
-    pathtolinux(path);
+    strtolower(*path);
+    pathtolinux(*path);
     errno = 0;
     return 1;
   }
@@ -338,9 +345,9 @@ int Client::backup(
   List    *backups      = new List();
   int     clientfailed  = 0;
   string  share;
-  string  listfilename;
+  string  list_path;
 
-  switch (get_paths(_protocol, _listfile, mount_point, &share, &listfilename)) {
+  switch (get_paths(_protocol, _listfile, mount_point, &share, &list_path)) {
     case 1:
       mount_share(mount_point, share);
       break;
@@ -364,7 +371,7 @@ int Client::backup(
       << "' using protocol '" << _protocol << "'" << endl;
   }
 
-  if (! read_listfile(listfilename, backups)) {
+  if (! read_listfile(list_path, backups)) {
     /* Backup */
     if (backups->size() == 0) {
       failed = 1;
@@ -402,10 +409,9 @@ int Client::backup(
             printf(" -> Parsing list of files\n");
           }
           prefix = _protocol + "://" + _name;
-          strtolower(&backup->path);
-          pathtolinux(&backup->path);
-          if (db_parse(prefix.c_str(), backup->path.c_str(),
-            backup_path.c_str(), filelist_get())) {
+          strtolower(backup->path);
+          pathtolinux(backup->path);
+          if (db_parse(prefix, backup->path, backup_path, filelist_get())) {
             failed        = 1;
           }
           filelist_free();
@@ -427,10 +433,10 @@ int Client::backup(
     // errno set by functions called
     switch (errno) {
       case ENOENT:
-        cerr << "List file not found " << listfilename << endl;
+        cerr << "List file not found " << list_path << endl;
         break;
       case EUCLEAN:
-        cerr << "List file corrupted " << listfilename << endl;
+        cerr << "List file corrupted " << list_path << endl;
     }
     failed = 1;
   }

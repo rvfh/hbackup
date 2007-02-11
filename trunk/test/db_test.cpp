@@ -69,26 +69,6 @@ int main(void) {
   int       status;
 
   /* Test internal functions */
-  printf("type_letter\n");
-  printf("File   : %c\n", type_letter(S_IFREG));
-  printf("Dir    : %c\n", type_letter(S_IFDIR));
-  printf("Char   : %c\n", type_letter(S_IFCHR));
-  printf("Block  : %c\n", type_letter(S_IFBLK));
-  printf("FIFO   : %c\n", type_letter(S_IFIFO));
-  printf("Link   : %c\n", type_letter(S_IFLNK));
-  printf("Socket : %c\n", type_letter(S_IFSOCK));
-  printf("Unknown: %c\n", type_letter(0));
-
-  printf("type_mode\n");
-  printf("File   : 0%06o\n", type_mode('f'));
-  printf("Dir    : 0%06o\n", type_mode('d'));
-  printf("Char   : 0%06o\n", type_mode('c'));
-  printf("Block  : 0%06o\n", type_mode('b'));
-  printf("FIFO   : 0%06o\n", type_mode('p'));
-  printf("Link   : 0%06o\n", type_mode('l'));
-  printf("Socket : 0%06o\n", type_mode('s'));
-  printf("Unknown: 0%06o\n", type_mode('?'));
-
   zcopy("test/testfile", "test_db/testfile.gz", &size, &zsize, checksum,
     zchecksum, 5);
   printf("Copied %ld -> %ld bytes: %s -> %s\n",
@@ -224,14 +204,14 @@ int main(void) {
   filelist_free();
 
   verbose = 2;
-  if ((status = db_scan(NULL, "59ca0efa9f5633cb0371bbc0355478d8-0"))) {
+  if ((status = db_scan("", "59ca0efa9f5633cb0371bbc0355478d8-0"))) {
     printf("db_scan error status %u\n", status);
     if (status) {
       return 0;
     }
   }
 
-  if ((status = db_check(NULL, "59ca0efa9f5633cb0371bbc0355478d8-0"))) {
+  if ((status = db_check("", "59ca0efa9f5633cb0371bbc0355478d8-0"))) {
     printf("db_check error status %u\n", status);
     if (status) {
       return 0;
@@ -241,14 +221,14 @@ int main(void) {
   db_close();
 
 
-  if ((status = db_scan("test_db", NULL))) {
+  if ((status = db_scan("test_db", ""))) {
     printf("db_scan (full) error status %u\n", status);
     if (status) {
       return 0;
     }
   }
 
-  if ((status = db_check("test_db", NULL))) {
+  if ((status = db_check("test_db", ""))) {
     printf("db_check (full) error status %u\n", status);
     if (status) {
       return 0;
@@ -256,17 +236,17 @@ int main(void) {
   }
 
   remove("test_db/data/59ca0efa9f5633cb0371bbc0355478d8-0/data");
-  if ((status = db_scan("test_db", NULL))) {
+  if ((status = db_scan("test_db", ""))) {
     printf("db_scan (full) error status %u\n", status);
   }
 
-  if ((status = db_check("test_db", NULL))) {
+  if ((status = db_check("test_db", ""))) {
     printf("db_check (full) error status %u\n", status);
   }
 
   testdir("test_db/data/59ca0efa9f5633cb0371bbc0355478d8-0", 1);
   testfile("test_db/data/59ca0efa9f5633cb0371bbc0355478d8-0/data", 1);
-  if ((status = db_check("test_db", NULL))) {
+  if ((status = db_check("test_db", ""))) {
     printf("db_check (full) error status %u\n", status);
   }
   verbose = 3;

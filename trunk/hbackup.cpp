@@ -19,6 +19,7 @@
 using namespace std;
 
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <signal.h>
 #include <errno.h>
@@ -43,7 +44,7 @@ using namespace std;
 static int verbose = 0;
 
 /* Configuration path */
-static const char default_config_path[] = "/etc/hbackup.conf";
+static string default_config_path = "/etc/hbackup.conf";
 
 /* Configuration path */
 static string default_db_path = "/hbackup";
@@ -88,16 +89,15 @@ void sighandler(int signal) {
 }
 
 int main(int argc, char **argv) {
-  const char       *config_path      = NULL;
-  string           db_path           = "";
-  FILE             *config;
-  int              failed            = 0;
-  int              expect_configpath = 0;
-  int              argn              = 0;
-  int              scan              = 0;
-  int              check             = 0;
-  bool             configcheck       = false;
-  struct sigaction action;
+  string            config_path       = "";
+  string            db_path           = "";
+  int               failed            = 0;
+  int               argn              = 0;
+  bool              scan              = false;
+  bool              check             = false;
+  bool              configcheck       = false;
+  bool              expect_configpath = false;
+  struct sigaction  action;
 
   /* Set signal catcher */
   action.sa_handler = sighandler;
@@ -113,8 +113,8 @@ int main(int argc, char **argv) {
 
     /* Get config path if request */
     if (expect_configpath) {
-      config_path = argv[argn];
-      expect_configpath = 0;
+      config_path       = argv[argn];
+      expect_configpath = false;
     }
 
     /* -* */
@@ -159,16 +159,16 @@ int main(int argc, char **argv) {
 
       switch (letter) {
         case 'c':
-          expect_configpath = 1;
+          expect_configpath = true;
           break;
         case 'h':
           show_help();
           return 0;
         case 's':
-          scan = 1;
+          scan = true;
           break;
         case 't':
-          check = 1;
+          check = true;
           break;
         case 'u':
           configcheck = true;
@@ -191,32 +191,33 @@ int main(int argc, char **argv) {
     return 2;
   }
 
-  if (config_path == NULL) {
+  if (config_path == "") {
     config_path = default_config_path;
   }
 
   /* Open configuration file */
-  if ((config = fopen(config_path, "r")) == NULL) {
-    fprintf(stderr, "Configuration file not found %s\n", config_path);
+  ifstream config_file(config_path.c_str());
+
+  if (! config_file.is_open()) {
+    cerr << "Configuration file not found " << config_path << endl;
     failed = 2;
   } else {
     /* Read configuration file */
-    char    *buffer = NULL;
-    size_t  size  = 0;
-    int     line = 0;
     Clients clients;
-    Client *client = NULL;
+    Client  *client = NULL;
+    string  buffer;
+    int     line    = 0;
 
     if (verbosity() > 1) {
       printf(" -> Reading configuration file\n");
     }
 
-    while ((getline(&buffer, &size, config) >= 0) && ! failed) {
-      buffer[strlen(buffer) - 1] = '\0';
-      char keyword[256];
-      char type[256];
-      string value;
-      int params = params_readline(buffer, keyword, type, &value);
+    while (! config_file.eof() && ! failed) {
+      getline(config_file, buffer);
+      char    keyword[256];
+      char    type[256];
+      string  value;
+      int     params = params_readline(buffer, keyword, type, &value);
 
       line++;
       if (params > 1) {
@@ -258,8 +259,7 @@ int main(int argc, char **argv) {
         failed = 2;
       }
     }
-    fclose(config);
-    free(buffer);
+    config_file.close();
 
     if (! failed && ! configcheck) {
       if (db_path == "") {
@@ -267,19 +267,19 @@ int main(int argc, char **argv) {
       }
       /* Open backup database */
       if (check) {
-        db_check(db_path.c_str(), NULL);
+        db_check(db_path, "");
       } else
       if (scan) {
-        db_scan(db_path.c_str(), NULL);
+        db_scan(db_path, "");
       } else
-      if (db_open(db_path.c_str()) == 2) {
+      if (db_open(db_path) == 2) {
         cerr << "Failed to open database in '" << db_path << "'" << endl;
         failed = 2;
       } else {
         string mount_path = db_path + "/mount";
 
         /* Make sure we have a mount path */
-        if (testdir(mount_path.c_str(), 1) == 2) {
+        if (testdir(mount_path, 1) == 2) {
           cerr << "Failed to create mount point" << endl;
           failed = 2;
         } else

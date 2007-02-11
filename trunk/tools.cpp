@@ -19,6 +19,7 @@
 using namespace std;
 
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <cctype>
 #include <dirent.h>
@@ -78,40 +79,40 @@ int RingBuffer<T>::read(T *data, int size){
   return count;
 }
 
-void no_trailing_slash(string *s) {
-  unsigned int pos = s->size() - 1;
+void no_trailing_slash(string& s) {
+  unsigned int pos = s.size() - 1;
 
-  while ((*s)[pos] == '/') {
+  while (s[pos] == '/') {
     pos--;
   }
-  if (pos < s->size() - 1) {
-    s->erase(pos + 1);
+  if (pos < s.size() - 1) {
+    s.erase(pos + 1);
   }
 }
 
-void strtolower(string *s) {
-  for (unsigned int i = 0; i< s->size(); i++) {
-    (*s)[i] = tolower((*s)[i]);
+void strtolower(string& s) {
+  for (unsigned int i = 0; i< s.size(); i++) {
+    s[i] = tolower(s[i]);
   }
 }
 
-void pathtolinux(string *s) {
+void pathtolinux(string& s) {
   unsigned int pos = 0;
 
-  if ((*s)[1] == ':') {
-    (*s)[1] = '$';
+  if (s[1] == ':') {
+    s[1] = '$';
   }
-  while ((pos = s->find("\\", pos)) != string::npos) {
-    s->replace(pos, 1, "/");
+  while ((pos = s.find("\\", pos)) != string::npos) {
+    s.replace(pos, 1, "/");
   }
 }
 
-int testdir(const char *path, int create) {
+int testdir(const string& path, bool create) {
   DIR  *directory;
 
-  if ((directory = opendir(path)) == NULL) {
-    if (create && mkdir(path, 0777)) {
-      fprintf(stderr, "db: failed to create directory: %s\n", path);
+  if ((directory = opendir(path.c_str())) == NULL) {
+    if (create && mkdir(path.c_str(), 0777)) {
+      cerr << "Failed to create directory: " << path << endl;
       return 2;
     }
     return 1;
@@ -120,20 +121,21 @@ int testdir(const char *path, int create) {
   return 0;
 }
 
-int testfile(const char *path, int create) {
-  FILE  *file;
+int testfile(const string& path, bool create) {
+  fstream file(path.c_str(), fstream::in);
 
-  if ((file = fopen(path, "r")) == NULL) {
+  if (! file.is_open()) {
     if (create) {
-      if ((file = fopen(path, "w")) == NULL) {
-        fprintf(stderr, "db: failed to create file: %s\n", path);
+      file.open(path.c_str(), fstream::out);
+      if (! file.is_open()) {
+        cerr << "db: failed to create file: " << path << endl;
         return 2;
       }
-      fclose(file);
+      file.close();
     }
     return 1;
   }
-  fclose(file);
+  file.close();
   return 0;
 }
 
@@ -176,49 +178,37 @@ static void md5sum(const char *checksum, int bytes) {
   delete copy;
 }
 
-int getdir(const char *db_path, const char *checksum, char **path_p) {
-  const char  *checksumpart = checksum;
-  char        *dir_path = NULL;
-  int         status;
-  int         failed = 0;
+int getdir(const string& db_path, const string &checksum, string& path) {
+  path = db_path + "/data";
+  int level = 0;
 
-  asprintf(&dir_path, "%s/data", db_path);
   /* Two cases: either there are files, or a .nofiles file and directories */
   do {
-    char *temp_path = NULL;
-
     /* If we can find a .nofiles file, then go down one more directory */
-    asprintf(&temp_path, "%s/.nofiles", dir_path);
-    status = testfile(temp_path, 0);
-    free(temp_path);
-
+    string  temp_path = path + "/.nofiles";
+    int     status = testfile(temp_path, false);
     if (! status) {
-      char *new_dir_path = NULL;
-
-      asprintf(&new_dir_path, "%s/%c%c", dir_path, checksumpart[0],
-        checksumpart[1]);
-      checksumpart += 2;
-      free(dir_path);
-      dir_path = new_dir_path;
+      path += "/" + checksum.substr(level, 2);
+      level += 2;
+    } else {
+      break;
     }
-  } while (! status);
+  } while (true);
+
   /* Return path */
-  asprintf(path_p, "%s/%s", dir_path, (char *) checksumpart);
-  if (testdir(dir_path, 1)) {
-    failed = 1;
-  }
-  free(dir_path);
-  return failed;
+  path += "/" + checksum.substr(level);
+
+  return testdir(path, true);
 }
 
 int zcopy(
-    const char *source_path,
-    const char *dest_path,
-    off_t *size_in,
-    off_t *size_out,
-    char *checksum_in,
-    char *checksum_out,
-    int compress) {
+    const string& source_path,
+    const string& dest_path,
+    off_t         *size_in,
+    off_t         *size_out,
+    char          *checksum_in,
+    char          *checksum_out,
+    int           compress) {
   FILE          *writefile;
   FILE          *readfile;
   unsigned char buffer_in[CHUNK];
@@ -233,12 +223,12 @@ int zcopy(
   if (size_out != NULL) *size_out = 0;
 
   /* Open file to read from */
-  if ((readfile = fopen(source_path, "r")) == NULL) {
+  if ((readfile = fopen(source_path.c_str(), "r")) == NULL) {
     return 2;
   }
 
   /* Open file to write to */
-  if ((writefile = fopen(dest_path, "w")) == NULL) {
+  if ((writefile = fopen(dest_path.c_str(), "w")) == NULL) {
     fclose(readfile);
     return 2;
   }
@@ -358,13 +348,13 @@ int zcopy(
   return 0;
 }
 
-int getchecksum(const char *path, const char *checksum) {
+int getchecksum(const string& path, const char *checksum) {
   FILE       *readfile;
   EVP_MD_CTX ctx;
   size_t     rlength;
 
   /* Open file */
-  if ((readfile = fopen(path, "r")) == NULL) {
+  if ((readfile = fopen(path.c_str(), "r")) == NULL) {
     return 2;
   }
 

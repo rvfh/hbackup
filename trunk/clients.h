@@ -26,8 +26,8 @@ class Client {
   string _username;
   string _password;
   string _listfile;
-  int mount_share(string mount_point, string path);
-  int unmount_share(string mount_point);
+  int mount_share(const string& mount_point, const string& path);
+  int unmount_share(const string& mount_point);
 public:
   Client(string name);
   void setHostOrIp(string value);

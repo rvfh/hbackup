@@ -23,9 +23,8 @@ using namespace std;
 
 #include "params.h"
 
-int params_readline(const char *linein, char *keyword, char *type,
+int params_readline(string line, char *keyword, char *type,
     string *s) {
-  string        line(linein);
   unsigned int  pos;
   unsigned int  minpos;
   int           param_count = 0;
