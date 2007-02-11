@@ -5,7 +5,7 @@ Protocol not supported: ssh
  --> Client: other
 Database initialized
 Backup client 'cbers11' using protocol 'file'
- -> Reading backup list
+ -> Reading backup list file
  --> Path: test
  --> Path: test2
 Backup path 'test'

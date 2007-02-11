@@ -78,5 +78,15 @@ int main(void) {
     << " parameters from " << line << ": '" << keyword << "' '" << type
     << "' '" << s << "'" <<  endl;
 
+  strcpy(line, "key\t \"this is\ta \tstring\" # Comment");
+  cout << "Read " << params_readline(line, keyword, type, &s)
+    << " parameters from " << line << ": '" << keyword << "' '" << type
+    << "' '" << s << "'" <<  endl;
+
+  strcpy(line, "key \ttype\t \"this is\ta \tstring\" # Comment");
+  cout << "Read " << params_readline(line, keyword, type, &s)
+    << " parameters from " << line << ": '" << keyword << "' '" << type
+    << "' '" << s << "'" <<  endl;
+
   return 0;
 }

@@ -46,35 +46,35 @@ public:
 };
 
 /* Make sure string finishes without slash */
-extern void no_trailing_slash(string *);
+extern void no_trailing_slash(string&);
 
 /* Convert string to lower case */
-extern void strtolower(string *);
+extern void strtolower(string&);
 
 /* Convert path to UNIX style */
-extern void pathtolinux(string *);
+extern void pathtolinux(string&);
 
 /* Test whether dir exists, create it if requested */
-extern int testdir(const char *path, int create);
+extern int testdir(const string& path, bool create);
 
 /* Test whether file exists, create it if requested */
-extern int testfile(const char *path, int create);
+extern int testfile(const string& path, bool create);
 
 extern char type_letter(mode_t mode);
 
 extern mode_t type_mode(char letter);
 
-extern int getdir(const char *db_path, const char *checksum, char **path_p);
+extern int getdir(const string& db_path, const string &checksum, string& path);
 
 extern int zcopy(
-  const char  *source_path,
-  const char  *dest_path,
-  off_t       *size_in,
-  off_t       *size_out,
-  char        *checksum_in,
-  char        *checksum_out,
-  int         compress);
+  const string& source_path,
+  const string& dest_path,
+  off_t         *size_in,
+  off_t         *size_out,
+  char          *checksum_in,
+  char          *checksum_out,
+  int           compress);
 
-extern int getchecksum(const char *path, const char *checksum);
+extern int getchecksum(const string& path, const char *checksum);
 
 #endif

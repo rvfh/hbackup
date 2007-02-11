@@ -4,24 +4,6 @@ File data corrupted for checksum 59ca0efa9f5633cb0371bbc0355478d8-0 (found to be
 db: close: failed to save active items list
 db: close: failed to save removed items list
 db: open: list missing
-type_letter
-File   : f
-Dir    : d
-Char   : c
-Block  : b
-FIFO   : p
-Link   : l
-Socket : s
-Unknown: ?
-type_mode
-File   : 0100000
-Dir    : 0040000
-Char   : 0020000
-Block  : 0060000
-FIFO   : 0010000
-Link   : 0120000
-Socket : 0140000
-Unknown: 0000000
 Copied 13 -> 33 bytes: 59ca0efa9f5633cb0371bbc0355478d8 -> f94b4a4f91902f37f53e9e38fafbb524
 Copied 33 -> 13 bytes: f94b4a4f91902f37f53e9e38fafbb524 -> 59ca0efa9f5633cb0371bbc0355478d8
 Copied 524288 -> ? bytes 59071590099d21dd439896592338bf95 -> ?

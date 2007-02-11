@@ -16,8 +16,6 @@
      Boston, MA 02111-1307, USA.
 */
 
-/* TODO Not all functions are tested */
-
 #include <iostream>
 #include "tools.cpp"
 
@@ -30,35 +28,40 @@ int terminating(void) {
 int main(void) {
   string line;
 
+  cout << "Tools Test" << endl;
+
+  cout << endl << "Test: no_trailing_slash" << endl;
   line = "/this/is/a/line";
   cout << "Check slashes to '" << line << "': ";
-  no_trailing_slash(&line);
+  no_trailing_slash(line);
   cout << "'" << line << "'" << endl;
 
   line = "/this/is/a/line/";
   cout << "Check slashes to '" << line << "': ";
-  no_trailing_slash(&line);
+  no_trailing_slash(line);
   cout << "'" << line << "'" << endl;
 
   line = "/this/is/a/line/////////////";
   cout << "Check slashes to '" << line << "': ";
-  no_trailing_slash(&line);
+  no_trailing_slash(line);
   cout << "'" << line << "'" << endl;
 
+  cout << endl << "Test: strtolower" << endl;
   line = "This is a text which I like";
   cout << "Converting '" << line << "' to lower case" << endl;
-  strtolower(&line);
+  strtolower(line);
   cout << "-> gives '" << line << "'" << endl;
 
+  cout << endl << "Test: pathtolinux" << endl;
   line = "C:\\Program Files\\HBackup\\hbackup.EXE";
   cout << "Converting '" << line << "' to linux style" << endl;
-  pathtolinux(&line);
+  pathtolinux(line);
   cout << "-> gives '" << line << "'" << endl;
   cout << "Then to lower case" << endl;
-  strtolower(&line);
+  strtolower(line);
   cout << "-> gives '" << line << "'" << endl;
 
-  printf("Test: RingBuffer\n");
+  cout << endl << "Test: RingBuffer" << endl;
   char  read_buffer[15];
   int   read_size;
   RingBuffer<char> ring_buffer(10);
@@ -77,8 +80,8 @@ int main(void) {
   cout << "Read: " << read_size << ", " << read_buffer << endl;
   cout << "Buffer size used: " << ring_buffer.size() << endl;
 
-  printf("Test: zcopy\n");
-  system("dd if=/dev/zero of=zcopy_test bs=1M count=100 status=noxfer 2> /dev/null");
+  cout << endl << "Test: zcopy (and thus getchecksum)" << endl;
+  system("dd if=/dev/zero of=zcopy_test bs=1M count=10 status=noxfer 2> /dev/null");
   off_t size_in;
   off_t size_out;
   char  check_in[36];
@@ -86,6 +89,72 @@ int main(void) {
   zcopy("zcopy_test", "zcopied", &size_in, &size_out, check_in, check_out, 5);
   cout << "In: " << size_in << " bytes, checksum: " << check_in << endl;
   cout << "Out: " << size_out << " bytes, checksum: " << check_out << endl;
+
+  cout << endl << "Test: testdir" << endl;
+  cout << "Check test_db dir: " << testdir("test_db", true) << endl;
+  cout << "Check but do not create test_db/0 1 dir: "
+    << testdir("test_db/0 1", false) << endl;
+  cout << "Check and create test_db/0 1 dir: "
+    << testdir("test_db/0 1", true) << endl;
+  cout << "Check test_db/0 1 dir: "
+    << testdir("test_db/0 1", false) << endl;
+
+  cout << endl << "Test: testfile" << endl;
+  cout << "Check but do not create test_db/0 1/a b file: "
+    << testfile("test_db/0 1/a b", false) << endl;
+  cout << "Check and create test_db/0 1/a b file: "
+    << testfile("test_db/0 1/a b", true) << endl;
+  cout << "Check test_db/0 1/a b file: "
+    << testfile("test_db/0 1/a b", 0) << endl;
+
+  cout << endl << "Test: type_letter" << endl;
+  printf("File   : %c\n", type_letter(S_IFREG));
+  printf("Dir    : %c\n", type_letter(S_IFDIR));
+  printf("Char   : %c\n", type_letter(S_IFCHR));
+  printf("Block  : %c\n", type_letter(S_IFBLK));
+  printf("FIFO   : %c\n", type_letter(S_IFIFO));
+  printf("Link   : %c\n", type_letter(S_IFLNK));
+  printf("Socket : %c\n", type_letter(S_IFSOCK));
+  printf("Unknown: %c\n", type_letter(0));
+
+  cout << endl << "Test: type_mode" << endl;
+  printf("File   : 0%06o\n", type_mode('f'));
+  printf("Dir    : 0%06o\n", type_mode('d'));
+  printf("Char   : 0%06o\n", type_mode('c'));
+  printf("Block  : 0%06o\n", type_mode('b'));
+  printf("FIFO   : 0%06o\n", type_mode('p'));
+  printf("Link   : 0%06o\n", type_mode('l'));
+  printf("Socket : 0%06o\n", type_mode('s'));
+  printf("Unknown: 0%06o\n", type_mode('?'));
+
+  cout << endl << "Test: getdir" << endl;
+  string  path;
+  cout << "Check test_db/data dir: " << testdir("test_db/data", true) << endl;
+  testfile("test_db/data/.nofiles", true);
+  testdir("test_db/data/fe", true);
+  testfile("test_db/data/fe/.nofiles", true);
+  testfile("test_db/data/fe/test4", true);
+  testdir("test_db/data/fe/dc", true);
+  testfile("test_db/data/fe/dc/.nofiles", true);
+  testdir("test_db/data/fe/ba", true);
+  testdir("test_db/data/fe/ba/test1", true);
+  testdir("test_db/data/fe/98", true);
+  testdir("test_db/data/fe/98/test2", true);
+  cout << "febatest1 status: " << getdir("test_db", "febatest1", path)
+    << ", path: " << path << endl;
+  cout << "fe98test2 status: " << getdir("test_db", "fe98test2", path)
+    << ", path: " << path << endl;
+  cout << "fe98test3 status: " << getdir("test_db", "fe98test3", path)
+    << ", path: " << path << endl;
+  cout << "fetest4 status: " << getdir("test_db", "fetest4", path)
+    << ", path: " << path << endl;
+  cout << "fedc76test5 status: " << getdir("test_db", "fedc76test5", path)
+    << ", path: " << path << endl;
+  testdir("test_db/data/fe/dc/76", true);
+  cout << "fedc76test6 status: " << getdir("test_db", "fedc76test6", path)
+    << ", path: " << path << endl;
+  cout << "fedc76test6 status: " << getdir("test_db", "fedc76test6", path)
+    << ", path: " << path << endl;
 
   return 0;
 }
