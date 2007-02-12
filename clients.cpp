@@ -107,7 +107,6 @@ int Client::mount_share(const string& mount_point, const string& client_path) {
 
   /* Issue mount command */
   result = system(command.c_str());
-//cout << "Mount: " << command.c_str() << endl;
   if (result != 0) {
     errno = ETIMEDOUT;
   } else {
@@ -229,7 +228,7 @@ static int add_parser(List *handle, const char *type, const char *string) {
   return 0;
 }
 
-static int read_listfile(string list_path, List *backups) {
+static int read_listfile(const string& list_path, List *backups) {
   string  buffer;
   int     line    = 0;
   path_t  *backup = NULL;

@@ -204,15 +204,36 @@ int main(void) {
   filelist_free();
 
   verbose = 2;
-  if ((status = db_scan("", "59ca0efa9f5633cb0371bbc0355478d8-0"))) {
+  if ((status = db_scan("59ca0efa9f5633cb0371bbc0355478d8-0"))) {
     printf("db_scan error status %u\n", status);
     if (status) {
       return 0;
     }
   }
 
-  if ((status = db_check("", "59ca0efa9f5633cb0371bbc0355478d8-0"))) {
-    printf("db_check error status %u\n", status);
+  if ((status = db_scan("59ca0efa9f5633cb0371bbc0355478d8-0", true))) {
+    printf("db_scan error status %u\n", status);
+    if (status) {
+      return 0;
+    }
+  }
+
+  db_close();
+  db_open("test_db");
+
+
+  if ((status = db_scan())) {
+    printf("db_scan (full) error status %u\n", status);
+    if (status) {
+      return 0;
+    }
+  }
+
+  db_close();
+  db_open("test_db");
+
+  if ((status = db_scan("", true))) {
+    printf("db_scan (full) error status %u\n", status);
     if (status) {
       return 0;
     }
@@ -220,36 +241,72 @@ int main(void) {
 
   db_close();
 
+  // Save list
+  zcopy("test_db/list", "test_db/list.save", NULL, NULL, NULL, NULL, 0);
 
-  if ((status = db_scan("test_db", ""))) {
-    printf("db_scan (full) error status %u\n", status);
-    if (status) {
-      return 0;
-    }
-  }
-
-  if ((status = db_check("test_db", ""))) {
-    printf("db_check (full) error status %u\n", status);
-    if (status) {
-      return 0;
-    }
-  }
+  db_open("test_db");
 
   remove("test_db/data/59ca0efa9f5633cb0371bbc0355478d8-0/data");
-  if ((status = db_scan("test_db", ""))) {
+  if ((status = db_scan())) {
     printf("db_scan (full) error status %u\n", status);
   }
 
-  if ((status = db_check("test_db", ""))) {
-    printf("db_check (full) error status %u\n", status);
+  db_close();
+
+  // Restore list
+  zcopy("test_db/list.save", "test_db/list", NULL, NULL, NULL, NULL, 0);
+
+  db_open("test_db");
+
+  if ((status = db_scan("", true))) {
+    printf("db_scan (full) error status %u\n", status);
   }
+
+  db_close();
+
+  // Restore list
+  zcopy("test_db/list.save", "test_db/list", NULL, NULL, NULL, NULL, 0);
+
+  db_open("test_db");
 
   testdir("test_db/data/59ca0efa9f5633cb0371bbc0355478d8-0", 1);
   testfile("test_db/data/59ca0efa9f5633cb0371bbc0355478d8-0/data", 1);
-  if ((status = db_check("test_db", ""))) {
-    printf("db_check (full) error status %u\n", status);
+  if ((status = db_scan("", true))) {
+    printf("db_scan (full) error status %u\n", status);
   }
   verbose = 3;
+
+  db_close();
+
+
+
+  /* Re-open database => correct missing file */
+  if ((status = db_open("test_db"))) {
+    printf("db_open error status %u\n", status);
+    if (status == 2) {
+      return 0;
+    }
+  }
+  cout << ">List " << db_list->size() << " element(s):\n";
+  db_list->show(NULL, db_data_show);
+
+  if ((status = filelist_new("test////", filter_handle, parsers_handle))) {
+    printf("file_list_new error status %u\n", status);
+    return 0;
+  }
+  cout << ">List " << filelist_get()->size() << " file(s):\n";
+  filelist_get()->show(NULL, file_data_show);
+
+  if ((status = db_parse("file://host", "/home/user", "test",
+      filelist_get()))) {
+    printf("db_parse error status %u\n", status);
+    db_close();
+    return 0;
+  }
+  cout << ">List " << db_list->size() << " element(s):\n";
+  db_list->show(NULL, db_data_show);
+
+  db_close();
 
 
 
