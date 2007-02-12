@@ -50,7 +50,7 @@ public:
   void setHostOrIp(string value);
   void setProtocol(string value);
   void setListfile(string value);
-  int  backup(string mount_point, bool configcheck = false);
+  int  backup(Database& db, bool configcheck = false);
   void show();
 };
 
@@ -61,10 +61,10 @@ public:
       delete (*this)[i];
     }
   }
-  int backup(string mount_point, bool configcheck = false) {
+  int backup(Database& db, bool configcheck = false) {
     int failed = 0;
     for (unsigned int i = 0; i < size(); i++) {
-      if ((*this)[i]->backup(mount_point, configcheck)) {
+      if ((*this)[i]->backup(db, configcheck)) {
         failed = 1;
       }
     }

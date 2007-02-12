@@ -35,8 +35,9 @@ int terminating(void) {
 }
 
 int main(void) {
-  Clients *clients;
-  Client  *client;
+  Clients   *clients;
+  Client    *client;
+  Database  db("test_db");
 
   remove("test_db/list");
 
@@ -54,7 +55,7 @@ int main(void) {
   for (unsigned int i = 0; i < clients->size(); i++) {
     (*clients)[i]->show();
   }
-  clients->backup("test_db/mount", 0);
+  clients->backup(db, 0);
   delete clients;
 
   clients = new Clients;
@@ -135,10 +136,10 @@ int main(void) {
   for (unsigned int i = 0; i < clients->size(); i++) {
     (*clients)[i]->show();
   }
-  db_open("test_db");
-  clients->backup("test_db/mount", 0);
+  db.open();
+  clients->backup(db, 0);
   delete clients;
-  db_close();
+  db.close();
 
   clients = new Clients;
   client = new Client("testhost");
@@ -150,10 +151,10 @@ int main(void) {
   for (unsigned int i = 0; i < clients->size(); i++) {
     (*clients)[i]->show();
   }
-  db_open("test_db");
-  clients->backup("test_db/mount", 0);
+  db.open();
+  clients->backup(db, 0);
   delete clients;
-  db_close();
+  db.close();
 
   clients = new Clients;
   client = new Client("testhost");
@@ -164,10 +165,10 @@ int main(void) {
   for (unsigned int i = 0; i < clients->size(); i++) {
     (*clients)[i]->show();
   }
-  db_open("test_db");
-  clients->backup("test_db/mount", 0);
+  db.open();
+  clients->backup(db, 0);
   delete clients;
-  db_close();
+  db.close();
 
   return 0;
 }

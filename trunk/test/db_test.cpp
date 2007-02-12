@@ -111,9 +111,10 @@ int main(void) {
   printf(">List %u file(s):\n", filelist_get()->size());
   filelist_get()->show(NULL, file_data_show);
 
+  Database db("test_db");
 
   /* Test database */
-  if ((status = db_open("test_db"))) {
+  if ((status = db.open())) {
     printf("db_open error status %u\n", status);
     if (status == 2) {
       return 0;
@@ -127,47 +128,46 @@ int main(void) {
   db_data.link = "this is a link";
   db_data.date_in = time(NULL);
   db_data.date_out = 0;
-  if ((status = db_write("test/", "testfile", &db_data, checksum, 0))) {
-    printf("db_write error status %u\n", status);
-    db_close();
+  if ((status = db.write("test/", "testfile", &db_data, checksum, 0))) {
+    printf("db.write error status %u\n", status);
+    db.close();
     return 0;
   }
   printf("%s  test/testfile\n", checksum);
   filelist = new List(db_data_show);
-  db_load("data/59ca0efa9f5633cb0371bbc0355478d8-0/list", filelist);
+  db.load("data/59ca0efa9f5633cb0371bbc0355478d8-0/list", filelist);
   cout << ">List " << filelist->size() << " element(s):\n";
   filelist->show(NULL, db_data_show);
   delete filelist;
 
   /* Obsolete check */
-  db_obsolete(db_data.host, db_data.filedata.path, checksum);
+  db.obsolete(db_data.host, db_data.filedata.path, checksum);
   filelist = new List(db_data_show);
-  db_load("data/59ca0efa9f5633cb0371bbc0355478d8-0/list", filelist);
+  db.load("data/59ca0efa9f5633cb0371bbc0355478d8-0/list", filelist);
   cout << ">List " << filelist->size() << " element(s):\n";
   filelist->show(NULL, db_data_show);
   delete filelist;
 
   /* Read check */
-  if ((status = db_read("test_db/blah", checksum))) {
-    printf("db_read error status %u\n", status);
-    db_close();
+  if ((status = db.read("test_db/blah", checksum))) {
+    printf("db.read error status %u\n", status);
+    db.close();
     return 0;
   }
 
-  if ((status = db_parse("file://host", "/home/user", "test",
+  if ((status = db.parse("file://host", "/home/user", "test",
       filelist_get()))) {
-    printf("db_parse error status %u\n", status);
-    db_close();
+    printf("db.parse error status %u\n", status);
+    db.close();
     return 0;
   }
   cout << ">List " << db_list->size() << " element(s):\n";
   db_list->show(NULL, db_data_show);
 
-  db_close();
-
+  db.close();
 
   /* Re-open database => no change */
-  if ((status = db_open("test_db"))) {
+  if ((status = db.open())) {
     printf("db_open error status %u\n", status);
     if (status == 2) {
       return 0;
@@ -176,10 +176,10 @@ int main(void) {
   cout << ">List " << db_list->size() << " element(s):\n";
   db_list->show(NULL, db_data_show);
 
-  if ((status = db_parse("file://host", "/home/user", "test",
+  if ((status = db.parse("file://host", "/home/user", "test",
       filelist_get()))) {
-    printf("db_parse error status %u\n", status);
-    db_close();
+    printf("db.parse error status %u\n", status);
+    db.close();
     return 0;
   }
   cout << ">List " << db_list->size() << " element(s):\n";
@@ -193,10 +193,10 @@ int main(void) {
   cout << ">List " << filelist_get()->size() << " file(s):\n";
   filelist_get()->show(NULL, file_data_show);
 
-  if ((status = db_parse("file://host", "/home/user2", "test2",
+  if ((status = db.parse("file://host", "/home/user2", "test2",
       filelist_get()))) {
-    printf("db_parse error status %u\n", status);
-    db_close();
+    printf("db.parse error status %u\n", status);
+    db.close();
     return 0;
   }
   cout << ">List " << db_list->size() << " element(s):\n";
@@ -204,84 +204,84 @@ int main(void) {
   filelist_free();
 
   verbose = 2;
-  if ((status = db_scan("59ca0efa9f5633cb0371bbc0355478d8-0"))) {
-    printf("db_scan error status %u\n", status);
+  if ((status = db.scan("59ca0efa9f5633cb0371bbc0355478d8-0"))) {
+    printf("scan error status %u\n", status);
     if (status) {
       return 0;
     }
   }
 
-  if ((status = db_scan("59ca0efa9f5633cb0371bbc0355478d8-0", true))) {
-    printf("db_scan error status %u\n", status);
+  if ((status = db.scan("59ca0efa9f5633cb0371bbc0355478d8-0", true))) {
+    printf("scan error status %u\n", status);
     if (status) {
       return 0;
     }
   }
 
-  db_close();
-  db_open("test_db");
+  db.close();
+  db.open();
 
 
-  if ((status = db_scan())) {
-    printf("db_scan (full) error status %u\n", status);
+  if ((status = db.scan())) {
+    printf("full scan error status %u\n", status);
     if (status) {
       return 0;
     }
   }
 
-  db_close();
-  db_open("test_db");
+  db.close();
+  db.open();
 
-  if ((status = db_scan("", true))) {
-    printf("db_scan (full) error status %u\n", status);
+  if ((status = db.scan("", true))) {
+    printf("full thorough scan error status %u\n", status);
     if (status) {
       return 0;
     }
   }
 
-  db_close();
+  db.close();
 
   // Save list
   zcopy("test_db/list", "test_db/list.save", NULL, NULL, NULL, NULL, 0);
 
-  db_open("test_db");
+  db.open();
 
   remove("test_db/data/59ca0efa9f5633cb0371bbc0355478d8-0/data");
-  if ((status = db_scan())) {
-    printf("db_scan (full) error status %u\n", status);
+  if ((status = db.scan())) {
+    printf("full scan error status %u\n", status);
   }
 
-  db_close();
+  db.close();
 
   // Restore list
   zcopy("test_db/list.save", "test_db/list", NULL, NULL, NULL, NULL, 0);
 
-  db_open("test_db");
+  db.open();
 
-  if ((status = db_scan("", true))) {
-    printf("db_scan (full) error status %u\n", status);
+  if ((status = db.scan("", true))) {
+    printf("full thorough scan error status %u\n", status);
   }
 
-  db_close();
+  db.close();
 
   // Restore list
   zcopy("test_db/list.save", "test_db/list", NULL, NULL, NULL, NULL, 0);
 
-  db_open("test_db");
+  db.open();
 
   testdir("test_db/data/59ca0efa9f5633cb0371bbc0355478d8-0", 1);
   testfile("test_db/data/59ca0efa9f5633cb0371bbc0355478d8-0/data", 1);
-  if ((status = db_scan("", true))) {
-    printf("db_scan (full) error status %u\n", status);
+  if ((status = db.scan("", true))) {
+    printf("full thorough scan error status %u\n", status);
   }
   verbose = 3;
 
-  db_close();
+  db.close();
 
 
 
   /* Re-open database => correct missing file */
-  if ((status = db_open("test_db"))) {
+  if ((status = db.open())) {
     printf("db_open error status %u\n", status);
     if (status == 2) {
       return 0;
@@ -297,21 +297,21 @@ int main(void) {
   cout << ">List " << filelist_get()->size() << " file(s):\n";
   filelist_get()->show(NULL, file_data_show);
 
-  if ((status = db_parse("file://host", "/home/user", "test",
+  if ((status = db.parse("file://host", "/home/user", "test",
       filelist_get()))) {
-    printf("db_parse error status %u\n", status);
-    db_close();
+    printf("db.parse error status %u\n", status);
+    db.close();
     return 0;
   }
   cout << ">List " << db_list->size() << " element(s):\n";
   db_list->show(NULL, db_data_show);
 
-  db_close();
+  db.close();
 
 
 
   /* Re-open database => remove some files */
-  if ((status = db_open("test_db"))) {
+  if ((status = db.open())) {
     printf("db_open error status %u\n", status);
     if (status == 2) {
       return 0;
@@ -329,10 +329,10 @@ int main(void) {
   cout << ">List " << filelist_get()->size() << " file(s):\n";
   filelist_get()->show(NULL, file_data_show);
 
-  if ((status = db_parse("file://host", "/home/user", "test",
+  if ((status = db.parse("file://host", "/home/user", "test",
       filelist_get()))) {
-    printf("db_parse error status %u\n", status);
-    db_close();
+    printf("db.parse error status %u\n", status);
+    db.close();
     return 0;
   }
   cout << ">List " << db_list->size() << " element(s):\n";
@@ -348,10 +348,10 @@ int main(void) {
   cout << ">List " << filelist_get()->size() << " file(s):\n";
   filelist_get()->show(NULL, file_data_show);
 
-  if ((status = db_parse("file://host", "/home/user", "test",
+  if ((status = db.parse("file://host", "/home/user", "test",
       filelist_get()))) {
-    printf("db_parse error status %u\n", status);
-    db_close();
+    printf("db.parse error status %u\n", status);
+    db.close();
     return 0;
   }
   cout << ">List " << db_list->size() << " element(s):\n";
@@ -365,23 +365,23 @@ int main(void) {
   cout << ">List " << filelist_get()->size() << " file(s):\n";
   filelist_get()->show(NULL, file_data_show);
 
-  if ((status = db_parse("file://host", "/home/user2", "test2",
+  if ((status = db.parse("file://host", "/home/user2", "test2",
       filelist_get()))) {
-    printf("db_parse error status %u\n", status);
-    db_close();
+    printf("db.parse error status %u\n", status);
+    db.close();
     return 0;
   }
   cout << ">List " << db_list->size() << " element(s):\n";
   db_list->show(NULL, db_data_show);
   filelist_free();
 
-  db_organize("test_db/data", 2);
+  db.organize("test_db/data", 2);
 
-  db_close();
+  db.close();
 
 
   /* Re-open database => one less active item */
-  if ((status = db_open("test_db"))) {
+  if ((status = db.open())) {
     printf("db_open error status %u\n", status);
     if (status == 2) {
       return 0;
@@ -390,7 +390,7 @@ int main(void) {
   cout << ">List " << db_list->size() << " element(s):\n";
   db_list->show(NULL, db_data_show);
 
-  db_close();
+  db.close();
 
 
   delete filter_handle;
@@ -398,34 +398,34 @@ int main(void) {
 
 
   /* List cannot be saved */
-  if ((status = db_open("test_db"))) {
+  if ((status = db.open())) {
     printf("db_open error status %u\n", status);
     if (status == 2) {
       return 0;
     }
   }
   system("chmod ugo-w test_db");
-  db_close();
+  db.close();
   printf("Error: %s\n", strerror(errno));
   system("chmod u+w test_db");
   system("rm -f test_db/lock");
 
   /* List cannot be read */
   system("chmod ugo-r test_db/list");
-  if ((status = db_open("test_db"))) {
+  if ((status = db.open())) {
     printf("Error: %s\n", strerror(errno));
   }
 
   /* List is garbaged */
   system("chmod u+r test_db/list");
   system("echo blah >> test_db/list");
-  if ((status = db_open("test_db"))) {
+  if ((status = db.open())) {
     printf("Error: %s\n", strerror(errno));
   }
 
   /* List is gone */
   remove("test_db/list");
-  if ((status = db_open("test_db"))) {
+  if ((status = db.open())) {
     printf("Error: %s\n", strerror(errno));
   }
 

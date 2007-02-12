@@ -23,28 +23,67 @@
 #error You must include list.h before db.h
 #endif
 
-/* Open database */
-extern int db_open(const string& db_path);
+#ifndef COMMON_H
+#error You must include common.h before db.h
+#endif
 
-/* Close database */
-extern void db_close(void);
+typedef struct {
+  char        *host;
+  filedata_t  filedata;
+  char        *link;
+  time_t      date_in;
+  time_t      date_out;
+} db_data_t;
 
-/* Check what needs to be done for given prefix (protocol://host/share) */
-extern int db_parse(
-  const string& prefix,
-  const string& real_path,
-  const string& mount_path,
-  List *list);
-
-/* Read file with given checksum, extract it to path */
-extern int db_read(const string& path, const string& checksum);
-
-/* Check database for missing/corrupted data */
-/* If local_db_path is empty, use already open database */
-/* If checksum is empty, scan all contents */
-/* If thorough is true, check for corruption */
-extern int db_scan(
-  const string& checksum = "",
-  bool thorough = false);
+class Database {
+  string _path;
+  int  save(
+    const string& filename,
+    List *list);
+  int  lock();
+  void unlock();
+  void list_free(List *list);
+public:
+  Database(const string& path) : _path(path) {}
+  /* Open database */
+  int  open();
+  /* Close database */
+  void close();
+  string mount() { return _path + "/mount"; }
+  /* Check what needs to be done for given host & path */
+  int  parse(
+    const string& prefix,
+    const string& real_path,
+    const string& mount_path,
+    List          *list);
+  /* Read file with given checksum, extract it to path */
+  int  read(
+    const string& path,
+    const string& checksum);
+  /* Check database for missing/corrupted data */
+  /* If local_db_path is empty, use already open database */
+  /* If checksum is empty, scan all contents */
+  /* If thorough is true, check for corruption */
+  int  scan(
+    const string& checksum = "",
+    bool thorough = false);
+// So I can test them
+  int  load(
+    const string &filename,
+    List *list);
+  int  obsolete(
+    const string& prefix,
+    const string& path,
+    const string& checksum);
+  int  organize(
+    const string& path,
+    int number);
+  int  write(
+    string          mount_path,
+    const char      *path,
+    const db_data_t *db_data,
+    char            *checksum,
+    int             compress);
+};
 
 #endif

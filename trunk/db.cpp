@@ -57,21 +57,12 @@ using namespace std;
 
 #define CHUNK 10240
 
-typedef struct {
-  char        *host;
-  filedata_t  filedata;
-  char        *link;
-  time_t      date_in;
-  time_t      date_out;
-} db_data_t;
-
 static List   *db_list = NULL;
-static string _path = "";
 
 /* Size of path being backed up */
 static int    backup_path_length = 0;
 
-static int db_load(const string &filename, List *list) {
+int Database::load(const string &filename, List *list) {
   string  source_path;
   FILE    *readfile;
   int     failed = 0;
@@ -190,7 +181,7 @@ static int db_load(const string &filename, List *list) {
   return failed;
 }
 
-static int db_save(const string& filename, List *list) {
+int Database::save(const string& filename, List *list) {
   string  temp_path;
   FILE    *writefile;
   int     failed = 0;
@@ -243,7 +234,7 @@ static char *db_data_get(const void *payload) {
   return string;
 }
 
-static int db_organize(const string& path, int number) {
+int Database::organize(const string& path, int number) {
   DIR           *directory;
   struct dirent *dir_entry;
   string        nofiles;
@@ -307,7 +298,7 @@ static int db_organize(const string& path, int number) {
   return failed;
 }
 
-static void db_list_free(List *list) {
+void Database::list_free(List *list) {
   list_entry_t *entry = NULL;
 
   while ((entry = list->next(entry)) != NULL) {
@@ -320,7 +311,7 @@ static void db_list_free(List *list) {
   delete list;
 }
 
-static int db_write(
+int Database::write(
     string          mount_path,
     const char      *path,
     const db_data_t *db_data,
@@ -428,15 +419,15 @@ static int db_write(
       /* Now dest_path is /path/to/checksum */
       listfile = dest_path.substr(_path.size() + 1) + "/list";
       list = new List(db_data_get);
-      if (db_load(listfile, list) == 2) {
+      if (load(listfile, list) == 2) {
         cerr << "db: write: failed to open data list" << endl;
       } else {
         strcpy(new_db_data.filedata.checksum, checksum_dest);
         entry = list->add(&new_db_data);
-        db_save(listfile, list);
+        save(listfile, list);
         list->remove(entry);
       }
-      db_list_free(list);
+      list_free(list);
     }
   }
 
@@ -448,14 +439,14 @@ static int db_write(
     if (pos != string::npos) {
       dest_path.erase(pos);
       /* Now dest_path is /path/to */
-      db_organize(dest_path, 256);
+      organize(dest_path, 256);
     }
   }
 
   return failed;
 }
 
-static int db_obsolete(
+int Database::obsolete(
     const string& prefix,
     const string& path,
     const string& checksum) {
@@ -471,7 +462,7 @@ static int db_obsolete(
   listfile = temp_path.substr(_path.size() + 1) + "/list";
 
   list = new List(db_data_get);
-  if (db_load(listfile.c_str(), list) == 2) {
+  if (load(listfile, list) == 2) {
     cerr << "db: obsolete: failed to open data list" << endl;
   } else {
     db_data_t     *db_data;
@@ -483,21 +474,20 @@ static int db_obsolete(
     if (entry != NULL) {
       db_data = (db_data_t *) (list_entry_payload(entry));
       db_data->date_out = time(NULL);
-      db_save(listfile.c_str(), list);
+      save(listfile, list);
     }
   }
-  db_list_free(list);
+  list_free(list);
 
   return failed;
 }
 
-static int db_lock(const string& path) {
+int Database::lock() {
   string  lock_path;
   FILE    *file;
   int     status = 0;
 
   /* Set the database path that we just locked as default */
-  _path = path;
   lock_path = _path + "/lock";
 
   /* Try to open lock file for reading: check who's holding the lock */
@@ -538,30 +528,30 @@ static int db_lock(const string& path) {
   return status;
 }
 
-static void db_unlock(const string& path) {
+void Database::unlock() {
   string lock_path = _path + "/lock";
-
-  _path = "";
   remove(lock_path.c_str());
 }
 
-
-int db_open(const string& path) {
+int Database::open() {
   int status;
 
   /* Take lock */
-  if (db_lock(path)) {
+  if (lock()) {
     errno = ENOLCK;
     return 2;
   }
 
+  /* Check that mount dir exists, if not create it */
+  if (testdir(_path + "/mount", true) == 2) {
+    cerr << "db: open: cannot create mount point" << endl;
+    status = 2;
+  } else
+
   /* Check that data dir and list file exist, if not create them */
-  _path = path;
-  string data_path = _path + "/data";
-  status = testdir(data_path, 1);
-  if (status == 1) {
-    data_path = _path + "/list";
-    if (testfile(data_path, 1) == 2) {
+  if ((status = testdir(_path + "/data", true)) == 1) {
+    if (testfile(_path + "/list", true) == 2) {
+      cerr << "db: open: cannot create list file" << endl;
       status = 2;
     } else if (verbosity() > 0) {
       cout << "Database initialized" << endl;
@@ -574,7 +564,7 @@ int db_open(const string& path) {
   /* Read database active items list */
   if (status != 2) {
     db_list = new List(db_data_get);
-    db_load("list", db_list);
+    load("list", db_list);
     switch (errno) {
       case 0:
         if ((verbosity() > 0) && (status == 0)) {
@@ -593,13 +583,22 @@ int db_open(const string& path) {
           status = 2;
         }
         break;
+      case EACCES:
+        cerr << "db: open: permission to read list denied" << endl;
+        status = 2;
+        break;
+      case EUCLEAN:
+        cerr << "db: open: list corrupted" << endl;
+        status = 2;
+        break;
       default:
+        cerr << "db: open: " << strerror(errno) << endl;
         status = 2;
     }
   }
 
   if (status == 2) {
-    db_unlock(path);
+    unlock();
     return 2;
   }
   return 0;
@@ -617,7 +616,7 @@ static char *close_select(const void *payload) {
   return string;
 }
 
-void db_close(void) {
+void Database::close() {
   List      *active_list = new List();
   List      *removed_list = new List();
   time_t    localtime;
@@ -629,33 +628,33 @@ void db_close(void) {
     char *daily_list = NULL;
 
     asprintf(&daily_list, "list_%02u", localtime_brokendown.tm_mday);
-    db_save(daily_list, db_list);
+    save(daily_list, db_list);
     free(daily_list);
   }
 
   /* Also load previously removed items into list */
   /* TODO What do we do if this fails? Recover? */
-  db_load("removed", db_list);
+  load("removed", db_list);
 
   /* Split list into active and removed records */
   db_list->select("@", close_select, active_list, removed_list);
 
   /* Save active list */
-  if (db_save("list", active_list)) {
+  if (save("list", active_list)) {
     cerr << "db: close: failed to save active items list" << endl;
   }
   active_list->deselect();
   delete active_list;
 
   /* Save removed list */
-  if (db_save("removed", removed_list)) {
+  if (save("removed", removed_list)) {
     cerr << "db: close: failed to save removed items list" << endl;
   }
   removed_list->deselect();
   delete removed_list;
 
   /* Release lock */
-  db_unlock(_path);
+  unlock();
   if (verbosity() > 0) {
     cout << "Database closed (total contents: "
       << db_list->size() << " file";
@@ -664,7 +663,7 @@ void db_close(void) {
     }
     cout << ")" << endl;
   }
-  db_list_free(db_list);
+  list_free(db_list);
 }
 
 static char *parse_select(const void *payload) {
@@ -709,7 +708,7 @@ static int parse_compare(void *db_data_p, void *filedata_p) {
   return result;
 }
 
-int db_parse(
+int Database::parse(
     const string& host,
     const string& real_path,
     const string& mount_path,
@@ -770,7 +769,7 @@ int db_parse(
           /* Checksum given by the compare function */
           strcpy(db_data->filedata.checksum, filedata->checksum);
         } else {
-          if (db_write(mount_path, filedata->path, db_data,
+          if (write(mount_path, filedata->path, db_data,
               db_data->filedata.checksum, 0)) {
             /* Write failed, need to go on */
             failed = 1;
@@ -808,7 +807,7 @@ int db_parse(
       || ((volume += db_data->filedata.metadata.size) >= 10000000)) {
         copied = 0;
         volume = 0;
-        db_save("list", db_list);
+        save("list", db_list);
       }
       if (verbosity() > 2) {
         filesbackedup++;
@@ -842,7 +841,7 @@ int db_parse(
       if (S_ISREG(db_data->filedata.metadata.type)
        && (db_data->filedata.checksum[0] != '\0')
        && (db_data->filedata.checksum[0] != 'N')) {
-        db_obsolete(db_data->host, db_data->filedata.path,
+        obsolete(db_data->host, db_data->filedata.path,
           db_data->filedata.checksum);
       }
     }
@@ -860,7 +859,7 @@ int db_parse(
   return 0;
 }
 
-int db_read(const string& path, const string& checksum) {
+int Database::read(const string& path, const string& checksum) {
   string  source_path;
   string  temp_path;
   char    temp_checksum[256];
@@ -876,7 +875,7 @@ int db_read(const string& path, const string& checksum) {
   temp_path = path + ".part";
 
   /* Copy file to temporary name (size not checked: checksum suffices) */
-  if (zcopy(source_path.c_str(), temp_path.c_str(), NULL, NULL, temp_checksum, NULL, 0)) {
+  if (zcopy(source_path, temp_path, NULL, NULL, temp_checksum, NULL, 0)) {
     cerr << "db: read: failed to copy file: " << source_path << endl;
     failed = 2;
   } else
@@ -902,7 +901,7 @@ int db_read(const string& path, const string& checksum) {
   return failed;
 }
 
-int db_scan(const string& checksum, bool thorough) {
+int Database::scan(const string& checksum, bool thorough) {
   int failed = 0;
   char checksum_real[256];
 
@@ -930,7 +929,7 @@ int db_scan(const string& checksum, bool thorough) {
       }
       files--;
       if (strlen(db_data->filedata.checksum)
-       && db_scan(db_data->filedata.checksum, thorough)) {
+       && scan(db_data->filedata.checksum, thorough)) {
         strcpy(db_data->filedata.checksum, "N");
         failed = 1;
         if (! terminating() && verbosity() > 1) {
@@ -980,7 +979,7 @@ int db_scan(const string& checksum, bool thorough) {
       List    *list;
 
       list = new List(db_data_get);
-      if (db_load(listfile, list) == 2) {
+      if (load(listfile, list) == 2) {
         errno = EUCLEAN;
         filefailed = true;
         cerr << "db: scan: failed to open list for checksum " << checksum << endl;
@@ -1011,7 +1010,7 @@ int db_scan(const string& checksum, bool thorough) {
           }
         }
       }
-      db_list_free(list);
+      list_free(list);
 
       // Remove corrupted file if any
       if (filefailed) {

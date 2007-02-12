@@ -68,7 +68,7 @@ Options: username= password=
 Database initialized
  --> mount -t nfs -o ro,noatime,nolock myClient:/home/User/devel test_db/mount
 Client unreachable 'myClient' using protocol 'nfs'
- --> mount -t cifs -o ro,noatime,nocase,username=Myself,password=flesyM //myClient/c$ test_db/mount > /dev/null 2>&1
+ --> mount -t cifs -o ro,noatime,nocase,username=Myself,password=flesyM //myClient/C$ test_db/mount > /dev/null 2>&1
 Client unreachable 'myClient2' using protocol 'smb'
  --> mount -t cifs -o ro,noatime,nocase,username=user,iocharset=utf8 //Client/c$ test_db/mount > /dev/null 2>&1
 Client unreachable 'Client' using protocol 'smb'
