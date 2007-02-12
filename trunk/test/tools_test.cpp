@@ -156,5 +156,59 @@ int main(void) {
   cout << "fedc76test6 status: " << getdir("test_db", "fedc76test6", path)
     << ", path: " << path << endl;
 
+  cout << endl << "Test: params_readline" << endl;
+  char   keyword[256];
+  char   type[256];
+  string s;
+
+  line = "";
+  cout << "Read " << params_readline(line, keyword, type, &s)
+    << " parameters from " << line << ": '" << keyword << "' '" << type
+    << "' '" << s << "'" <<  endl;
+  line = "# Normal comment";
+  cout << "Read " << params_readline(line, keyword, type, &s)
+    << " parameters from " << line << ": '" << keyword << "' '" << type
+    << "' '" << s << "'" <<  endl;
+  line = " \t# Displaced comment";
+  cout << "Read " << params_readline(line, keyword, type, &s)
+    << " parameters from " << line << ": '" << keyword << "' '" << type
+    << "' '" << s << "'" <<  endl;
+  line = "\tkey # Comment";
+  cout << "Read " << params_readline(line, keyword, type, &s)
+    << " parameters from " << line << ": '" << keyword << "' '" << type
+    << "' '" << s << "'" <<  endl;
+  line = "key\t \"string\" # Comment";
+  cout << "Read " << params_readline(line, keyword, type, &s)
+    << " parameters from " << line << ": '" << keyword << "' '" << type
+    << "' '" << s << "'" <<  endl;
+  line = "key \ttype\t\"string\" # Comment";
+  cout << "Read " << params_readline(line, keyword, type, &s)
+    << " parameters from " << line << ": '" << keyword << "' '" << type
+    << "' '" << s << "'" <<  endl;
+  line = "key\t string \t# Comment";
+  cout << "Read " << params_readline(line, keyword, type, &s)
+    << " parameters from " << line << ": '" << keyword << "' '" << type
+    << "' '" << s << "'" <<  endl;
+  line = "key \ttype\t string # Comment";
+  cout << "Read " << params_readline(line, keyword, type, &s)
+    << " parameters from " << line << ": '" << keyword << "' '" << type
+    << "' '" << s << "'" <<  endl;
+  line = "key \ttype \t\"string # Comment";
+  cout << "Read " << params_readline(line, keyword, type, &s)
+    << " parameters from " << line << ": '" << keyword << "' '" << type
+    << "' '" << s << "'" <<  endl;
+  line = "key \ttype string\" # Comment";
+  cout << "Read " << params_readline(line, keyword, type, &s)
+    << " parameters from " << line << ": '" << keyword << "' '" << type
+    << "' '" << s << "'" <<  endl;
+  line = "key\t \"this is\ta \tstring\" # Comment";
+  cout << "Read " << params_readline(line, keyword, type, &s)
+    << " parameters from " << line << ": '" << keyword << "' '" << type
+    << "' '" << s << "'" <<  endl;
+  line = "key \ttype\t \"this is\ta \tstring\" # Comment";
+  cout << "Read " << params_readline(line, keyword, type, &s)
+    << " parameters from " << line << ": '" << keyword << "' '" << type
+    << "' '" << s << "'" <<  endl;
+
   return 0;
 }

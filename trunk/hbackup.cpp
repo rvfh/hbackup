@@ -24,7 +24,6 @@ using namespace std;
 #include <signal.h>
 #include <errno.h>
 
-#include "params.h"
 #include "list.h"
 #include "tools.h"
 #include "metadata.h"

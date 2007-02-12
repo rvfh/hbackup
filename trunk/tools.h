@@ -77,4 +77,8 @@ extern int zcopy(
 
 extern int getchecksum(const string& path, const char *checksum);
 
+/* Read parameters from line */
+extern int params_readline(string line, char *keyword, char *type,
+  string *);
+
 #endif
