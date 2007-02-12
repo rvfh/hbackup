@@ -1,4 +1,3 @@
-iterate_directory
 >List 27 file(s):
 -> cvs
 -> cvs/CVS
@@ -91,7 +90,7 @@ as previous with CVS parser
 -> testdir
 -> testfile
 -> testfile~
-filelist_new, as previous
+as previous
 >List 13 file(s):
 -> cvs
 -> cvs/dirbad

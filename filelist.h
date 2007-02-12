@@ -39,16 +39,22 @@
 #error You must include filters.h before filelist.h
 #endif
 
-/* Create list of files from path, using filters */
-extern int filelist_new(
-  const char    *path,
-  const Filter  *filter,
-  const List    *parsers);
+#ifndef PARSERS_H
+#error You must include parsers.h before filelist.h
+#endif
 
-/* Destroy list of files */
-extern void filelist_free(void);
-
-/* Obtain list of files */
-extern List *filelist_get(void);
+class FileList {
+  List          *_files;
+  const Filter  *_filter_handle;
+  const List    *_parsers_handle;
+  int           _mount_path_length;
+  int           iterate_directory(const string& path, parser_t *parser);
+public:
+  FileList(
+    const string& mount_path,
+    const Filter  *filter,
+    const List    *parsers);
+  List *getList();
+};
 
 #endif
