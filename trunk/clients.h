@@ -19,21 +19,36 @@
 #ifndef CLIENT_H
 #define CLIENT_H
 
+class Option {
+  string _name;
+  string _value;
+public:
+  Option(const string& name, const string& value) : _name(name), _value(value) {}
+  string name() { return _name; }
+  string value() { return _value; }
+  string option() {
+    if (_name.size() != 0)
+      return _name + "=" + _value;
+    else
+      return _value;
+  }
+};
+
 class Client {
   string _name;
+  vector<Option> _options;
   string _host_or_ip;
   string _protocol;
-  string _username;
-  string _password;
   string _listfile;
   int mount_share(const string& mount_point, const string& path);
   int unmount_share(const string& mount_point);
 public:
   Client(string name);
+  void addOption(const string& name, const string& value) {
+    _options.push_back(Option(name, value));
+  }
   void setHostOrIp(string value);
   void setProtocol(string value);
-  void setUsername(string value);
-  void setPassword(string value);
   void setListfile(string value);
   int  backup(string mount_point, bool configcheck = false);
   void show();

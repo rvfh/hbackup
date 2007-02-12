@@ -234,11 +234,8 @@ int main(int argc, char **argv) {
           if (! strcmp(keyword, "protocol")) {
             client->setProtocol(value);
           } else
-          if (! strcmp(keyword, "username")) {
-            client->setUsername(value);
-          } else
-          if (! strcmp(keyword, "password")) {
-            client->setPassword(value);
+          if (! strcmp(keyword, "option")) {
+            client->addOption(type, value);
           } else
           if (! strcmp(keyword, "listfile")) {
             client->setListfile(value);

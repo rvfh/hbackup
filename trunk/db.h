@@ -42,7 +42,7 @@ extern int db_read(const string& path, const string& checksum);
 /* Check database for missing/corrupted data */
 /* If local_db_path is empty, use already open database */
 /* If checksum is empty, scan all contents */
-/* TODO If thorough is true, check for corruption */
+/* If thorough is true, check for corruption */
 extern int db_scan(
   const string& checksum = "",
   bool thorough = false);
