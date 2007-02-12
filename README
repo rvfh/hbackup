@@ -11,11 +11,33 @@ that are on a server somewhere, itself with its own backup system?
 SERVER CONFIGURATION
 
 The default configuration file is /etc/hbackup.conf, and can be overriden using
-the -c option. Only two keywords are acceptable there: 'db' and 'client'.
-* db gives the backup database path. The default is '/hbackup'. Syntax:
-  db "<path to backup database>"
-* client gives the necessary information for all clients to backup. Syntax:
-  client <protocol>://[<username>[:<password>]@]<hostname> "<path to list>"
+the -c option. The following keywords are acceptable there:
+* db gives the backup database path. The default is '/hbackup'.
+  Syntax:  db "<path to backup database>"
+  Example: db "/backup"
+* client gives the client name.
+  Syntax:  client "<client desired name>"
+  Example: client "montblanc"
+
+The client keyword can be followed by the following keywords:
+* protocol is mandatory and can be file, smb or nfs.
+  Syntax:  protocol "<protocol name>"
+  Example: protocol "smb"
+* listfile is mandatory as it gives the path to the backup list file.
+  Syntax:         listfile "<path to file>"
+  Example (smb):  listfile "C:/Backup/hbackup.list"
+  Example (file): listfile "/etc/hbackup.list"
+* hostname is required for smb and nfs protocols.
+  Syntax:               hostname "<host name or IP address>"
+  Example (name):       hostname "everest"
+  Example (IP address): hostname "192.168.0.2"
+* option can be used to specify any file system option.
+  Syntax:  option <option name>
+  Syntax:  option <option name> "<option value>"
+  Example: option nocase
+  Example: option nolock
+  Example: option username "herve"
+  Example: option iocharset "utf8"
 
 CLIENT CONFIGURATION
 
@@ -62,5 +84,5 @@ There are four modes:
 Only one parser is implemented at the moment:
 * cvs: this parser does not check for file modification
 
-Note: parsers that do not check for file modification return a special code, and
-all controlled files get backed up if mod was chosen (all files if mod+oth).
+Note: parsers that do not check for file modification backup all controlled
+files if mod was chosen or all files if mod+oth was chosen.

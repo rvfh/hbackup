@@ -89,8 +89,9 @@ listfile "$CONFIGDIR/localhost.list"
 
 client client
 protocol smb
-username Myself
-password flesyM
+option username Myself
+option password flesyM
+option nocase
 hostname myClient
 listfile "C:\Backup\Backup.LST"
 

@@ -93,19 +93,19 @@ int Client::mount_share(const string& mount_point, const string& client_path) {
     command += "-t nfs -o ro,noatime,nolock "+ share + " " + mount_point;
   } else
   if (_protocol == "smb") {
-    command += "-t smbfs -o ro,noatime,nocase,iocharset=utf8,codepage=858";
+    // codepage=858
+    command += "-t cifs -o ro,noatime,nocase";
 
-    if (_username != "") {
-      command += ",username=" + _username;
-
-      if (_password != "") {
-        command += ",password=" + _password;
-      }
+    for (unsigned int i = 0; i < _options.size(); i++ ) {
+      command += "," + _options[i].option();
     }
     command += " " + share + " " + mount_point + " > /dev/null 2>&1";
   }
 
   /* Issue mount command */
+  if (verbosity() > 2) {
+    cout << " --> " << command << endl;
+  }
   result = system(command.c_str());
   if (result != 0) {
     errno = ETIMEDOUT;
@@ -129,12 +129,7 @@ void Client::setHostOrIp(string value) {
 void Client::setProtocol(string value) {
   _protocol = string(value);
 }
-void Client::setUsername(string value) {
-  _username = string(value);
-}
-void Client::setPassword(string value) {
-  _password = string(value);
-}
+
 void Client::setListfile(string value) {
   _listfile = string(value);
 }
@@ -142,19 +137,18 @@ void Client::setListfile(string value) {
 void Client::show() {
   cout << "-> " << _protocol << "://";
   if (_host_or_ip != "") {
-    if (_username != "") {
-      cout << _username;
-
-      if (_password != "") {
-        cout << ":" << _password;
-      }
-      cout << "@";
-    }
     cout << _host_or_ip;
   } else {
     cout << "localhost";
   }
   cout << " " << _listfile << endl;
+  if (_options.size() > 0) {
+    cout << "Options:";
+    for (unsigned int i = 0; i < _options.size(); i++ ) {
+      cout << " " + _options[i].option();
+    }
+    cout << endl;
+  }
 }
 
 static int add_filter(Filter *handle, const char *type, const char *string) {

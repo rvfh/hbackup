@@ -75,8 +75,8 @@ int main(void) {
   clients->push_back(client);
   client->setProtocol("smb");
   client->setHostOrIp("myClient");
-  client->setUsername("Myself");
-  client->setPassword("flesyM");
+  client->addOption("username", "Myself");
+  client->addOption("password", "flesyM");
   client->setListfile("C:\\Backup\\Backup.LST");
   printf(">List %u client(s):\n", clients->size());
   for (unsigned int i = 0; i < clients->size(); i++) {
@@ -95,7 +95,8 @@ int main(void) {
   clients->push_back(client);
   client->setProtocol("smb");
   client->setHostOrIp("Client");
-  client->setUsername("user");
+  client->addOption("username", "user");
+  client->addOption("iocharset", "utf8");
   client->setListfile("c:/home/BlaH/Backup.list");
   printf(">List %u client(s):\n", clients->size());
   for (unsigned int i = 0; i < clients->size(); i++) {
@@ -105,8 +106,9 @@ int main(void) {
   clients->push_back(client);
   client->setProtocol("smb");
   client->setHostOrIp("Client");
-  client->setUsername("user");
-  client->setPassword("");
+  client->addOption("", "nocase");
+  client->addOption("username", "user");
+  client->addOption("password", "");
   client->setListfile("c:/home/BlaH/Backup.list");
   printf(">List %u client(s):\n", clients->size());
   for (unsigned int i = 0; i < clients->size(); i++) {
@@ -116,7 +118,7 @@ int main(void) {
   clients->push_back(client);
   client->setProtocol("smb");
   client->setHostOrIp("Client");
-  client->setUsername("");
+  client->addOption("username", "");
   client->setListfile("c:/home/BlaH/Backup.list");
   printf(">List %u client(s):\n", clients->size());
   for (unsigned int i = 0; i < clients->size(); i++) {
@@ -126,8 +128,8 @@ int main(void) {
   clients->push_back(client);
   client->setProtocol("smb");
   client->setHostOrIp("Client");
-  client->setUsername("");
-  client->setPassword("");
+  client->addOption("username", "");
+  client->addOption("password", "");
   client->setListfile("c:/home/BlaH/Backup.list");
   printf(">List %u client(s):\n", clients->size());
   for (unsigned int i = 0; i < clients->size(); i++) {
