@@ -25,7 +25,7 @@
 
 /* File data */
 typedef struct {
-  char        *path;
+  string      path;
   char        checksum[36];
   metadata_t  metadata;
 } filedata_t;

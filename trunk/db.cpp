@@ -92,10 +92,10 @@ int Database::load(const string &filename, List *list) {
         failed = 0;
         switch (++field) {
           case 1:   /* Prefix */
-            asprintf(&db_data.host, "%s", string);
+            db_data.host = string;
             break;
           case 2:   /* Path */
-            asprintf(&db_data.filedata.path, "%s", string);
+            db_data.filedata.path = string;
             break;
           case 3:   /* Type */
             if (sscanf(string, "%c", &letter) != 1) {
@@ -129,7 +129,7 @@ int Database::load(const string &filename, List *list) {
             }
             break;
           case 9:   /* Link */
-            asprintf(&db_data.link, "%s", string);
+            db_data.link = string;
             break;
           case 10:  /* Checksum */
             strcpy(db_data.filedata.checksum, string);
@@ -154,12 +154,6 @@ int Database::load(const string &filename, List *list) {
         }
         start = delim + 1;
         if (failed) {
-          if (field >= 1) {
-            free(db_data.host);
-          }
-          if (field >= 9) {
-            free(db_data.link);
-          }
           break;
         }
       }
@@ -193,20 +187,15 @@ int Database::save(const string& filename, List *list) {
 
     while ((entry = list->next(entry)) != NULL) {
       db_data_t *db_data = (db_data_t *) (list_entry_payload(entry));
-      char *link = "";
 
-      /* The link could also be stored as data... */
-      if (db_data->link != NULL) {
-        link = db_data->link;
-      }
       fprintf(writefile,
         "%s\t%s\t%c\t%ld\t%ld\t%u\t%u\t%o\t%s\t%s\t%ld\t%ld\t%c\n",
-        db_data->host, db_data->filedata.path,
+        db_data->host.c_str(), db_data->filedata.path.c_str(),
         type_letter(db_data->filedata.metadata.type),
         db_data->filedata.metadata.size, db_data->filedata.metadata.mtime,
         db_data->filedata.metadata.uid, db_data->filedata.metadata.gid,
-        db_data->filedata.metadata.mode, link, db_data->filedata.checksum,
-        db_data->date_in, db_data->date_out, '-');
+        db_data->filedata.metadata.mode, db_data->link.c_str(),
+        db_data->filedata.checksum, db_data->date_in, db_data->date_out, '-');
     }
     fclose(writefile);
 
@@ -225,11 +214,12 @@ static char *db_data_get(const void *payload) {
 
   if (db_data->date_out == 0) {
     /* '@' > '9' */
-    asprintf(&string, "%s %s %c", db_data->host, db_data->filedata.path, '@');
+    asprintf(&string, "%s %s %c", db_data->host.c_str(),
+      db_data->filedata.path.c_str(), '@');
   } else {
     /* ' ' > '0' */
-    asprintf(&string, "%s %s %11ld", db_data->host, db_data->filedata.path,
-      db_data->date_out);
+    asprintf(&string, "%s %s %11ld", db_data->host.c_str(),
+      db_data->filedata.path.c_str(), db_data->date_out);
   }
   return string;
 }
@@ -298,22 +288,9 @@ int Database::organize(const string& path, int number) {
   return failed;
 }
 
-void Database::list_free(List *list) {
-  list_entry_t *entry = NULL;
-
-  while ((entry = list->next(entry)) != NULL) {
-    db_data_t *db_data = (db_data_t *) (list_entry_payload(entry));
-
-    free(db_data->host);
-    free(db_data->link);
-    free(db_data->filedata.path);
-  }
-  delete list;
-}
-
 int Database::write(
-    string          mount_path,
-    const char      *path,
+    const string&   mount_path,
+    const string&   path,
     const db_data_t *db_data,
     char            *checksum,
     int             compress) {
@@ -427,7 +404,7 @@ int Database::write(
         save(listfile, list);
         list->remove(entry);
       }
-      list_free(list);
+      delete list;
     }
   }
 
@@ -477,7 +454,7 @@ int Database::obsolete(
       save(listfile, list);
     }
   }
-  list_free(list);
+  delete list;
 
   return failed;
 }
@@ -663,7 +640,7 @@ void Database::close() {
     }
     cout << ")" << endl;
   }
-  list_free(db_list);
+  delete db_list;
 }
 
 static char *parse_select(const void *payload) {
@@ -674,7 +651,7 @@ static char *parse_select(const void *payload) {
     /* This string cannot be matched */
     asprintf(&string, "\t");
   } else {
-    asprintf(&string, "%s", db_data->filedata.path);
+    asprintf(&string, "%s", db_data->filedata.path.c_str());
   }
   return string;
 }
@@ -687,7 +664,7 @@ static int parse_compare(void *db_data_p, void *filedata_p) {
 
   /* If paths differ, that's all we want to check */
   if ((result = strcmp(&db_data->filedata.path[backup_path_length],
-      filedata->path))) {
+      filedata->path.c_str()))) {
     return result;
   }
   /* If the file has been modified, just return 1 or -1 and that should do */
@@ -757,10 +734,10 @@ int Database::parse(
       filedata_t *filedata = (filedata_t *) (list_entry_payload(entry));
       db_data_t  *db_data  = new db_data_t;
 
-      asprintf(&db_data->host, "%s", host.c_str());
+      db_data->host = host;
       db_data->filedata.metadata = filedata->metadata;
-      asprintf(&db_data->filedata.path, "%s/%s", real_path.c_str(), filedata->path);
-      db_data->link = NULL;
+      db_data->filedata.path = real_path + "/" + filedata->path;
+      db_data->link = "";
       db_data->date_in = time(NULL);
       db_data->date_out = 0;
       /* Save new data */
@@ -775,8 +752,8 @@ int Database::parse(
             failed = 1;
             if (! terminating()) {
               /* Don't signal errors on termination */
-              fprintf(stderr, "\r%s: %s, ignoring\n",
-                  strerror(errno), db_data->filedata.path);
+              cerr << "\r" << strerror(errno) << ": "
+                << db_data->filedata.path << ", ignoring" << endl;
             }
             strcpy(db_data->filedata.checksum, "N");
           }
@@ -794,11 +771,11 @@ int Database::parse(
 
         if ((size = readlink(full_path.c_str(), link, FILENAME_MAX)) < 0) {
           failed = 1;
-          fprintf(stderr, "\r%s: %s, ignoring\n",
-            strerror(errno), db_data->filedata.path);
+          cerr << "\r" << strerror(errno) << ": "
+            << db_data->filedata.path << ", ignoring" << endl;
         } else {
           link[size] = '\0';
-          asprintf(&db_data->link, "%s", link);
+          db_data->link = link;
         }
         free(link);
       }
@@ -934,8 +911,8 @@ int Database::scan(const string& checksum, bool thorough) {
         failed = 1;
         if (! terminating() && verbosity() > 1) {
           struct tm *time;
-          printf(" -> Client:      %s\n", db_data->host);
-          printf(" -> File name:   %s\n", db_data->filedata.path);
+          cout << " -> Client:      " << db_data->host << endl;
+          cout << " -> File name:   " << db_data->filedata.path << endl;
           time = localtime(&db_data->filedata.metadata.mtime);
           printf(" -> Modified:    %04u-%02u-%02u %2u:%02u:%02u\n",
             time->tm_year + 1900, time->tm_mon + 1, time->tm_mday,
@@ -1010,7 +987,7 @@ int Database::scan(const string& checksum, bool thorough) {
           }
         }
       }
-      list_free(list);
+      delete list;
 
       // Remove corrupted file if any
       if (filefailed) {

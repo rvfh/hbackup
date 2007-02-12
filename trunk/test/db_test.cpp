@@ -25,26 +25,22 @@ static int verbose = 3;
 static char *file_data_show(const void *payload) {
   char *string = NULL;
 
-  asprintf(&string, "%s", ((filedata_t *) payload)->path);
+  asprintf(&string, "%s", ((filedata_t *) payload)->path.c_str());
   return string;
 }
 
 static char *db_data_show(const void *payload) {
   const db_data_t *db_data = (db_data_t *) payload;
-  char  *link = "";
   char *string = NULL;
 
-  if (db_data->link != NULL) {
-    link = db_data->link;
-  }
   /* Times are omitted here... */
   asprintf(&string, "'%s' '%s' %c %ld %d %u %u 0%o '%s' %s %d %d %c",
-    db_data->host, db_data->filedata.path,
+    db_data->host.c_str(), db_data->filedata.path.c_str(),
     type_letter(db_data->filedata.metadata.type),
     db_data->filedata.metadata.size,
     db_data->filedata.metadata.mtime || 0, db_data->filedata.metadata.uid,
-    db_data->filedata.metadata.gid, db_data->filedata.metadata.mode, link,
-    db_data->filedata.checksum, db_data->date_in || 0,
+    db_data->filedata.metadata.gid, db_data->filedata.metadata.mode,
+    db_data->link.c_str(), db_data->filedata.checksum, db_data->date_in || 0,
     db_data->date_out || 0, '-');
   return string;
 }
@@ -123,7 +119,7 @@ int main(void) {
 
   /* Write check */
   db_data.filedata.path = "test/testfile";
-  metadata_get(db_data.filedata.path, &db_data.filedata.metadata);
+  metadata_get(db_data.filedata.path.c_str(), &db_data.filedata.metadata);
   db_data.host = "this is a host";
   db_data.link = "this is a link";
   db_data.date_in = time(NULL);

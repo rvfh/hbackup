@@ -16,6 +16,7 @@
      Boston, MA 02111-1307, USA.
 */
 
+#include <iostream>
 #include "cvs_parser.cpp"
 
 static char *cvs_show(const void *payload) {
@@ -55,33 +56,33 @@ int main(void) {
   } else {
     ((List *) handle2)->show(NULL, cvs_show);
     /* Files */
-    strcpy(file_data.path, "test/cvs/nofile");
+    file_data.path = "test/cvs/nofile";
     if (cvs_file_check(handle2, &file_data) == parser_file_other) {
-      printf("%s is not under CVS control\n", file_data.path);
+      cout << file_data.path << " is not under CVS control" << endl;
     }
-    strcpy(file_data.path, "test/cvs/filenew.c");
+    file_data.path = "test/cvs/filenew.c";
     if (cvs_file_check(handle2, &file_data) == parser_file_other) {
-      printf("%s is not under CVS control\n", file_data.path);
+      cout << file_data.path << " is not under CVS control" << endl;
     }
-    strcpy(file_data.path, "test/cvs/filemod.o");
+    file_data.path = "test/cvs/filemod.o";
     if (cvs_file_check(handle2, &file_data) == parser_file_other) {
-      printf("%s is not under CVS control\n", file_data.path);
+      cout << file_data.path << " is not under CVS control" << endl;
     }
-    strcpy(file_data.path, "test/cvs/fileutd.h");
+    file_data.path = "test/cvs/fileutd.h";
     if (cvs_file_check(handle2, &file_data) == parser_file_other) {
-      printf("%s is not under CVS control\n", file_data.path);
+      cout << file_data.path << " is not under CVS control" << endl;
     }
-    strcpy(file_data.path, "test/cvs/fileoth");
+    file_data.path = "test/cvs/fileoth";
     if (cvs_file_check(handle2, &file_data) == parser_file_other) {
-      printf("%s is not under CVS control\n", file_data.path);
+      cout << file_data.path << " is not under CVS control" << endl;
     }
-    strcpy(file_data.path, "test/cvs/dirutd");
+    file_data.path = "test/cvs/dirutd";
     if (cvs_file_check(handle2, &file_data) == parser_file_other) {
-      printf("%s is not under CVS control\n", file_data.path);
+      cout << file_data.path << " is not under CVS control" << endl;
     }
-    strcpy(file_data.path, "test/cvs/diroth");
+    file_data.path = "test/cvs/diroth";
     if (cvs_file_check(handle2, &file_data) == parser_file_other) {
-      printf("%s is not under CVS control\n", file_data.path);
+      cout << file_data.path << " is not under CVS control" << endl;
     }
     cvs_dir_leave(handle2);
   }
@@ -90,11 +91,11 @@ int main(void) {
     printf("test/cvs/dirutd is not under CVS control\n");
   } else {
     ((List *) handle3)->show(NULL, cvs_show);
-    strcpy(file_data.path, "test/cvs/dirutd/fileutd");
+    file_data.path = "test/cvs/dirutd/fileutd";
     if (cvs_file_check(handle3, &file_data) == parser_file_other) {
-      printf("%s is not under CVS control\n", file_data.path);
+      cout << file_data.path << " is not under CVS control" << endl;
     }
-    strcpy(file_data.path, "test/cvs/dirutd/fileoth");
+    file_data.path = "test/cvs/dirutd/fileoth";
     if (cvs_file_check(handle3, &file_data) == parser_file_other) {
       printf("test/cvs/dirutd/fileoth is not under CVS control\n");
     }
@@ -105,13 +106,13 @@ int main(void) {
     printf("test/cvs/dirbad is not under CVS control\n");
   } else {
     ((List *) handle4)->show(NULL, cvs_show);
-    strcpy(file_data.path, "test/cvs/dirbad/fileutd");
+    file_data.path = "test/cvs/dirbad/fileutd";
     if (cvs_file_check(handle4, &file_data) == parser_file_other) {
-      printf("%s is not under CVS control\n", file_data.path);
+      cout << file_data.path << " is not under CVS control" << endl;
     }
-    strcpy(file_data.path, "test/cvs/dirbad/fileoth");
+    file_data.path = "test/cvs/dirbad/fileoth";
     if (cvs_file_check(handle4, &file_data) == parser_file_other) {
-      printf("%s is not under CVS control\n", file_data.path);
+      cout << file_data.path << " is not under CVS control" << endl;
     }
     cvs_dir_leave(handle4);
   }
@@ -127,26 +128,25 @@ int main(void) {
     printf("test/cvs is not under CVS control\n");
   } else {
     ((List *) handle)->show(NULL, cvs_show);
-    strcpy(file_data.path, "test/cvs/fileutd");
+    file_data.path = "test/cvs/fileutd";
     if (cvs_parser->file_check(handle, &file_data) == parser_file_other) {
-      printf("%s is not under CVS control\n", file_data.path);
+      cout << file_data.path << " is not under CVS control" << endl;
     }
-    strcpy(file_data.path, "test/cvs/fileoth");
+    file_data.path = "test/cvs/fileoth";
     if (cvs_parser->file_check(handle, &file_data) == parser_file_other) {
-      printf("%s is not under CVS control\n", file_data.path);
+      cout << file_data.path << " is not under CVS control" << endl;
     }
-    strcpy(file_data.path, "test/cvs/dirutd");
+    file_data.path = "test/cvs/dirutd";
     if (cvs_parser->file_check(handle, &file_data) == parser_file_other) {
-      printf("%s is not under CVS control\n", file_data.path);
+      cout << file_data.path << " is not under CVS control" << endl;
     }
-    strcpy(file_data.path, "test/cvs/diroth");
+    file_data.path = "test/cvs/diroth";
     if (cvs_parser->file_check(handle, &file_data) == parser_file_other) {
-      printf("%s is not under CVS control\n", file_data.path);
+      cout << file_data.path << " is not under CVS control" << endl;
     }
     cvs_parser->dir_leave(handle);
   }
   parsers_free(parsers_handle);
-  free(file_data.path);
 
   return 0;
 }
