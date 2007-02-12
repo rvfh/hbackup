@@ -28,64 +28,52 @@ int terminating(void) {
 }
 
 int main(int argc, char *argv[]) {
-  Filter *test_filter_handle = NULL;
-  List *test_parsers_handle = NULL;
-  int status;
+  Filter  *test_filter_handle = NULL;
+  List    *test_parsers_handle = NULL;
+  int     status;
 
   test_filter_handle = new Filter;
   /* Make sure filenew List uses the filters */
-  filter_handle = test_filter_handle;
   if ((status = parsers_new(&test_parsers_handle))) {
-    printf("parsers_new error status %u\n", status);
+    cout << "parsers_new error status " << status << endl;
   }
-  parsers_handle = test_parsers_handle;
-  mount_path_length = 4;
 
-  printf("iterate_directory\n");
-  files = new List(filedata_get);
-  if (! iterate_directory("test", NULL)) {
-    cout << ">List " << files->size() << " file(s):\n";
-    files->show();
+  FileList file_list1("test", test_filter_handle, test_parsers_handle);
+  if (file_list1.getList() != NULL) {
+    cout << ">List " << file_list1.getList()->size() << " file(s):\n";
+    file_list1.getList()->show();
   }
-  delete files;
 
-  printf("as previous with subdir in ignore list\n");
-  test_filter_handle->push_back(new Rule(new Condition(S_IFDIR, filter_path_start, "subdir")));
-  files = new List(filedata_get);
-  if (! iterate_directory("test", NULL)) {
-    cout << ">List " << files->size() << " file(s):\n";
-    files->show();
+  cout << "as previous with subdir in ignore list" << endl;
+  test_filter_handle->push_back(new Rule(new Condition(S_IFDIR,
+    filter_path_start, "subdir")));
+  FileList file_list2("test", test_filter_handle, test_parsers_handle);
+  if (file_list2.getList() != NULL) {
+    cout << ">List " << file_list2.getList()->size() << " file(s):\n";
+    file_list2.getList()->show();
   }
-  delete files;
 
-  printf("as previous with testlink in ignore list\n");
+  cout << "as previous with testlink in ignore list" << endl;
   test_filter_handle->push_back(new Rule(new Condition(S_IFLNK, filter_path_start, "testlink")));
-  files = new List(filedata_get);
-  if (! iterate_directory("test", NULL)) {
-    cout << ">List " << files->size() << " file(s):\n";
-    files->show();
+  FileList file_list3("test", test_filter_handle, test_parsers_handle);
+  if (file_list3.getList() != NULL) {
+    cout << ">List " << file_list3.getList()->size() << " file(s):\n";
+    file_list3.getList()->show();
   }
-  delete files;
 
-  printf("as previous with CVS parser\n");
+  cout << "as previous with CVS parser" << endl;
   parsers_add(test_parsers_handle, parser_controlled, cvs_parser_new());
-  files = new List(filedata_get);
-  if (! iterate_directory("test", NULL)) {
-    cout << ">List " << files->size() << " file(s):\n";
-    files->show();
+  FileList file_list4("test", test_filter_handle, test_parsers_handle);
+  if (file_list4.getList() != NULL) {
+    cout << ">List " << file_list4.getList()->size() << " file(s):\n";
+    file_list4.getList()->show();
   }
-  delete files;
 
-  /* Now make sure we don't mess with private data */
-  filter_handle = NULL;
-  parsers_handle = NULL;
-  mount_path_length = 0;
-
-  printf("filelist_new, as previous\n");
-  if (! filelist_new("test", test_filter_handle, test_parsers_handle)) {
-    cout << ">List " << files->size() << " file(s):\n";
-    files->show();
-    filelist_free();
+  cout << "as previous" << endl;
+  FileList file_list5("test", test_filter_handle, test_parsers_handle);
+  if (file_list5.getList() != NULL) {
+    cout << ">List " << file_list5.getList()->size() << " file(s):\n";
+    file_list5.getList()->show();
   }
 
   delete test_filter_handle;

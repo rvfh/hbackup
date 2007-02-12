@@ -37,7 +37,6 @@ using namespace std;
 #include <string>
 #include <sys/types.h>
 #include <dirent.h>
-#include "hbackup.h"
 #include "list.h"
 #include "metadata.h"
 #include "common.h"
@@ -45,15 +44,6 @@ using namespace std;
 #include "parsers.h"
 #include "tools.h"
 #include "filelist.h"
-
-using namespace std;
-
-/* Mount point string length */
-static int mount_path_length = 0;
-
-static List         *files          = NULL;
-static const Filter *filter_handle = NULL;
-static const List   *parsers_handle = NULL;
 
 static char *filedata_get(const void *payload) {
   const filedata_t *filedata = (const filedata_t *) (payload);
@@ -63,7 +53,7 @@ static char *filedata_get(const void *payload) {
   return string;
 }
 
-static int iterate_directory(const char *path, parser_t *parser) {
+int FileList::iterate_directory(const string& path, parser_t *parser) {
   void          *handle;
   filedata_t    filedata;
   filedata_t    *filedata_p;
@@ -71,31 +61,31 @@ static int iterate_directory(const char *path, parser_t *parser) {
   struct dirent *dir_entry;
 
   if (verbosity() > 3) {
-    printf(" --> Dir: %s\n", &path[mount_path_length]);
+    cout << " --> Dir: " << path.substr(_mount_path_length) << endl;
   }
   /* Check whether directory is under SCM control */
-  if (parsers_dir_check(parsers_handle, &parser, &handle, path) == 2) {
+  if (parsers_dir_check(_parsers_handle, &parser, &handle, path.c_str()) == 2) {
     return 0;
   }
-  directory = opendir(path);
+  directory = opendir(path.c_str());
   if (directory == NULL) {
-    fprintf(stderr, "filelist: cannot open directory: %s\n", path);
+    cerr << "filelist: cannot open directory: " << path << endl;
     return 2;
   }
   while (((dir_entry = readdir(directory)) != NULL) && ! terminating()) {
-    char *file_path;
-    int  failed = 0;
+    string  file_path;
+    int     failed = 0;
 
     /* Ignore . and .. */
     if (! strcmp(dir_entry->d_name, ".") || ! strcmp(dir_entry->d_name, "..")){
       continue;
     }
-    asprintf(&file_path, "%s/%s", path, dir_entry->d_name);
+    file_path = path + "/" + dir_entry->d_name;
     /* Remove mount path and leading slash from records */
-    filedata.path = &file_path[mount_path_length + 1];
+    filedata.path = file_path.substr(_mount_path_length + 1);
     strcpy(filedata.checksum, "");
-    if (metadata_get(file_path, &filedata.metadata)) {
-      fprintf(stderr, "filelist: cannot get metadata: %s\n", file_path);
+    if (metadata_get(file_path.c_str(), &filedata.metadata)) {
+      cerr << "filelist: cannot get metadata: " << file_path << endl;
       failed = 2;
     } else
     /* Let the parser analyse the file data to know whether to back it up */
@@ -103,24 +93,23 @@ static int iterate_directory(const char *path, parser_t *parser) {
       failed = 1;
     } else
     /* Now pass it through the filters */
-    if ((filter_handle != NULL) && ! filter_handle->match(&filedata)) {
+    if ((_filter_handle != NULL) && ! _filter_handle->match(&filedata)) {
       failed = 1;
     } else
     if (S_ISDIR(filedata.metadata.type)) {
       filedata.metadata.size = 0;
       if (iterate_directory(file_path, parser)) {
         if (! terminating()) {
-          fprintf(stderr, "filelist: cannot iterate into directory: %s\n",
-            dir_entry->d_name);
+          cerr << "filelist: cannot iterate into directory: "
+            << dir_entry->d_name << endl;
         }
         failed = 2;
       }
     }
-    free(file_path);
     if (! failed) {
       filedata_p = new filedata_t;
       *filedata_p = filedata;
-      files->add(filedata_p);
+      _files->add(filedata_p);
     }
   }
   closedir(directory);
@@ -130,27 +119,20 @@ static int iterate_directory(const char *path, parser_t *parser) {
   return 0;
 }
 
-int filelist_new(const char *path, const Filter *filter, const List *parsers) {
-  filter_handle = filter;
-  parsers_handle = parsers;
-  files = new List(filedata_get);
-  if (files == NULL) {
-    fprintf(stderr, "filelist: new: cannot initialise\n");
-    return 2;
+FileList::FileList(
+    const string& mount_path,
+    const Filter  *filter,
+    const List    *parsers) {
+  _filter_handle = filter;
+  _parsers_handle = parsers;
+  _files = new List(filedata_get);
+  _mount_path_length = mount_path.size();
+  if (iterate_directory(mount_path, NULL)) {
+    delete _files;
+    _files = NULL;
   }
-  mount_path_length = strlen(path);
-  if (iterate_directory(path, NULL)) {
-    filelist_free();
-    return 1;
-  }
-  return 0;
 }
 
-void filelist_free(void) {
-  delete files;
+List *FileList::getList() {
+  return _files;
 }
-
-List *filelist_get(void) {
-  return files;
-}
-

@@ -100,12 +100,14 @@ int main(void) {
   filter_handle->push_back(new Rule(new Condition(S_IFREG, filter_path_end, "~")));
   filter_handle->push_back(new Rule(new Condition(S_IFREG, filter_path_regexp, "\\.o$")));
 
-  if ((status = filelist_new("test////", filter_handle, parsers_handle))) {
-    printf("file_list_new error status %u\n", status);
+  FileList *file_list;
+  file_list = new FileList("test////", filter_handle, parsers_handle);
+  if (file_list->getList() == NULL) {
+    cout << "file_list_new error status " << status << endl;
     return 0;
   }
-  printf(">List %u file(s):\n", filelist_get()->size());
-  filelist_get()->show(NULL, file_data_show);
+  cout << ">List " << file_list->getList()->size() << " file(s):" << endl;
+  file_list->getList()->show(NULL, file_data_show);
 
   Database db("test_db");
 
@@ -152,7 +154,7 @@ int main(void) {
   }
 
   if ((status = db.parse("file://host", "/home/user", "test",
-      filelist_get()))) {
+      file_list->getList()))) {
     printf("db.parse error status %u\n", status);
     db.close();
     return 0;
@@ -173,31 +175,32 @@ int main(void) {
   db_list->show(NULL, db_data_show);
 
   if ((status = db.parse("file://host", "/home/user", "test",
-      filelist_get()))) {
+      file_list->getList()))) {
     printf("db.parse error status %u\n", status);
     db.close();
     return 0;
   }
   cout << ">List " << db_list->size() << " element(s):\n";
   db_list->show(NULL, db_data_show);
-  filelist_free();
+  delete file_list;
 
-  if ((status = filelist_new("test2", filter_handle, parsers_handle))) {
-    printf("file_list_new error status %u\n", status);
+  file_list = new FileList("test2", filter_handle, parsers_handle);
+  if (file_list->getList() == NULL) {
+    cout << "file_list_new error status " << status << endl;
     return 0;
   }
-  cout << ">List " << filelist_get()->size() << " file(s):\n";
-  filelist_get()->show(NULL, file_data_show);
+  cout << ">List " << file_list->getList()->size() << " file(s):" << endl;
+  file_list->getList()->show(NULL, file_data_show);
 
   if ((status = db.parse("file://host", "/home/user2", "test2",
-      filelist_get()))) {
+      file_list->getList()))) {
     printf("db.parse error status %u\n", status);
     db.close();
     return 0;
   }
   cout << ">List " << db_list->size() << " element(s):\n";
   db_list->show(NULL, db_data_show);
-  filelist_free();
+  delete file_list;
 
   verbose = 2;
   if ((status = db.scan("59ca0efa9f5633cb0371bbc0355478d8-0"))) {
@@ -286,15 +289,16 @@ int main(void) {
   cout << ">List " << db_list->size() << " element(s):\n";
   db_list->show(NULL, db_data_show);
 
-  if ((status = filelist_new("test////", filter_handle, parsers_handle))) {
-    printf("file_list_new error status %u\n", status);
+  file_list = new FileList("test////", filter_handle, parsers_handle);
+  if (file_list->getList() == NULL) {
+    cout << "file_list_new error status " << status << endl;
     return 0;
   }
-  cout << ">List " << filelist_get()->size() << " file(s):\n";
-  filelist_get()->show(NULL, file_data_show);
+  cout << ">List " << file_list->getList()->size() << " file(s):" << endl;
+  file_list->getList()->show(NULL, file_data_show);
 
   if ((status = db.parse("file://host", "/home/user", "test",
-      filelist_get()))) {
+      file_list->getList()))) {
     printf("db.parse error status %u\n", status);
     db.close();
     return 0;
@@ -318,15 +322,16 @@ int main(void) {
 
   remove("test/testfile");
 
-  if ((status = filelist_new("test////", filter_handle, parsers_handle))) {
-    printf("file_list_new error status %u\n", status);
+  file_list = new FileList("test////", filter_handle, parsers_handle);
+  if (file_list->getList() == NULL) {
+    cout << "file_list_new error status " << status << endl;
     return 0;
   }
-  cout << ">List " << filelist_get()->size() << " file(s):\n";
-  filelist_get()->show(NULL, file_data_show);
+  cout << ">List " << file_list->getList()->size() << " file(s):" << endl;
+  file_list->getList()->show(NULL, file_data_show);
 
   if ((status = db.parse("file://host", "/home/user", "test",
-      filelist_get()))) {
+      file_list->getList()))) {
     printf("db.parse error status %u\n", status);
     db.close();
     return 0;
@@ -335,41 +340,43 @@ int main(void) {
   db_list->show(NULL, db_data_show);
   cout << ">List " << db_list->size() << " element(s):\n";
   db_list->show(NULL, parse_select);
-  filelist_free();
+  delete file_list;
 
-  if ((status = filelist_new("test////", filter_handle, parsers_handle))) {
-    printf("file_list_new error status %u\n", status);
+  file_list = new FileList("test////", filter_handle, parsers_handle);
+  if (file_list->getList() == NULL) {
+    cout << "file_list_new error status " << status << endl;
     return 0;
   }
-  cout << ">List " << filelist_get()->size() << " file(s):\n";
-  filelist_get()->show(NULL, file_data_show);
+  cout << ">List " << file_list->getList()->size() << " file(s):" << endl;
+  file_list->getList()->show(NULL, file_data_show);
 
   if ((status = db.parse("file://host", "/home/user", "test",
-      filelist_get()))) {
+      file_list->getList()))) {
     printf("db.parse error status %u\n", status);
     db.close();
     return 0;
   }
   cout << ">List " << db_list->size() << " element(s):\n";
   db_list->show(NULL, db_data_show);
-  filelist_free();
+  delete file_list;
 
-  if ((status = filelist_new("test2", filter_handle, parsers_handle))) {
-    printf("file_list_new error status %u\n", status);
+  file_list = new FileList("test2", filter_handle, parsers_handle);
+  if (file_list->getList() == NULL) {
+    cout << "file_list_new error status " << status << endl;
     return 0;
   }
-  cout << ">List " << filelist_get()->size() << " file(s):\n";
-  filelist_get()->show(NULL, file_data_show);
+  cout << ">List " << file_list->getList()->size() << " file(s):" << endl;
+  file_list->getList()->show(NULL, file_data_show);
 
   if ((status = db.parse("file://host", "/home/user2", "test2",
-      filelist_get()))) {
+      file_list->getList()))) {
     printf("db.parse error status %u\n", status);
     db.close();
     return 0;
   }
   cout << ">List " << db_list->size() << " element(s):\n";
   db_list->show(NULL, db_data_show);
-  filelist_free();
+  delete file_list;
 
   db.organize("test_db/data", 2);
 

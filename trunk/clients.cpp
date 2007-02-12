@@ -389,25 +389,26 @@ int Client::backup(
             clientfailed = 1;
         }
 
-        if ( ! clientfailed
-          && ! filelist_new(backup_path.c_str(), backup->ignore_handle,
-            backup->parsers_handle)) {
-          if (verbosity() > 1) {
-            printf(" -> Parsing list of files\n");
-          }
-          pathtolinux(backup->path);
-          if (db.parse(_protocol + "://" + _name, backup->path, backup_path,
-                filelist_get())) {
+        if (! clientfailed) {
+          FileList file_list(backup_path, backup->ignore_handle,
+              backup->parsers_handle);
+          if (file_list.getList() != NULL) {
+            if (verbosity() > 1) {
+              printf(" -> Parsing list of files\n");
+            }
+            pathtolinux(backup->path);
+            if (db.parse(_protocol + "://" + _name, backup->path, backup_path,
+                  file_list.getList())) {
+              failed        = 1;
+            }
+          } else {
+            // prepare_share sets errno
+            if (! terminating()) {
+              fprintf(stderr, "clients: backup: list creation failed\n");
+            }
             failed        = 1;
+            clientfailed  = 1;
           }
-          filelist_free();
-        } else {
-          // prepare_share sets errno
-          if (! terminating()) {
-            fprintf(stderr, "clients: backup: list creation failed\n");
-          }
-          failed        = 1;
-          clientfailed  = 1;
         }
 
         /* Free encapsulated data */
