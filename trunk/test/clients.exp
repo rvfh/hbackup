@@ -56,11 +56,11 @@ Client unreachable 'Client' using protocol 'smb'
 Client unreachable 'Client2' using protocol 'smb'
 Client unreachable 'Client3' using protocol 'smb'
 Client unreachable 'Client4' using protocol 'smb'
-Database closed (total contents: 0 file(s))
+Database closed (total contents: 0 files)
  --> Client: testhost
 >List 1 client(s):
 -> file://localhost etc/localhost.list
-Database opened (active contents: 0 file(s))
+Database opened (active contents: 0 files)
 Backup client 'testhost' using protocol 'file'
  -> Reading backup list file
  --> Path: test
@@ -75,11 +75,11 @@ Backup path 'test2'
  -> Parsing list of files
  --> Files to add: 5 (928768 bytes)
  --> Done: 1/5 (0.0%) --> Done: 2/5 (15.7%) --> Done: 3/5 (43.6%) --> Done: 4/5 (100.0%) --> Done: 5/5 (100.0%) --> No files to remove
-Database closed (total contents: 16 file(s))
+Database closed (total contents: 16 files)
  --> Client: testhost
 >List 1 client(s):
 -> file://localhost etc/localhost.list
-Database opened (active contents: 16 file(s))
+Database opened (active contents: 16 files)
 Backup client 'testhost' using protocol 'file'
  -> Reading backup list file
  --> Path: test
@@ -94,4 +94,4 @@ Backup path 'test2'
  -> Parsing list of files
  --> No files to add
  --> No files to remove
-Database closed (total contents: 16 file(s))
+Database closed (total contents: 16 files)

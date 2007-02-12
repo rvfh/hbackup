@@ -578,8 +578,12 @@ int db_open(const string& path) {
     switch (errno) {
       case 0:
         if ((verbosity() > 0) && (status == 0)) {
-          printf("Database opened (active contents: %u file(s))\n",
-            db_list->size());
+          cout << "Database opened (active contents: "
+            << db_list->size() << " file";
+          if (db_list->size() != 1) {
+            cout << "s";
+          }
+          cout << ")" << endl;
         }
         break;
       case ENOENT:
@@ -653,8 +657,12 @@ void db_close(void) {
   /* Release lock */
   db_unlock(_path);
   if (verbosity() > 0) {
-    printf("Database closed (total contents: %u file(s))\n",
-      db_list->size());
+    cout << "Database closed (total contents: "
+      << db_list->size() << " file";
+    if (db_list->size() != 1) {
+      cout << "s";
+    }
+    cout << ")" << endl;
   }
   db_list_free(db_list);
 }
@@ -894,206 +902,125 @@ int db_read(const string& path, const string& checksum) {
   return failed;
 }
 
-int db_scan(const string& local_db_path, const string& checksum) {
-  int failed = 0;
-
-  if (local_db_path != "") {
-    if (db_lock(local_db_path)) {
-      fprintf(stderr, "db: scan: failed to lock\n");
-      return 2;
-    }
-
-    db_list = new List(db_data_get);
-    failed = db_load("list", db_list) | db_load("removed", db_list);
-    if (failed) {
-      fprintf(stderr, "db: scan: failed to read lists\n");
-      failed = 2;
-    }
-  }
-
-  if (! failed) {
-    if (checksum == "") {
-      list_entry_t *entry = NULL;
-      int          files = db_list->size();
-
-      if (verbosity() > 0) {
-        printf("Scanning database (contents: %u file(s))\n", files);
-      }
-      while ((entry = db_list->next(entry)) != NULL) {
-        db_data_t *db_data = (db_data_t *) (list_entry_payload(entry));
-
-        if ((verbosity() > 2) && ((files & 0xFF) == 0)) {
-          printf(" --> Files left to go: %u\n", files);
-        }
-        files--;
-        if (strlen(db_data->filedata.checksum)
-         && db_scan("", db_data->filedata.checksum)) {
-          failed = 1;
-          fprintf(stderr, "File data missing for checksum %s\n",
-            db_data->filedata.checksum);
-          if (! terminating() && verbosity() > 1) {
-            struct tm *time;
-            printf(" -> Client:      %s\n", db_data->host);
-            printf(" -> File name:   %s\n", db_data->filedata.path);
-            time = localtime(&db_data->filedata.metadata.mtime);
-            printf(" -> Modified:    %04u-%02u-%02u %2u:%02u:%02u\n",
-              time->tm_year + 1900, time->tm_mon + 1, time->tm_mday,
-              time->tm_hour, time->tm_min, time->tm_sec);
-            if (verbosity() > 2) {
-              time = localtime(&db_data->date_in);
-              printf(" --> Seen first: %04u-%02u-%02u %2u:%02u:%02u\n",
-                time->tm_year + 1900, time->tm_mon + 1, time->tm_mday,
-                time->tm_hour, time->tm_min, time->tm_sec);
-              if (db_data->date_out != 0) {
-                time = localtime(&db_data->date_out);
-                printf(" --> Seen gone:  %04u-%02u-%02u %2u:%02u:%02u\n",
-                  time->tm_year + 1900, time->tm_mon + 1, time->tm_mday,
-                  time->tm_hour, time->tm_min, time->tm_sec);
-              }
-            }
-          }
-        }
-        if (terminating()) {
-          failed = 3;
-          break;
-        }
-      }
-    } else if ((checksum[0] != 'N') && (checksum[0] != '\0')) {
-      string  path;
-
-      if (getdir(_path, checksum, path)) {
-        failed = 1;
-      } else {
-        string  test_path = path + "/data";
-
-        if (testfile(test_path, 0)) {
-          failed = 2;
-        }
-      }
-    }
-  }
-
-  if (local_db_path != "") {
-    db_list_free(db_list);
-    db_unlock(local_db_path);
-  }
-
-  return failed;
-}
-
-int db_check(const string& local_db_path, const string& checksum) {
+int db_scan(const string& checksum, bool thorough) {
   int failed = 0;
   char checksum_real[256];
 
-  if (local_db_path != "") {
-    if (db_lock(local_db_path)) {
-      fprintf(stderr, "db: check: failed to lock\n");
-      return 2;
+  if (checksum == "") {
+    list_entry_t *entry = NULL;
+    int          files = db_list->size();
+
+    if (verbosity() > 0) {
+      cout << "Scanning database contents";
+      if (thorough) {
+        cout << " thoroughly";
+      }
+      cout << ": " << db_list->size() << " file";
+      if (db_list->size() != 1) {
+        cout << "s";
+      }
+      cout << endl;
     }
 
-    db_list = new List(db_data_get);
-    failed = db_load("list", db_list) | db_load("removed", db_list);
-    if (failed) {
-      fprintf(stderr, "db: check: failed to read lists\n");
-      failed = 2;
-    }
-  }
+    while ((entry = db_list->next(entry)) != NULL) {
+      db_data_t *db_data = (db_data_t *) (list_entry_payload(entry));
 
-  if (! failed) {
-    if (checksum == "") {
-      list_entry_t *entry = NULL;
-      int          files = db_list->size();
-
-      if (verbosity() > 0) {
-        printf("Checking database (contents: %u file(s))\n",
-          db_list->size());
+      if ((verbosity() > 2) && ((files & 0xFF) == 0)) {
+        printf(" --> Files left to go: %u\n", files);
       }
-      while ((entry = db_list->next(entry)) != NULL) {
-        db_data_t *db_data = (db_data_t *) (list_entry_payload(entry));
-
-        if ((verbosity() > 2) && ((files & 0xFF) == 0)) {
-          printf(" --> Files left to go: %u\n", files);
-        }
-        files--;
-        if (strlen(db_data->filedata.checksum)) {
-          failed = db_check("", db_data->filedata.checksum);
-        }
-        if (terminating()) {
-          failed = 3;
-          break;
-        }
-      }
-    } else if ((checksum[0] != 'N') && (checksum[0] != '\0')) {
-      string  path;
-
-      if (getdir(_path, checksum, path)) {
-        failed = 2;
-      } else {
-        string  check_path;
-        string  listfile;
-        List    *list;
-
-        listfile = path.substr(_path.size() + 1) + "/list";
-        list = new List(db_data_get);
-        if (db_load(listfile, list) == 2) {
-          fprintf(stderr, "db: check: failed to open data list\n");
-        } else {
-          list_entry_t *entry = list->next(NULL);
-
-          if (entry == NULL) {
-            fprintf(stderr, "db: check: failed to obtain checksum\n");
-            failed = 2;
-          } else {
-            db_data_t *db_data = (db_data_t *) (list_entry_payload(entry));
-
-            /* Read file to compute checksum, compare with expected */
-            check_path = path + "/data";
-            if (getchecksum(check_path.c_str(), checksum_real) == 2) {
-              cerr << "File data missing for checksum " << checksum << endl;
-              failed = 1;
-            } else
-            if (strncmp(db_data->filedata.checksum, checksum_real,
-                  strlen(checksum_real)) != 0) {
-              if (! terminating()) {
-                cerr << "File data corrupted for checksum " << checksum
-                  << " (found to be " << checksum_real << ")" << endl;
-              }
-              failed = 1;
-            }
-
-            if (! terminating() && (failed == 1) && verbosity() > 1) {
-              struct tm *time;
-
-              printf(" -> Client:      %s\n", db_data->host);
-              printf(" -> File name:   %s\n", db_data->filedata.path);
-              time = localtime(&db_data->filedata.metadata.mtime);
-              printf(" -> Modified:    %04u-%02u-%02u %2u:%02u:%02u\n",
+      files--;
+      if (strlen(db_data->filedata.checksum)
+       && db_scan(db_data->filedata.checksum, thorough)) {
+        strcpy(db_data->filedata.checksum, "N");
+        failed = 1;
+        if (! terminating() && verbosity() > 1) {
+          struct tm *time;
+          printf(" -> Client:      %s\n", db_data->host);
+          printf(" -> File name:   %s\n", db_data->filedata.path);
+          time = localtime(&db_data->filedata.metadata.mtime);
+          printf(" -> Modified:    %04u-%02u-%02u %2u:%02u:%02u\n",
+            time->tm_year + 1900, time->tm_mon + 1, time->tm_mday,
+            time->tm_hour, time->tm_min, time->tm_sec);
+          if (verbosity() > 2) {
+            time = localtime(&db_data->date_in);
+            printf(" --> Seen first: %04u-%02u-%02u %2u:%02u:%02u\n",
+              time->tm_year + 1900, time->tm_mon + 1, time->tm_mday,
+              time->tm_hour, time->tm_min, time->tm_sec);
+            if (db_data->date_out != 0) {
+              time = localtime(&db_data->date_out);
+              printf(" --> Seen gone:  %04u-%02u-%02u %2u:%02u:%02u\n",
                 time->tm_year + 1900, time->tm_mon + 1, time->tm_mday,
                 time->tm_hour, time->tm_min, time->tm_sec);
-              if (verbosity() > 2) {
-                time = localtime(&db_data->date_in);
-                printf(" --> Seen first: %04u-%02u-%02u %2u:%02u:%02u\n",
-                  time->tm_year + 1900, time->tm_mon + 1, time->tm_mday,
-                  time->tm_hour, time->tm_min, time->tm_sec);
-                if (db_data->date_out != 0) {
-                  time = localtime(&db_data->date_out);
-                  printf(" --> Seen gone:  %04u-%02u-%02u %2u:%02u:%02u\n",
-                    time->tm_year + 1900, time->tm_mon + 1, time->tm_mday,
-                    time->tm_hour, time->tm_min, time->tm_sec);
-                }
-              }
             }
           }
         }
-        db_list_free(list);
+      }
+      if (terminating()) {
+        failed = 3;
+        break;
       }
     }
-  }
+  } else if (checksum[0] != 'N') {
+    string  path;
+    bool    filefailed = false;
 
-  if (local_db_path != "") {
-    db_list_free(db_list);
-    db_unlock(local_db_path);
-  }
+    if (getdir(_path, checksum, path)) {
+      errno = ENODATA;
+      filefailed = true;
+      cerr << "db: scan: failed to get directory for checksum " << checksum << endl;
+    } else
+    if (testfile(path + "/data", 0)) {
+      errno = ENOENT;
+      filefailed = true;
+      cerr << "db: scan: file data missing for checksum " << checksum << endl;
+    } else
+    if (thorough) {
+      string  check_path = path + "/data";
+      string  listfile = path.substr(_path.size() + 1) + "/list";
+      List    *list;
 
+      list = new List(db_data_get);
+      if (db_load(listfile, list) == 2) {
+        errno = EUCLEAN;
+        filefailed = true;
+        cerr << "db: scan: failed to open list for checksum " << checksum << endl;
+      } else {
+        list_entry_t *entry = list->next(NULL);
+
+        if (entry == NULL) {
+          errno = EUCLEAN;
+          filefailed = true;
+          cerr << "db: scan: list empty for checksum " << checksum << endl;
+        } else {
+          db_data_t *db_data = (db_data_t *) (list_entry_payload(entry));
+
+          /* Read file to compute checksum, compare with expected */
+          if (getchecksum(check_path.c_str(), checksum_real) == 2) {
+            errno = ENOENT;
+            filefailed = true;
+            cerr << "db: scan: file data missing for checksum " << checksum << endl;
+          } else
+          if (strncmp(db_data->filedata.checksum, checksum_real,
+                strlen(checksum_real)) != 0) {
+            errno = EILSEQ;
+            filefailed = true;
+            if (! terminating()) {
+              cerr << "db: scan: file data corrupted for checksum " << checksum
+                << " (found to be " << checksum_real << ")" << endl;
+            }
+          }
+        }
+      }
+      db_list_free(list);
+
+      // Remove corrupted file if any
+      if (filefailed) {
+        remove(check_path.c_str());
+      }
+    }
+    if (filefailed) {
+      failed = 1;
+    }
+  }
   return failed;
 }

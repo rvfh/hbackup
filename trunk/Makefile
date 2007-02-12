@@ -4,6 +4,7 @@ BUGFIX = 0
 
 AR := ar
 RANLIB := ranlib
+STRIP := strip
 CXXFLAGS := -Wall -O2 -ansi -pedantic
 LDFLAGS := -lssl -lz
 PREFIX := /usr/local/bin
@@ -65,3 +66,4 @@ version.h:
 %: %.o
 	@echo "BUILD	$@"
 	@$(CXX) $(LDFLAGS) -o $@ $^
+	@$(STRIP) $@

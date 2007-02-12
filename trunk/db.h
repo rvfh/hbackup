@@ -39,10 +39,12 @@ extern int db_parse(
 /* Read file with given checksum, extract it to path */
 extern int db_read(const string& path, const string& checksum);
 
-/* Check that data for given checksum exists (if NULL, scan all) */
-extern int db_scan(const string& local_db_path, const string& checksum);
-
-/* Check that data for given checksum is not corrupted (if NULL, check all) */
-extern int db_check(const string& local_db_path, const string& checksum);
+/* Check database for missing/corrupted data */
+/* If local_db_path is empty, use already open database */
+/* If checksum is empty, scan all contents */
+/* TODO If thorough is true, check for corruption */
+extern int db_scan(
+  const string& checksum = "",
+  bool thorough = false);
 
 #endif

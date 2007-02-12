@@ -266,27 +266,28 @@ int main(int argc, char **argv) {
         db_path = default_db_path;
       }
       /* Open backup database */
-      if (check) {
-        db_check(db_path, "");
-      } else
-      if (scan) {
-        db_scan(db_path, "");
-      } else
       if (db_open(db_path) == 2) {
         cerr << "Failed to open database in '" << db_path << "'" << endl;
         failed = 2;
       } else {
-        string mount_path = db_path + "/mount";
-
-        /* Make sure we have a mount path */
-        if (testdir(mount_path, 1) == 2) {
-          cerr << "Failed to create mount point" << endl;
-          failed = 2;
+        if (check) {
+          db_scan("", true);
         } else
+        if (scan) {
+          db_scan();
+        } else {
+          string mount_path = db_path + "/mount";
 
-        /* Backup */
-        if (clients.backup(mount_path, configcheck)) {
-          failed = 1;
+          /* Make sure we have a mount path */
+          if (testdir(mount_path, 1) == 2) {
+            cerr << "Failed to create mount point" << endl;
+            failed = 2;
+          } else
+
+          /* Backup */
+          if (clients.backup(mount_path, configcheck)) {
+            failed = 1;
+          }
         }
         db_close();
       }
