@@ -5,8 +5,7 @@ LDFLAGS := -lssl -lz
 
 all: test
 
-test:	params.done \
-	list.done \
+test:	list.done \
 	tools.done \
 	metadata.done \
 	filters.done \

@@ -26,7 +26,6 @@ using namespace std;
 
 #include "metadata.h"
 #include "common.h"
-#include "params.h"
 #include "tools.h"
 #include "list.h"
 #include "filters.h"
