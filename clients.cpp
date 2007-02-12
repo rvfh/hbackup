@@ -317,12 +317,9 @@ static int get_paths(
   } else
 
   if (protocol == "smb") {
-    *share = backup_path.substr(0,1) + "$";
-    strtolower(*share);
+    pathtolinux(backup_path);
+    *share = backup_path.substr(0,2);
     *path  = mount_point + "/" +  backup_path.substr(3);
-    /* Lower case */
-    strtolower(*path);
-    pathtolinux(*path);
     errno = 0;
     return 1;
   }
@@ -332,17 +329,17 @@ static int get_paths(
 }
 
 int Client::backup(
-    string  mount_point,
-    bool    configcheck) {
+    Database& db,
+    bool      configcheck) {
   int     failed = 0;
   List    *backups      = new List();
   int     clientfailed  = 0;
   string  share;
   string  list_path;
 
-  switch (get_paths(_protocol, _listfile, mount_point, &share, &list_path)) {
+  switch (get_paths(_protocol, _listfile, db.mount(), &share, &list_path)) {
     case 1:
-      mount_share(mount_point, share);
+      mount_share(db.mount(), share);
       break;
   }
   if (errno != 0) {
@@ -383,9 +380,9 @@ int Client::backup(
           }
         }
 
-        switch (get_paths(_protocol, backup->path, mount_point, &share, &backup_path)) {
+        switch (get_paths(_protocol, backup->path, db.mount(), &share, &backup_path)) {
           case 1:
-            if (mount_share(mount_point, share)) {
+            if (mount_share(db.mount(), share)) {
               clientfailed = 1;
             }
             break;
@@ -396,15 +393,12 @@ int Client::backup(
         if ( ! clientfailed
           && ! filelist_new(backup_path.c_str(), backup->ignore_handle,
             backup->parsers_handle)) {
-          string prefix;
-
           if (verbosity() > 1) {
             printf(" -> Parsing list of files\n");
           }
-          prefix = _protocol + "://" + _name;
-          strtolower(backup->path);
           pathtolinux(backup->path);
-          if (db_parse(prefix, backup->path, backup_path, filelist_get())) {
+          if (db.parse(_protocol + "://" + _name, backup->path, backup_path,
+                filelist_get())) {
             failed        = 1;
           }
           filelist_free();
@@ -435,6 +429,6 @@ int Client::backup(
   }
   /* Free backups list */
   delete backups;
-  unmount_share(mount_point); // does not change errno
+  unmount_share(db.mount()); // does not change errno
   return failed;
 }

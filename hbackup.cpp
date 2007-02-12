@@ -26,10 +26,10 @@ using namespace std;
 
 #include "params.h"
 #include "list.h"
-#include "db.h"
 #include "tools.h"
 #include "metadata.h"
 #include "common.h"
+#include "db.h"
 #include "filters.h"
 #include "parsers.h"
 #include "filelist.h"
@@ -258,35 +258,27 @@ int main(int argc, char **argv) {
     }
     config_file.close();
 
-    if (! failed && ! configcheck) {
+    if (! failed) {
       if (db_path == "") {
         db_path = default_db_path;
       }
       /* Open backup database */
-      if (db_open(db_path) == 2) {
-        cerr << "Failed to open database in '" << db_path << "'" << endl;
-        failed = 2;
-      } else {
+      Database db(db_path);
+      if (! db.open()) {
         if (check) {
-          db_scan("", true);
+          db.scan("", true);
         } else
         if (scan) {
-          db_scan();
+          db.scan();
         } else {
-          string mount_path = db_path + "/mount";
-
-          /* Make sure we have a mount path */
-          if (testdir(mount_path, 1) == 2) {
-            cerr << "Failed to create mount point" << endl;
-            failed = 2;
-          } else
-
           /* Backup */
-          if (clients.backup(mount_path, configcheck)) {
+          if (clients.backup(db, configcheck)) {
             failed = 1;
           }
         }
-        db_close();
+        db.close();
+      } else {
+        return 2;
       }
     }
   }
