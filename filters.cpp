@@ -16,6 +16,8 @@
      Boston, MA 02111-1307, USA.
 */
 
+using namespace std;
+
 #include <iostream>
 #include <stdarg.h>
 #include <regex.h>
@@ -35,7 +37,7 @@ Condition::Condition(
     case filter_path_end:
     case filter_path_start:
     case filter_path_regexp:
-      strncpy(_string, va_arg(args, char *), 255);
+      _string = va_arg(args, char *);
       _file_type  = file_type;
       break;
     case filter_size_above:
@@ -44,7 +46,7 @@ Condition::Condition(
       _file_type  = S_IFREG;
       break;
     default:
-      fprintf(stderr, "filters: add: unknown filter type\n");
+      cerr << "filters: add: unknown filter type" << endl;
   }
   va_end(args);
 }
@@ -57,26 +59,26 @@ int Condition::match(const filedata_t *filedata) const {
   /* Run conditions */
   switch(_type) {
   case filter_path_end: {
-    signed int diff = strlen(filedata->path) - strlen(_string);
+    signed int diff = filedata->path.size() - _string.size();
     if (diff < 0) {
       return 1;
     }
-    return strcmp(_string, &filedata->path[diff]); }
+    return _string != filedata->path.substr(diff); }
   case filter_path_start:
-    return strncmp(filedata->path, _string, strlen(_string));
+    return filedata->path.substr(0, _string.size()) != _string;
   case filter_path_regexp:
     regex_t regex;
-    if (regcomp(&regex, _string, REG_EXTENDED)) {
-      fprintf(stderr, "filters: regexp: incorrect expression\n");
+    if (regcomp(&regex, _string.c_str(), REG_EXTENDED)) {
+      cerr << "filters: regexp: incorrect expression" << endl;
       return 2;
     }
-    return regexec(&regex, filedata->path, 0, NULL, 0);
+    return regexec(&regex, filedata->path.c_str(), 0, NULL, 0);
   case filter_size_above:
     return filedata->metadata.size < _size;
   case filter_size_below:
     return filedata->metadata.size > _size;
   default:
-    fprintf(stderr, "filters: match: unknown condition type\n");
+    cerr << "filters: match: unknown condition type" << endl;
     return 2;
   }
   return 1;

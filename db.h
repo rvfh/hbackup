@@ -28,9 +28,9 @@
 #endif
 
 typedef struct {
-  char        *host;
+  string      host;
   filedata_t  filedata;
-  char        *link;
+  string      link;
   time_t      date_in;
   time_t      date_out;
 } db_data_t;
@@ -42,7 +42,6 @@ class Database {
     List *list);
   int  lock();
   void unlock();
-  void list_free(List *list);
 public:
   Database(const string& path) : _path(path) {}
   /* Open database */
@@ -79,8 +78,8 @@ public:
     const string& path,
     int number);
   int  write(
-    string          mount_path,
-    const char      *path,
+    const string&   mount_path,
+    const string&   path,
     const db_data_t *db_data,
     char            *checksum,
     int             compress);

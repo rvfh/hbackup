@@ -25,8 +25,6 @@
 #error You must include common.h before filters.h
 #endif
 
-using namespace std;
-
 /* The filter stores a list of rules, each containing a list of conditions.
  * A rule matches if all conditions in it match (AND)
  *    rule = condition AND condition AND ... AND condition
@@ -48,7 +46,7 @@ class Condition {
   filter_type_t _type;
   mode_t        _file_type;
   off_t         _size;
-  char          _string[256];
+  string        _string;
 public:
   Condition(
     mode_t file_type,

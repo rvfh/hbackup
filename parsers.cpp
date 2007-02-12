@@ -16,7 +16,9 @@
      Boston, MA 02111-1307, USA.
 */
 
-#include <stdlib.h>
+using namespace std;
+
+#include <string>
 #include "list.h"
 #include "metadata.h"
 #include "common.h"

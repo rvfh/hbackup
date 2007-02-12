@@ -31,12 +31,10 @@ Algorithm for temporary list creation:
      no: add to temporary list of files to be backed up
 */
 
-#ifndef _GNU_SOURCE
-#define _GNU_SOURCE
-#endif
-#include <stdlib.h>
+using namespace std;
+
 #include <iostream>
-#include <string.h>
+#include <string>
 #include <sys/types.h>
 #include <dirent.h>
 #include "hbackup.h"
@@ -61,7 +59,7 @@ static char *filedata_get(const void *payload) {
   const filedata_t *filedata = (const filedata_t *) (payload);
   char *string = NULL;
 
-  asprintf(&string, "%s", filedata->path);
+  asprintf(&string, "%s", filedata->path.c_str());
   return string;
 }
 
@@ -94,7 +92,7 @@ static int iterate_directory(const char *path, parser_t *parser) {
     }
     asprintf(&file_path, "%s/%s", path, dir_entry->d_name);
     /* Remove mount path and leading slash from records */
-    asprintf(&filedata.path, "%s", &file_path[mount_path_length + 1]);
+    filedata.path = &file_path[mount_path_length + 1];
     strcpy(filedata.checksum, "");
     if (metadata_get(file_path, &filedata.metadata)) {
       fprintf(stderr, "filelist: cannot get metadata: %s\n", file_path);
@@ -119,9 +117,7 @@ static int iterate_directory(const char *path, parser_t *parser) {
       }
     }
     free(file_path);
-    if (failed) {
-      free(filedata.path);
-    } else {
+    if (! failed) {
       filedata_p = new filedata_t;
       *filedata_p = filedata;
       files->add(filedata_p);
@@ -151,13 +147,6 @@ int filelist_new(const char *path, const Filter *filter, const List *parsers) {
 }
 
 void filelist_free(void) {
-  list_entry_t *entry = NULL;
-
-  while ((entry = files->next(entry)) != NULL) {
-    filedata_t *filedata = (filedata_t *) (list_entry_payload(entry));
-
-    delete filedata->path;
-  }
   delete files;
 }
 

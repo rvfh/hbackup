@@ -16,6 +16,8 @@
      Boston, MA 02111-1307, USA.
 */
 
+using namespace std;
+
 #include <string>
 #include "list.h"
 #include "metadata.h"
@@ -117,12 +119,12 @@ static parser_file_status_t cvs_file_check(void *list_handle,
     fprintf(stderr, "cvs parser: file check: not initialised\n");
     return parser_file_unknown;
   } else {
-    const char *file = strrchr(file_data->path, '/');
+    const char *file = strrchr(file_data->path.c_str(), '/');
 
     if (file != NULL) {
       file++;
     } else {
-      file = file_data->path;
+      file = file_data->path.c_str();
     }
     if (list->find(file, NULL, NULL)) {
       return parser_file_other;
