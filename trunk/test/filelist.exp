@@ -1,3 +1,5 @@
+filelist: directory should be controlled: test/cvs/dirbad
+filelist: directory should be controlled: test/cvs/dirbad
 >List 27 file(s):
 -> cvs
 -> cvs/CVS

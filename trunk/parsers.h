@@ -19,79 +19,33 @@
 #ifndef PARSERS_H
 #define PARSERS_H
 
-#ifndef LIST_H
-#error You must include list.h before parsers.h
+#ifndef PARSER_H
+#error You must include parser.h before parsers.h
 #endif
 
-#ifndef COMMON_H
-#error You must include common.h before parsers.h
-#endif
-
-/* Our enums */
-typedef enum {
-  parser_disabled,
-  parser_controlled,
-  parser_modified,
-  parser_modifiedandothers,
-  parser_others
-} parser_mode_t;
-
-typedef enum {
-  parser_dir_unknown,
-  parser_dir_controlled,
-  parser_dir_other
-} parser_dir_status_t;
-
-typedef enum {
-  parser_file_unknown,
-  parser_file_maybemodified,
-  parser_file_controlled,
-  parser_file_modified,
-  parser_file_other
-} parser_file_status_t;
-
-/* Type for function to check if a directory is under control and enter it */
-typedef parser_dir_status_t (parsers_dir_check_f) (void **dir_handle,
-  const char *dir_path);
-
-/* Type for function to leave a directory */
-typedef void (parsers_dir_leave_f) (void *dir_handle);
-
-/* Type for function to check whether a file is under control */
-typedef parser_file_status_t (parsers_file_check_f) (void *dir_handle,
-  const filedata_t *filedata);
-
-/* Our data */
-typedef struct {
-  parsers_dir_check_f   *dir_check;
-  parsers_dir_leave_f   *dir_leave;
-  parsers_file_check_f  *file_check;
-  parser_mode_t         mode;
-  char                  name[32];
-} parser_t;
-
-/* Create parsers list */
-extern int parsers_new(List **handle);
-
-/* Add to list of parsers */
-extern int parsers_add(List *handle, parser_mode_t mode, parser_t *parser);
-
-/* Destroy parsers list and all parsers */
-extern void parsers_free(List *handle);
-
-/* Check whether [a] parser matches. Returns:
- * 0: [a] parser matches (if *parser_handle not null, only test that parser)
- * 1: no parser matches
- * 2: *parser_handle not null but does not match
- */
-extern int parsers_dir_check(const void *parsers_handle,
-  parser_t **parser_handle, void **dir_handle, const char *path);
-
-/* Check whether [a] parser matches. Returns:
- * 0: match (use)
- * 1: no match (ignore)
- */
-extern int parsers_file_check(parser_t *parser_handle, void *dir_handle,
-  const filedata_t *filedata);
+class Parsers : public vector<Parser *> {
+public:
+  ~Parsers() {
+    for (unsigned int i = 0; i < this->size(); i++) {
+      delete (*this)[i];
+    }
+  }
+  Parser* isControlled(const string& dir_path) const {
+    Parser *parser;
+    for (unsigned int i = 0; i < this->size(); i++) {
+      parser = (*this)[i]->isControlled(dir_path);
+      if (parser != NULL) {
+        return parser;
+      }
+    }
+    return NULL;
+  }
+  void list() {
+    cout << "List: " << this->size() << " parser(s)" << endl;
+    for (unsigned int i = 0; i < this->size(); i++) {
+      cout << "-> " << (*this)[i]->name() << endl;
+    }
+  }
+};
 
 #endif

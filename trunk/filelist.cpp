@@ -41,40 +41,49 @@ using namespace std;
 #include "metadata.h"
 #include "common.h"
 #include "filters.h"
+#include "parser.h"
 #include "parsers.h"
 #include "tools.h"
 #include "filelist.h"
 
-static char *filedata_get(const void *payload) {
-  const filedata_t *filedata = (const filedata_t *) (payload);
-  char *string = NULL;
+static char *filedata_get(const void* payload) {
+  const filedata_t* filedata = (const filedata_t*) (payload);
+  char*             string   = NULL;
 
   asprintf(&string, "%s", filedata->path.c_str());
   return string;
 }
 
-int FileList::iterate_directory(const string& path, parser_t *parser) {
-  void          *handle;
-  filedata_t    filedata;
-  filedata_t    *filedata_p;
-  DIR           *directory;
-  struct dirent *dir_entry;
-
+int FileList::iterate_directory(const string& path, Parser* parser) {
   if (verbosity() > 3) {
     cout << " --> Dir: " << path.substr(_mount_path_length) << endl;
   }
   /* Check whether directory is under SCM control */
-  if (parsers_dir_check(_parsers_handle, &parser, &handle, path.c_str()) == 2) {
-    return 0;
+  if (_parsers != NULL) {
+    if (parser != NULL) {
+      // We have a parser, check this directory
+      if ((parser = parser->isControlled(path)) == NULL) {
+        // Parent is controlled so child should be
+        cerr << "filelist: directory should be controlled: " << path << endl;
+        parser = new IgnoreParser;
+      }
+    }
+    if (parser == NULL) {
+      // We don't have a parser [anymore], check this directory
+      parser = _parsers->isControlled(path);
+    }
+  } else {
+    parser = NULL;
   }
-  directory = opendir(path.c_str());
+  DIR* directory = opendir(path.c_str());
   if (directory == NULL) {
     cerr << "filelist: cannot open directory: " << path << endl;
     return 2;
   }
+  struct dirent *dir_entry;
   while (((dir_entry = readdir(directory)) != NULL) && ! terminating()) {
-    string  file_path;
-    int     failed = 0;
+    filedata_t  filedata;
+    string      file_path;
 
     /* Ignore . and .. */
     if (! strcmp(dir_entry->d_name, ".") || ! strcmp(dir_entry->d_name, "..")){
@@ -86,15 +95,15 @@ int FileList::iterate_directory(const string& path, parser_t *parser) {
     strcpy(filedata.checksum, "");
     if (metadata_get(file_path.c_str(), &filedata.metadata)) {
       cerr << "filelist: cannot get metadata: " << file_path << endl;
-      failed = 2;
+      continue;
     } else
     /* Let the parser analyse the file data to know whether to back it up */
-    if (parsers_file_check(parser, handle, &filedata)) {
-      failed = 1;
+    if ((parser != NULL) && (parser->ignore(&filedata))) {
+      continue;
     } else
     /* Now pass it through the filters */
-    if ((_filter_handle != NULL) && ! _filter_handle->match(&filedata)) {
-      failed = 1;
+    if ((_filters != NULL) && ! _filters->match(&filedata)) {
+      continue;
     } else
     if (S_ISDIR(filedata.metadata.type)) {
       filedata.metadata.size = 0;
@@ -103,14 +112,10 @@ int FileList::iterate_directory(const string& path, parser_t *parser) {
           cerr << "filelist: cannot iterate into directory: "
             << dir_entry->d_name << endl;
         }
-        failed = 2;
+        continue;
       }
     }
-    if (! failed) {
-      filedata_p = new filedata_t;
-      *filedata_p = filedata;
-      _files->add(filedata_p);
-    }
+    _files->add(new filedata_t(filedata));
   }
   closedir(directory);
   if (terminating()) {
@@ -120,11 +125,11 @@ int FileList::iterate_directory(const string& path, parser_t *parser) {
 }
 
 FileList::FileList(
-    const string& mount_path,
-    const Filter  *filter,
-    const List    *parsers) {
-  _filter_handle = filter;
-  _parsers_handle = parsers;
+    const string&   mount_path,
+    const Filter*   filters,
+    const Parsers*  parsers) {
+  _filters = filters;
+  _parsers = parsers;
   _files = new List(filedata_get);
   _mount_path_length = mount_path.size();
   if (iterate_directory(mount_path, NULL)) {
@@ -133,6 +138,6 @@ FileList::FileList(
   }
 }
 
-List *FileList::getList() {
+List* FileList::getList() {
   return _files;
 }

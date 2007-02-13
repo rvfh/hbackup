@@ -29,6 +29,7 @@ using namespace std;
 #include "tools.h"
 #include "list.h"
 #include "filters.h"
+#include "parser.h"
 #include "parsers.h"
 #include "filelist.h"
 #include "cvs_parser.h"
@@ -36,9 +37,9 @@ using namespace std;
 #include "clients.h"
 
 typedef struct {
-  string  path;
-  Filter  *ignore_handle;
-  List    *parsers_handle;
+  string    path;
+  Filter*   filters;
+  Parsers*  parsers;
 } path_t;
 
 static string mounted = "";
@@ -197,15 +198,20 @@ static int add_filter(Filter *handle, const char *type, const char *string) {
   return 0;
 }
 
-static int add_parser(List *handle, const char *type, const char *string) {
+static int add_parser(
+    Parsers*      parsers,
+    const string& type,
+    const string& string) {
   parser_mode_t mode;
 
   /* Determine mode */
-  if (! strcmp(type, "mod")) {
+  if (type == "mod") {
     mode = parser_modified;
-  } else if (! strcmp(type, "mod+oth")) {
+  } else
+  if (type == "mod+oth") {
     mode = parser_modifiedandothers;
-  } else if (! strcmp(type, "oth")) {
+  } else
+  if (type == "oth") {
     mode = parser_others;
   } else {
     /* Default */
@@ -213,8 +219,8 @@ static int add_parser(List *handle, const char *type, const char *string) {
   }
 
   /* Add specified parser */
-  if (! strcmp(string, "cvs")) {
-    parsers_add(handle, mode, cvs_parser_new());
+  if (string == "cvs") {
+    parsers->push_back(new CvsParser(mode));
   } else {
     return 1;
   }
@@ -260,21 +266,21 @@ static int read_listfile(const string& list_path, List *backups) {
           failed = 1;
         }
       } else if (! strcmp(keyword, "ignore")) {
-        if (add_filter(backup->ignore_handle, type, value.c_str())) {
+        if (add_filter(backup->filters, type, value.c_str())) {
           cerr << "clients: backup: unsupported filter in list file "
             << list_path << " line " << line << endl;
         }
       } else if (! strcmp(keyword, "parser")) {
         strtolower(value);
-        if (add_parser(backup->parsers_handle, type, value.c_str())) {
+        if (add_parser(backup->parsers, type, value)) {
           cerr << "clients: backup: unsupported parser '" << value
             << "'in list file " << list_path << " line " << line << endl;
         }
       } else if (! strcmp(keyword, "path")) {
         /* New backup entry */
         backup = new path_t;
-        backup->ignore_handle = new Filter;
-        parsers_new(&backup->parsers_handle);
+        backup->filters = new Filter;
+        backup->parsers = new Parsers;
         backup->path = value;
         no_trailing_slash(backup->path);
         if (verbosity() > 2) {
@@ -390,8 +396,8 @@ int Client::backup(
         }
 
         if (! clientfailed) {
-          FileList file_list(backup_path, backup->ignore_handle,
-              backup->parsers_handle);
+          FileList file_list(backup_path, backup->filters,
+              backup->parsers);
           if (file_list.getList() != NULL) {
             if (verbosity() > 1) {
               printf(" -> Parsing list of files\n");
@@ -412,8 +418,8 @@ int Client::backup(
         }
 
         /* Free encapsulated data */
-        delete backup->ignore_handle;
-        parsers_free(backup->parsers_handle);
+        delete backup->filters;
+        delete backup->parsers;
       }
     }
   } else {

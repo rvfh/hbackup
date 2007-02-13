@@ -26,7 +26,7 @@ check: all
 
 # Dependencies
 libhbackup.a: clients.o cvs_parser.o db.o filelist.o filters.o list.o \
-	metadata.o parsers.o tools.o
+	metadata.o tools.o
 version.h: libhbackup.a Makefile
 hbackup: libhbackup.a version.h
 
@@ -35,7 +35,6 @@ metadata.o: metadata.h
 list.o: list.h
 db.o: db.h list.h metadata.h tools.h hbackup.h
 filters.o: filters.h list.h metadata.h
-parsers.o: parsers.h list.h metadata.h
 cvs_parser.o: cvs_parser.h parsers.h list.h metadata.h
 filelist.o: filelist.h parsers.h list.h metadata.h tools.h hbackup.h
 clients.o: clients.h list.h tools.h hbackup.h

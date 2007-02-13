@@ -16,14 +16,43 @@
      Boston, MA 02111-1307, USA.
 */
 
+// TODO: this is really incomplete:
+//  D on its own
+//  parser mode not taken into account
+
 #ifndef CVS_PARSER_H
 #define CVS_PARSER_H
 
-#ifndef PARSERS_H
-#error You must include parsers.h before cvs_parser.h
+#ifndef PARSER_H
+#error You must include parser.h before cvs_parser.h
 #endif
 
-/* Create CVS parser and get info */
-extern parser_t *cvs_parser_new(void);
+typedef struct {
+  string  name;   /* File name */
+  mode_t  type;   /* File type */
+} cvs_entry_t;
+
+class CvsParser : public Parser {
+  vector<cvs_entry_t> _files;
+  parser_mode_t       _mode;
+public:
+  // Constructor for parsers list
+  CvsParser(parser_mode_t mode) : _mode(mode) {}
+  // Constructor for directory parsing
+  CvsParser(parser_mode_t mode, const string& dir_path);
+  // Just to know the parser used
+  string name();
+  // This will create an appropriate parser for the directory if relevant
+  Parser* isControlled(const string& dir_path);
+  // That tells use whether to ignore the file, i.e. not back it up
+  bool ignore(const filedata_t *file_data);
+  // For debug purposes
+  void list() {
+    cout << "List: " << _files.size() << " file(s)" << endl;
+    for (unsigned int i = 0; i < _files.size(); i++) {
+      cout << "-> " << _files[i].name << endl;
+    }
+  }
+};
 
 #endif
