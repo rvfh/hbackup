@@ -1,2 +1,8 @@
--> test parser [0x12345678, 0xdeadbeef, 0x34567890]
--> test parser [0x12345678, 0xdeadbeef, 0x34567890]
+Contructing for mode: 2
+Contructing for mode: 2 and path: test
+Displaying list
+Destroying (index 2)
+List: 2 parser(s)
+-> test
+-> ignore
+Destroying (index 1)

@@ -18,131 +18,78 @@
 
 using namespace std;
 
+#include <fstream>
+#include <iostream>
+#include <vector>
 #include <string>
-#include "list.h"
+#include "tools.h"
 #include "metadata.h"
 #include "common.h"
-#include "parsers.h"
+#include "parser.h"
 #include "cvs_parser.h"
 
-/* Our data */
-typedef struct {
-  char    *name;  /* File name */
-  mode_t  type;   /* File type */
-} cvs_entry_t;
+CvsParser::CvsParser(parser_mode_t mode, const string& dir_path) {
+  string    path = dir_path + "/CVS/Entries";
+  ifstream  entries(path.c_str());
 
-static char *cvs_payload_get(const void *payload) {
-  char *string = NULL;
+  /* Fill in list of controlled files */
+  while (! entries.eof()) {
+    string  buffer;
+    getline(entries, buffer);
+    cvs_entry_t cvs_entry;
 
-  asprintf(&string, "%s", ((cvs_entry_t *) payload)->name);
-  return string;
-}
-
-static parser_dir_status_t cvs_dir_check(void **handle, const char *path) {
-  char                *d_path = NULL;
-  FILE                *entries;
-  parser_dir_status_t result = parser_dir_unknown;
-
-  asprintf(&d_path, "%s/CVS/Entries", path);
-
-  /* Check that file exists */
-  if ((entries = fopen(d_path, "r")) == NULL) {
-    /* Directory is not under CVS control */
-    *handle = NULL;
-    result = parser_dir_other;
-  } else {
-    List    *list   = new List(cvs_payload_get);
-    char    *buffer = NULL;
-    size_t  size    = 0;
-
-    /* Return list */
-    *handle = list;
-    result = parser_dir_controlled;
-
-    /* Fill in list of controlled files */
-    while (getline(&buffer, &size, entries) >= 0) {
-      cvs_entry_t cvs_entry;
-      cvs_entry_t *payload;
-      char *start = buffer;
-      char *delim;
-
-      if (start[0] == 'D') {
-        cvs_entry.type = S_IFDIR;
-        start++;
-      } else {
-        cvs_entry.type = S_IFREG;
-      }
-      if (start[0] != '/') {
-        continue;
-      }
-      start++;
-      if ((delim = strchr(start, '/')) == NULL) {
-        continue;
-      }
-
-      *delim = '\0';
-      asprintf(&cvs_entry.name, "%s", start);
-
-      payload = new cvs_entry_t;
-      *payload = cvs_entry;
-      list->add(payload);
-    }
-    /* Close file */
-    fclose(entries);
-    free(buffer);
-  }
-  free(d_path);
-  return result;
-}
-
-static void cvs_dir_leave(void *list_handle) {
-  if (list_handle != NULL) {
-    List *list = (List *) list_handle;
-    list_entry_t *entry = NULL;
-
-    while ((entry = list->next(entry)) != NULL) {
-      cvs_entry_t *cvs_entry = (cvs_entry_t *) list_entry_payload(entry);
-      delete cvs_entry->name;
-    }
-    delete list;
-  }
-}
-
-
-/* Ideally, this function should return 0 when the file is added or modified */
-/* For now, it returns 0 for any file under CVS control */
-static parser_file_status_t cvs_file_check(void *list_handle,
-    const filedata_t *file_data) {
-  List *list = (List *) (list_handle);
-
-  if (list == NULL) {
-    fprintf(stderr, "cvs parser: file check: not initialised\n");
-    return parser_file_unknown;
-  } else {
-    const char *file = strrchr(file_data->path.c_str(), '/');
-
-    if (file != NULL) {
-      file++;
+    if (buffer.substr(0,1) == "D") {
+      cvs_entry.type = S_IFDIR;
+      buffer.erase(0,1);
     } else {
-      file = file_data->path.c_str();
+      cvs_entry.type = S_IFREG;
     }
-    if (list->find(file, NULL, NULL)) {
-      return parser_file_other;
-    } else {
-      return parser_file_maybemodified;
-   }
+    if (buffer.substr(0,1) != "/") {
+      continue;
+    }
+    buffer.erase(0,1);
+    unsigned int pos = buffer.find("/");
+    if (pos == string::npos) {
+      continue;
+    }
+    buffer.erase(pos);
+    cvs_entry.name = buffer;
+    _files.push_back(cvs_entry);
+  }
+  /* Close file */
+  entries.close();
+}
+
+string CvsParser::name() {
+  return "cvs";
+}
+
+Parser *CvsParser::isControlled(const string& dir_path) {
+  // If CVS dir and entries file exist, assume CVS control
+  if (testfile(dir_path + "/CVS/Entries", false)) {
+    return NULL;
+  } else {
+    return new CvsParser(_mode, dir_path);
   }
 }
 
-/* That's the parser */
-static parser_t cvs_parser = {
-  cvs_dir_check, cvs_dir_leave, cvs_file_check, parser_disabled, "cvs"
-};
+bool CvsParser::ignore(const filedata_t *file_data) {
+  // Get file base name
+  string file_name;
+  unsigned int pos = file_data->path.rfind("/");
+  if (pos == string::npos) {
+    file_name = file_data->path;
+  } else {
+    file_name = file_data->path.substr(pos + 1);
+  }
 
-parser_t *cvs_parser_new(void) {
-  /* This needs to be dynamic memory */
-  parser_t *parser = new parser_t;
+  // Look for match in list
+  for (unsigned int i = 0; i < _files.size(); i++) {
+    if ((_files[i].name == file_name)
+     && (_files[i].type == file_data->metadata.type)){
+      return false;
+    }
+  }
+  return true;
 
-  *parser = cvs_parser;
-  return parser;
 }

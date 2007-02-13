@@ -16,56 +16,66 @@
      Boston, MA 02111-1307, USA.
 */
 
-#ifndef _GNU_SOURCE
-#define _GNU_SOURCE
-#endif
-#include <iostream>
 using namespace std;
-#include "parsers.cpp"
 
-static parser_t parser = {
-  (parsers_dir_check_f *) 0x12345678,
-  (parsers_dir_leave_f *) 0xDEADBEEF,
-  (parsers_file_check_f *) 0x34567890,
-  parser_disabled,
-  "test parser" };
+#include <iostream>
+#include <vector>
+#include "metadata.h"
+#include "common.h"
+#include "parser.h"
+#include "parsers.h"
 
-/* Use payload as argument name, cast once and for all */
-static char *parsers_show(const void *payload) {
-  const parser_t *parser = (const parser_t *) (payload);
-  char *string = NULL;
+class TestParser : public Parser {
+  parser_mode_t _mode;
+  int           _index;
+public:
+  // Constructor for parsers list
+  TestParser(parser_mode_t mode) : _mode(mode) {
+    _index = 1;
+    cout << "Contructing for mode: " << _mode << endl;
+  }
+  // Constructor for directory parsing
+  TestParser(parser_mode_t mode, const string& dir_path) {
+    _mode = mode;
+    _index = 2;
+    cout << "Contructing for mode: " << mode
+      << " and path: " << dir_path << endl;
+  }
+  ~TestParser() {
+    cout << "Destroying (index " << _index << ")" << endl;
+  }
+  // Just to know the parser used
+  string name() {
+    return "test";
+  }
+  // This will create an appropriate parser for the directory if relevant
+  Parser* isControlled(const string& dir_path) {
+    return new TestParser(_mode, dir_path);
+  }
+  // That tells use whether to ignore the file, i.e. not back it up
+  bool ignore(const filedata_t *file_data) {
+    return false;
+  }
+  // For debug purposes
+  void list() {
+    cout << "Displaying list" << endl;
+  }
+};
 
-  asprintf(&string, "%s [0x%08x, 0x%08x, 0x%08x]",
-    parser->name,
-    (unsigned int) parser->dir_check,
-    (unsigned int) parser->dir_leave,
-    (unsigned int) parser->file_check);
-  return string;
-}
-
-/* TODO parsers_dir_check and parsers_file_check test */
 int main(void) {
-  parser_t *parser_p = new parser_t;
-  List *handle1 = NULL;
-  List *handle2 = NULL;
+  Parsers*  parsers;
+  Parser*   parser;
 
-  if (parsers_new(&handle1)) {
-    cout << "Failed to create\n";
+  parsers = new Parsers;
+  parsers->push_back(new TestParser(parser_modified));
+  parsers->push_back(new IgnoreParser());
+  parser = parsers->isControlled("test");
+  if (parser != NULL) {
+    parser->list();
+    delete parser;
   }
-  *parser_p = parser;
-  if (parsers_add(handle1, parser_controlled, parser_p)) {
-    cout << "Failed to add\n";
-  }
-  handle1->show(NULL, parsers_show);
-  if (parser_p != list_entry_payload(handle1->next(NULL))) {
-    cout << "Parsers differ\n";
-  }
-  if (parsers_new(&handle2)) {
-    cout << "Failed to create\n";
-  }
-  handle2->show(NULL, parsers_show);
-  handle1->show(NULL, parsers_show);
-  parsers_free(handle2);
-  parsers_free(handle1);
+  parsers->list();
+  delete parsers;
+
   return 0;
 }

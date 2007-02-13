@@ -1,6 +1,10 @@
+filelist: directory should be controlled: test/////cvs/dirbad
 db: scan: file data missing for checksum 59ca0efa9f5633cb0371bbc0355478d8-0
 db: scan: file data missing for checksum 59ca0efa9f5633cb0371bbc0355478d8-0
 db: scan: file data corrupted for checksum 59ca0efa9f5633cb0371bbc0355478d8-0 (found to be d41d8cd98f00b204e9800998ecf8427e)
+filelist: directory should be controlled: test/////cvs/dirbad
+filelist: directory should be controlled: test/////cvs/dirbad
+filelist: directory should be controlled: test/////cvs/dirbad
 db: close: failed to save active items list
 db: close: failed to save removed items list
 db: open: permission to read list denied

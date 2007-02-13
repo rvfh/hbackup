@@ -54,14 +54,14 @@ int terminating(void) {
 }
 
 int main(void) {
-  Filter  *filter_handle = NULL;
-  List    *parsers_handle = NULL;
+  Filter    *filters = NULL;
+  Parsers   *parsers = NULL;
   char      checksum[40];
   char      zchecksum[40];
   db_data_t db_data;
   off_t     size;
   off_t     zsize;
-  List    *filelist;
+  List      *filelist;
   int       status;
 
   /* Test internal functions */
@@ -84,26 +84,19 @@ int main(void) {
   printf("Copied ? -> %ld bytes ? -> %s\n", zsize, zchecksum);
 
   /* Use other modules */
-  if ((status = parsers_new(&parsers_handle))) {
-    printf("parsers_new error status %u\n", status);
-    return 0;
-  }
-  if ((status = parsers_add(parsers_handle, parser_controlled,
-      cvs_parser_new()))) {
-    printf("parsers_add error status %u\n", status);
-    return 0;
-  }
+  parsers = new Parsers;
+  parsers->push_back(new CvsParser(parser_controlled));
 
-  filter_handle = new Filter;
-  filter_handle->push_back(new Rule(new Condition(S_IFDIR, filter_path_start, ".svn")));
-  filter_handle->push_back(new Rule(new Condition(S_IFDIR, filter_path_start, "subdir")));
-  filter_handle->push_back(new Rule(new Condition(S_IFREG, filter_path_end, "~")));
-  filter_handle->push_back(new Rule(new Condition(S_IFREG, filter_path_regexp, "\\.o$")));
+  filters = new Filter;
+  filters->push_back(new Rule(new Condition(S_IFDIR, filter_path_start, ".svn")));
+  filters->push_back(new Rule(new Condition(S_IFDIR, filter_path_start, "subdir")));
+  filters->push_back(new Rule(new Condition(S_IFREG, filter_path_end, "~")));
+  filters->push_back(new Rule(new Condition(S_IFREG, filter_path_regexp, "\\.o$")));
 
   FileList *file_list;
-  file_list = new FileList("test////", filter_handle, parsers_handle);
+  file_list = new FileList("test////", filters, parsers);
   if (file_list->getList() == NULL) {
-    cout << "file_list_new error status " << status << endl;
+    cout << "file_list is NULL" << endl;
     return 0;
   }
   cout << ">List " << file_list->getList()->size() << " file(s):" << endl;
@@ -184,7 +177,7 @@ int main(void) {
   db_list->show(NULL, db_data_show);
   delete file_list;
 
-  file_list = new FileList("test2", filter_handle, parsers_handle);
+  file_list = new FileList("test2", filters, parsers);
   if (file_list->getList() == NULL) {
     cout << "file_list_new error status " << status << endl;
     return 0;
@@ -289,7 +282,7 @@ int main(void) {
   cout << ">List " << db_list->size() << " element(s):\n";
   db_list->show(NULL, db_data_show);
 
-  file_list = new FileList("test////", filter_handle, parsers_handle);
+  file_list = new FileList("test////", filters, parsers);
   if (file_list->getList() == NULL) {
     cout << "file_list_new error status " << status << endl;
     return 0;
@@ -322,7 +315,7 @@ int main(void) {
 
   remove("test/testfile");
 
-  file_list = new FileList("test////", filter_handle, parsers_handle);
+  file_list = new FileList("test////", filters, parsers);
   if (file_list->getList() == NULL) {
     cout << "file_list_new error status " << status << endl;
     return 0;
@@ -342,7 +335,7 @@ int main(void) {
   db_list->show(NULL, parse_select);
   delete file_list;
 
-  file_list = new FileList("test////", filter_handle, parsers_handle);
+  file_list = new FileList("test////", filters, parsers);
   if (file_list->getList() == NULL) {
     cout << "file_list_new error status " << status << endl;
     return 0;
@@ -360,7 +353,7 @@ int main(void) {
   db_list->show(NULL, db_data_show);
   delete file_list;
 
-  file_list = new FileList("test2", filter_handle, parsers_handle);
+  file_list = new FileList("test2", filters, parsers);
   if (file_list->getList() == NULL) {
     cout << "file_list_new error status " << status << endl;
     return 0;
@@ -396,8 +389,8 @@ int main(void) {
   db.close();
 
 
-  delete filter_handle;
-  parsers_free(parsers_handle);
+  delete filters;
+  delete parsers;
 
 
   /* List cannot be saved */

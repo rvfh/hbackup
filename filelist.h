@@ -44,17 +44,19 @@
 #endif
 
 class FileList {
-  List          *_files;
-  const Filter  *_filter_handle;
-  const List    *_parsers_handle;
-  int           _mount_path_length;
-  int           iterate_directory(const string& path, parser_t *parser);
+  List*           _files;
+  const Filter*   _filters;
+  const Parsers*  _parsers;
+  int             _mount_path_length;
+  int             iterate_directory(
+    const string&   path,
+    Parser*         parser);
 public:
   FileList(
-    const string& mount_path,
-    const Filter  *filter,
-    const List    *parsers);
-  List *getList();
+    const string&   mount_path,
+    const Filter*   filter,
+    const Parsers*  parsers);
+  List* getList();
 };
 
 #endif

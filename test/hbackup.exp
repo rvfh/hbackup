@@ -1,3 +1,4 @@
+filelist: directory should be controlled: test/cvs/dirbad
 Protocol not supported: ssh
  -> Reading configuration file
  --> Client: cbers11

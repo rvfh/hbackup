@@ -52,6 +52,7 @@ using namespace std;
 #include "metadata.h"
 #include "common.h"
 #include "filters.h"
+#include "parser.h"
 #include "parsers.h"
 #include "filelist.h"
 #include "db.h"

@@ -1,6 +1,8 @@
 List file not found etc/doesnotexist
 mount: only root can do that
 Protocol not supported: ssh
+filelist: directory should be controlled: test/cvs/dirbad
+filelist: directory should be controlled: test/cvs/dirbad
 >List 0 client(s):
  --> Client: localhost
 >List 1 client(s):
