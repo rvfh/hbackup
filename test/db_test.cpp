@@ -54,7 +54,7 @@ int terminating(void) {
 }
 
 int main(void) {
-  Filter    *filters = NULL;
+  Filters   *filters = NULL;
   Parsers   *parsers = NULL;
   char      checksum[40];
   char      zchecksum[40];
@@ -87,11 +87,11 @@ int main(void) {
   parsers = new Parsers;
   parsers->push_back(new CvsParser(parser_controlled));
 
-  filters = new Filter;
-  filters->push_back(new Rule(new Condition(S_IFDIR, filter_path_start, ".svn")));
-  filters->push_back(new Rule(new Condition(S_IFDIR, filter_path_start, "subdir")));
-  filters->push_back(new Rule(new Condition(S_IFREG, filter_path_end, "~")));
-  filters->push_back(new Rule(new Condition(S_IFREG, filter_path_regexp, "\\.o$")));
+  filters = new Filters;
+  filters->push_back(new Filter(new Condition(S_IFDIR, filter_path_start, ".svn")));
+  filters->push_back(new Filter(new Condition(S_IFDIR, filter_path_start, "subdir")));
+  filters->push_back(new Filter(new Condition(S_IFREG, filter_path_end, "~")));
+  filters->push_back(new Filter(new Condition(S_IFREG, filter_path_regexp, "\\.o$")));
 
   FileList *file_list;
   file_list = new FileList("test////", filters, parsers);

@@ -126,7 +126,7 @@ int FileList::iterate_directory(const string& path, Parser* parser) {
 
 FileList::FileList(
     const string&   mount_path,
-    const Filter*   filters,
+    const Filters*  filters,
     const Parsers*  parsers) {
   _filters = filters;
   _parsers = parsers;
