@@ -16,10 +16,6 @@
      Boston, MA 02111-1307, USA.
 */
 
-// TODO: this is really incomplete:
-//  D on its own
-//  parser mode not taken into account
-
 #ifndef CVS_PARSER_H
 #define CVS_PARSER_H
 
@@ -33,11 +29,13 @@ typedef struct {
 } cvs_entry_t;
 
 class CvsParser : public Parser {
-  vector<cvs_entry_t> _files;
   parser_mode_t       _mode;
+  bool                _dummy;
+  vector<cvs_entry_t> _files;
+  bool                _all_files;
 public:
   // Constructor for parsers list
-  CvsParser(parser_mode_t mode) : _mode(mode) {}
+  CvsParser(parser_mode_t mode) : _mode(mode), _dummy(true) {}
   // Constructor for directory parsing
   CvsParser(parser_mode_t mode, const string& dir_path);
   // Just to know the parser used

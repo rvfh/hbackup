@@ -1,3 +1,4 @@
+Directory should be under CVS control: test/cvs/diroth
 test is not under CVS control
 List: 5 file(s)
 -> filenew.c
@@ -8,7 +9,9 @@ List: 5 file(s)
 test/cvs/nofile is not under CVS control
 test/cvs/fileoth is not under CVS control
 test/cvs/diroth is not under CVS control
+test/cvs/CVS is not under CVS control
 List: 1 file(s)
 -> fileutd
 test/cvs/dirutd/fileoth is not under CVS control
 test/cvs/dirbad is not under CVS control
+test/cvs/CVS is not under CVS control
