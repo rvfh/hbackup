@@ -45,7 +45,7 @@
 
 class FileList {
   List*           _files;
-  const Filter*   _filters;
+  const Filters*  _filters;
   const Parsers*  _parsers;
   int             _mount_path_length;
   int             iterate_directory(
@@ -54,7 +54,7 @@ class FileList {
 public:
   FileList(
     const string&   mount_path,
-    const Filter*   filter,
+    const Filters*  filters,
     const Parsers*  parsers);
   List* getList();
 };

@@ -38,7 +38,7 @@ using namespace std;
 
 typedef struct {
   string    path;
-  Filter*   filters;
+  Filters*  filters;
   Parsers*  parsers;
 } path_t;
 
@@ -151,7 +151,7 @@ void Client::show() {
   }
 }
 
-static int add_filter(Filter *handle, const char *type, const char *string) {
+static int add_filter(Filters *handle, const char *type, const char *string) {
   const char *filter_type;
   const char *delim    = strchr(type, '/');
   mode_t     file_type = 0;
@@ -183,15 +183,15 @@ static int add_filter(Filter *handle, const char *type, const char *string) {
 
   /* Add specified filter */
   if (! strcmp(filter_type, "path_end")) {
-    handle->push_back(new Rule(new Condition(file_type, filter_path_end, string)));
+    handle->push_back(new Filter(new Condition(file_type, filter_path_end, string)));
   } else if (! strcmp(filter_type, "path_start")) {
-    handle->push_back(new Rule(new Condition(file_type, filter_path_start, string)));
+    handle->push_back(new Filter(new Condition(file_type, filter_path_start, string)));
   } else if (! strcmp(filter_type, "path_regexp")) {
-    handle->push_back(new Rule(new Condition(file_type, filter_path_regexp, string)));
+    handle->push_back(new Filter(new Condition(file_type, filter_path_regexp, string)));
   } else if (! strcmp(filter_type, "size_below")) {
-    handle->push_back(new Rule(new Condition(0, filter_size_below, strtoul(string, NULL, 10))));
+    handle->push_back(new Filter(new Condition(0, filter_size_below, strtoul(string, NULL, 10))));
   } else if (! strcmp(filter_type, "size_above")) {
-    handle->push_back(new Rule(new Condition(0, filter_size_above, strtoul(string, NULL, 10))));
+    handle->push_back(new Filter(new Condition(0, filter_size_above, strtoul(string, NULL, 10))));
   } else {
     return 1;
   }
@@ -279,7 +279,7 @@ static int read_listfile(const string& list_path, List *backups) {
       } else if (! strcmp(keyword, "path")) {
         /* New backup entry */
         backup = new path_t;
-        backup->filters = new Filter;
+        backup->filters = new Filters;
         backup->parsers = new Parsers;
         backup->path = value;
         no_trailing_slash(backup->path);

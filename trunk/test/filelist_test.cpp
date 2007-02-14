@@ -39,10 +39,10 @@ int terminating(void) {
 }
 
 int main(int argc, char *argv[]) {
-  Filter  *filters = NULL;
+  Filters *filters = NULL;
   Parsers *parsers = NULL;
 
-  filters = new Filter;
+  filters = new Filters;
   parsers = new Parsers;
 
   FileList file_list1("test", filters, parsers);
@@ -52,7 +52,7 @@ int main(int argc, char *argv[]) {
   }
 
   cout << "as previous with subdir in ignore list" << endl;
-  filters->push_back(new Rule(new Condition(S_IFDIR,
+  filters->push_back(new Filter(new Condition(S_IFDIR,
     filter_path_start, "subdir")));
   FileList file_list2("test", filters, parsers);
   if (file_list2.getList() != NULL) {
@@ -61,7 +61,7 @@ int main(int argc, char *argv[]) {
   }
 
   cout << "as previous with testlink in ignore list" << endl;
-  filters->push_back(new Rule(new Condition(S_IFLNK, filter_path_start, "testlink")));
+  filters->push_back(new Filter(new Condition(S_IFLNK, filter_path_start, "testlink")));
   FileList file_list3("test", filters, parsers);
   if (file_list3.getList() != NULL) {
     cout << ">List " << file_list3.getList()->size() << " file(s):\n";

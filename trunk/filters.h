@@ -57,16 +57,16 @@ public:
   void show() const;
 };
 
-class Rule: public vector<Condition*> {
+class Filter: public vector<Condition*> {
 public:
-  Rule() {}
-  Rule(Condition *condition);
-  ~Rule();
+  Filter() {}
+  Filter(Condition *condition);
+  ~Filter();
 };
 
-class Filter: public vector<Rule*> {
+class Filters: public vector<Filter*> {
 public:
-  ~Filter();
+  ~Filters();
   int match(const filedata_t *filedata) const;
 };
 
