@@ -56,6 +56,7 @@ public:
     const string&   mount_path,
     const Filters*  filters,
     const Parsers*  parsers);
+  ~FileList();
   List* getList();
 };
 
