@@ -56,20 +56,16 @@ static char *filedata_get(const void* payload) {
 
 int FileList::iterate_directory(const string& path, Parser* parser) {
   if (verbosity() > 3) {
-    cout << " --> Dir: " << path.substr(_mount_path_length) << endl;
+    cout << " ---> Dir: " << path.substr(_mount_path_length) << endl;
   }
   /* Check whether directory is under SCM control */
   if (_parsers != NULL) {
+    // We have a parser, check this directory with it
     if (parser != NULL) {
-      // We have a parser, check this directory
-      if ((parser = parser->isControlled(path)) == NULL) {
-        // Parent is controlled so child should be
-        cerr << "filelist: directory should be controlled: " << path << endl;
-        parser = new IgnoreParser;
-      }
+      parser = parser->isControlled(path);
     }
+    // We don't have a parser [anymore], check this directory
     if (parser == NULL) {
-      // We don't have a parser [anymore], check this directory
       parser = _parsers->isControlled(path);
     }
   } else {

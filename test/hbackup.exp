@@ -1,4 +1,4 @@
-filelist: directory should be controlled: test/cvs/dirbad
+Directory should be under CVS control: test/cvs/dirbad
 Protocol not supported: ssh
  -> Reading configuration file
  --> Client: cbers11
@@ -12,8 +12,8 @@ Backup client 'cbers11' using protocol 'file'
 Backup path 'test'
  -> Building list of files
  -> Parsing list of files
- --> Files to add: 11 (0 bytes)
- --> Done: 1/11 --> Done: 2/11 --> Done: 3/11 --> Done: 4/11 --> Done: 5/11 --> Done: 6/11 --> Done: 7/11 --> Done: 8/11 --> Done: 9/11 --> Done: 10/11 --> Done: 11/11 --> No files to remove
+ --> Files to add: 13 (0 bytes)
+ --> Done: 1/13 --> Done: 2/13 --> Done: 3/13 --> Done: 4/13 --> Done: 5/13 --> Done: 6/13 --> Done: 7/13 --> Done: 8/13 --> Done: 9/13 --> Done: 10/13 --> Done: 11/13 --> Done: 12/13 --> Done: 13/13 --> No files to remove
 Backup path 'test2'
  -> Building list of files
  -> Parsing list of files
@@ -21,18 +21,18 @@ Backup path 'test2'
  --> Done: 1/5 (0.0%) --> Done: 2/5 (15.7%) --> Done: 3/5 (43.6%) --> Done: 4/5 (100.0%) --> Done: 5/5 (100.0%) --> No files to remove
  --> mount -t cifs -o ro,noatime,nocase,username=Myself,password=flesyM,nocase //myClient/C$ test_db/mount > /dev/null 2>&1
 Client unreachable 'client' using protocol 'smb'
-Database closed (total contents: 16 files)
+Database closed (total contents: 18 files)
  -> Reading configuration file
  --> Client: cbers11
  --> Client: client
  --> Client: other
-Database opened (active contents: 16 files)
-Scanning database contents: 16 files
-Database closed (total contents: 16 files)
+Database opened (active contents: 18 files)
+Scanning database contents: 18 files
+Database closed (total contents: 18 files)
  -> Reading configuration file
  --> Client: cbers11
  --> Client: client
  --> Client: other
-Database opened (active contents: 16 files)
-Scanning database contents thoroughly: 16 files
-Database closed (total contents: 16 files)
+Database opened (active contents: 18 files)
+Scanning database contents thoroughly: 18 files
+Database closed (total contents: 18 files)

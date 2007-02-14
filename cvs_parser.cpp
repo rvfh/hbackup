@@ -16,6 +16,10 @@
      Boston, MA 02111-1307, USA.
 */
 
+// TODO: this is incomplete:
+//  * D on its own (_all_files)
+//  * other nice traps?
+
 using namespace std;
 
 #include <fstream>
@@ -32,7 +36,12 @@ CvsParser::CvsParser(parser_mode_t mode, const string& dir_path) {
   string    path = dir_path + "/CVS/Entries";
   ifstream  entries(path.c_str());
 
+  // Save mode
+  _mode = mode;
+  _dummy = false;
+
   /* Fill in list of controlled files */
+  _all_files = false;
   while (! entries.eof()) {
     string  buffer;
     getline(entries, buffer);
@@ -65,15 +74,35 @@ string CvsParser::name() {
 }
 
 Parser *CvsParser::isControlled(const string& dir_path) {
+  // Parent under CVS control, this is the control directory
+  if (! _dummy
+   && (dir_path.size() > 4)
+   && (dir_path.substr(dir_path.size() - 4) == "/CVS")) {
+    return NULL;
+  }
+
   // If CVS dir and entries file exist, assume CVS control
   if (testfile(dir_path + "/CVS/Entries", false)) {
-    return NULL;
+    if (! _dummy) {
+      cerr << "Directory should be under CVS control: " << dir_path << endl;
+      return new IgnoreParser;
+    } else {
+      return NULL;
+    }
   } else {
     return new CvsParser(_mode, dir_path);
   }
 }
 
 bool CvsParser::ignore(const filedata_t *file_data) {
+  // Deal with no-work cases
+  if (  (_all_files)
+     // We don't know whether controlled files are modified or not
+     || (_mode == parser_modifiedandothers)
+     || (_mode == parser_disabled)) {
+    return false;
+  }
+
   // Get file base name
   string file_name;
   unsigned int pos = file_data->path.rfind("/");
@@ -83,13 +112,33 @@ bool CvsParser::ignore(const filedata_t *file_data) {
     file_name = file_data->path.substr(pos + 1);
   }
 
+  // Do not ignore CVS directory
+  if (  (file_name == "CVS")
+     && (file_data->metadata.type == S_IFDIR)) {
+    return false;
+  }
+
   // Look for match in list
+  bool controlled = false;
   for (unsigned int i = 0; i < _files.size(); i++) {
     if ((_files[i].name == file_name)
-     && (_files[i].type == file_data->metadata.type)){
-      return false;
+     && (_files[i].type == file_data->metadata.type)) {
+      controlled = true;
+      break;
     }
   }
-  return true;
 
+  // Deal with result
+  switch (_mode) {
+    // We don't know whether controlled files are modified or not
+    case parser_controlled:
+    case parser_modified:
+      if (controlled) return false; else return true;
+    case parser_modifiedandothers:
+      return false;
+    case parser_others:
+      if (controlled) return true; else return false;
+    default:  // parser_disabled
+      return false;
+  }
 }
