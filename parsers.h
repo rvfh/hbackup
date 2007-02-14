@@ -23,7 +23,7 @@
 #error You must include parser.h before parsers.h
 #endif
 
-class Parsers : public vector<Parser *> {
+class Parsers : public vector<Parser*> {
 public:
   ~Parsers() {
     for (unsigned int i = 0; i < this->size(); i++) {

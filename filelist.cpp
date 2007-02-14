@@ -134,6 +134,10 @@ FileList::FileList(
   }
 }
 
+FileList::~FileList() {
+  delete _files;
+}
+
 List* FileList::getList() {
   return _files;
 }

@@ -25,6 +25,9 @@ using namespace std;
 #include "common.h"
 #include "list.h"
 #include "filters.h"
+#include "parser.h"
+#include "parsers.h"
+#include "filelist.h"
 #include "db.h"
 #include "clients.h"
 
