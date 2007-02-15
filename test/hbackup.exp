@@ -8,13 +8,13 @@ Database initialized
 Backup client 'cbers11' using protocol 'file'
  -> Reading backup list file
  --> Path: test
- --> Path: test2
+ --> Path: test2//
 Backup path 'test'
  -> Building list of files
  -> Parsing list of files
  --> Files to add: 13 (0 bytes)
  --> Done: 1/13 --> Done: 2/13 --> Done: 3/13 --> Done: 4/13 --> Done: 5/13 --> Done: 6/13 --> Done: 7/13 --> Done: 8/13 --> Done: 9/13 --> Done: 10/13 --> Done: 11/13 --> Done: 12/13 --> Done: 13/13 --> No files to remove
-Backup path 'test2'
+Backup path 'test2//'
  -> Building list of files
  -> Parsing list of files
  --> Files to add: 5 (928768 bytes)

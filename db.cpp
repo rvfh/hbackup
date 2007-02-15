@@ -54,7 +54,6 @@ using namespace std;
 #include "filters.h"
 #include "parser.h"
 #include "parsers.h"
-#include "filelist.h"
 #include "db.h"
 
 #define CHUNK 10240

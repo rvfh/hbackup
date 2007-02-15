@@ -16,48 +16,46 @@
      Boston, MA 02111-1307, USA.
 */
 
-#ifndef FILE_LIST_H
-#define FILE_LIST_H
-
-#ifndef _GNU_SOURCE
-#define _GNU_SOURCE
-#endif
-#include <stdio.h>
-#include <sys/types.h>
-/* Declare lstat and S_* macros */
-#ifndef __USE_BSD
-#define __USE_BSD
-#endif
-#include <sys/stat.h>
-#include <unistd.h>
+#ifndef PATHS_H
+#define PATHS_H
 
 #ifndef LIST_H
-#error You must include list.h before filelist.h
+#error You must include list.h before paths.h
 #endif
 
 #ifndef FILTERS_H
-#error You must include filters.h before filelist.h
+#error You must include filters.h before paths.h
 #endif
 
 #ifndef PARSERS_H
-#error You must include parsers.h before filelist.h
+#error You must include parsers.h before paths.h
 #endif
 
-class FileList {
-  List*           _files;
-  const Filters*  _filters;
-  const Parsers*  _parsers;
-  int             _mount_path_length;
-  int             iterate_directory(
+class Path {
+  string  _path;  // FIXME do something
+  Parsers _parsers;
+  Filters _filters;
+  List*   _list;
+  int     _mount_path_length;
+  int iterate_directory(
     const string&   path,
     Parser*         parser);
 public:
-  FileList(
-    const string&   mount_path,
-    const Filters*  filters,
-    const Parsers*  parsers);
-  ~FileList();
-  List* getList();
+  Path(const string& path) : _path(path) {}
+  ~Path() { delete _list; }
+  string path() {
+    return _path;
+  }
+  List* list() {
+    return _list;
+  }
+  int addFilter(
+    const char *type,
+    const char *string);
+  int addParser(
+    const string& type,
+    const string& string);
+  int backup(const string& backup_path);
 };
 
 #endif

@@ -19,44 +19,9 @@
 #ifndef CLIENT_H
 #define CLIENT_H
 
-#ifndef LIST_H
-#error You must include list.h before clients.h
+#ifndef PATHS_H
+#error You must include paths.h before clients.h
 #endif
-
-#ifndef FILE_LIST_H
-#error You must include filelist.h before clients.h
-#endif
-
-#ifndef FILTERS_H
-#error You must include filters.h before clients.h
-#endif
-
-#ifndef PARSERS_H
-#error You must include parsers.h before clients.h
-#endif
-
-class Path {
-  string    _path;
-  Parsers   _parsers;
-  Filters   _filters;
-  FileList* _list;
-public:
-  Path(const string& path) : _path(path) {}
-  ~Path() { delete _list; }
-  string path() {
-    return _path;
-  }
-  List* list() {
-    return _list->getList();
-  }
-  int addFilter(
-    const char *type,
-    const char *string);
-  int addParser(
-    const string& type,
-    const string& string);
-  int backup(const string& backup_path);
-};
 
 class Option {
   string _name;
@@ -80,6 +45,7 @@ class Client {
   string          _protocol;
   vector<Option*> _options;
   vector<Path*>   _paths;
+  string          _mounted;
   int mountShare(const string& mount_point, const string& path);
   int unmountShare(const string& mount_point);
   int readListFile(const string& list_path);

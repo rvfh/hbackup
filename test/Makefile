@@ -11,7 +11,7 @@ test:	list.done \
 	filters.done \
 	parsers.done \
 	cvs_parser.done \
-	filelist.done \
+	paths.done \
 	db.done \
 	clients.done \
 	hbackup.done
