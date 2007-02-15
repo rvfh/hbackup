@@ -32,7 +32,7 @@
 #endif
 
 class Path {
-  string  _path;  // FIXME do something
+  string  _path;
   Parsers _parsers;
   Filters _filters;
   List*   _list;
@@ -41,7 +41,7 @@ class Path {
     const string&   path,
     Parser*         parser);
 public:
-  Path(const string& path) : _path(path) {}
+  Path(const string& path);
   ~Path() { delete _list; }
   string path() {
     return _path;
