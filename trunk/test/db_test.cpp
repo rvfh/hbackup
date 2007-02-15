@@ -16,9 +16,12 @@
      Boston, MA 02111-1307, USA.
 */
 
+using namespace std;
+
 #include "db.cpp"
 #include "parsers.h"
 #include "cvs_parser.h"
+#include "paths.h"
 
 static int verbose = 3;
 
@@ -54,8 +57,7 @@ int terminating(void) {
 }
 
 int main(void) {
-  Filters   *filters = NULL;
-  Parsers   *parsers = NULL;
+  Path*     path;
   char      checksum[40];
   char      zchecksum[40];
   db_data_t db_data;
@@ -84,23 +86,18 @@ int main(void) {
   printf("Copied ? -> %ld bytes ? -> %s\n", zsize, zchecksum);
 
   /* Use other modules */
-  parsers = new Parsers;
-  parsers->push_back(new CvsParser(parser_controlled));
-
-  filters = new Filters;
-  filters->push_back(new Filter(new Condition(S_IFDIR, filter_path_start, ".svn")));
-  filters->push_back(new Filter(new Condition(S_IFDIR, filter_path_start, "subdir")));
-  filters->push_back(new Filter(new Condition(S_IFREG, filter_path_end, "~")));
-  filters->push_back(new Filter(new Condition(S_IFREG, filter_path_regexp, "\\.o$")));
-
-  FileList *file_list;
-  file_list = new FileList("test////", filters, parsers);
-  if (file_list->getList() == NULL) {
-    cout << "file_list is NULL" << endl;
+  path = new Path("");
+  path->addParser("all", "cvs");
+  path->addFilter("dir/path_start", ".svn");
+  path->addFilter("dir/path_start", "subdir");
+  path->addFilter("file/path_end", "~");
+  path->addFilter("file/path_regexp", "\\.o$");
+  if (path->backup("test////")) {
+    cout << "file list is empty" << endl;
     return 0;
   }
-  cout << ">List " << file_list->getList()->size() << " file(s):" << endl;
-  file_list->getList()->show(NULL, file_data_show);
+  cout << ">List " << path->list()->size() << " file(s):" << endl;
+  path->list()->show(NULL, file_data_show);
 
   Database db("test_db");
 
@@ -146,8 +143,7 @@ int main(void) {
     return 0;
   }
 
-  if ((status = db.parse("file://host", "/home/user", "test",
-      file_list->getList()))) {
+  if ((status = db.parse("file://host", "/home/user", "test", path->list()))) {
     printf("db.parse error status %u\n", status);
     db.close();
     return 0;
@@ -167,33 +163,37 @@ int main(void) {
   cout << ">List " << db_list->size() << " element(s):\n";
   db_list->show(NULL, db_data_show);
 
-  if ((status = db.parse("file://host", "/home/user", "test",
-      file_list->getList()))) {
+  if ((status = db.parse("file://host", "/home/user", "test", path->list()))) {
     printf("db.parse error status %u\n", status);
     db.close();
     return 0;
   }
   cout << ">List " << db_list->size() << " element(s):\n";
   db_list->show(NULL, db_data_show);
-  delete file_list;
+  delete path;
 
-  file_list = new FileList("test2", filters, parsers);
-  if (file_list->getList() == NULL) {
-    cout << "file_list_new error status " << status << endl;
+  path = new Path("");
+  path->addParser("all", "cvs");
+  path->addFilter("dir/path_start", ".svn");
+  path->addFilter("dir/path_start", "subdir");
+  path->addFilter("file/path_end", "~");
+  path->addFilter("file/path_regexp", "\\.o$");
+  if (path->backup("test2")) {
+    cout << "file list is empty" << endl;
     return 0;
   }
-  cout << ">List " << file_list->getList()->size() << " file(s):" << endl;
-  file_list->getList()->show(NULL, file_data_show);
+  cout << ">List " << path->list()->size() << " file(s):" << endl;
+  path->list()->show(NULL, file_data_show);
 
   if ((status = db.parse("file://host", "/home/user2", "test2",
-      file_list->getList()))) {
+      path->list()))) {
     printf("db.parse error status %u\n", status);
     db.close();
     return 0;
   }
   cout << ">List " << db_list->size() << " element(s):\n";
   db_list->show(NULL, db_data_show);
-  delete file_list;
+  delete path;
 
   verbose = 2;
   if ((status = db.scan("59ca0efa9f5633cb0371bbc0355478d8-0"))) {
@@ -282,16 +282,20 @@ int main(void) {
   cout << ">List " << db_list->size() << " element(s):\n";
   db_list->show(NULL, db_data_show);
 
-  file_list = new FileList("test////", filters, parsers);
-  if (file_list->getList() == NULL) {
-    cout << "file_list_new error status " << status << endl;
+  path = new Path("");
+  path->addParser("all", "cvs");
+  path->addFilter("dir/path_start", ".svn");
+  path->addFilter("dir/path_start", "subdir");
+  path->addFilter("file/path_end", "~");
+  path->addFilter("file/path_regexp", "\\.o$");
+  if (path->backup("test////")) {
+    cout << "file list is empty" << endl;
     return 0;
   }
-  cout << ">List " << file_list->getList()->size() << " file(s):" << endl;
-  file_list->getList()->show(NULL, file_data_show);
+  cout << ">List " << path->list()->size() << " file(s):" << endl;
+  path->list()->show(NULL, file_data_show);
 
-  if ((status = db.parse("file://host", "/home/user", "test",
-      file_list->getList()))) {
+  if ((status = db.parse("file://host", "/home/user", "test", path->list()))) {
     printf("db.parse error status %u\n", status);
     db.close();
     return 0;
@@ -315,16 +319,21 @@ int main(void) {
 
   remove("test/testfile");
 
-  file_list = new FileList("test////", filters, parsers);
-  if (file_list->getList() == NULL) {
-    cout << "file_list_new error status " << status << endl;
+  path = new Path("");
+  path->addParser("all", "cvs");
+  path->addFilter("dir/path_start", ".svn");
+  path->addFilter("dir/path_start", "subdir");
+  path->addFilter("file/path_end", "~");
+  path->addFilter("file/path_regexp", "\\.o$");
+  if (path->backup("test////")) {
+    cout << "file list is empty" << endl;
     return 0;
   }
-  cout << ">List " << file_list->getList()->size() << " file(s):" << endl;
-  file_list->getList()->show(NULL, file_data_show);
+  cout << ">List " << path->list()->size() << " file(s):" << endl;
+  path->list()->show(NULL, file_data_show);
 
   if ((status = db.parse("file://host", "/home/user", "test",
-      file_list->getList()))) {
+      path->list()))) {
     printf("db.parse error status %u\n", status);
     db.close();
     return 0;
@@ -333,43 +342,53 @@ int main(void) {
   db_list->show(NULL, db_data_show);
   cout << ">List " << db_list->size() << " element(s):\n";
   db_list->show(NULL, parse_select);
-  delete file_list;
+  delete path;
 
-  file_list = new FileList("test////", filters, parsers);
-  if (file_list->getList() == NULL) {
-    cout << "file_list_new error status " << status << endl;
+  path = new Path("");
+  path->addParser("all", "cvs");
+  path->addFilter("dir/path_start", ".svn");
+  path->addFilter("dir/path_start", "subdir");
+  path->addFilter("file/path_end", "~");
+  path->addFilter("file/path_regexp", "\\.o$");
+  if (path->backup("test////")) {
+    cout << "file list is empty" << endl;
     return 0;
   }
-  cout << ">List " << file_list->getList()->size() << " file(s):" << endl;
-  file_list->getList()->show(NULL, file_data_show);
+  cout << ">List " << path->list()->size() << " file(s):" << endl;
+  path->list()->show(NULL, file_data_show);
 
   if ((status = db.parse("file://host", "/home/user", "test",
-      file_list->getList()))) {
+      path->list()))) {
     printf("db.parse error status %u\n", status);
     db.close();
     return 0;
   }
   cout << ">List " << db_list->size() << " element(s):\n";
   db_list->show(NULL, db_data_show);
-  delete file_list;
+  delete path;
 
-  file_list = new FileList("test2", filters, parsers);
-  if (file_list->getList() == NULL) {
-    cout << "file_list_new error status " << status << endl;
+  path = new Path("");
+  path->addParser("all", "cvs");
+  path->addFilter("dir/path_start", ".svn");
+  path->addFilter("dir/path_start", "subdir");
+  path->addFilter("file/path_end", "~");
+  path->addFilter("file/path_regexp", "\\.o$");
+  if (path->backup("test2")) {
+    cout << "file list is empty" << endl;
     return 0;
   }
-  cout << ">List " << file_list->getList()->size() << " file(s):" << endl;
-  file_list->getList()->show(NULL, file_data_show);
+  cout << ">List " << path->list()->size() << " file(s):" << endl;
+  path->list()->show(NULL, file_data_show);
 
   if ((status = db.parse("file://host", "/home/user2", "test2",
-      file_list->getList()))) {
+      path->list()))) {
     printf("db.parse error status %u\n", status);
     db.close();
     return 0;
   }
   cout << ">List " << db_list->size() << " element(s):\n";
   db_list->show(NULL, db_data_show);
-  delete file_list;
+  delete path;
 
   db.organize("test_db/data", 2);
 
@@ -387,10 +406,6 @@ int main(void) {
   db_list->show(NULL, db_data_show);
 
   db.close();
-
-
-  delete filters;
-  delete parsers;
 
 
   /* List cannot be saved */

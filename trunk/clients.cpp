@@ -31,103 +31,19 @@ using namespace std;
 #include "filters.h"
 #include "parser.h"
 #include "parsers.h"
-#include "filelist.h"
 #include "cvs_parser.h"
+#include "paths.h"
 #include "db.h"
 #include "clients.h"
 
-int Path::addFilter(
-    const char *type,
-    const char *string) {
-  const char *filter_type;
-  const char *delim    = strchr(type, '/');
-  mode_t     file_type = 0;
-
-  /* Check whether file type was specified */
-  if (delim != NULL) {
-    filter_type = delim + 1;
-    if (! strncmp(type, "file", delim - type)) {
-      file_type = S_IFREG;
-    } else if (! strncmp(type, "dir", delim - type)) {
-      file_type = S_IFDIR;
-    } else if (! strncmp(type, "char", delim - type)) {
-      file_type = S_IFCHR;
-    } else if (! strncmp(type, "block", delim - type)) {
-      file_type = S_IFBLK;
-    } else if (! strncmp(type, "pipe", delim - type)) {
-      file_type = S_IFIFO;
-    } else if (! strncmp(type, "link", delim - type)) {
-      file_type = S_IFLNK;
-    } else if (! strncmp(type, "socket", delim - type)) {
-      file_type = S_IFSOCK;
-    } else {
-      return 1;
-    }
-  } else {
-    filter_type = type;
-    file_type = S_IFMT;
-  }
-
-  /* Add specified filter */
-  if (! strcmp(filter_type, "path_end")) {
-    _filters.push_back(new Filter(new Condition(file_type, filter_path_end, string)));
-  } else if (! strcmp(filter_type, "path_start")) {
-    _filters.push_back(new Filter(new Condition(file_type, filter_path_start, string)));
-  } else if (! strcmp(filter_type, "path_regexp")) {
-    _filters.push_back(new Filter(new Condition(file_type, filter_path_regexp, string)));
-  } else if (! strcmp(filter_type, "size_below")) {
-    _filters.push_back(new Filter(new Condition(0, filter_size_below, strtoul(string, NULL, 10))));
-  } else if (! strcmp(filter_type, "size_above")) {
-    _filters.push_back(new Filter(new Condition(0, filter_size_above, strtoul(string, NULL, 10))));
-  } else {
-    return 1;
-  }
-  return 0;
-}
-
-int Path::addParser(
-    const string& type,
-    const string& string) {
-  parser_mode_t mode;
-
-  /* Determine mode */
-  if (type == "mod") {
-    mode = parser_modified;
-  } else
-  if (type == "mod+oth") {
-    mode = parser_modifiedandothers;
-  } else
-  if (type == "oth") {
-    mode = parser_others;
-  } else {
-    /* Default */
-    mode = parser_controlled;
-  }
-
-  /* Add specified parser */
-  if (string == "cvs") {
-    _parsers.push_back(new CvsParser(mode));
-  } else {
-    return 1;
-  }
-  return 0;
-}
-
-int Path::backup(const string& backup_path) {
-  _list = new FileList(backup_path, &_filters, &_parsers);
-  if (_list->getList() == NULL) {
-    return 1;
-  }
-  return 0;
-}
-
 /* Return 1 to force mount */
 static int get_paths(
-    string  protocol,
-    string  backup_path,
-    string  mount_point,
-    string  *share,
-    string  *path) {
+    const string& protocol,
+    string        backup_path,
+    const string& mount_point,
+    string        *share,
+    string        *path) {
+  no_trailing_slash(backup_path);
   if (protocol == "file") {
     *share = "";
     *path  = backup_path;
@@ -155,8 +71,6 @@ static int get_paths(
 }
 
 // Client methods
-static string mounted = "";
-
 int Client::mountShare(const string& mount_point, const string& client_path) {
   int    result   = 0;
   string share;
@@ -177,8 +91,8 @@ int Client::mountShare(const string& mount_point, const string& client_path) {
   }
 
   /* Check what is mounted */
-  if (mounted != "") {
-    if (mounted != share) {
+  if (_mounted != "") {
+    if (_mounted != share) {
       /* Different share mounted: unmount */
       unmountShare(mount_point);
     } else {
@@ -212,17 +126,17 @@ int Client::mountShare(const string& mount_point, const string& client_path) {
   if (result != 0) {
     errno = ETIMEDOUT;
   } else {
-    mounted = share;
+    _mounted = share;
   }
   return result;
 }
 
 int Client::unmountShare(const string& mount_point) {
-  if (mounted != "") {
+  if (_mounted != "") {
     string command = "umount ";
 
     command += mount_point;
-    mounted = "";
+    _mounted = "";
     return system(command.c_str());
   }
   return 0;
@@ -268,8 +182,6 @@ int Client::readListFile(const string& list_path) {
         }
       } else if (! strcmp(keyword, "path")) {
         /* New backup path */
-        no_trailing_slash(value);
-        pathtolinux(value);
         path = new Path(value);
         if (verbosity() > 2) {
           cout << " --> Path: " << value << endl;
@@ -303,6 +215,7 @@ int Client::readListFile(const string& list_path) {
 
 Client::Client(string value) {
   _name     = value;
+  _mounted  = "";
   if (verbosity() > 2) {
     cout << " --> Client: " << _name << endl;
   }

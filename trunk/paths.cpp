@@ -16,35 +16,23 @@
      Boston, MA 02111-1307, USA.
 */
 
-/* Create a list of files to be backed up
-
-Algorithm for temporary list creation:
- is directory under known SCM control
-  yes: is file reported added or modified
-   yes: add to temporary list of files to be backed up
-   no: nothing
-  no: for each element of current directory
-   is it to be ignored?
-    yes: nothing
-    no: is it a directory?
-     yes: add to temporary list of files to be backed up and descend into it
-     no: add to temporary list of files to be backed up
-*/
-
 using namespace std;
 
 #include <iostream>
 #include <string>
+#include <errno.h>
 #include <sys/types.h>
 #include <dirent.h>
-#include "list.h"
+
 #include "metadata.h"
 #include "common.h"
+#include "tools.h"
+#include "list.h"
 #include "filters.h"
 #include "parser.h"
 #include "parsers.h"
-#include "tools.h"
-#include "filelist.h"
+#include "cvs_parser.h"
+#include "paths.h"
 
 static char *filedata_get(const void* payload) {
   const filedata_t* filedata = (const filedata_t*) (payload);
@@ -54,19 +42,19 @@ static char *filedata_get(const void* payload) {
   return string;
 }
 
-int FileList::iterate_directory(const string& path, Parser* parser) {
+int Path::iterate_directory(const string& path, Parser* parser) {
   if (verbosity() > 3) {
     cout << " ---> Dir: " << path.substr(_mount_path_length) << endl;
   }
   /* Check whether directory is under SCM control */
-  if (_parsers != NULL) {
+  if (_parsers.size() != 0) {
     // We have a parser, check this directory with it
     if (parser != NULL) {
       parser = parser->isControlled(path);
     }
     // We don't have a parser [anymore], check this directory
     if (parser == NULL) {
-      parser = _parsers->isControlled(path);
+      parser = _parsers.isControlled(path);
     }
   } else {
     parser = NULL;
@@ -98,7 +86,7 @@ int FileList::iterate_directory(const string& path, Parser* parser) {
       continue;
     } else
     /* Now pass it through the filters */
-    if ((_filters != NULL) && ! _filters->match(&filedata)) {
+    if ((_filters.size() != 0) && ! _filters.match(&filedata)) {
       continue;
     } else
     if (S_ISDIR(filedata.metadata.type)) {
@@ -111,7 +99,7 @@ int FileList::iterate_directory(const string& path, Parser* parser) {
         continue;
       }
     }
-    _files->add(new filedata_t(filedata));
+    _list->add(new filedata_t(filedata));
   }
   closedir(directory);
   if (terminating()) {
@@ -120,24 +108,90 @@ int FileList::iterate_directory(const string& path, Parser* parser) {
   return 0;
 }
 
-FileList::FileList(
-    const string&   mount_path,
-    const Filters*  filters,
-    const Parsers*  parsers) {
-  _filters = filters;
-  _parsers = parsers;
-  _files = new List(filedata_get);
-  _mount_path_length = mount_path.size();
-  if (iterate_directory(mount_path, NULL)) {
-    delete _files;
-    _files = NULL;
+int Path::addFilter(
+    const char *type,
+    const char *string) {
+  const char *filter_type;
+  const char *delim    = strchr(type, '/');
+  mode_t     file_type = 0;
+
+  /* Check whether file type was specified */
+  if (delim != NULL) {
+    filter_type = delim + 1;
+    if (! strncmp(type, "file", delim - type)) {
+      file_type = S_IFREG;
+    } else if (! strncmp(type, "dir", delim - type)) {
+      file_type = S_IFDIR;
+    } else if (! strncmp(type, "char", delim - type)) {
+      file_type = S_IFCHR;
+    } else if (! strncmp(type, "block", delim - type)) {
+      file_type = S_IFBLK;
+    } else if (! strncmp(type, "pipe", delim - type)) {
+      file_type = S_IFIFO;
+    } else if (! strncmp(type, "link", delim - type)) {
+      file_type = S_IFLNK;
+    } else if (! strncmp(type, "socket", delim - type)) {
+      file_type = S_IFSOCK;
+    } else {
+      return 1;
+    }
+  } else {
+    filter_type = type;
+    file_type = S_IFMT;
   }
+
+  /* Add specified filter */
+  if (! strcmp(filter_type, "path_end")) {
+    _filters.push_back(new Filter(new Condition(file_type, filter_path_end, string)));
+  } else if (! strcmp(filter_type, "path_start")) {
+    _filters.push_back(new Filter(new Condition(file_type, filter_path_start, string)));
+  } else if (! strcmp(filter_type, "path_regexp")) {
+    _filters.push_back(new Filter(new Condition(file_type, filter_path_regexp, string)));
+  } else if (! strcmp(filter_type, "size_below")) {
+    _filters.push_back(new Filter(new Condition(0, filter_size_below, strtoul(string, NULL, 10))));
+  } else if (! strcmp(filter_type, "size_above")) {
+    _filters.push_back(new Filter(new Condition(0, filter_size_above, strtoul(string, NULL, 10))));
+  } else {
+    return 1;
+  }
+  return 0;
 }
 
-FileList::~FileList() {
-  delete _files;
+int Path::addParser(
+    const string& type,
+    const string& string) {
+  parser_mode_t mode;
+
+  /* Determine mode */
+  if (type == "mod") {
+    mode = parser_modified;
+  } else
+  if (type == "mod+oth") {
+    mode = parser_modifiedandothers;
+  } else
+  if (type == "oth") {
+    mode = parser_others;
+  } else {
+    /* Default */
+    mode = parser_controlled;
+  }
+
+  /* Add specified parser */
+  if (string == "cvs") {
+    _parsers.push_back(new CvsParser(mode));
+  } else {
+    return 1;
+  }
+  return 0;
 }
 
-List* FileList::getList() {
-  return _files;
+int Path::backup(const string& backup_path) {
+  _list = new List(filedata_get);
+  _mount_path_length = backup_path.size();
+  if (iterate_directory(backup_path, NULL)) {
+    delete _list;
+    _list = NULL;
+    return 1;
+  }
+  return 0;
 }

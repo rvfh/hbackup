@@ -25,20 +25,23 @@ check: all
 	@${MAKE} -C test
 
 # Dependencies
-libhbackup.a: clients.o cvs_parser.o db.o filelist.o filters.o list.o \
-	metadata.o tools.o
+libhbackup.a: clients.o cvs_parser.o db.o filters.o list.o metadata.o paths.o \
+	tools.o
 version.h: libhbackup.a Makefile
 hbackup: libhbackup.a version.h
 
-tools.o: hbackup.h tools.h
-metadata.o: metadata.h
+clients.o: metadata.h common.h tools.h list.h filters.h parser.h parsers.h \
+	cvs_parser.h paths.h db.h clients.h
+cvs_parser.o: metadata.h common.h tools.h parser.h cvs_parser.h
+db.o: list.h tools.h metadata.h common.h filters.h parser.h parsers.h db.h
+filters.o: metadata.h common.h filters.h
+hbackup.o: list.h tools.h metadata.h common.h db.h filters.h parser.h \
+	parsers.h cvs_parser.h paths.h clients.h hbackup.h version.h
 list.o: list.h
-db.o: db.h list.h metadata.h tools.h hbackup.h
-filters.o: filters.h list.h metadata.h
-cvs_parser.o: cvs_parser.h parsers.h list.h metadata.h
-filelist.o: filelist.h parsers.h list.h metadata.h tools.h hbackup.h
-clients.o: clients.h list.h tools.h hbackup.h
-hbackup.o: hbackup.h version.h
+metadata.o: metadata.h
+paths.o: metadata.h common.h tools.h list.h filters.h parser.h parsers.h \
+	cvs_parser.h paths.h
+tools.o: metadata.h common.h tools.h
 
 # Rules
 version.h:
