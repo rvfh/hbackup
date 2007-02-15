@@ -30,56 +30,6 @@ int main(void) {
 
   cout << "Tools Test" << endl;
 
-  cout << endl << "Test: no_trailing_slash" << endl;
-  line = "/this/is/a/line";
-  cout << "Check slashes to '" << line << "': ";
-  no_trailing_slash(line);
-  cout << "'" << line << "'" << endl;
-
-  line = "/this/is/a/line/";
-  cout << "Check slashes to '" << line << "': ";
-  no_trailing_slash(line);
-  cout << "'" << line << "'" << endl;
-
-  line = "/this/is/a/line/////////////";
-  cout << "Check slashes to '" << line << "': ";
-  no_trailing_slash(line);
-  cout << "'" << line << "'" << endl;
-
-  cout << endl << "Test: strtolower" << endl;
-  line = "This is a text which I like";
-  cout << "Converting '" << line << "' to lower case" << endl;
-  strtolower(line);
-  cout << "-> gives '" << line << "'" << endl;
-
-  cout << endl << "Test: pathtolinux" << endl;
-  line = "C:\\Program Files\\HBackup\\hbackup.EXE";
-  cout << "Converting '" << line << "' to linux style" << endl;
-  pathtolinux(line);
-  cout << "-> gives '" << line << "'" << endl;
-  cout << "Then to lower case" << endl;
-  strtolower(line);
-  cout << "-> gives '" << line << "'" << endl;
-
-  cout << endl << "Test: RingBuffer" << endl;
-  char  read_buffer[15];
-  int   read_size;
-  RingBuffer<char> ring_buffer(10);
-
-  cout << "Buffer size used: " << ring_buffer.size() << endl;
-  cout << "Wrote: " << ring_buffer.write("1234567890", 5) << endl;
-  cout << "Buffer size used: " << ring_buffer.size() << endl;
-  cout << "Wrote: " << ring_buffer.write("ABCDEFGHIJKLM", 7) << endl;
-  cout << "Buffer size used: " << ring_buffer.size() << endl;
-  read_size = ring_buffer.read(read_buffer, 7);
-  read_buffer[read_size] = '\0';
-  cout << "Read: " << read_size << ", " << read_buffer << endl;
-  cout << "Buffer size used: " << ring_buffer.size() << endl;
-  read_size = ring_buffer.read(read_buffer, 7);
-  read_buffer[read_size] = '\0';
-  cout << "Read: " << read_size << ", " << read_buffer << endl;
-  cout << "Buffer size used: " << ring_buffer.size() << endl;
-
   cout << endl << "Test: zcopy (and thus getchecksum)" << endl;
   system("dd if=/dev/zero of=zcopy_test bs=1M count=10 status=noxfer 2> /dev/null");
   off_t size_in;

@@ -108,6 +108,23 @@ int Path::iterate_directory(const string& path, Parser* parser) {
   return 0;
 }
 
+Path::Path(const string& path) {
+  _path = path;
+  _list = NULL;
+
+  unsigned int pos = 0;
+  while ((pos = _path.find("\\", pos)) != string::npos) {
+    _path.replace(pos, 1, "/");
+  }
+  pos = _path.size() - 1;
+  while (_path[pos] == '/') {
+    pos--;
+  }
+  if (pos < _path.size() - 1) {
+    _path.erase(pos + 1);
+  }
+}
+
 int Path::addFilter(
     const char *type,
     const char *string) {

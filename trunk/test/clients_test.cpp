@@ -72,7 +72,7 @@ int main(void) {
   clients->push_back(client);
   client->setProtocol("nfs");
   client->setHostOrIp("myClient");
-  client->setListfile("/home/User/devel");
+  client->setListfile("/home/User/hbackup.list");
   printf(">List %u client(s):\n", clients->size());
   for (unsigned int i = 0; i < clients->size(); i++) {
     (*clients)[i]->show();

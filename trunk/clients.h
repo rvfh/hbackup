@@ -41,13 +41,17 @@ public:
 class Client {
   string          _name;
   string          _host_or_ip;
-  string          _listfile;
+  string          _listfilename;
+  string          _listfiledir;
   string          _protocol;
   vector<Option*> _options;
   vector<Path*>   _paths;
   string          _mounted;
-  int mountShare(const string& mount_point, const string& path);
-  int unmountShare(const string& mount_point);
+  int mountPath(
+    string        backup_path,
+    const string& mount_point,
+    string        *path);
+  int umount(const string& mount_point);
   int readListFile(const string& list_path);
 public:
   Client(string name);
