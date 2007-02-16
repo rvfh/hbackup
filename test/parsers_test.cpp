@@ -20,8 +20,8 @@ using namespace std;
 
 #include <iostream>
 #include <vector>
-#include "metadata.h"
-#include "common.h"
+
+#include "files.h"
 #include "parser.h"
 #include "parsers.h"
 

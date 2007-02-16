@@ -23,8 +23,8 @@
 #error You must include list.h before db.h
 #endif
 
-#ifndef COMMON_H
-#error You must include common.h before db.h
+#ifndef FILES_H
+#error You must include files.h before db.h
 #endif
 
 typedef struct {
@@ -67,6 +67,10 @@ public:
     const string& checksum = "",
     bool thorough = false);
 // So I can test them
+  int getDir(
+    const string& checksum,
+    string&       path,
+    bool          create);
   int  load(
     const string &filename,
     List *list);

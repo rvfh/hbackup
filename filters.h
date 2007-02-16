@@ -19,10 +19,8 @@
 #ifndef FILTERS_H
 #define FILTERS_H
 
-#include <vector>
-
-#ifndef COMMON_H
-#error You must include common.h before filters.h
+#ifndef FILES_H
+#error You must include files.h before filters.h
 #endif
 
 /* The filter stores a list of rules, each containing a list of conditions.

@@ -19,10 +19,12 @@
 using namespace std;
 
 #include <iostream>
+#include <vector>
 #include <stdarg.h>
 #include <regex.h>
-#include "metadata.h"
-#include "common.h"
+#include <sys/stat.h>
+
+#include "files.h"
 #include "filters.h"
 
 Condition::Condition(

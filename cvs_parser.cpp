@@ -26,9 +26,9 @@ using namespace std;
 #include <iostream>
 #include <vector>
 #include <string>
-#include "tools.h"
-#include "metadata.h"
-#include "common.h"
+#include <sys/stat.h>
+
+#include "files.h"
 #include "parser.h"
 #include "cvs_parser.h"
 

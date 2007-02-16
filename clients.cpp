@@ -18,15 +18,13 @@
 
 using namespace std;
 
-#include <iostream>
 #include <fstream>
-#include <string>
+#include <iostream>
 #include <vector>
+#include <string>
 #include <errno.h>
 
-#include "metadata.h"
-#include "common.h"
-#include "tools.h"
+#include "files.h"
 #include "list.h"
 #include "filters.h"
 #include "parser.h"
@@ -35,6 +33,7 @@ using namespace std;
 #include "paths.h"
 #include "db.h"
 #include "clients.h"
+#include "hbackup.h"
 
 int Client::mountPath(
     string        backup_path,

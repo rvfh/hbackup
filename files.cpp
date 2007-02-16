@@ -29,9 +29,8 @@ using namespace std;
 #include <openssl/evp.h>
 #include <zlib.h>
 
-#include "metadata.h"
-#include "common.h"
-#include "tools.h"
+#include "files.h"
+#include "hbackup.h"
 
 #define CHUNK 409600
 
@@ -104,33 +103,6 @@ static void md5sum(const char *checksum, int bytes) {
   }
   *write = '\0';
   delete copy;
-}
-
-int getdir(
-    const string& db_path,
-    const string& checksum,
-    string&       path,
-    bool          create) {
-  path = db_path + "/data";
-  int level = 0;
-
-  // Two cases: either there are files, or a .nofiles file and directories
-  do {
-    // If we can find a .nofiles file, then go down one more directory
-    string  temp_path = path + "/.nofiles";
-    if (! testfile(temp_path, false)) {
-      path += "/" + checksum.substr(level, 2);
-      level += 2;
-      if (testdir(path, create) == 2) {
-        return 1;
-      }
-    } else {
-      break;
-    }
-  } while (true);
-  // Return path
-  path += "/" + checksum.substr(level);
-  return testdir(path, create);
 }
 
 int zcopy(
@@ -438,4 +410,21 @@ int params_readline(string line, char *keyword, char *type,
   }
 
   return param_count;
+}
+
+int metadata_get(const char *path, metadata_t *metadata_p) {
+  struct stat metadata;
+
+  if (lstat(path, &metadata)) {
+    // errno set by lstat
+    return 2;
+  }
+  /* Fill in file information */
+  metadata_p->type  = metadata.st_mode & S_IFMT;
+  metadata_p->mtime = metadata.st_mtime;
+  metadata_p->size  = metadata.st_size;
+  metadata_p->uid   = metadata.st_uid;
+  metadata_p->gid   = metadata.st_gid;
+  metadata_p->mode  = metadata.st_mode & ~S_IFMT;
+  return 0;
 }

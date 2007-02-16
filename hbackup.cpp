@@ -21,13 +21,12 @@ using namespace std;
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <vector>
 #include <signal.h>
 #include <errno.h>
 
 #include "list.h"
-#include "tools.h"
-#include "metadata.h"
-#include "common.h"
+#include "files.h"
 #include "db.h"
 #include "filters.h"
 #include "parser.h"

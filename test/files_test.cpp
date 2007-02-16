@@ -16,10 +16,13 @@
      Boston, MA 02111-1307, USA.
 */
 
-#include <iostream>
-#include "tools.cpp"
-
 using namespace std;
+
+#include <iostream>
+#include <string>
+#include <sys/stat.h>
+
+#include "files.h"
 
 int terminating(void) {
   return 0;
@@ -77,35 +80,6 @@ int main(void) {
   printf("Socket : 0%06o\n", type_mode('s'));
   printf("Unknown: 0%06o\n", type_mode('?'));
 
-  cout << endl << "Test: getdir" << endl;
-  string  path;
-  cout << "Check test_db/data dir: " << testdir("test_db/data", true) << endl;
-  testfile("test_db/data/.nofiles", true);
-  testdir("test_db/data/fe", true);
-  testfile("test_db/data/fe/.nofiles", true);
-  testfile("test_db/data/fe/test4", true);
-  testdir("test_db/data/fe/dc", true);
-  testfile("test_db/data/fe/dc/.nofiles", true);
-  testdir("test_db/data/fe/ba", true);
-  testdir("test_db/data/fe/ba/test1", true);
-  testdir("test_db/data/fe/98", true);
-  testdir("test_db/data/fe/98/test2", true);
-  cout << "febatest1 status: " << getdir("test_db", "febatest1", path, true)
-    << ", path: " << path << endl;
-  cout << "fe98test2 status: " << getdir("test_db", "fe98test2", path, true)
-    << ", path: " << path << endl;
-  cout << "fe98test3 status: " << getdir("test_db", "fe98test3", path, true)
-    << ", path: " << path << endl;
-  cout << "fetest4 status: " << getdir("test_db", "fetest4", path, true)
-    << ", path: " << path << endl;
-  cout << "fedc76test5 status: " << getdir("test_db", "fedc76test5", path, true)
-    << ", path: " << path << endl;
-  testdir("test_db/data/fe/dc/76", true);
-  cout << "fedc76test6 status: " << getdir("test_db", "fedc76test6", path, true)
-    << ", path: " << path << endl;
-  cout << "fedc76test6 status: " << getdir("test_db", "fedc76test6", path, true)
-    << ", path: " << path << endl;
-
   cout << endl << "Test: params_readline" << endl;
   char   keyword[256];
   char   type[256];
@@ -159,6 +133,24 @@ int main(void) {
   cout << "Read " << params_readline(line, keyword, type, &s)
     << " parameters from " << line << ": '" << keyword << "' '" << type
     << "' '" << s << "'" <<  endl;
+
+  metadata_t metadata;
+  struct tm *time;
+
+  cout << "\nmetadata_get" << endl;
+  metadata_get("test/testfile", &metadata);
+  time = localtime(&metadata.mtime);
+
+  printf(" * type: 0x%08x\n", metadata.type);
+  printf(" * size: %u\n", (unsigned int) metadata.size);
+
+  printf(" * mtime: %04u-%02u-%02u %2u:%02u:%02u\n",
+    time->tm_year + 1900, time->tm_mon + 1, time->tm_mday,
+    time->tm_hour, time->tm_min, time->tm_sec);
+
+  printf(" * uid: %u\n", metadata.uid);
+  printf(" * gid: %u\n", metadata.gid);
+  printf(" * mode: 0x%08x\n", metadata.mode);
 
   return 0;
 }

@@ -38,6 +38,7 @@ using namespace std;
 
 #include <iostream>
 #include <string>
+#include <vector>
 #include <sstream>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -48,13 +49,12 @@ using namespace std;
 #include <errno.h>
 
 #include "list.h"
-#include "tools.h"
-#include "metadata.h"
-#include "common.h"
+#include "files.h"
 #include "filters.h"
 #include "parser.h"
 #include "parsers.h"
 #include "db.h"
+#include "hbackup.h"
 
 #define CHUNK 10240
 
@@ -379,7 +379,7 @@ int Database::write(
   } else
 
   /* Get file final location */
-  if (getdir(_path, checksum_source, dest_path, true) == 2) {
+  if (getDir(checksum_source, dest_path, true) == 2) {
     cerr << "db: write: failed to get dir for: " << checksum_source << endl;
     failed = 1;
   } else {
@@ -487,7 +487,7 @@ int Database::obsolete(
   int     failed = 0;
   List    *list;
 
-  if (getdir(_path, checksum, temp_path, false)) {
+  if (getDir(checksum, temp_path, false)) {
     cerr << "db: obsolete: failed to get dir for: " << checksum << endl;
     return 2;
   }
@@ -563,6 +563,32 @@ int Database::lock() {
 void Database::unlock() {
   string lock_path = _path + "/lock";
   remove(lock_path.c_str());
+}
+
+int Database::getDir(
+    const string& checksum,
+    string&       path,
+    bool          create) {
+  path = _path + "/data";
+  int level = 0;
+
+  // Two cases: either there are files, or a .nofiles file and directories
+  do {
+    // If we can find a .nofiles file, then go down one more directory
+    string  temp_path = path + "/.nofiles";
+    if (! testfile(temp_path, false)) {
+      path += "/" + checksum.substr(level, 2);
+      level += 2;
+      if (testdir(path, create) == 2) {
+        return 1;
+      }
+    } else {
+      break;
+    }
+  } while (true);
+  // Return path
+  path += "/" + checksum.substr(level);
+  return testdir(path, create);
 }
 
 int Database::open() {
@@ -843,7 +869,7 @@ int Database::read(const string& path, const string& checksum) {
   char    temp_checksum[256];
   int     failed = 0;
 
-  if (getdir(_path, checksum, source_path, false)) {
+  if (getDir(checksum, source_path, false)) {
     cerr << "db: read: failed to get dir for: " << checksum << endl;
     return 2;
   }
@@ -941,7 +967,7 @@ int Database::scan(const string& checksum, bool thorough) {
     string  path;
     bool    filefailed = false;
 
-    if (getdir(_path, checksum, path, false)) {
+    if (getDir(checksum, path, false)) {
       errno = ENODATA;
       filefailed = true;
       cerr << "db: scan: failed to get directory for checksum " << checksum << endl;

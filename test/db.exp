@@ -385,6 +385,16 @@ Database opened (active contents: 19 files)
 -> 'file://host' '/home/user2/testfile' f 145408 1 1000 1000 0644 '' 3d546a1ce46c6ae10ad34ab8a81c542e-0 1 0 -
 -> 'file://host' '/home/user2/testfile2' f 259072 1 1000 1000 0644 '' fb00cd74a5f35e89a7fbdd3c1d05375a-0 1 0 -
 -> 'file://host' '/home/user2/testlink' l 8 1 1000 1000 0777 'testfile'  1 0 -
+
+Test: getdir
+Check test_db/data dir: 0
+febatest1 status: 0, getdir_path: test_db/data/fe/ba/test1
+fe98test2 status: 0, getdir_path: test_db/data/fe/98/test2
+fe98test3 status: 1, getdir_path: test_db/data/fe/98/test3
+fetest4 status: 1, getdir_path: test_db/data/fe/te/st4
+fedc76test5 status: 1, getdir_path: test_db/data/fe/dc/76/test5
+fedc76test6 status: 1, getdir_path: test_db/data/fe/dc/76/test6
+fedc76test6 status: 0, getdir_path: test_db/data/fe/dc/76/test6
 Database closed (total contents: 21 files)
 Database opened (active contents: 19 files)
 Database closed (total contents: 21 files)

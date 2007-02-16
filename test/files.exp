@@ -35,16 +35,6 @@ Link   : 0120000
 Socket : 0140000
 Unknown: 0000000
 
-Test: getdir
-Check test_db/data dir: 1
-febatest1 status: 0, path: test_db/data/fe/ba/test1
-fe98test2 status: 0, path: test_db/data/fe/98/test2
-fe98test3 status: 1, path: test_db/data/fe/98/test3
-fetest4 status: 1, path: test_db/data/fe/te/st4
-fedc76test5 status: 1, path: test_db/data/fe/dc/76/test5
-fedc76test6 status: 1, path: test_db/data/fe/dc/76/test6
-fedc76test6 status: 0, path: test_db/data/fe/dc/76/test6
-
 Test: params_readline
 Read 0 parameters from : '' '' ''
 Read 0 parameters from # Normal comment: '' '' ''
@@ -58,3 +48,11 @@ Read -1 parameters from key 	type 	"string # Comment: 'key' '' '"string'
 Read -1 parameters from key 	type string" # Comment: 'key' '' ''
 Read 2 parameters from key	 "this is	a 	string" # Comment: 'key' '' 'this is	a 	string'
 Read 3 parameters from key 	type	 "this is	a 	string" # Comment: 'key' 'type' 'this is	a 	string'
+
+metadata_get
+ * type: 0x00008000
+ * size: 13
+ * mtime: 2006-10-22  0:00:00
+ * uid: 1000
+ * gid: 1000
+ * mode: 0x000001a4

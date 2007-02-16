@@ -23,8 +23,8 @@ using namespace std;
 #include <iostream>
 #include <vector>
 #include <string>
-#include "metadata.h"
-#include "common.h"
+
+#include "files.h"
 #include "filters.h"
 #include "parser.h"
 #include "parsers.h"

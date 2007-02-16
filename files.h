@@ -16,22 +16,9 @@
      Boston, MA 02111-1307, USA.
 */
 
-#ifndef METADATA_H
-#define METADATA_H
+#ifndef FILES_H
+#define FILES_H
 
-#ifndef _GNU_SOURCE
-#define _GNU_SOURCE
-#endif
-#include <stdio.h>
-#include <sys/types.h>
-/* Declare lstat and S_* macros */
-#ifndef __USE_BSD
-#define __USE_BSD
-#endif
-#include <sys/stat.h>
-#include <unistd.h>
-
-/* File metadata */
 typedef struct {
   mode_t type;    /* type */
   time_t mtime;   /* time of last modification */
@@ -41,6 +28,37 @@ typedef struct {
   mode_t mode;    /* permissions */
 } metadata_t;
 
+typedef struct {
+  string      path;
+  char        checksum[36];
+  metadata_t  metadata;
+} filedata_t;
+
 extern int metadata_get(const char *path, metadata_t *metadata);
+
+/* Test whether dir exists, create it if requested */
+extern int testdir(const string& path, bool create);
+
+/* Test whether file exists, create it if requested */
+extern int testfile(const string& path, bool create);
+
+extern char type_letter(mode_t mode);
+
+extern mode_t type_mode(char letter);
+
+extern int zcopy(
+  const string& source_path,
+  const string& dest_path,
+  off_t         *size_in,
+  off_t         *size_out,
+  char          *checksum_in,
+  char          *checksum_out,
+  int           compress);
+
+extern int getchecksum(const string& path, const char *checksum);
+
+/* Read parameters from line */
+extern int params_readline(string line, char *keyword, char *type,
+  string *);
 
 #endif

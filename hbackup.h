@@ -19,4 +19,10 @@
 #ifndef HBACKUP_H
 #define HBACKUP_H
 
+/* Verbosity level */
+extern int verbosity(void);
+
+/* Termination required */
+extern int terminating(void);
+
 #endif
