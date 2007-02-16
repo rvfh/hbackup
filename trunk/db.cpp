@@ -63,6 +63,76 @@ static List   *db_list = NULL;
 /* Size of path being backed up */
 static int    backup_path_length = 0;
 
+static char *db_data_get(const void *payload) {
+  const db_data_t *db_data = (const db_data_t *) (payload);
+  char *string = NULL;
+
+  if (db_data->date_out == 0) {
+    /* '@' > '9' */
+    asprintf(&string, "%s %s %c", db_data->host.c_str(),
+      db_data->filedata.path.c_str(), '@');
+  } else {
+    /* ' ' > '0' */
+    asprintf(&string, "%s %s %11ld", db_data->host.c_str(),
+      db_data->filedata.path.c_str(), db_data->date_out);
+  }
+  return string;
+}
+
+static char *close_select(const void *payload) {
+  const db_data_t *db_data = (const db_data_t *) (payload);
+  char *string = NULL;
+
+  if (db_data->date_out == 0) {
+    asprintf(&string, "@");
+  } else {
+    asprintf(&string, "#");
+  }
+  return string;
+}
+
+static char *parse_select(const void *payload) {
+  const db_data_t *db_data = (const db_data_t *) (payload);
+  char *string = NULL;
+
+  if (db_data->date_out != 0) {
+    /* This string cannot be matched */
+    asprintf(&string, "\t");
+  } else {
+    asprintf(&string, "%s", db_data->filedata.path.c_str());
+  }
+  return string;
+}
+
+/* Need to compare only for matching paths */
+static int parse_compare(void *db_data_p, void *filedata_p) {
+  const db_data_t *db_data  = (const db_data_t *) (db_data_p);
+  filedata_t      *filedata = (filedata_t *) (filedata_p);
+  int             result;
+
+  /* If paths differ, that's all we want to check */
+  if ((result = strcmp(&db_data->filedata.path[backup_path_length],
+      filedata->path.c_str()))) {
+    return result;
+  }
+  /* If the file has been modified, just return 1 or -1 and that should do */
+  result = memcmp(&db_data->filedata.metadata, &filedata->metadata,
+    sizeof(metadata_t));
+
+  /* If it's a file and size and mtime are the same, copy checksum accross */
+  if (S_ISREG(db_data->filedata.metadata.type)) {
+    if (db_data->filedata.checksum[0] == 'N') {
+      /* Checksum missing, add to added list */
+      return 1;
+    } else
+    if ((db_data->filedata.metadata.size == filedata->metadata.size)
+     || (db_data->filedata.metadata.mtime == filedata->metadata.mtime)) {
+      strcpy(filedata->checksum, db_data->filedata.checksum);
+    }
+  }
+  return result;
+}
+
 int Database::load(const string &filename, List *list) {
   string  source_path;
   FILE    *readfile;
@@ -209,22 +279,6 @@ int Database::save(const string& filename, List *list) {
   return failed;
 }
 
-static char *db_data_get(const void *payload) {
-  const db_data_t *db_data = (const db_data_t *) (payload);
-  char *string = NULL;
-
-  if (db_data->date_out == 0) {
-    /* '@' > '9' */
-    asprintf(&string, "%s %s %c", db_data->host.c_str(),
-      db_data->filedata.path.c_str(), '@');
-  } else {
-    /* ' ' > '0' */
-    asprintf(&string, "%s %s %11ld", db_data->host.c_str(),
-      db_data->filedata.path.c_str(), db_data->date_out);
-  }
-  return string;
-}
-
 int Database::organize(const string& path, int number) {
   DIR           *directory;
   struct dirent *dir_entry;
@@ -325,7 +379,7 @@ int Database::write(
   } else
 
   /* Get file final location */
-  if (getdir(_path, checksum_source, dest_path) == 2) {
+  if (getdir(_path, checksum_source, dest_path, true) == 2) {
     cerr << "db: write: failed to get dir for: " << checksum_source << endl;
     failed = 1;
   } else {
@@ -433,7 +487,7 @@ int Database::obsolete(
   int     failed = 0;
   List    *list;
 
-  if (getdir(_path, checksum, temp_path)) {
+  if (getdir(_path, checksum, temp_path, false)) {
     cerr << "db: obsolete: failed to get dir for: " << checksum << endl;
     return 2;
   }
@@ -582,18 +636,6 @@ int Database::open() {
   return 0;
 }
 
-static char *close_select(const void *payload) {
-  const db_data_t *db_data = (const db_data_t *) (payload);
-  char *string = NULL;
-
-  if (db_data->date_out == 0) {
-    asprintf(&string, "@");
-  } else {
-    asprintf(&string, "#");
-  }
-  return string;
-}
-
 void Database::close() {
   List      *active_list = new List();
   List      *removed_list = new List();
@@ -642,48 +684,6 @@ void Database::close() {
     cout << ")" << endl;
   }
   delete db_list;
-}
-
-static char *parse_select(const void *payload) {
-  const db_data_t *db_data = (const db_data_t *) (payload);
-  char *string = NULL;
-
-  if (db_data->date_out != 0) {
-    /* This string cannot be matched */
-    asprintf(&string, "\t");
-  } else {
-    asprintf(&string, "%s", db_data->filedata.path.c_str());
-  }
-  return string;
-}
-
-/* Need to compare only for matching paths */
-static int parse_compare(void *db_data_p, void *filedata_p) {
-  const db_data_t *db_data  = (const db_data_t *) (db_data_p);
-  filedata_t      *filedata = (filedata_t *) (filedata_p);
-  int             result;
-
-  /* If paths differ, that's all we want to check */
-  if ((result = strcmp(&db_data->filedata.path[backup_path_length],
-      filedata->path.c_str()))) {
-    return result;
-  }
-  /* If the file has been modified, just return 1 or -1 and that should do */
-  result = memcmp(&db_data->filedata.metadata, &filedata->metadata,
-    sizeof(metadata_t));
-
-  /* If it's a file and size and mtime are the same, copy checksum accross */
-  if (S_ISREG(db_data->filedata.metadata.type)) {
-    if (db_data->filedata.checksum[0] == 'N') {
-      /* Checksum missing, add to added list */
-      return 1;
-    } else
-    if ((db_data->filedata.metadata.size == filedata->metadata.size)
-     || (db_data->filedata.metadata.mtime == filedata->metadata.mtime)) {
-      strcpy(filedata->checksum, db_data->filedata.checksum);
-    }
-  }
-  return result;
 }
 
 int Database::parse(
@@ -843,7 +843,7 @@ int Database::read(const string& path, const string& checksum) {
   char    temp_checksum[256];
   int     failed = 0;
 
-  if (getdir(_path, checksum, source_path)) {
+  if (getdir(_path, checksum, source_path, false)) {
     cerr << "db: read: failed to get dir for: " << checksum << endl;
     return 2;
   }
@@ -941,7 +941,7 @@ int Database::scan(const string& checksum, bool thorough) {
     string  path;
     bool    filefailed = false;
 
-    if (getdir(_path, checksum, path)) {
+    if (getdir(_path, checksum, path, false)) {
       errno = ENODATA;
       filefailed = true;
       cerr << "db: scan: failed to get directory for checksum " << checksum << endl;

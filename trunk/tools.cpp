@@ -106,27 +106,31 @@ static void md5sum(const char *checksum, int bytes) {
   delete copy;
 }
 
-int getdir(const string& db_path, const string &checksum, string& path) {
+int getdir(
+    const string& db_path,
+    const string& checksum,
+    string&       path,
+    bool          create) {
   path = db_path + "/data";
   int level = 0;
 
-  /* Two cases: either there are files, or a .nofiles file and directories */
+  // Two cases: either there are files, or a .nofiles file and directories
   do {
-    /* If we can find a .nofiles file, then go down one more directory */
+    // If we can find a .nofiles file, then go down one more directory
     string  temp_path = path + "/.nofiles";
-    int     status = testfile(temp_path, false);
-    if (! status) {
+    if (! testfile(temp_path, false)) {
       path += "/" + checksum.substr(level, 2);
       level += 2;
+      if (testdir(path, create) == 2) {
+        return 1;
+      }
     } else {
       break;
     }
   } while (true);
-
-  /* Return path */
+  // Return path
   path += "/" + checksum.substr(level);
-
-  return testdir(path, true);
+  return testdir(path, create);
 }
 
 int zcopy(
