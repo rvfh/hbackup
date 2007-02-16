@@ -20,12 +20,12 @@
 #define FILES_H
 
 typedef struct {
-  mode_t type;    /* type */
-  time_t mtime;   /* time of last modification */
-  off_t  size;    /* total size, in bytes */
-  uid_t  uid;     /* user ID of owner */
-  gid_t  gid;     /* group ID of owner */
-  mode_t mode;    /* permissions */
+  mode_t  type;     // type
+  time_t  mtime;    // time of last modification
+  off_t   size;     // total size, in bytes
+  uid_t   uid;      // user ID of owner
+  gid_t   gid;      // group ID of owner
+  mode_t  mode;     // permissions
 } metadata_t;
 
 typedef struct {
@@ -36,29 +36,41 @@ typedef struct {
 
 extern int metadata_get(const char *path, metadata_t *metadata);
 
-/* Test whether dir exists, create it if requested */
-extern int testdir(const string& path, bool create);
-
-/* Test whether file exists, create it if requested */
-extern int testfile(const string& path, bool create);
-
-extern char type_letter(mode_t mode);
-
-extern mode_t type_mode(char letter);
-
-extern int zcopy(
-  const string& source_path,
-  const string& dest_path,
-  off_t         *size_in,
-  off_t         *size_out,
-  char          *checksum_in,
-  char          *checksum_out,
-  int           compress);
-
-extern int getchecksum(const string& path, const char *checksum);
-
 /* Read parameters from line */
 extern int params_readline(string line, char *keyword, char *type,
   string *);
+
+class File {
+  string  _path;      // file path
+  string  _checksum;  // file checksum
+  mode_t  _type;      // file type
+  time_t  _mtime;     // time of last modification
+  off_t   _size;      // total size, in bytes
+  uid_t   _uid;       // user ID of owner
+  gid_t   _gid;       // group ID of owner
+  mode_t  _mode;      // permissions
+public:
+  // Test whether dir exists, create it if requested
+  static int testDir(const string& path, bool create);
+  // Test whether file exists, create it if requested
+  static int testReg(const string& path, bool create);
+  // Transform letter into mode
+  static char typeLetter(mode_t mode);
+  // Transform mode into letter
+  static mode_t typeMode(char letter);
+  // Convert MD5 to readable string
+  static void md5sum(const char *checksum, int bytes);
+  // Copy, compress and compute checksum (MD5), all in once
+  static int zcopy(
+    const string& source_path,
+    const string& dest_path,
+    off_t         *size_in,
+    off_t         *size_out,
+    char          *checksum_in,
+    char          *checksum_out,
+    int           compress);
+  // Compute file checksum (MD5)
+  static int getChecksum(const string& path, const char *checksum);
+};
 
 #endif

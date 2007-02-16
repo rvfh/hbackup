@@ -39,7 +39,7 @@ static char *db_data_show(const void *payload) {
   /* Times are omitted here... */
   asprintf(&string, "'%s' '%s' %c %ld %d %u %u 0%o '%s' %s %d %d %c",
     db_data->host.c_str(), db_data->filedata.path.c_str(),
-    type_letter(db_data->filedata.metadata.type),
+    File::typeLetter(db_data->filedata.metadata.type),
     db_data->filedata.metadata.size,
     db_data->filedata.metadata.mtime || 0, db_data->filedata.metadata.uid,
     db_data->filedata.metadata.gid, db_data->filedata.metadata.mode,
@@ -67,21 +67,21 @@ int main(void) {
   int       status;
 
   /* Test internal functions */
-  zcopy("test/testfile", "test_db/testfile.gz", &size, &zsize, checksum,
+  File::zcopy("test/testfile", "test_db/testfile.gz", &size, &zsize, checksum,
     zchecksum, 5);
   printf("Copied %ld -> %ld bytes: %s -> %s\n",
     size, zsize, checksum, zchecksum);
 
-  zcopy("test_db/testfile.gz", "/dev/null", &size, &zsize, checksum,
+  File::zcopy("test_db/testfile.gz", "/dev/null", &size, &zsize, checksum,
     zchecksum, -1);
   printf("Copied %ld -> %ld bytes: %s -> %s\n",
     size, zsize, checksum, zchecksum);
 
-  zcopy("test2/testfile~", "test_db/testfile.gz", &size, NULL, checksum,
+  File::zcopy("test2/testfile~", "test_db/testfile.gz", &size, NULL, checksum,
     NULL, 5);
   printf("Copied %ld -> ? bytes %s -> ?\n", size, checksum);
 
-  zcopy("test2/testfile~", "test_db/testfile.gz", NULL, &zsize, NULL,
+  File::zcopy("test2/testfile~", "test_db/testfile.gz", NULL, &zsize, NULL,
     zchecksum, 9);
   printf("Copied ? -> %ld bytes ? -> %s\n", zsize, zchecksum);
 
@@ -234,7 +234,7 @@ int main(void) {
   db.close();
 
   // Save list
-  zcopy("test_db/list", "test_db/list.save", NULL, NULL, NULL, NULL, 0);
+  File::zcopy("test_db/list", "test_db/list.save", NULL, NULL, NULL, NULL, 0);
 
   db.open();
 
@@ -246,7 +246,7 @@ int main(void) {
   db.close();
 
   // Restore list
-  zcopy("test_db/list.save", "test_db/list", NULL, NULL, NULL, NULL, 0);
+  File::zcopy("test_db/list.save", "test_db/list", NULL, NULL, NULL, NULL, 0);
 
   db.open();
 
@@ -257,12 +257,12 @@ int main(void) {
   db.close();
 
   // Restore list
-  zcopy("test_db/list.save", "test_db/list", NULL, NULL, NULL, NULL, 0);
+  File::zcopy("test_db/list.save", "test_db/list", NULL, NULL, NULL, NULL, 0);
 
   db.open();
 
-  testdir("test_db/data/59ca0efa9f5633cb0371bbc0355478d8-0", 1);
-  testfile("test_db/data/59ca0efa9f5633cb0371bbc0355478d8-0/data", 1);
+  File::testDir("test_db/data/59ca0efa9f5633cb0371bbc0355478d8-0", 1);
+  File::testReg("test_db/data/59ca0efa9f5633cb0371bbc0355478d8-0/data", 1);
   if ((status = db.scan("", true))) {
     printf("full thorough scan error status %u\n", status);
   }
@@ -406,17 +406,17 @@ int main(void) {
   db_list->show(NULL, db_data_show);
 
   cout << endl << "Test: getdir" << endl;
-  cout << "Check test_db/data dir: " << testdir("test_db/data", true) << endl;
-  testfile("test_db/data/.nofiles", true);
-  testdir("test_db/data/fe", true);
-  testfile("test_db/data/fe/.nofiles", true);
-  testfile("test_db/data/fe/test4", true);
-  testdir("test_db/data/fe/dc", true);
-  testfile("test_db/data/fe/dc/.nofiles", true);
-  testdir("test_db/data/fe/ba", true);
-  testdir("test_db/data/fe/ba/test1", true);
-  testdir("test_db/data/fe/98", true);
-  testdir("test_db/data/fe/98/test2", true);
+  cout << "Check test_db/data dir: " << File::testDir("test_db/data", true) << endl;
+  File::testReg("test_db/data/.nofiles", true);
+  File::testDir("test_db/data/fe", true);
+  File::testReg("test_db/data/fe/.nofiles", true);
+  File::testReg("test_db/data/fe/test4", true);
+  File::testDir("test_db/data/fe/dc", true);
+  File::testReg("test_db/data/fe/dc/.nofiles", true);
+  File::testDir("test_db/data/fe/ba", true);
+  File::testDir("test_db/data/fe/ba/test1", true);
+  File::testDir("test_db/data/fe/98", true);
+  File::testDir("test_db/data/fe/98/test2", true);
   string  getdir_path;
   cout << "febatest1 status: " << db.getDir("febatest1", getdir_path, true)
     << ", getdir_path: " << getdir_path << endl;
@@ -428,7 +428,7 @@ int main(void) {
     << ", getdir_path: " << getdir_path << endl;
   cout << "fedc76test5 status: " << db.getDir("fedc76test5", getdir_path, true)
     << ", getdir_path: " << getdir_path << endl;
-  testdir("test_db/data/fe/dc/76", true);
+  File::testDir("test_db/data/fe/dc/76", true);
   cout << "fedc76test6 status: " << db.getDir("fedc76test6", getdir_path, true)
     << ", getdir_path: " << getdir_path << endl;
   cout << "fedc76test6 status: " << db.getDir("fedc76test6", getdir_path, true)

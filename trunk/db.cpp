@@ -172,7 +172,7 @@ int Database::load(const string &filename, List *list) {
             if (sscanf(string, "%c", &letter) != 1) {
               failed = 2;
             }
-            db_data.filedata.metadata.type = type_mode(letter);
+            db_data.filedata.metadata.type = File::typeMode(letter);
             break;
           case 4:   /* Size */
             if (sscanf(string, "%ld", &db_data.filedata.metadata.size) != 1) {
@@ -262,7 +262,7 @@ int Database::save(const string& filename, List *list) {
       fprintf(writefile,
         "%s\t%s\t%c\t%ld\t%ld\t%u\t%u\t%o\t%s\t%s\t%ld\t%ld\t%c\n",
         db_data->host.c_str(), db_data->filedata.path.c_str(),
-        type_letter(db_data->filedata.metadata.type),
+        File::typeLetter(db_data->filedata.metadata.type),
         db_data->filedata.metadata.size, db_data->filedata.metadata.mtime,
         db_data->filedata.metadata.uid, db_data->filedata.metadata.gid,
         db_data->filedata.metadata.mode, db_data->link.c_str(),
@@ -287,7 +287,7 @@ int Database::organize(const string& path, int number) {
 
   /* Already organized? */
   nofiles = path + "/.nofiles";
-  if (! testfile(nofiles, 0)) {
+  if (! File::testReg(nofiles, 0)) {
     return 0;
   }
   /* Find out how many entries */
@@ -321,7 +321,7 @@ int Database::organize(const string& path, int number) {
 
         /* Create two-letter directory */
         dir_path = string(path) + "/" + dir_entry->d_name[0] + dir_entry->d_name[1];
-        if (testdir(dir_path, 1) == 2) {
+        if (File::testDir(dir_path, 1) == 2) {
           failed = 2;
         } else {
           string  dest_path;
@@ -336,7 +336,7 @@ int Database::organize(const string& path, int number) {
       }
     }
     if (! failed) {
-      testfile(nofiles, 1);
+      File::testReg(nofiles, 1);
     }
   }
   closedir(directory);
@@ -367,7 +367,7 @@ int Database::write(
   temp_path = _path + "/filedata";
 
   /* Copy file locally */
-  if (zcopy(source_path, temp_path, &size_source, &size_dest,
+  if (File::zcopy(source_path, temp_path, &size_source, &size_dest,
       checksum_source, checksum_dest, compress)) {
     failed = 1;
   } else
@@ -395,12 +395,12 @@ int Database::write(
       ss << index;
       ss >> str;
       final_path += str;
-      if (! testdir(final_path, 1)) {
+      if (! File::testDir(final_path, 1)) {
         /* Directory exists */
         string try_path;
 
         try_path = final_path + "/data";
-        if (! testfile(try_path, 0)) {
+        if (! File::testReg(try_path, 0)) {
           /* A file already exists, let's compare */
           metadata_t try_md;
           metadata_t temp_md;
@@ -576,10 +576,10 @@ int Database::getDir(
   do {
     // If we can find a .nofiles file, then go down one more directory
     string  temp_path = path + "/.nofiles";
-    if (! testfile(temp_path, false)) {
+    if (! File::testReg(temp_path, false)) {
       path += "/" + checksum.substr(level, 2);
       level += 2;
-      if (testdir(path, create) == 2) {
+      if (File::testDir(path, create) == 2) {
         return 1;
       }
     } else {
@@ -588,7 +588,7 @@ int Database::getDir(
   } while (true);
   // Return path
   path += "/" + checksum.substr(level);
-  return testdir(path, create);
+  return File::testDir(path, create);
 }
 
 int Database::open() {
@@ -601,14 +601,14 @@ int Database::open() {
   }
 
   /* Check that mount dir exists, if not create it */
-  if (testdir(_path + "/mount", true) == 2) {
+  if (File::testDir(_path + "/mount", true) == 2) {
     cerr << "db: open: cannot create mount point" << endl;
     status = 2;
   } else
 
   /* Check that data dir and list file exist, if not create them */
-  if ((status = testdir(_path + "/data", true)) == 1) {
-    if (testfile(_path + "/list", true) == 2) {
+  if ((status = File::testDir(_path + "/data", true)) == 1) {
+    if (File::testReg(_path + "/list", true) == 2) {
       cerr << "db: open: cannot create list file" << endl;
       status = 2;
     } else if (verbosity() > 0) {
@@ -879,7 +879,7 @@ int Database::read(const string& path, const string& checksum) {
   temp_path = path + ".part";
 
   /* Copy file to temporary name (size not checked: checksum suffices) */
-  if (zcopy(source_path, temp_path, NULL, NULL, temp_checksum, NULL, 0)) {
+  if (File::zcopy(source_path, temp_path, NULL, NULL, temp_checksum, NULL, 0)) {
     cerr << "db: read: failed to copy file: " << source_path << endl;
     failed = 2;
   } else
@@ -972,7 +972,7 @@ int Database::scan(const string& checksum, bool thorough) {
       filefailed = true;
       cerr << "db: scan: failed to get directory for checksum " << checksum << endl;
     } else
-    if (testfile(path + "/data", 0)) {
+    if (File::testReg(path + "/data", 0)) {
       errno = ENOENT;
       filefailed = true;
       cerr << "db: scan: file data missing for checksum " << checksum << endl;
@@ -998,7 +998,7 @@ int Database::scan(const string& checksum, bool thorough) {
           db_data_t *db_data = (db_data_t *) (list_entry_payload(entry));
 
           /* Read file to compute checksum, compare with expected */
-          if (getchecksum(check_path.c_str(), checksum_real) == 2) {
+          if (File::getChecksum(check_path.c_str(), checksum_real) == 2) {
             errno = ENOENT;
             filefailed = true;
             cerr << "db: scan: file data missing for checksum " << checksum << endl;

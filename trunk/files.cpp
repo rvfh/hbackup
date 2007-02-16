@@ -34,7 +34,7 @@ using namespace std;
 
 #define CHUNK 409600
 
-int testdir(const string& path, bool create) {
+int File::testDir(const string& path, bool create) {
   DIR  *directory;
 
   if ((directory = opendir(path.c_str())) == NULL) {
@@ -48,7 +48,7 @@ int testdir(const string& path, bool create) {
   return 0;
 }
 
-int testfile(const string& path, bool create) {
+int File::testReg(const string& path, bool create) {
   fstream file(path.c_str(), fstream::in);
 
   if (! file.is_open()) {
@@ -66,7 +66,7 @@ int testfile(const string& path, bool create) {
   return 0;
 }
 
-char type_letter(mode_t mode) {
+char File::typeLetter(mode_t mode) {
   if (S_ISREG(mode))  return 'f';
   if (S_ISDIR(mode))  return 'd';
   if (S_ISCHR(mode))  return 'c';
@@ -77,7 +77,7 @@ char type_letter(mode_t mode) {
   return '?';
 }
 
-mode_t type_mode(char letter) {
+mode_t File::typeMode(char letter) {
   if (letter == 'f') return S_IFREG;
   if (letter == 'd') return S_IFDIR;
   if (letter == 'c') return S_IFCHR;
@@ -88,7 +88,7 @@ mode_t type_mode(char letter) {
   return 0;
 }
 
-static void md5sum(const char *checksum, int bytes) {
+void File::md5sum(const char *checksum, int bytes) {
   char *hex            = "0123456789abcdef";
   unsigned char *copy  = new unsigned char[bytes];
   unsigned char *read  = copy;
@@ -105,7 +105,7 @@ static void md5sum(const char *checksum, int bytes) {
   delete copy;
 }
 
-int zcopy(
+int File::zcopy(
     const string& source_path,
     const string& dest_path,
     off_t         *size_in,
@@ -252,7 +252,7 @@ int zcopy(
   return 0;
 }
 
-int getchecksum(const string& path, const char *checksum) {
+int File::getChecksum(const string& path, const char *checksum) {
   FILE       *readfile;
   EVP_MD_CTX ctx;
   size_t     rlength;
