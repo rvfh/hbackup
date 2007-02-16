@@ -1,21 +1,21 @@
 Tools Test
 
-Test: zcopy (and thus getchecksum)
+Test: zcopy
 In: 10485760 bytes, checksum: f1c9645dbc14efddc7d8a322685f26eb
 Out: 10208 bytes, checksum: b7350db49d036137b2ef752a82145e91
 
-Test: testdir
+Test: testDir
 Check test_db dir: 0
 Check but do not create test_db/0 1 dir: 1
 Check and create test_db/0 1 dir: 1
 Check test_db/0 1 dir: 0
 
-Test: testfile
+Test: testReg
 Check but do not create test_db/0 1/a b file: 1
 Check and create test_db/0 1/a b file: 1
 Check test_db/0 1/a b file: 0
 
-Test: type_letter
+Test: typeLetter
 File   : f
 Dir    : d
 Char   : c
@@ -25,7 +25,7 @@ Link   : l
 Socket : s
 Unknown: ?
 
-Test: type_mode
+Test: typeMode
 File   : 0100000
 Dir    : 0040000
 Char   : 0020000

@@ -82,7 +82,7 @@ Parser *CvsParser::isControlled(const string& dir_path) {
   }
 
   // If CVS dir and entries file exist, assume CVS control
-  if (testfile(dir_path + "/CVS/Entries", false)) {
+  if (File::testReg(dir_path + "/CVS/Entries", false)) {
     if (! _dummy) {
       cerr << "Directory should be under CVS control: " << dir_path << endl;
       return new IgnoreParser;
