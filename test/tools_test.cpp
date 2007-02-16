@@ -90,20 +90,20 @@ int main(void) {
   testdir("test_db/data/fe/ba/test1", true);
   testdir("test_db/data/fe/98", true);
   testdir("test_db/data/fe/98/test2", true);
-  cout << "febatest1 status: " << getdir("test_db", "febatest1", path)
+  cout << "febatest1 status: " << getdir("test_db", "febatest1", path, true)
     << ", path: " << path << endl;
-  cout << "fe98test2 status: " << getdir("test_db", "fe98test2", path)
+  cout << "fe98test2 status: " << getdir("test_db", "fe98test2", path, true)
     << ", path: " << path << endl;
-  cout << "fe98test3 status: " << getdir("test_db", "fe98test3", path)
+  cout << "fe98test3 status: " << getdir("test_db", "fe98test3", path, true)
     << ", path: " << path << endl;
-  cout << "fetest4 status: " << getdir("test_db", "fetest4", path)
+  cout << "fetest4 status: " << getdir("test_db", "fetest4", path, true)
     << ", path: " << path << endl;
-  cout << "fedc76test5 status: " << getdir("test_db", "fedc76test5", path)
+  cout << "fedc76test5 status: " << getdir("test_db", "fedc76test5", path, true)
     << ", path: " << path << endl;
   testdir("test_db/data/fe/dc/76", true);
-  cout << "fedc76test6 status: " << getdir("test_db", "fedc76test6", path)
+  cout << "fedc76test6 status: " << getdir("test_db", "fedc76test6", path, true)
     << ", path: " << path << endl;
-  cout << "fedc76test6 status: " << getdir("test_db", "fedc76test6", path)
+  cout << "fedc76test6 status: " << getdir("test_db", "fedc76test6", path, true)
     << ", path: " << path << endl;
 
   cout << endl << "Test: params_readline" << endl;

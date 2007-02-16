@@ -1,5 +1,3 @@
-Failed to create directory: test_db/data/fe/te/st4
-Failed to create directory: test_db/data/fe/dc/76/test5
 Tools Test
 
 Test: zcopy (and thus getchecksum)
@@ -42,8 +40,8 @@ Check test_db/data dir: 1
 febatest1 status: 0, path: test_db/data/fe/ba/test1
 fe98test2 status: 0, path: test_db/data/fe/98/test2
 fe98test3 status: 1, path: test_db/data/fe/98/test3
-fetest4 status: 2, path: test_db/data/fe/te/st4
-fedc76test5 status: 2, path: test_db/data/fe/dc/76/test5
+fetest4 status: 1, path: test_db/data/fe/te/st4
+fedc76test5 status: 1, path: test_db/data/fe/dc/76/test5
 fedc76test6 status: 1, path: test_db/data/fe/dc/76/test6
 fedc76test6 status: 0, path: test_db/data/fe/dc/76/test6
 

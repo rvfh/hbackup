@@ -29,7 +29,11 @@ extern char type_letter(mode_t mode);
 
 extern mode_t type_mode(char letter);
 
-extern int getdir(const string& db_path, const string &checksum, string& path);
+extern int getdir(
+  const string& db_path,
+  const string& checksum,
+  string&       path,
+  bool          create);
 
 extern int zcopy(
   const string& source_path,
