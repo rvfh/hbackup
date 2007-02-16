@@ -21,8 +21,8 @@ using namespace std;
 #include <iostream>
 #include <vector>
 #include <errno.h>
-#include "metadata.h"
-#include "common.h"
+
+#include "files.h"
 #include "list.h"
 #include "filters.h"
 #include "parser.h"

@@ -20,19 +20,19 @@ using namespace std;
 
 #include <iostream>
 #include <string>
+#include <vector>
 #include <errno.h>
-#include <sys/types.h>
 #include <dirent.h>
+#include <sys/stat.h>
 
-#include "metadata.h"
-#include "common.h"
-#include "tools.h"
 #include "list.h"
+#include "files.h"
 #include "filters.h"
 #include "parser.h"
 #include "parsers.h"
 #include "cvs_parser.h"
 #include "paths.h"
+#include "hbackup.h"
 
 static char *filedata_get(const void* payload) {
   const filedata_t* filedata = (const filedata_t*) (payload);

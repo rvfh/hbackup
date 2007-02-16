@@ -19,8 +19,10 @@
 using namespace std;
 
 #include <iostream>
-#include "metadata.h"
-#include "common.h"
+#include <vector>
+#include <sys/stat.h>
+
+#include "files.h"
 #include "filters.h"
 
 void filter_show(const Filters& filters) {

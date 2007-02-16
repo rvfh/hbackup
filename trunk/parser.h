@@ -19,8 +19,8 @@
 #ifndef PARSER_H
 #define PARSER_H
 
-#ifndef COMMON_H
-#error You must include common.h before parser.h
+#ifndef FILES_H
+#error You must include files.h before parser.h
 #endif
 
 typedef enum {

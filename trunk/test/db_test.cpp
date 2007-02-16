@@ -405,6 +405,35 @@ int main(void) {
   cout << ">List " << db_list->size() << " element(s):\n";
   db_list->show(NULL, db_data_show);
 
+  cout << endl << "Test: getdir" << endl;
+  cout << "Check test_db/data dir: " << testdir("test_db/data", true) << endl;
+  testfile("test_db/data/.nofiles", true);
+  testdir("test_db/data/fe", true);
+  testfile("test_db/data/fe/.nofiles", true);
+  testfile("test_db/data/fe/test4", true);
+  testdir("test_db/data/fe/dc", true);
+  testfile("test_db/data/fe/dc/.nofiles", true);
+  testdir("test_db/data/fe/ba", true);
+  testdir("test_db/data/fe/ba/test1", true);
+  testdir("test_db/data/fe/98", true);
+  testdir("test_db/data/fe/98/test2", true);
+  string  getdir_path;
+  cout << "febatest1 status: " << db.getDir("febatest1", getdir_path, true)
+    << ", getdir_path: " << getdir_path << endl;
+  cout << "fe98test2 status: " << db.getDir("fe98test2", getdir_path, true)
+    << ", getdir_path: " << getdir_path << endl;
+  cout << "fe98test3 status: " << db.getDir("fe98test3", getdir_path, true)
+    << ", getdir_path: " << getdir_path << endl;
+  cout << "fetest4 status: " << db.getDir("fetest4", getdir_path, true)
+    << ", getdir_path: " << getdir_path << endl;
+  cout << "fedc76test5 status: " << db.getDir("fedc76test5", getdir_path, true)
+    << ", getdir_path: " << getdir_path << endl;
+  testdir("test_db/data/fe/dc/76", true);
+  cout << "fedc76test6 status: " << db.getDir("fedc76test6", getdir_path, true)
+    << ", getdir_path: " << getdir_path << endl;
+  cout << "fedc76test6 status: " << db.getDir("fedc76test6", getdir_path, true)
+    << ", getdir_path: " << getdir_path << endl;
+
   db.close();
 
 
