@@ -94,7 +94,7 @@ Parser *CvsParser::isControlled(const string& dir_path) {
   }
 }
 
-bool CvsParser::ignore(const filedata_t *file_data) {
+bool CvsParser::ignore(const File& file_data) {
   // Deal with no-work cases
   if (  (_all_files)
      // We don't know whether controlled files are modified or not
@@ -103,26 +103,16 @@ bool CvsParser::ignore(const filedata_t *file_data) {
     return false;
   }
 
-  // Get file base name
-  string file_name;
-  unsigned int pos = file_data->path.rfind("/");
-  if (pos == string::npos) {
-    file_name = file_data->path;
-  } else {
-    file_name = file_data->path.substr(pos + 1);
-  }
-
   // Do not ignore CVS directory
-  if (  (file_name == "CVS")
-     && (file_data->metadata.type == S_IFDIR)) {
+  if ((file_data.name() == "CVS") && (file_data.type() == S_IFDIR)) {
     return false;
   }
 
   // Look for match in list
   bool controlled = false;
   for (unsigned int i = 0; i < _files.size(); i++) {
-    if ((_files[i].name == file_name)
-     && (_files[i].type == file_data->metadata.type)) {
+    if ((_files[i].name == file_data.name())
+     && (_files[i].type == file_data.type())) {
       controlled = true;
       break;
     }

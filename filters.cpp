@@ -53,32 +53,32 @@ Condition::Condition(
   va_end(args);
 }
 
-int Condition::match(const filedata_t *filedata) const {
+int Condition::match(const File& filedata) const {
   /* Check that file type matches */
-  if ((_file_type & filedata->metadata.type) == 0) {
+  if ((_file_type & filedata.type()) == 0) {
     return 1;
   }
   /* Run conditions */
   switch(_type) {
   case filter_path_end: {
-    signed int diff = filedata->path.size() - _string.size();
+    signed int diff = filedata.path().size() - _string.size();
     if (diff < 0) {
       return 1;
     }
-    return _string != filedata->path.substr(diff); }
+    return _string != filedata.path().substr(diff); }
   case filter_path_start:
-    return filedata->path.substr(0, _string.size()) != _string;
+    return filedata.path().substr(0, _string.size()) != _string;
   case filter_path_regexp:
     regex_t regex;
     if (regcomp(&regex, _string.c_str(), REG_EXTENDED)) {
       cerr << "filters: regexp: incorrect expression" << endl;
       return 2;
     }
-    return regexec(&regex, filedata->path.c_str(), 0, NULL, 0);
+    return regexec(&regex, filedata.path().c_str(), 0, NULL, 0);
   case filter_size_above:
-    return filedata->metadata.size < _size;
+    return filedata.size() < _size;
   case filter_size_below:
-    return filedata->metadata.size > _size;
+    return filedata.size() > _size;
   default:
     cerr << "filters: match: unknown condition type" << endl;
     return 2;
@@ -118,7 +118,7 @@ Filters::~Filters() {
   }
 }
 
-int Filters::match(const filedata_t *filedata) const {
+int Filters::match(const File& filedata) const {
   /* Read through list of rules */
   for (unsigned int i = 0; i < size(); i++) {
     Filter  *rule = (*this)[i];

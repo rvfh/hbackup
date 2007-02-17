@@ -39,7 +39,7 @@ public:
   // This will create an appropriate parser for the directory if relevant
   virtual Parser* isControlled(const string& dir_path) = 0;
   // That tells use whether to ignore the file, i.e. not back it up
-  virtual bool ignore(const filedata_t *file_data) = 0;
+  virtual bool ignore(const File& file_data) = 0;
   // For debug purposes
   virtual void list() {};
 };
@@ -53,7 +53,7 @@ class IgnoreParser : public Parser {
     return NULL;
   };
   // Ignore all files
-  bool ignore(const filedata_t *file_data) {
+  bool ignore(const File& file_data) {
     return true;
   };
 };

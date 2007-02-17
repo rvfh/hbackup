@@ -43,7 +43,7 @@ public:
   // This will create an appropriate parser for the directory if relevant
   Parser* isControlled(const string& dir_path);
   // That tells use whether to ignore the file, i.e. not back it up
-  bool ignore(const filedata_t *file_data);
+  bool ignore(const File& file_data);
   // For debug purposes
   void list() {
     cout << "List: " << _files.size() << " file(s)" << endl;

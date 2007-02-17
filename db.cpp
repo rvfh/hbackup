@@ -105,19 +105,19 @@ static char *parse_select(const void *payload) {
 }
 
 /* Need to compare only for matching paths */
-static int parse_compare(void *db_data_p, void *filedata_p) {
-  const db_data_t *db_data  = (const db_data_t *) (db_data_p);
-  filedata_t      *filedata = (filedata_t *) (filedata_p);
+static int parse_compare(void *db_data_p, void *file_data_p) {
+  const db_data_t *db_data   = (const db_data_t *) (db_data_p);
+  File            *file_data = (File *) (file_data_p);
   int             result;
 
   /* If paths differ, that's all we want to check */
   if ((result = strcmp(&db_data->filedata.path[backup_path_length],
-      filedata->path.c_str()))) {
+      file_data->path().c_str()))) {
     return result;
   }
   /* If the file has been modified, just return 1 or -1 and that should do */
-  result = memcmp(&db_data->filedata.metadata, &filedata->metadata,
-    sizeof(metadata_t));
+  metadata_t metadata = file_data->metadata();
+  result = memcmp(&db_data->filedata.metadata, &metadata, sizeof(metadata_t));
 
   /* If it's a file and size and mtime are the same, copy checksum accross */
   if (S_ISREG(db_data->filedata.metadata.type)) {
@@ -125,9 +125,9 @@ static int parse_compare(void *db_data_p, void *filedata_p) {
       /* Checksum missing, add to added list */
       return 1;
     } else
-    if ((db_data->filedata.metadata.size == filedata->metadata.size)
-     || (db_data->filedata.metadata.mtime == filedata->metadata.mtime)) {
-      filedata->checksum = db_data->filedata.checksum;
+    if ((db_data->filedata.metadata.size == file_data->size())
+     || (db_data->filedata.metadata.mtime == file_data->mtime())) {
+      file_data->setChecksum(db_data->filedata.checksum);
     }
   }
   return result;
@@ -747,11 +747,11 @@ int Database::parse(
     /* Determine volume to be copied */
     if (verbosity() > 2) {
       while ((entry = added_files_list->next(entry)) != NULL) {
-        filedata_t *filedata = (filedata_t *) (list_entry_payload(entry));
+        File* filedata = (File*) (list_entry_payload(entry));
 
         filestobackup++;
-        if (S_ISREG(filedata->metadata.type)) {
-          sizetobackup += double(filedata->metadata.size);
+        if (S_ISREG(filedata->type())) {
+          sizetobackup += double(filedata->size());
         }
       }
       printf(" --> Files to add: %u (%0.f bytes)\n",
@@ -759,22 +759,22 @@ int Database::parse(
     }
 
     while (((entry = added_files_list->next(entry)) != NULL) && ! terminating()) {
-      filedata_t *filedata = (filedata_t *) (list_entry_payload(entry));
-      db_data_t  *db_data  = new db_data_t;
+      File*       filedata = (File*) (list_entry_payload(entry));
+      db_data_t*  db_data  = new db_data_t;
 
       db_data->host = host;
-      db_data->filedata.metadata = filedata->metadata;
-      db_data->filedata.path = real_path + "/" + filedata->path;
+      db_data->filedata.metadata = filedata->metadata();
+      db_data->filedata.path = real_path + "/" + filedata->path();
       db_data->link = "";
       db_data->date_in = time(NULL);
       db_data->date_out = 0;
       /* Save new data */
-      if (S_ISREG(filedata->metadata.type)) {
-        if (filedata->checksum[0] != '\0') {
+      if (S_ISREG(filedata->type())) {
+        if (filedata->checksum().size() != '\0') {
           /* Checksum given by the compare function */
-          db_data->filedata.checksum = filedata->checksum;
+          db_data->filedata.checksum = filedata->checksum();
         } else {
-          if (write(mount_path, filedata->path, db_data,
+          if (write(mount_path, filedata->path(), db_data,
               db_data->filedata.checksum, 0)) {
             /* Write failed, need to go on */
             failed = 1;
@@ -787,13 +787,13 @@ int Database::parse(
           }
         }
         if (verbosity() > 2) {
-          sizebackedup += double(filedata->metadata.size);
+          sizebackedup += double(filedata->size());
         }
       } else {
         db_data->filedata.checksum = "";
       }
-      if (S_ISLNK(filedata->metadata.type)) {
-        string  full_path = mount_path + "/" + filedata->path;
+      if (S_ISLNK(filedata->type())) {
+        string  full_path = mount_path + "/" + filedata->path();
         char    *link     = new char[FILENAME_MAX];
         int     size;
 

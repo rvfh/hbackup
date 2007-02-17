@@ -35,10 +35,9 @@ using namespace std;
 #include "hbackup.h"
 
 static char *filedata_get(const void* payload) {
-  const filedata_t* filedata = (const filedata_t*) (payload);
-  char*             string   = NULL;
+  char *string = NULL;
 
-  asprintf(&string, "%s", filedata->path.c_str());
+  asprintf(&string, "%s", ((File *) payload)->path().c_str());
   return string;
 }
 
@@ -66,31 +65,28 @@ int Path::iterate_directory(const string& path, Parser* parser) {
   }
   struct dirent *dir_entry;
   while (((dir_entry = readdir(directory)) != NULL) && ! terminating()) {
-    filedata_t  filedata;
-    string      file_path;
-
     /* Ignore . and .. */
     if (! strcmp(dir_entry->d_name, ".") || ! strcmp(dir_entry->d_name, "..")){
       continue;
     }
-    file_path = path + "/" + dir_entry->d_name;
+    string file_path = path + "/" + dir_entry->d_name;
+    File   file_data(file_path.substr(0, _mount_path_length),
+      file_path.substr(_mount_path_length + 1));
+
     /* Remove mount path and leading slash from records */
-    filedata.path = file_path.substr(_mount_path_length + 1);
-    filedata.checksum = "";
-    if (metadata_get(file_path.c_str(), &filedata.metadata)) {
+    if (file_data.type() == 0) {
       cerr << "filelist: cannot get metadata: " << file_path << endl;
       continue;
     } else
     /* Let the parser analyse the file data to know whether to back it up */
-    if ((parser != NULL) && (parser->ignore(&filedata))) {
+    if ((parser != NULL) && (parser->ignore(file_data))) {
       continue;
     } else
     /* Now pass it through the filters */
-    if ((_filters.size() != 0) && ! _filters.match(&filedata)) {
+    if ((_filters.size() != 0) && ! _filters.match(file_data)) {
       continue;
     } else
-    if (S_ISDIR(filedata.metadata.type)) {
-      filedata.metadata.size = 0;
+    if (S_ISDIR(file_data.type())) {
       if (iterate_directory(file_path, parser)) {
         if (! terminating()) {
           cerr << "filelist: cannot iterate into directory: "
@@ -99,7 +95,7 @@ int Path::iterate_directory(const string& path, Parser* parser) {
         continue;
       }
     }
-    _list->add(new filedata_t(filedata));
+    _list->add(new File(file_data));
   }
   closedir(directory);
   if (terminating()) {
