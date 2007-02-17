@@ -27,13 +27,14 @@
 #error You must include files.h before db.h
 #endif
 
-typedef struct {
-  string      host;
-  filedata_t  filedata;
-  string      link;
-  time_t      date_in;
-  time_t      date_out;
-} db_data_t;
+// FIXME This is a temporary ugly hack
+class db_data_t {
+public:
+  ~db_data_t() { delete filedata; }
+  File    *filedata;
+  time_t  date_in;
+  time_t  date_out;
+};
 
 class Database {
   string _path;
@@ -74,10 +75,7 @@ public:
   int  load(
     const string &filename,
     List *list);
-  int  obsolete(
-    const string& prefix,
-    const string& path,
-    const string& checksum);
+  int  obsolete(const File& file_data);
   int  organize(
     const string& path,
     int number);

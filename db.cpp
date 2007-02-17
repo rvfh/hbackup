@@ -19,7 +19,7 @@
 /* Compression to use when required: gzip -5 (best speed/ratio) */
 
 /* List file contents:
- *  host          (given in the format: 'protocol://host')
+ *  prefix        (given in the format: 'protocol://host')
  *  path          (metadata)
  *  type          (metadata)
  *  size          (metadata)
@@ -37,9 +37,9 @@
 using namespace std;
 
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <vector>
-#include <sstream>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <signal.h>
@@ -69,12 +69,12 @@ static char *db_data_get(const void *payload) {
 
   if (db_data->date_out == 0) {
     /* '@' > '9' */
-    asprintf(&string, "%s %s %c", db_data->host.c_str(),
-      db_data->filedata.path.c_str(), '@');
+    asprintf(&string, "%s %s %c", db_data->filedata->access_path().c_str(),
+      db_data->filedata->path().c_str(), '@');
   } else {
     /* ' ' > '0' */
-    asprintf(&string, "%s %s %11ld", db_data->host.c_str(),
-      db_data->filedata.path.c_str(), db_data->date_out);
+    asprintf(&string, "%s %s %11ld", db_data->filedata->access_path().c_str(),
+      db_data->filedata->path().c_str(), db_data->date_out);
   }
   return string;
 }
@@ -99,7 +99,7 @@ static char *parse_select(const void *payload) {
     /* This string cannot be matched */
     asprintf(&string, "\t");
   } else {
-    asprintf(&string, "%s", db_data->filedata.path.c_str());
+    asprintf(&string, "%s", db_data->filedata->path().c_str());
   }
   return string;
 }
@@ -111,23 +111,25 @@ static int parse_compare(void *db_data_p, void *file_data_p) {
   int             result;
 
   /* If paths differ, that's all we want to check */
-  if ((result = strcmp(&db_data->filedata.path[backup_path_length],
-      file_data->path().c_str()))) {
+  result = strcmp(db_data->filedata->path().substr(backup_path_length).c_str(),
+    file_data->path().c_str());
+  if (result) {
     return result;
   }
   /* If the file has been modified, just return 1 or -1 and that should do */
-  metadata_t metadata = file_data->metadata();
-  result = memcmp(&db_data->filedata.metadata, &metadata, sizeof(metadata_t));
+  result = *db_data->filedata != *file_data;
+  if (result) {
+  }
 
   /* If it's a file and size and mtime are the same, copy checksum accross */
-  if (S_ISREG(db_data->filedata.metadata.type)) {
-    if (db_data->filedata.checksum[0] == 'N') {
+  if (S_ISREG(db_data->filedata->type())) {
+    if (db_data->filedata->checksum() == "N") {
       /* Checksum missing, add to added list */
       return 1;
     } else
-    if ((db_data->filedata.metadata.size == file_data->size())
-     || (db_data->filedata.metadata.mtime == file_data->mtime())) {
-      file_data->setChecksum(db_data->filedata.checksum);
+    if ((db_data->filedata->size() == file_data->size())
+     || (db_data->filedata->mtime() == file_data->mtime())) {
+      file_data->setChecksum(db_data->filedata->checksum());
     }
   }
   return result;
@@ -147,76 +149,86 @@ int Database::load(const string &filename, List *list) {
 
     while (getline(&buffer, &size, readfile) >= 0) {
       db_data_t db_data;
-      db_data_t *db_data_p = NULL;
+      // Don't destroy something else!
+      db_data.filedata = NULL;
       char      *start = buffer;
       char      *delim;
-      char      *string = new char[size];
+      char      *value = new char[size];
+      // Data
+      string    access_path;
+      string    path;
+      string    link;
+      string    checksum;
       char      letter;
+      time_t    mtime;
+      off_t     size;
+      uid_t     uid;
+      gid_t     gid;
+      mode_t    mode;
       int       field = 0;
       int       failed = 1;
 
       while ((delim = strchr(start, '\t')) != NULL) {
         /* Get string portion */
-        strncpy(string, start, delim - start);
-        string[delim - start] = '\0';
+        strncpy(value, start, delim - start);
+        value[delim - start] = '\0';
         /* Extract data */
         failed = 0;
         switch (++field) {
           case 1:   /* Prefix */
-            db_data.host = string;
+            access_path = value;
             break;
           case 2:   /* Path */
-            db_data.filedata.path = string;
+            path = value;
             break;
           case 3:   /* Type */
-            if (sscanf(string, "%c", &letter) != 1) {
+            if (sscanf(value, "%c", &letter) != 1) {
               failed = 2;
             }
-            db_data.filedata.metadata.type = File::typeMode(letter);
             break;
           case 4:   /* Size */
-            if (sscanf(string, "%ld", &db_data.filedata.metadata.size) != 1) {
+            if (sscanf(value, "%ld", &size) != 1) {
               failed = 2;
             }
             break;
           case 5:   /* Modification time */
-            if (sscanf(string, "%ld", &db_data.filedata.metadata.mtime) != 1) {
+            if (sscanf(value, "%ld", &mtime) != 1) {
               failed = 2;
             }
             break;
           case 6:   /* User */
-            if (sscanf(string, "%u", &db_data.filedata.metadata.uid) != 1) {
+            if (sscanf(value, "%u", &uid) != 1) {
               failed = 2;
             }
             break;
           case 7:   /* Group */
-            if (sscanf(string, "%u", &db_data.filedata.metadata.gid) != 1) {
+            if (sscanf(value, "%u", &gid) != 1) {
               failed = 2;
             }
             break;
           case 8:   /* Permissions */
-            if (sscanf(string, "%o", &db_data.filedata.metadata.mode) != 1) {
+            if (sscanf(value, "%o", &mode) != 1) {
               failed = 2;
             }
             break;
           case 9:   /* Link */
-            db_data.link = string;
+            link = value;
             break;
           case 10:  /* Checksum */
-            db_data.filedata.checksum = string;
+            checksum = value;
             break;
           case 11:  /* Date in */
-            if (sscanf(string, "%ld", &db_data.date_in) != 1) {
+            if (sscanf(value, "%ld", &db_data.date_in) != 1) {
               failed = 2;
             }
             break;
           case 12:  /* Date out */
-            if (sscanf(string, "%ld", &db_data.date_out) != 1) {
+            if (sscanf(value, "%ld", &db_data.date_out) != 1) {
               failed = 2;
             }
             break;
           case 13:  /* Mark */
-            if (strcmp(string, "-")) {
+            if (strcmp(value, "-")) {
               failed = 2;
             }
             break;
@@ -228,12 +240,13 @@ int Database::load(const string &filename, List *list) {
           break;
         }
       }
-      free(string);
+      free(value);
       if (failed) {
         errno = EUCLEAN;
       } else {
-        db_data_p = new db_data_t;
-        *db_data_p = db_data;
+        db_data_t *db_data_p = new db_data_t(db_data);
+        db_data_p->filedata = new File(access_path, path, link, checksum,
+          File::typeMode(letter), mtime, size, uid, gid, mode);
         list->add(db_data_p);
       }
     }
@@ -259,15 +272,9 @@ int Database::save(const string& filename, List *list) {
     while ((entry = list->next(entry)) != NULL) {
       db_data_t *db_data = (db_data_t *) (list_entry_payload(entry));
 
-      fprintf(writefile,
-        "%s\t%s\t%c\t%ld\t%ld\t%u\t%u\t%o\t%s\t%s\t%ld\t%ld\t%c\n",
-        db_data->host.c_str(), db_data->filedata.path.c_str(),
-        File::typeLetter(db_data->filedata.metadata.type),
-        db_data->filedata.metadata.size, db_data->filedata.metadata.mtime,
-        db_data->filedata.metadata.uid, db_data->filedata.metadata.gid,
-        db_data->filedata.metadata.mode, db_data->link.c_str(),
-        db_data->filedata.checksum.c_str(), db_data->date_in, db_data->date_out,
-        '-');
+      fprintf(writefile, "%s\t%ld\t%ld\t-\n",
+        db_data->filedata->line().c_str(),
+        db_data->date_in, db_data->date_out);
     }
     fclose(writefile);
 
@@ -302,34 +309,30 @@ int Database::organize(const string& path, int number) {
   if (number == 0) {
     rewinddir(directory);
     while ((dir_entry = readdir(directory)) != NULL) {
-      metadata_t  metadata;
-      string      source_path;
-
       /* Ignore . and .. */
       if (! strcmp(dir_entry->d_name, ".")
        || ! strcmp(dir_entry->d_name, "..")) {
         continue;
       }
-      source_path = path + "/" + dir_entry->d_name;
-      if (metadata_get(source_path.c_str(), &metadata)) {
+      File file_data(path, dir_entry->d_name);
+      string source_path = path + "/" + dir_entry->d_name;
+      if (file_data.type() == 0) {
         cerr << "db: organize: cannot get metadata: " << source_path << endl;
         failed = 2;
-      } else if (S_ISDIR(metadata.type) && (dir_entry->d_name[2] != '\0')
-        /* If we crashed, we might have some two-letter dirs already */
-              && (dir_entry->d_name[2] != '-')) {
-        /* If we've reached the point where the dir is ??-?, stop! */
-        string  dir_path;
-
-        /* Create two-letter directory */
-        dir_path = string(path) + "/" + dir_entry->d_name[0] + dir_entry->d_name[1];
+      } else
+      if (S_ISDIR(file_data.type())
+       // If we crashed, we might have some two-letter dirs already
+       && (file_data.name().size() != 2)
+       // If we've reached the point where the dir is ??-?, stop!
+       && (file_data.name()[2] != '-')) {
+        // Create two-letter directory
+        string dir_path = path + "/" + file_data.name().substr(0,2);
         if (File::testDir(dir_path, 1) == 2) {
           failed = 2;
         } else {
-          string  dest_path;
-
-          /* Create destination path */
-          dest_path = dir_path + "/" + &dir_entry->d_name[2];
-          /* Move directory accross, changing its name */
+          // Create destination path
+          string dest_path = dir_path + "/" + file_data.name().substr(2);
+          // Move directory accross, changing its name
           if (rename(source_path.c_str(), dest_path.c_str())) {
             failed = 1;
           }
@@ -374,7 +377,7 @@ int Database::write(
   } else
 
   /* Check size_source size */
-  if (size_source != db_data->filedata.metadata.size) {
+  if (size_source != db_data->filedata->size()) {
     cerr << "db: write: file copy incomplete: " << path << endl;
     failed = 1;
   } else
@@ -401,19 +404,12 @@ int Database::write(
         string try_path;
 
         try_path = final_path + "/data";
-        if (! File::testReg(try_path, 0)) {
+        if (File::testReg(try_path, 0) == 0) {
           /* A file already exists, let's compare */
-          metadata_t try_md;
-          metadata_t temp_md;
+          File try_md(try_path);
+          File temp_md(temp_path);
 
-          differ = 1;
-
-          /* Compare sizes only */
-          if (! metadata_get(try_path.c_str(), &try_md)
-          && ! metadata_get(temp_path.c_str(), &temp_md)
-          && (try_md.size == temp_md.size)) {
-            differ = 0;
-          }
+          differ = (try_md.size() != temp_md.size());
         }
       }
       if (! differ) {
@@ -455,7 +451,8 @@ int Database::write(
       if (load(listfile, list) == 2) {
         cerr << "db: write: failed to open data list" << endl;
       } else {
-        new_db_data.filedata.checksum = checksum_dest;
+        new_db_data.filedata = new File(*db_data->filedata);
+        new_db_data.filedata->setChecksum(checksum_dest);
         entry = list->add(&new_db_data);
         save(listfile, list);
         list->remove(entry);
@@ -479,17 +476,15 @@ int Database::write(
   return failed;
 }
 
-int Database::obsolete(
-    const string& prefix,
-    const string& path,
-    const string& checksum) {
+int Database::obsolete(const File& file_data) {
   string  listfile;
   string  temp_path;
   int     failed = 0;
   List    *list;
 
-  if (getDir(checksum, temp_path, false)) {
-    cerr << "db: obsolete: failed to get dir for: " << checksum << endl;
+  if (getDir(file_data.checksum(), temp_path, false)) {
+    cerr << "db: obsolete: failed to get dir for: "
+      << file_data.checksum() << endl;
     return 2;
   }
   listfile = temp_path.substr(_path.size() + 1) + "/list";
@@ -502,7 +497,7 @@ int Database::obsolete(
     list_entry_t  *entry;
     string        string;
 
-    string = prefix + " " + path + " @";
+    string = file_data.access_path() + " " + file_data.path() + " @";
     list->find(string.c_str(), NULL, &entry);
     if (entry != NULL) {
       db_data = (db_data_t *) (list_entry_payload(entry));
@@ -589,7 +584,7 @@ int Database::getDir(
   } while (true);
   // Return path
   path += "/" + checksum.substr(level);
-  return File::testDir(path, create);
+  return File::testDir(path, false);
 }
 
 int Database::open() {
@@ -714,7 +709,7 @@ void Database::close() {
 }
 
 int Database::parse(
-    const string& host,
+    const string& prefix,
     const string& real_path,
     const string& mount_path,
     List          *file_list) {
@@ -725,7 +720,7 @@ int Database::parse(
   char          *pathslash  = NULL;
   int           failed      = 0;
 
-  /* Compare list with db list for matching host */
+  /* Compare list with db list for matching prefix */
   backup_path_length = real_path.size() + 1;
   asprintf(&pathslash, "%s/", real_path.c_str());
   db_list->select(pathslash, parse_select, selected_files_list, NULL);
@@ -759,57 +754,43 @@ int Database::parse(
     }
 
     while (((entry = added_files_list->next(entry)) != NULL) && ! terminating()) {
-      File*       filedata = (File*) (list_entry_payload(entry));
+      const File* filedata = (File*) (list_entry_payload(entry));
       db_data_t*  db_data  = new db_data_t;
 
-      db_data->host = host;
-      db_data->filedata.metadata = filedata->metadata();
-      db_data->filedata.path = real_path + "/" + filedata->path();
-      db_data->link = "";
+      // Set database data
       db_data->date_in = time(NULL);
       db_data->date_out = 0;
-      /* Save new data */
+      // Set object data
+      db_data->filedata = new File(*filedata);
+      db_data->filedata->setAccessPath(prefix);
+      // Set checksum
+      string checksum = "";
       if (S_ISREG(filedata->type())) {
-        if (filedata->checksum().size() != '\0') {
+        if (filedata->checksum().size() != 0) {
           /* Checksum given by the compare function */
-          db_data->filedata.checksum = filedata->checksum();
-        } else {
-          if (write(mount_path, filedata->path(), db_data,
-              db_data->filedata.checksum, 0)) {
-            /* Write failed, need to go on */
-            failed = 1;
-            if (! terminating()) {
-              /* Don't signal errors on termination */
-              cerr << "\r" << strerror(errno) << ": "
-                << db_data->filedata.path << ", ignoring" << endl;
-            }
-            db_data->filedata.checksum = "N";
+          checksum = filedata->checksum();
+        } else
+        if (write(mount_path, filedata->path(), db_data, checksum, 0)) {
+          /* Write failed, need to go on */
+          checksum = "N";
+          failed   = 1;
+          if (! terminating()) {
+            /* Don't signal errors on termination */
+            cerr << "\r" << strerror(errno) << ": "
+              << db_data->filedata->path() << ", ignoring" << endl;
           }
         }
         if (verbosity() > 2) {
           sizebackedup += double(filedata->size());
         }
-      } else {
-        db_data->filedata.checksum = "";
       }
-      if (S_ISLNK(filedata->type())) {
-        string  full_path = mount_path + "/" + filedata->path();
-        char    *link     = new char[FILENAME_MAX];
-        int     size;
-
-        if ((size = readlink(full_path.c_str(), link, FILENAME_MAX)) < 0) {
-          failed = 1;
-          cerr << "\r" << strerror(errno) << ": "
-            << db_data->filedata.path << ", ignoring" << endl;
-        } else {
-          link[size] = '\0';
-          db_data->link = link;
-        }
-        free(link);
-      }
+      // Update file path
+      db_data->filedata->setPath(real_path + "/" + filedata->path());
+      db_data->filedata->setChecksum(checksum);
+      // Save new data
       db_list->add(db_data);
       if ((++copied >= 1000)
-      || ((volume += db_data->filedata.metadata.size) >= 10000000)) {
+      || ((volume += db_data->filedata->size()) >= 100000000)) {
         copied = 0;
         volume = 0;
         save("list", db_list);
@@ -843,11 +824,10 @@ int Database::parse(
       db_data->date_out = time(NULL);
 
       /* Update local list */
-      if (S_ISREG(db_data->filedata.metadata.type)
-       && (db_data->filedata.checksum[0] != '\0')
-       && (db_data->filedata.checksum[0] != 'N')) {
-        obsolete(db_data->host, db_data->filedata.path,
-          db_data->filedata.checksum);
+      if (S_ISREG(db_data->filedata->type())
+       && (db_data->filedata->checksum().size() != 0)
+       && (db_data->filedata->checksum() != "N")) {
+        obsolete(*db_data->filedata);
       }
     }
   } else if (verbosity() > 2) {
@@ -932,15 +912,17 @@ int Database::scan(const string& checksum, bool thorough) {
         printf(" --> Files left to go: %u\n", files);
       }
       files--;
-      if ((db_data->filedata.checksum.size() != 0)
-       && scan(db_data->filedata.checksum, thorough)) {
-        db_data->filedata.checksum = "N";
+      if ((db_data->filedata->checksum().size() != 0)
+       && scan(db_data->filedata->checksum(), thorough)) {
+        db_data->filedata->setChecksum("N");
         failed = 1;
         if (! terminating() && verbosity() > 1) {
           struct tm *time;
-          cout << " -> Client:      " << db_data->host << endl;
-          cout << " -> File name:   " << db_data->filedata.path << endl;
-          time = localtime(&db_data->filedata.metadata.mtime);
+          cout << " -> Client:      " << db_data->filedata->access_path()
+            << endl;
+          cout << " -> File name:   " << db_data->filedata->path() << endl;
+          time_t file_mtime = db_data->filedata->mtime();
+          time = localtime(&file_mtime);
           printf(" -> Modified:    %04u-%02u-%02u %2u:%02u:%02u\n",
             time->tm_year + 1900, time->tm_mon + 1, time->tm_mday,
             time->tm_hour, time->tm_min, time->tm_sec);
@@ -1004,7 +986,7 @@ int Database::scan(const string& checksum, bool thorough) {
             filefailed = true;
             cerr << "db: scan: file data missing for checksum " << checksum << endl;
           } else
-          if (db_data->filedata.checksum.substr(0, checksum_real.size())
+          if (db_data->filedata->checksum().substr(0, checksum_real.size())
            != checksum_real) {
             errno = EILSEQ;
             filefailed = true;
