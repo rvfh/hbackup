@@ -34,12 +34,12 @@ int main(void) {
   cout << "Tools Test" << endl;
 
   cout << endl << "Test: zcopy" << endl;
-  system("dd if=/dev/zero of=zcopy_test bs=1M count=10 status=noxfer 2> /dev/null");
+  system("dd if=/dev/zero of=test/zcopy_source bs=1M count=10 status=noxfer 2> /dev/null");
   off_t   size_in   = 125;
   off_t   size_out  = 250;
   string  check_in  = "bart";
   string  check_out = "ernest";
-  File::zcopy("zcopy_test", "zcopied", &size_in, &size_out, &check_in,
+  File::zcopy("test/zcopy_source", "test/zcopy_dest", &size_in, &size_out, &check_in,
     &check_out, 5);
   cout << "In: " << size_in << " bytes, checksum: " << check_in << endl;
   cout << "Out: " << size_out << " bytes, checksum: " << check_out << endl;
@@ -47,7 +47,7 @@ int main(void) {
   size_out = 250;
   check_in  = "bart";
   check_out = "ernest";
-  File::zcopy("zcopy_test", "zcopied", &size_in, &size_out, &check_in,
+  File::zcopy("test/zcopy_source", "test/zcopy_dest", &size_in, &size_out, &check_in,
     &check_out, 0);
   cout << "In: " << size_in << " bytes, checksum: " << check_in << endl;
   cout << "Out: " << size_out << " bytes, checksum: " << check_out << endl;
