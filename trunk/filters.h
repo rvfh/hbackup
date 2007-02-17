@@ -50,7 +50,7 @@ public:
     mode_t file_type,
     filter_type_t type,
     ...);
-  int  match(const filedata_t *filedata) const;
+  int  match(const File& file_data) const;
   /* Debug only */
   void show() const;
 };
@@ -65,7 +65,7 @@ public:
 class Filters: public vector<Filter*> {
 public:
   ~Filters();
-  int match(const filedata_t *filedata) const;
+  int match(const File& file_data) const;
 };
 
 #endif

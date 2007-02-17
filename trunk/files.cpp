@@ -34,6 +34,55 @@ using namespace std;
 
 #define CHUNK 409600
 
+// TODO test
+File::File(const string& access_path, const string& path) {
+  _access_path = access_path;
+  _path        = path;
+  _checksum    = "";
+  string  full_path = _access_path + "/" + _path;
+  struct  stat metadata;
+
+  if (lstat(full_path.c_str(), &metadata)) {
+    // errno set by lstat
+    _type  = 0;
+  } else {
+    /* Fill in file information */
+    _type  = metadata.st_mode & S_IFMT;
+    _mtime = metadata.st_mtime;
+    if (S_ISDIR(_type)) {
+      _size  = 0;
+    } else {
+      _size  = metadata.st_size;
+    }
+    _uid   = metadata.st_uid;
+    _gid   = metadata.st_gid;
+    _mode  = metadata.st_mode & ~S_IFMT;
+  }
+}
+
+// TODO test
+string File::name() const {
+  unsigned int pos = _path.rfind("/");
+  if (pos == string::npos) {
+    return _path;
+  } else {
+    return _path.substr(pos + 1);
+  }
+}
+
+// TODO remove
+metadata_t File::metadata() const {
+  metadata_t metadata;
+  metadata.type  = _type;
+  metadata.mtime = _mtime;
+  metadata.size  = _size;
+  metadata.uid   = _uid;
+  metadata.gid   = _gid;
+  metadata.mode  = _mode;
+  return metadata;
+}
+
+// Public functions
 int File::testDir(const string& path, bool create) {
   DIR  *directory;
 
