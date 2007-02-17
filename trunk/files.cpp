@@ -18,8 +18,8 @@
 
 using namespace std;
 
-#include <iostream>
 #include <fstream>
+#include <iostream>
 #include <string>
 #include <cctype>
 #include <dirent.h>
@@ -36,28 +36,56 @@ using namespace std;
 
 // TODO test
 File::File(const string& access_path, const string& path) {
-  _access_path = access_path;
-  _path        = path;
+  string full_path;
+  if (path.size() != 0) {
+    _access_path = access_path;
+    _path        = path;
+    full_path    = _access_path + "/" + _path;
+  } else {
+    _access_path = "";
+    _path        = access_path;
+    full_path    = _path;
+  }
   _checksum    = "";
-  string  full_path = _access_path + "/" + _path;
+  _link        = "";
   struct  stat metadata;
 
   if (lstat(full_path.c_str(), &metadata)) {
     // errno set by lstat
-    _type  = 0;
+    _type = 0;
   } else {
     /* Fill in file information */
     _type  = metadata.st_mode & S_IFMT;
     _mtime = metadata.st_mtime;
     if (S_ISDIR(_type)) {
-      _size  = 0;
+      _size = 0;
     } else {
-      _size  = metadata.st_size;
+      _size = metadata.st_size;
     }
     _uid   = metadata.st_uid;
     _gid   = metadata.st_gid;
     _mode  = metadata.st_mode & ~S_IFMT;
+    // Get value pointed by link
+    if (S_ISLNK(_type)) {
+      char* link = new char[FILENAME_MAX];
+      int   size = readlink(full_path.c_str(), link, FILENAME_MAX);
+
+      if (size < 0) {
+        _type = 0;
+      } else {
+        link[size] = '\0';
+        _link = link;
+      }
+      free(link);
+    }
   }
+}
+
+// TODO test
+bool File::operator!=(const File& right) {
+  return (_type != right._type) || (_mtime != right._mtime)
+      || (_size != right._size) || (_uid != right._uid)
+      || (_gid != right._gid) || (_mode != right._mode);
 }
 
 // TODO test
@@ -70,16 +98,22 @@ string File::name() const {
   }
 }
 
-// TODO remove
-metadata_t File::metadata() const {
-  metadata_t metadata;
-  metadata.type  = _type;
-  metadata.mtime = _mtime;
-  metadata.size  = _size;
-  metadata.uid   = _uid;
-  metadata.gid   = _gid;
-  metadata.mode  = _mode;
-  return metadata;
+// TODO test
+string File::line(bool nodates) {
+  string  output = _access_path + "\t" + _path + "\t" + typeLetter(_type);
+  char*   numbers = NULL;
+  time_t  mtime;
+
+  if (nodates) {
+    mtime = _mtime != 0;
+  } else {
+    mtime = _mtime;
+  }
+
+  asprintf(&numbers, "%ld\t%ld\t%u\t%u\t%o", _size, mtime, _uid, _gid, _mode);
+  output += "\t" + string(numbers) + "\t" + _link + "\t" + _checksum;
+  delete numbers;
+  return output;
 }
 
 // Public functions
@@ -468,21 +502,4 @@ int params_readline(string line, char *keyword, char *type,
   }
 
   return param_count;
-}
-
-int metadata_get(const char *path, metadata_t *metadata_p) {
-  struct stat metadata;
-
-  if (lstat(path, &metadata)) {
-    // errno set by lstat
-    return 2;
-  }
-  /* Fill in file information */
-  metadata_p->type  = metadata.st_mode & S_IFMT;
-  metadata_p->mtime = metadata.st_mtime;
-  metadata_p->size  = metadata.st_size;
-  metadata_p->uid   = metadata.st_uid;
-  metadata_p->gid   = metadata.st_gid;
-  metadata_p->mode  = metadata.st_mode & ~S_IFMT;
-  return 0;
 }

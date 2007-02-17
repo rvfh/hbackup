@@ -37,14 +37,9 @@ static char *db_data_show(const void *payload) {
   char *string = NULL;
 
   /* Times are omitted here... */
-  asprintf(&string, "'%s' '%s' %c %ld %d %u %u 0%o '%s' %s %d %d %c",
-    db_data->host.c_str(), db_data->filedata.path.c_str(),
-    File::typeLetter(db_data->filedata.metadata.type),
-    db_data->filedata.metadata.size,
-    db_data->filedata.metadata.mtime || 0, db_data->filedata.metadata.uid,
-    db_data->filedata.metadata.gid, db_data->filedata.metadata.mode,
-    db_data->link.c_str(), db_data->filedata.checksum.c_str(),
-    db_data->date_in || 0, db_data->date_out || 0, '-');
+  asprintf(&string, "%s\t%d\t%d",
+    db_data->filedata->line(true).c_str(),
+    db_data->date_in || 0, db_data->date_out || 0);
   return string;
 }
 
@@ -110,10 +105,7 @@ int main(void) {
   }
 
   /* Write check */
-  db_data.filedata.path = "test/testfile";
-  metadata_get(db_data.filedata.path.c_str(), &db_data.filedata.metadata);
-  db_data.host = "this is a host";
-  db_data.link = "this is a link";
+  db_data.filedata = new File("test/testfile");
   db_data.date_in = time(NULL);
   db_data.date_out = 0;
   if ((status = db.write("test/", "testfile", &db_data, checksum, 0))) {
@@ -129,7 +121,8 @@ int main(void) {
   delete filelist;
 
   /* Obsolete check */
-  db.obsolete(db_data.host, db_data.filedata.path, checksum);
+  db_data.filedata->setChecksum(checksum);
+  db.obsolete(*db_data.filedata);
   filelist = new List(db_data_show);
   db.load("data/59ca0efa9f5633cb0371bbc0355478d8-0/list", filelist);
   cout << ">List " << filelist->size() << " element(s):\n";
@@ -431,6 +424,7 @@ int main(void) {
   File::testDir("test_db/data/fe/dc/76", true);
   cout << "fedc76test6 status: " << db.getDir("fedc76test6", getdir_path, true)
     << ", getdir_path: " << getdir_path << endl;
+  mkdir("test_db/data/fe/dc/76/test6", 0755);
   cout << "fedc76test6 status: " << db.getDir("fedc76test6", getdir_path, true)
     << ", getdir_path: " << getdir_path << endl;
 

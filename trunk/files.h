@@ -19,23 +19,6 @@
 #ifndef FILES_H
 #define FILES_H
 
-typedef struct {
-  mode_t  type;     // type
-  time_t  mtime;    // time of last modification
-  off_t   size;     // total size, in bytes
-  uid_t   uid;      // user ID of owner
-  gid_t   gid;      // group ID of owner
-  mode_t  mode;     // permissions
-} metadata_t;
-
-typedef struct {
-  string      path;
-  string      checksum;
-  metadata_t  metadata;
-} filedata_t;
-
-extern int metadata_get(const char *path, metadata_t *metadata);
-
 /* Read parameters from line */
 extern int params_readline(string line, char *keyword, char *type,
   string *);
@@ -43,6 +26,7 @@ extern int params_readline(string line, char *keyword, char *type,
 class File {
   string  _access_path; // mount or share path or prrefix
   string  _path;        // file path
+  string  _link;        // what the link points to (if a link, of course)
   string  _checksum;    // file checksum
   mode_t  _type;        // file type (0 if metadata not available)
   time_t  _mtime;       // time of last modification
@@ -51,12 +35,13 @@ class File {
   gid_t   _gid;         // group ID of owner
   mode_t  _mode;        // permissions
 public:
-  // Constructor for existing file
-  File(const string& access_path, const string& path);
+  // Constructor for existing file (if only one argument, it will be the path)
+  File(const string& access_path, const string& path = "");
   // Constructor for given file data
   File(
     const string& access_path,
     const string& path,
+    const string& link,
     const string& checksum,
     mode_t        type,
     time_t        mtime,
@@ -66,6 +51,7 @@ public:
     mode_t        mode) :
       _access_path(access_path),
       _path(path),
+      _link(link),
       _checksum(checksum),
       _type(type),
       _mtime(mtime),
@@ -73,18 +59,18 @@ public:
       _uid(uid),
       _gid(gid),
       _mode(mode) {}
+  bool operator!=(const File&);
   string name() const;
-//   string access_path() const { return _access_path; };
+  string access_path() const { return _access_path; };
   string path() const { return _path; };
   string checksum() const { return _checksum; };
   mode_t type() const { return _type; }
   time_t mtime() const { return _mtime; };
   off_t  size() const { return _size; };
-//   uid_t  uid() const { return _uid; };
-//   gid_t  gid() const { return _gid; };
-//   mode_t mode() const { return _mode; };
-  // Transitional function
-  metadata_t metadata() const;
+  // Line containing all data (argument for debug only)
+  string line(bool nodates = false);
+  void setAccessPath(const string& access_path) { _access_path = access_path; }
+  void setPath(const string& path) { _path = path; }
   void setChecksum(const string& checksum) { _checksum = checksum; }
 // These are public
   // Test whether dir exists, create it if requested

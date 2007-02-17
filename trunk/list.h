@@ -71,6 +71,7 @@ public:
   void *remove(list_entry_t *entry);
   void drop(list_entry_t *entry);
   int size() const;
+  list_entry_t *first() const { return _first; }
   list_entry_t *previous(const list_entry_t *entry) const;
   list_entry_t *next(const list_entry_t *entry) const;
   int find(const char *search_string, list_payload_get_f payload_get_f, list_entry_t **entry_handle);
