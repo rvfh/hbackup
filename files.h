@@ -30,7 +30,7 @@ typedef struct {
 
 typedef struct {
   string      path;
-  char        checksum[36];
+  string      checksum;
   metadata_t  metadata;
 } filedata_t;
 
@@ -59,18 +59,21 @@ public:
   // Transform mode into letter
   static mode_t typeMode(char letter);
   // Convert MD5 to readable string
-  static void md5sum(const char *checksum, int bytes);
+  static void md5sum(
+    string&               checksum_out,
+    const unsigned char*  checksum_in,
+    int                   bytes);
   // Copy, compress and compute checksum (MD5), all in once
   static int zcopy(
     const string& source_path,
     const string& dest_path,
-    off_t         *size_in,
-    off_t         *size_out,
-    char          *checksum_in,
-    char          *checksum_out,
+    off_t*        size_in,
+    off_t*        size_out,
+    string*       checksum_in,
+    string*       checksum_out,
     int           compress);
   // Compute file checksum (MD5)
-  static int getChecksum(const string& path, const char *checksum);
+  static int getChecksum(const string& path, string& checksum);
 };
 
 #endif

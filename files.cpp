@@ -88,30 +88,32 @@ mode_t File::typeMode(char letter) {
   return 0;
 }
 
-void File::md5sum(const char *checksum, int bytes) {
-  char *hex            = "0123456789abcdef";
-  unsigned char *copy  = new unsigned char[bytes];
-  unsigned char *read  = copy;
-  unsigned char *write = (unsigned char *) checksum;
+void File::md5sum(
+    string&               checksum_out,
+    const unsigned char*  checksum_in,
+    int                   bytes) {
+  char* hex   = "0123456789abcdef";
+  char* copy  = new char[2 * bytes];
+  char* write = copy;
 
-  memcpy(copy, checksum, bytes);
   while (bytes != 0) {
-    *write++ = hex[*read >> 4];
-    *write++ = hex[*read & 0xf];
-    read++;
+   *write++ = hex[*checksum_in >> 4];
+   *write++ = hex[*checksum_in & 0xf];
+    checksum_in++;
     bytes--;
   }
   *write = '\0';
+  checksum_out = copy;
   delete copy;
 }
 
 int File::zcopy(
     const string& source_path,
     const string& dest_path,
-    off_t         *size_in,
-    off_t         *size_out,
-    char          *checksum_in,
-    char          *checksum_out,
+    off_t*        size_in,
+    off_t*        size_out,
+    string*       checksum_in,
+    string*       checksum_out,
     int           compress) {
   FILE          *writefile;
   FILE          *readfile;
@@ -209,6 +211,9 @@ int File::zcopy(
         } while ((rlength != 0) && (wlength != 0));
       } while (strm.avail_out == 0);
     } else {
+      /* Size to write */
+      if (size_out != NULL) *size_out += rlength;
+
       do {
         wlength = fwrite(buffer_in, 1, rlength, writefile);
         rlength -= wlength;
@@ -220,16 +225,18 @@ int File::zcopy(
 
   /* Get checksum for input file */
   if (checksum_in != NULL) {
-    EVP_DigestFinal(&ctx_in, (unsigned char *) checksum_in, &length);
-    md5sum(checksum_in, length);
+    unsigned char checksum[36];
+    EVP_DigestFinal(&ctx_in, checksum, &length);
+    md5sum(*checksum_in, checksum, length);
   }
 
   /* Destroy zlib resources */
   if (compress != 0) {
     /* Get checksum for output file */
     if (checksum_out != NULL) {
-      EVP_DigestFinal(&ctx_out, (unsigned char *) checksum_out, &length);
-      md5sum(checksum_out, length);
+      unsigned char checksum[36];
+      EVP_DigestFinal(&ctx_out, checksum, &length);
+      md5sum(*checksum_out, checksum, length);
     }
 
     if (compress > 0) {
@@ -242,17 +249,18 @@ int File::zcopy(
     /* Might want the original checksum in the output */
     if (checksum_out != NULL) {
       if (checksum_in != NULL) {
-        strcpy(checksum_out, checksum_in);
+        *checksum_out = *checksum_in;
       } else {
-        EVP_DigestFinal(&ctx_in, (unsigned char *) checksum_out, &length);
-        md5sum(checksum_out, length);
+        unsigned char checksum[36];
+        EVP_DigestFinal(&ctx_in, checksum, &length);
+        md5sum(*checksum_out, checksum, length);
       }
     }
   }
   return 0;
 }
 
-int File::getChecksum(const string& path, const char *checksum) {
+int File::getChecksum(const string& path, string& checksum) {
   FILE       *readfile;
   EVP_MD_CTX ctx;
   size_t     rlength;
@@ -275,8 +283,9 @@ int File::getChecksum(const string& path, const char *checksum) {
   fclose(readfile);
 
   /* Get checksum */
-  EVP_DigestFinal(&ctx, (unsigned char *) checksum, &rlength);
-  md5sum(checksum, rlength);
+  unsigned char checksum_temp[36];
+  EVP_DigestFinal(&ctx, checksum_temp, &rlength);
+  md5sum(checksum, checksum_temp, rlength);
 
   return 0;
 }

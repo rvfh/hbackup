@@ -76,7 +76,7 @@ int Path::iterate_directory(const string& path, Parser* parser) {
     file_path = path + "/" + dir_entry->d_name;
     /* Remove mount path and leading slash from records */
     filedata.path = file_path.substr(_mount_path_length + 1);
-    strcpy(filedata.checksum, "");
+    filedata.checksum = "";
     if (metadata_get(file_path.c_str(), &filedata.metadata)) {
       cerr << "filelist: cannot get metadata: " << file_path << endl;
       continue;

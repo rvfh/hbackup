@@ -43,8 +43,8 @@ static char *db_data_show(const void *payload) {
     db_data->filedata.metadata.size,
     db_data->filedata.metadata.mtime || 0, db_data->filedata.metadata.uid,
     db_data->filedata.metadata.gid, db_data->filedata.metadata.mode,
-    db_data->link.c_str(), db_data->filedata.checksum, db_data->date_in || 0,
-    db_data->date_out || 0, '-');
+    db_data->link.c_str(), db_data->filedata.checksum.c_str(),
+    db_data->date_in || 0, db_data->date_out || 0, '-');
   return string;
 }
 
@@ -58,8 +58,8 @@ int terminating(void) {
 
 int main(void) {
   Path*     path;
-  char      checksum[40];
-  char      zchecksum[40];
+  string    checksum;
+  string    zchecksum;
   db_data_t db_data;
   off_t     size;
   off_t     zsize;
@@ -67,23 +67,23 @@ int main(void) {
   int       status;
 
   /* Test internal functions */
-  File::zcopy("test/testfile", "test_db/testfile.gz", &size, &zsize, checksum,
-    zchecksum, 5);
-  printf("Copied %ld -> %ld bytes: %s -> %s\n",
-    size, zsize, checksum, zchecksum);
+  File::zcopy("test/testfile", "test_db/testfile.gz", &size, &zsize, &checksum,
+    &zchecksum, 5);
+  cout << "Copied " << size << " -> " << zsize << " bytes: "
+    << checksum << " -> " << zchecksum << endl;
 
-  File::zcopy("test_db/testfile.gz", "/dev/null", &size, &zsize, checksum,
-    zchecksum, -1);
-  printf("Copied %ld -> %ld bytes: %s -> %s\n",
-    size, zsize, checksum, zchecksum);
+  File::zcopy("test_db/testfile.gz", "/dev/null", &size, &zsize, &checksum,
+    &zchecksum, -1);
+  cout << "Copied " << size << " -> " << zsize << " bytes: "
+    << checksum << " -> " << zchecksum << endl;
 
-  File::zcopy("test2/testfile~", "test_db/testfile.gz", &size, NULL, checksum,
+  File::zcopy("test2/testfile~", "test_db/testfile.gz", &size, NULL, &checksum,
     NULL, 5);
-  printf("Copied %ld -> ? bytes %s -> ?\n", size, checksum);
+  cout << "Copied " << size << " -> ? bytes " << checksum << " -> ?" << endl;
 
   File::zcopy("test2/testfile~", "test_db/testfile.gz", NULL, &zsize, NULL,
-    zchecksum, 9);
-  printf("Copied ? -> %ld bytes ? -> %s\n", zsize, zchecksum);
+    &zchecksum, 9);
+  cout << "Copied ? -> " << zsize << " bytes ? -> " << zchecksum << endl;
 
   /* Use other modules */
   path = new Path("");
@@ -121,7 +121,7 @@ int main(void) {
     db.close();
     return 0;
   }
-  printf("%s  test/testfile\n", checksum);
+  cout << checksum << "  test/testfile" << endl;
   filelist = new List(db_data_show);
   db.load("data/59ca0efa9f5633cb0371bbc0355478d8-0/list", filelist);
   cout << ">List " << filelist->size() << " element(s):\n";
