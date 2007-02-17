@@ -85,7 +85,7 @@ public:
     const string&   mount_path,
     const string&   path,
     const db_data_t *db_data,
-    char            *checksum,
+    string&         checksum,
     int             compress);
 };
 

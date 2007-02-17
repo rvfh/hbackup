@@ -127,7 +127,7 @@ static int parse_compare(void *db_data_p, void *filedata_p) {
     } else
     if ((db_data->filedata.metadata.size == filedata->metadata.size)
      || (db_data->filedata.metadata.mtime == filedata->metadata.mtime)) {
-      strcpy(filedata->checksum, db_data->filedata.checksum);
+      filedata->checksum = db_data->filedata.checksum;
     }
   }
   return result;
@@ -203,7 +203,7 @@ int Database::load(const string &filename, List *list) {
             db_data.link = string;
             break;
           case 10:  /* Checksum */
-            strcpy(db_data.filedata.checksum, string);
+            db_data.filedata.checksum = string;
             break;
           case 11:  /* Date in */
             if (sscanf(string, "%ld", &db_data.date_in) != 1) {
@@ -266,7 +266,8 @@ int Database::save(const string& filename, List *list) {
         db_data->filedata.metadata.size, db_data->filedata.metadata.mtime,
         db_data->filedata.metadata.uid, db_data->filedata.metadata.gid,
         db_data->filedata.metadata.mode, db_data->link.c_str(),
-        db_data->filedata.checksum, db_data->date_in, db_data->date_out, '-');
+        db_data->filedata.checksum.c_str(), db_data->date_in, db_data->date_out,
+        '-');
     }
     fclose(writefile);
 
@@ -347,13 +348,13 @@ int Database::write(
     const string&   mount_path,
     const string&   path,
     const db_data_t *db_data,
-    char            *checksum,
+    string&         checksum,
     int             compress) {
   string  source_path;
   string  temp_path;
   string  dest_path;
-  char    checksum_source[36];
-  char    checksum_dest[36];
+  string  checksum_source;
+  string  checksum_dest;
   int     index = 0;
   int     deleteit = 0;
   int     failed = 0;
@@ -368,7 +369,7 @@ int Database::write(
 
   /* Copy file locally */
   if (File::zcopy(source_path, temp_path, &size_source, &size_dest,
-      checksum_source, checksum_dest, compress)) {
+      &checksum_source, &checksum_dest, compress)) {
     failed = 1;
   } else
 
@@ -389,11 +390,11 @@ int Database::write(
       bool    differ = false;
 
       /* Complete checksum with index */
-      sprintf((char *) checksum, "%s-%u", checksum_source, index);
       stringstream ss;
       string str;
       ss << index;
       ss >> str;
+      checksum = checksum_source + "-" + str;
       final_path += str;
       if (! File::testDir(final_path, 1)) {
         /* Directory exists */
@@ -454,7 +455,7 @@ int Database::write(
       if (load(listfile, list) == 2) {
         cerr << "db: write: failed to open data list" << endl;
       } else {
-        strcpy(new_db_data.filedata.checksum, checksum_dest);
+        new_db_data.filedata.checksum = checksum_dest;
         entry = list->add(&new_db_data);
         save(listfile, list);
         list->remove(entry);
@@ -771,7 +772,7 @@ int Database::parse(
       if (S_ISREG(filedata->metadata.type)) {
         if (filedata->checksum[0] != '\0') {
           /* Checksum given by the compare function */
-          strcpy(db_data->filedata.checksum, filedata->checksum);
+          db_data->filedata.checksum = filedata->checksum;
         } else {
           if (write(mount_path, filedata->path, db_data,
               db_data->filedata.checksum, 0)) {
@@ -782,14 +783,14 @@ int Database::parse(
               cerr << "\r" << strerror(errno) << ": "
                 << db_data->filedata.path << ", ignoring" << endl;
             }
-            strcpy(db_data->filedata.checksum, "N");
+            db_data->filedata.checksum = "N";
           }
         }
         if (verbosity() > 2) {
           sizebackedup += double(filedata->metadata.size);
         }
       } else {
-        strcpy(db_data->filedata.checksum, "");
+        db_data->filedata.checksum = "";
       }
       if (S_ISLNK(filedata->metadata.type)) {
         string  full_path = mount_path + "/" + filedata->path;
@@ -866,7 +867,7 @@ int Database::parse(
 int Database::read(const string& path, const string& checksum) {
   string  source_path;
   string  temp_path;
-  char    temp_checksum[256];
+  string  temp_checksum;
   int     failed = 0;
 
   if (getDir(checksum, source_path, false)) {
@@ -879,13 +880,13 @@ int Database::read(const string& path, const string& checksum) {
   temp_path = path + ".part";
 
   /* Copy file to temporary name (size not checked: checksum suffices) */
-  if (File::zcopy(source_path, temp_path, NULL, NULL, temp_checksum, NULL, 0)) {
+  if (File::zcopy(source_path, temp_path, NULL, NULL, &temp_checksum, NULL, 0)) {
     cerr << "db: read: failed to copy file: " << source_path << endl;
     failed = 2;
   } else
 
   /* Verify that checksums match before overwriting current final destination */
-  if (checksum.substr(0, strlen(temp_checksum)) != string(temp_checksum)) {
+  if (checksum.substr(0, temp_checksum.size()) != temp_checksum) {
     cerr << "db: read: checksums don't match: " << source_path
       << " " << temp_checksum << endl;
     failed = 2;
@@ -906,8 +907,7 @@ int Database::read(const string& path, const string& checksum) {
 }
 
 int Database::scan(const string& checksum, bool thorough) {
-  int failed = 0;
-  char checksum_real[256];
+  int     failed = 0;
 
   if (checksum == "") {
     list_entry_t *entry = NULL;
@@ -932,9 +932,9 @@ int Database::scan(const string& checksum, bool thorough) {
         printf(" --> Files left to go: %u\n", files);
       }
       files--;
-      if (strlen(db_data->filedata.checksum)
+      if ((db_data->filedata.checksum.size() != 0)
        && scan(db_data->filedata.checksum, thorough)) {
-        strcpy(db_data->filedata.checksum, "N");
+        db_data->filedata.checksum = "N";
         failed = 1;
         if (! terminating() && verbosity() > 1) {
           struct tm *time;
@@ -996,15 +996,16 @@ int Database::scan(const string& checksum, bool thorough) {
           cerr << "db: scan: list empty for checksum " << checksum << endl;
         } else {
           db_data_t *db_data = (db_data_t *) (list_entry_payload(entry));
+          string  checksum_real;
 
           /* Read file to compute checksum, compare with expected */
-          if (File::getChecksum(check_path.c_str(), checksum_real) == 2) {
+          if (File::getChecksum(check_path, checksum_real) == 2) {
             errno = ENOENT;
             filefailed = true;
             cerr << "db: scan: file data missing for checksum " << checksum << endl;
           } else
-          if (strncmp(db_data->filedata.checksum, checksum_real,
-                strlen(checksum_real)) != 0) {
+          if (db_data->filedata.checksum.substr(0, checksum_real.size())
+           != checksum_real) {
             errno = EILSEQ;
             filefailed = true;
             if (! terminating()) {
