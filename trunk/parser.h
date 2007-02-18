@@ -32,7 +32,20 @@ typedef enum {
 } parser_mode_t;
 
 class Parser {
+protected:
+  parser_mode_t _mode;
+  bool          _dummy;
 public:
+  // Constructor for parsers list
+  // Note: inherited classes MUST PURELY INHERIT this constructor
+  // Example: MyParser(parser_mode_t mode) : Parser(mode) {}
+  Parser(parser_mode_t mode) : _mode(mode), _dummy(true) {}
+  // Default constructor
+  // Again MUST BE INHERITED when classes define a default constructor
+  // Example1: MyParser() : Parser() { ... }, inherited
+  // Example2: MyParser(blah_t blah) { ... }, called implicitely
+  Parser() : _mode(parser_disabled), _dummy(false) {}
+  // Need a virtual destructor
   virtual ~Parser() {};
   // Just to know the parser used
   virtual string name() = 0;
@@ -45,6 +58,12 @@ public:
 };
 
 class IgnoreParser : public Parser {
+public:
+  // Default contructor
+  IgnoreParser() : Parser() {}
+  // Useless here as IgnoreParser never gets enlisted, but rules are rules.
+  IgnoreParser(parser_mode_t mode) : Parser(mode) {}
+  // Tell them who we are
   string name() {
     return "ignore";
   };
