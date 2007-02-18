@@ -26,20 +26,20 @@ using namespace std;
 #include "parsers.h"
 
 class TestParser : public Parser {
-  parser_mode_t _mode;
   int           _index;
 public:
   // Constructor for parsers list
-  TestParser(parser_mode_t mode) : _mode(mode) {
+  TestParser(parser_mode_t mode) : Parser(mode) {
     _index = 1;
-    cout << "Contructing for mode: " << _mode << endl;
+    cout << "Contructing for list, mode: " << _mode << ", dummy: " << _dummy
+      << endl;
   }
   // Constructor for directory parsing
   TestParser(parser_mode_t mode, const string& dir_path) {
     _mode = mode;
     _index = 2;
-    cout << "Contructing for mode: " << mode
-      << " and path: " << dir_path << endl;
+    cout << "Contructing for use, mode: " << mode << ", dummy: " << _dummy
+      << ", path: " << dir_path << endl;
   }
   ~TestParser() {
     cout << "Destroying (index " << _index << ")" << endl;
@@ -67,8 +67,11 @@ int main(void) {
   Parser*   parser;
 
   parsers = new Parsers;
+  cout << "Add TestParser to list" << endl;
   parsers->push_back(new TestParser(parser_modified));
-  parsers->push_back(new IgnoreParser());
+  cout << "Add IgnoreParser to list" << endl;
+  parsers->push_back(new IgnoreParser(parser_modified));  // Whatever mode...
+  cout << "Check parsers against test directory" << endl;
   parser = parsers->isControlled("test");
   if (parser != NULL) {
     parser->list();

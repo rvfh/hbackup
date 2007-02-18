@@ -38,7 +38,6 @@ CvsParser::CvsParser(parser_mode_t mode, const string& dir_path) {
 
   // Save mode
   _mode = mode;
-  _dummy = false;
 
   /* Fill in list of controlled files */
   _all_files = false;

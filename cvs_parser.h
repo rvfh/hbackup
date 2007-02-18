@@ -29,13 +29,11 @@ typedef struct {
 } cvs_entry_t;
 
 class CvsParser : public Parser {
-  parser_mode_t       _mode;
-  bool                _dummy;
   vector<cvs_entry_t> _files;
   bool                _all_files;
 public:
   // Constructor for parsers list
-  CvsParser(parser_mode_t mode) : _mode(mode), _dummy(true) {}
+  CvsParser(parser_mode_t mode) : Parser(mode) {}
   // Constructor for directory parsing
   CvsParser(parser_mode_t mode, const string& dir_path);
   // Just to know the parser used
