@@ -69,11 +69,11 @@ static char *db_data_get(const void *payload) {
 
   if (db_data->date_out == 0) {
     /* '@' > '9' */
-    asprintf(&string, "%s %s %c", db_data->filedata->access_path().c_str(),
+    asprintf(&string, "%s %s %c", db_data->filedata->prefix().c_str(),
       db_data->filedata->path().c_str(), '@');
   } else {
     /* ' ' > '0' */
-    asprintf(&string, "%s %s %11ld", db_data->filedata->access_path().c_str(),
+    asprintf(&string, "%s %s %11ld", db_data->filedata->prefix().c_str(),
       db_data->filedata->path().c_str(), db_data->date_out);
   }
   return string;
@@ -497,7 +497,7 @@ int Database::obsolete(const File& file_data) {
     list_entry_t  *entry;
     string        string;
 
-    string = file_data.access_path() + " " + file_data.path() + " @";
+    string = file_data.prefix() + " " + file_data.path() + " @";
     list->find(string.c_str(), NULL, &entry);
     if (entry != NULL) {
       db_data = (db_data_t *) (list_entry_payload(entry));
@@ -762,7 +762,7 @@ int Database::parse(
       db_data->date_out = 0;
       // Set object data
       db_data->filedata = new File(*filedata);
-      db_data->filedata->setAccessPath(prefix);
+      db_data->filedata->setPrefix(prefix);
       // Set checksum
       string checksum = "";
       if (S_ISREG(filedata->type())) {
@@ -918,8 +918,7 @@ int Database::scan(const string& checksum, bool thorough) {
         failed = 1;
         if (! terminating() && verbosity() > 1) {
           struct tm *time;
-          cout << " -> Client:      " << db_data->filedata->access_path()
-            << endl;
+          cout << " -> Client:      " << db_data->filedata->prefix() << endl;
           cout << " -> File name:   " << db_data->filedata->path() << endl;
           time_t file_mtime = db_data->filedata->mtime();
           time = localtime(&file_mtime);

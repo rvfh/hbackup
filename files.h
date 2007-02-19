@@ -20,7 +20,7 @@
 #define FILES_H
 
 class File {
-  string  _access_path; // mount or share path or prrefix
+  string  _prefix;      // mount or share path or prrefix
   string  _path;        // file path
   string  _link;        // what the link points to (if a link, of course)
   string  _checksum;    // file checksum
@@ -35,7 +35,7 @@ public:
   File(const string& access_path, const string& path = "");
   // Constructor for given file data
   File(
-    const string& access_path,
+    const string& prefix,
     const string& path,
     const string& link,
     const string& checksum,
@@ -45,7 +45,7 @@ public:
     uid_t         uid,
     gid_t         gid,
     mode_t        mode) :
-      _access_path(access_path),
+      _prefix(prefix),
       _path(path),
       _link(link),
       _checksum(checksum),
@@ -57,7 +57,7 @@ public:
       _mode(mode) {}
   bool operator!=(const File&);
   string name() const;
-  string access_path() const { return _access_path; };
+  string prefix() const { return _prefix; };
   string path() const { return _path; };
   string checksum() const { return _checksum; };
   mode_t type() const { return _type; }
@@ -65,7 +65,7 @@ public:
   off_t  size() const { return _size; };
   // Line containing all data (argument for debug only)
   string line(bool nodates = false);
-  void setAccessPath(const string& access_path) { _access_path = access_path; }
+  void setPrefix(const string& prefix) { _prefix = prefix; }
   void setPath(const string& path) { _path = path; }
   void setChecksum(const string& checksum) { _checksum = checksum; }
 // These are public
