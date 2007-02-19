@@ -22,6 +22,7 @@
 /* Read parameters from line */
 extern int params_readline(string line, char *keyword, char *type,
   string *);
+extern int readline(const string& line, vector<string>& params);
 
 class File {
   string  _access_path; // mount or share path or prrefix

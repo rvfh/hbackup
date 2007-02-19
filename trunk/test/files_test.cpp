@@ -19,6 +19,7 @@
 using namespace std;
 
 #include <iostream>
+#include <vector>
 #include <string>
 #include <sys/stat.h>
 
@@ -155,6 +156,89 @@ int main(void) {
   printf(" * mtime: %04u-%02u-%02u %2u:%02u:%02u\n",
     time->tm_year + 1900, time->tm_mon + 1, time->tm_mday,
     time->tm_hour, time->tm_min, time->tm_sec);
+
+  cout << "\nreadline" << endl;
+  vector<string> *params;
+  line = "a";
+  params = new vector<string>;
+  cout << "readline(" << line << ") = " << readline(line, *params) << endl;
+  for (unsigned int i = 0; i < params->size(); i++) {
+    cout << (*params)[i] << endl;
+  }
+  cout << endl;
+  delete params;
+
+  line = " \ta \tb";
+  params = new vector<string>;
+  cout << "readline(" << line << ") = " << readline(line, *params) << endl;
+  for (unsigned int i = 0; i < params->size(); i++) {
+    cout << (*params)[i] << endl;
+  }
+  cout << endl;
+  delete params;
+
+  line = "\t ab";
+  params = new vector<string>;
+  cout << "readline(" << line << ") = " << readline(line, *params) << endl;
+  for (unsigned int i = 0; i < params->size(); i++) {
+    cout << (*params)[i] << endl;
+  }
+  cout << endl;
+  delete params;
+
+  line = "\t ab cd";
+  params = new vector<string>;
+  cout << "readline(" << line << ") = " << readline(line, *params) << endl;
+  for (unsigned int i = 0; i < params->size(); i++) {
+    cout << (*params)[i] << endl;
+  }
+  cout << endl;
+  delete params;
+
+  line = "\t ab cd\tef # blah";
+  params = new vector<string>;
+  cout << "readline(" << line << ") = " << readline(line, *params) << endl;
+  for (unsigned int i = 0; i < params->size(); i++) {
+    cout << (*params)[i] << endl;
+  }
+  cout << endl;
+  delete params;
+
+  line = "\t 'ab' 'cd'\t'ef' # blah";
+  params = new vector<string>;
+  cout << "readline(" << line << ") = " << readline(line, *params) << endl;
+  for (unsigned int i = 0; i < params->size(); i++) {
+    cout << (*params)[i] << endl;
+  }
+  cout << endl;
+  delete params;
+
+  line = "\t \"ab\" 'cd'\t\"ef\" # blah";
+  params = new vector<string>;
+  cout << "readline(" << line << ") = " << readline(line, *params) << endl;
+  for (unsigned int i = 0; i < params->size(); i++) {
+    cout << (*params)[i] << endl;
+  }
+  cout << endl;
+  delete params;
+
+  line = "\t ab cd\tef 'gh ij\tkl' \"mn op\tqr\" \t# blah";
+  params = new vector<string>;
+  cout << "readline(" << line << ") = " << readline(line, *params) << endl;
+  for (unsigned int i = 0; i < params->size(); i++) {
+    cout << (*params)[i] << endl;
+  }
+  cout << endl;
+  delete params;
+
+  line = "\t ab cd\tef 'gh \"ij\\\'\tkl' \"mn 'op\\\"\tqr\" \t# blah";
+  params = new vector<string>;
+  cout << "readline(" << line << ") = " << readline(line, *params) << endl;
+  for (unsigned int i = 0; i < params->size(); i++) {
+    cout << (*params)[i] << endl;
+  }
+  cout << endl;
+  delete params;
 
   return 0;
 }

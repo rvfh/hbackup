@@ -55,3 +55,48 @@ metadata
 Line: 	test/testfile	f	13	1161486000	1000	1000	644		
  * type: 0x00008000
  * mtime: 2006-10-22  0:00:00
+
+readline
+readline(a) = 1
+a
+
+readline( 	a 	b) = 2
+a
+b
+
+readline(	 ab) = 1
+ab
+
+readline(	 ab cd) = 2
+ab
+cd
+
+readline(	 ab cd	ef # blah) = 3
+ab
+cd
+ef
+
+readline(	 'ab' 'cd'	'ef' # blah) = 3
+ab
+cd
+ef
+
+readline(	 "ab" 'cd'	"ef" # blah) = 3
+ab
+cd
+ef
+
+readline(	 ab cd	ef 'gh ij	kl' "mn op	qr" 	# blah) = 5
+ab
+cd
+ef
+gh ij	kl
+mn op	qr
+
+readline(	 ab cd	ef 'gh "ij\'	kl' "mn 'op\"	qr" 	# blah) = 5
+ab
+cd
+ef
+gh "ij'	kl
+mn 'op"	qr
+
