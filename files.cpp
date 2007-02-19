@@ -20,6 +20,7 @@ using namespace std;
 
 #include <fstream>
 #include <iostream>
+#include <vector>
 #include <string>
 #include <cctype>
 #include <dirent.h>
@@ -176,7 +177,7 @@ void File::md5sum(
     const unsigned char*  checksum_in,
     int                   bytes) {
   char* hex   = "0123456789abcdef";
-  char* copy  = new char[2 * bytes];
+  char* copy  = new char[2 * bytes + 1];
   char* write = copy;
 
   while (bytes != 0) {
@@ -502,4 +503,107 @@ int params_readline(string line, char *keyword, char *type,
   }
 
   return param_count;
+}
+
+int readline(const string& line, vector<string>& params) {
+  const char* read  = line.c_str();
+  const char* end   = &read[line.size()];
+  char* value       = NULL;
+  char* write       = NULL;
+  bool increment;
+  bool skipblanks   = true;
+  bool checkcomment = false;
+  bool escaped      = false;
+  bool unquoted     = false;
+  bool singlequoted = false;
+  bool doublequoted = false;
+  bool valueend     = false;
+
+  while (read <= end) {
+    increment = true;
+    // End of line
+    if (read == end) {
+      if (unquoted || singlequoted || doublequoted) {
+        // Stop decoding (singlequoted and doublequoted mean quote mismatch!)
+        valueend = true;
+      }
+    } else
+    // Skip blanks until no more, then change mode
+    if (skipblanks) {
+      if ((*read != ' ') && (*read != '\t')) {
+        skipblanks = false;
+        checkcomment = true;
+        // Do not increment!
+        increment = false;
+      }
+    } else if (checkcomment) {
+      if (*read == '#') {
+        // Nothing more to do
+        break;
+      } else {
+        checkcomment = false;
+        // Do not increment!
+        increment = false;
+      }
+    } else { // neither a blank nor a comment
+      if (singlequoted || doublequoted) {
+        // Decoding quoted string
+        if ((singlequoted && (*read == '\''))
+         || (doublequoted && (*read == '"'))) {
+          if (escaped) {
+            *write++ = *read;
+            escaped  = false;
+          } else {
+            // Found match, stop decoding
+            singlequoted = doublequoted = false;
+            valueend = true;
+          }
+        } else if (*read == '\\') {
+          escaped = true;
+        } else {
+          if (escaped) {
+            *write++ = '\\';
+            escaped  = false;
+          }
+          *write++ = *read;
+        }
+      } else if (unquoted) {
+        // Decoding unquoted string
+        if ((*read == ' ') || (*read == '\t')) {
+          // Found blank, stop decoding
+          unquoted = false;
+          valueend = true;
+          // Do not increment!
+          increment = false;
+        } else {
+          *write++ = *read;
+        }
+      } else {
+        // Start decoding new string
+        write = value = new char[end - read + 1];
+        if (*read == '\'') {
+          singlequoted = true;
+        } else
+        if (*read == '"') {
+          doublequoted = true;
+        } else {
+          unquoted = true;
+          // Do not increment!
+          increment = false;
+        }
+      }
+    }
+    if (valueend) {
+      *write++ = '\0';
+      params.push_back(string(value));
+      delete value;
+      skipblanks = true;
+      valueend = false;
+    }
+    if (increment) {
+      read++;
+    }
+  }
+
+  return params.size();
 }
