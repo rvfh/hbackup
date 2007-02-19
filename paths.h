@@ -50,8 +50,8 @@ public:
     return _list;
   }
   int addFilter(
-    const char *type,
-    const char *string);
+    const string& type,
+    const string& string);
   int addParser(
     const string& type,
     const string& string);

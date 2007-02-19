@@ -27,7 +27,8 @@ class Option {
   string _name;
   string _value;
 public:
-  Option(const string& name, const string& value) : _name(name), _value(value) {}
+  Option(const string& name, const string& value) :
+    _name(name), _value(value) {}
   string name() { return _name; }
   string value() { return _value; }
   string option() {
@@ -56,7 +57,12 @@ class Client {
 public:
   Client(string name);
   ~Client();
-  void addOption(const string& name, const string& value);
+  void addOption(const string& value) {
+    _options.push_back(new Option("", value));
+  }
+  void addOption(const string& name, const string& value) {
+    _options.push_back(new Option(name, value));
+  }
   void setHostOrIp(string value);
   void setProtocol(string value);
   void setListfile(string value);

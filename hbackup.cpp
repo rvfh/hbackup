@@ -213,46 +213,86 @@ int main(int argc, char **argv) {
 
     while (! config_file.eof() && ! failed) {
       getline(config_file, buffer);
-      char    keyword[256];
-      char    type[256];
-      string  value;
-      int     params = params_readline(buffer, keyword, type, &value);
+      unsigned int pos = buffer.find("\r");
+      if (pos != string::npos) {
+        buffer.erase(pos);
+      }
+      vector<string> params;
 
       line++;
-      if (params > 1) {
-        if (! strcmp(keyword, "db")) {
-          db_path = value;
-        } else if (! strcmp(keyword, "client")) {
-          client = new Client(value);
-
+      if (File::decodeLine(buffer, params)) {
+        errno = EUCLEAN;
+        cerr << "Warning: in file " << config_path << ", line " << line
+          << " missing single- or double-quote" << endl;
+      }
+      if (params.size() == 1) {
+        errno = EUCLEAN;
+        cerr << "Error: in file " << config_path << ", line " << line
+          << " unexpected lonely keyword: " << params[0] << endl;
+        failed = 2;
+      } else if (params.size() > 1) {
+        if (params[0] == "db") {
+          if (params.size() > 2) {
+            cerr << "Error: in file " << config_path << ", line " << line
+              << " '" << params[0] << "' takes exactly one argument" << endl;
+            failed = 2;
+          }
+          db_path = params[1];
+        } else if (params[0] == "client") {
+          if (params.size() > 2) {
+            cerr << "Error: in file " << config_path << ", line " << line
+              << " '" << params[0] << "' takes exactly one argument" << endl;
+            failed = 2;
+          }
+          client = new Client(params[1]);
           clients.push_back(client);
         } else if (client != NULL) {
-          if (! strcmp(keyword, "hostname")) {
-            client->setHostOrIp(value);
+          if (params[0] == "hostname") {
+            if (params.size() > 2) {
+              cerr << "Error: in file " << config_path << ", line " << line
+                << " '" << params[0] << "' takes exactly one argument" << endl;
+              failed = 2;
+            }
+            client->setHostOrIp(params[1]);
           } else
-          if (! strcmp(keyword, "protocol")) {
-            client->setProtocol(value);
+          if (params[0] == "protocol") {
+            if (params.size() > 2) {
+              cerr << "Error: in file " << config_path << ", line " << line
+                << " '" << params[0] << "' takes exactly one argument" << endl;
+              failed = 2;
+            }
+            client->setProtocol(params[1]);
           } else
-          if (! strcmp(keyword, "option")) {
-            client->addOption(type, value);
+          if (params[0] == "option") {
+            if (params.size() > 3) {
+              cerr << "Error: in file " << config_path << ", line " << line
+                << " '" << params[0] << "' takes one or two arguments" << endl;
+              failed = 2;
+            }
+            if (params.size() == 2) {
+              client->addOption(params[1]);
+            } else {
+              client->addOption(params[1], params[2]);
+            }
           } else
-          if (! strcmp(keyword, "listfile")) {
-            client->setListfile(value);
+          if (params[0] == "listfile") {
+            if (params.size() > 2) {
+              cerr << "Error: in file " << config_path << ", line " << line
+                << " '" << params[0] << "' takes exactly one argument" << endl;
+              failed = 2;
+            }
+            client->setListfile(params[1]);
           } else {
-            cerr << "Unrecognised keyword '" << keyword
+            cerr << "Unrecognised keyword '" << params[0]
               << "' in configuration file, line " << line
               << endl;
             failed = 2;
           }
         } else {
-          cerr << "Unrecognised keyword in configuration file, line " << line
-            << endl;
+          cerr << "Error: in file " << config_path << ", line " << line
+            << " unknown keyword" << endl;
           failed = 2;
         }
-      } else if (params < 0) {
-        errno = EUCLEAN;
-        cerr << "Syntax error in configuration file, line " << line << endl;
-        failed = 2;
       }
     }
     config_file.close();

@@ -19,11 +19,6 @@
 #ifndef FILES_H
 #define FILES_H
 
-/* Read parameters from line */
-extern int params_readline(string line, char *keyword, char *type,
-  string *);
-extern int readline(const string& line, vector<string>& params);
-
 class File {
   string  _access_path; // mount or share path or prrefix
   string  _path;        // file path
@@ -98,6 +93,8 @@ public:
     int           compress);
   // Compute file checksum (MD5)
   static int getChecksum(const string& path, string& checksum);
+  // Read parameters from line
+  static int decodeLine(const string& line, vector<string>& params);
 };
 
 #endif
