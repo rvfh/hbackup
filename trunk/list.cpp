@@ -16,9 +16,11 @@
      Boston, MA 02111-1307, USA.
 */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
+using namespace std;
+
+#include <iostream>
+#include <string>
+
 #include "list.h"
 
 list_entry_t *list_entry_new() {
@@ -45,64 +47,45 @@ List::~List() {
   }
 }
 
-char *List::payloadString(const void *payload) const {
+string List::payloadString(const void *payload) const {
   return _payload_get_f(payload);
 }
 
 list_entry_t *List::find_hidden(
-    const char *search_string,
-    list_payload_get_f payload_get) const {
+    const string&       search_string,
+    list_payload_get_f  payload_get) const {
   list_entry_t *entry = NULL;
 
   /* Search the list  (hint is only null if the list is empty) */
   if (_size != 0) {
+    /* List is ordered, so search from hint to hopefully save time */
+    entry = _hint;
+    string payload_string = payload_get(entry->payload);
     /* Which direction to go? */
-    if (_payload_get_f == NULL) {
-      int breakme = 0;
-
-      /* List is not ordered: search it all */
-      while (((entry = next(entry)) != NULL) && ! breakme) {
-        char *string = payload_get(entry->payload);
-
-        if (! strcmp(string, search_string)) {
-          breakme = 1;
+    if (payload_string < search_string) {
+      /* List is ordered and hint is before the searched pattern: forward */
+      while (payload_string < search_string) {
+        entry = entry->next;
+        if (entry == NULL) {
+          break;
         }
-        free(string);
+        payload_string = payload_get(entry->payload);
       }
     } else {
-      char *string = NULL;
-
-      /* List is ordered: search from hint to hopefully save time */
-      entry = _hint;
-      string = payload_get(entry->payload);
-      if (strcmp(string, search_string) < 0) {
-        /* List is ordered and hint is before the searched pattern: forward */
-        while (strcmp(string, search_string) < 0) {
-          entry = entry->next;
-          if (entry == NULL) {
-            break;
-          }
-          free(string);
-          string = payload_get(entry->payload);
-        }
-      } else {
-        /* List is ordered and hint is after the search pattern: backward */
-        while (strcmp(string, search_string) > 0) {
-          entry = entry->previous;
-          if (entry == NULL) {
-            break;
-          }
-          free(string);
-          string = payload_get(entry->payload);
-        }
-        /* We must always give the next when the record was not found */
+      /* List is ordered and hint is after the search pattern: backward */
+      while (payload_string > search_string) {
+        entry = entry->previous;
         if (entry == NULL) {
-          entry = _first;
-        } else if (strcmp(string, search_string)) {
-          entry = entry->next;
+          break;
         }
+        payload_string = payload_get(entry->payload);
       }
-      free(string);
+      /* We must always give the next when the record was not found */
+      if (entry == NULL) {
+        entry = _first;
+      } else if (payload_string != search_string) {
+        entry = entry->next;
+      }
     }
   }
   return entry;
@@ -144,11 +127,7 @@ list_entry_t *List::add(void *payload) {
   if (_payload_get_f == NULL) {
     entry->next = NULL;
   } else {
-    char *string = NULL;
-
-    string = _payload_get_f(entry->payload);
-    entry->next = find_hidden(string, _payload_get_f);
-    free(string);
+    entry->next = find_hidden(_payload_get_f(entry->payload), _payload_get_f);
   }
   if (entry->next == NULL) {
     entry->previous = _last;
@@ -202,12 +181,10 @@ list_entry_t *List::next(const list_entry_t *entry) const {
 }
 
 int List::find(
-    const char *search_string,
-    list_payload_get_f payload_get,
-    list_entry_t **entry_handle) const {
+    const string&       search_string,
+    list_payload_get_f  payload_get,
+    list_entry_t**      entry_handle) const {
   list_entry_t    *entry;
-  char            *string = NULL;
-  int             result;
 
   /* Impossible to search without interpreting the payload */
   if (payload_get == NULL) {
@@ -226,11 +203,7 @@ int List::find(
   if (entry == NULL) {
     return 1;
   }
-  string = payload_get(entry->payload);
-  result = strcmp(string, search_string);
-  free(string);
-
-  return result;
+  return payload_get(entry->payload) != search_string;
 }
 
 void List::show(list_entry_t *entry, list_payload_get_f payload_get) const {
@@ -248,16 +221,10 @@ void List::show(list_entry_t *entry, list_payload_get_f payload_get) const {
 
   if (entry != NULL) {
     if (list_entry_payload(entry) != NULL) {
-      char *string = payload_get(list_entry_payload(entry));
-      if (string != NULL) {
-        int i;
-
-        for (i = 0; i < level; i++) {
-          printf("-");
-        }
-        printf("> %s\n", string);
-        free(string);
+      for (int i = 0; i < level; i++) {
+        printf("-");
       }
+      cout << "> " << payload_get(list_entry_payload(entry)) << endl;
     } else {
       fprintf(stderr, "list: show: no payload!\n");
     }
@@ -305,12 +272,8 @@ int List::compare(
     } else if (compare_f != NULL) {
       result = compare_f(payload_this, payload_other);
     } else {
-      char  *string_this  = payloadString(payload_this);
-      char  *string_other = other->payloadString(payload_other);
-
-      result = strcmp(string_this, string_other);
-      free(string_this);
-      free(string_other);
+      result = payloadString(payload_this).compare(
+        other->payloadString(payload_other));
     }
     differ |= (result != 0);
     /* left < right => element is missing from right list */
@@ -339,12 +302,11 @@ int List::compare(
 }
 
 int List::select(
-    const char          *search_string,
+    const string&       search_string,
     list_payload_get_f  payload_get,
     List                *selected_p,
     List                *unselected_p) const {
   list_entry_t  *entry = NULL;
-  int             length = strlen(search_string);
 
   /* Note: list_find does not garantee to find the first element */
 
@@ -357,16 +319,16 @@ int List::select(
   /* Search the complete list, but stop when no more match is found */
   while ((entry = next(entry)) != NULL) {
     if (entry->payload != NULL) {
-      char *string = NULL;
-      int  result;
+      string payload_string;
 
       if (payload_get != NULL) {
-        string = payload_get(entry->payload);
+        payload_string = payload_get(entry->payload);
       } else {
-        string = _payload_get_f(entry->payload);
+        payload_string = _payload_get_f(entry->payload);
       }
       /* Only compare the portion of string of search_string's length */
-      result = strncmp(string, search_string, length);
+      int result = payload_string.compare(0, search_string.size(),
+        search_string);
       if (result == 0) {
         /* Portions of strings match */
         if (selected_p != NULL) {
@@ -379,7 +341,6 @@ int List::select(
         /* When using the default payload function, time can be saved */
         break;
       }
-      free(string);
     } else {
       fprintf(stderr, "list: select: found null payload, ignoring\n");
     }

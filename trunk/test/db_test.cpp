@@ -25,22 +25,17 @@ using namespace std;
 
 static int verbose = 3;
 
-static char *file_data_show(const void *payload) {
-  char *string = NULL;
-
-  asprintf(&string, "%s", ((File *) payload)->path().c_str());
-  return string;
+static string file_data_show(const void *payload) {
+  return ((File *) payload)->path();
 }
 
-static char *db_data_show(const void *payload) {
+static string db_data_show(const void *payload) {
   const db_data_t *db_data = (db_data_t *) payload;
-  char *string = NULL;
-
-  /* Times are omitted here... */
-  asprintf(&string, "%s\t%d\t%d",
-    db_data->filedata->line(true).c_str(),
-    db_data->date_in || 0, db_data->date_out || 0);
-  return string;
+  string d_in;
+  string d_out;
+  if (db_data->date_in == 0) d_in = "0"; else d_in = "1";
+  if (db_data->date_out == 0) d_out = "0"; else d_out = "1";
+  return db_data->filedata->line(true) + "\t" + d_in + "\t" + d_out;
 }
 
 int verbosity(void) {

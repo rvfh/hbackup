@@ -16,12 +16,11 @@
      Boston, MA 02111-1307, USA.
 */
 
-#ifndef _GNU_SOURCE
-#define _GNU_SOURCE
-#endif
-#include <iostream>
 using namespace std;
-#include <string.h>
+
+#include <iostream>
+#include <string>
+
 #include "list.h"
 
 typedef struct {
@@ -33,20 +32,14 @@ typedef struct {
   char filename[256];
 } payload2_t;
 
-static char *payload_get(const void *payload_p) {
+static string payload_get(const void *payload_p) {
   const payload_t *payload = (const payload_t *) (payload_p);
-  char *string = NULL;
-
-  asprintf(&string, "%s", payload->name);
-  return string;
+  return payload->name;
 }
 
-static char *payload2_get(const void *payload_p) {
+static string payload2_get(const void *payload_p) {
   const payload2_t *payload = (const payload2_t *) (payload_p);
-  char *string = NULL;
-
-  asprintf(&string, "%s/%s", payload->dir, payload->filename);
-  return string;
+  return string(payload->dir) + "/" + string(payload->filename);
 }
 
 static int payloads_compare(void *payload_left, void *payload_right) {
@@ -77,7 +70,6 @@ int main() {
   List          list3(payload2_get);
   List          *added              = NULL;
   List          *missing            = NULL;
-  char          *string             = NULL;
 
   cout << "Fill in list\n";
   strcpy(payload.name, "test");
@@ -89,12 +81,9 @@ int main() {
   list.add(list_test_new(payload));
   cout << "List " << list.size() << " element(s):\n";
   list.show(NULL, payload_get);
-  list.find("test", NULL, &entry);
-  string = payload_get(list_entry_payload(entry));
-  if (strcmp(string, "test")) {
+  if (list.find("test", NULL, &entry)) {
     cout << "test not found???\n";
   }
-  free(string);
 
   strcpy(payload.name, "test/subdir/testfile1");
   list.add(list_test_new(payload));
