@@ -19,10 +19,8 @@
 #ifndef LIST_H
 #define LIST_H
 
-/* Type for function to convert payload into usable data
- * *string_p must be allocated by the function, but is freed by this module
- */
-typedef char *(list_payload_get_f) (const void *payload);
+// Type for function to convert payload into usable data
+typedef string (list_payload_get_f) (const void *payload);
 
 /* Type for function to compare payloads from two lists
  * Return codes:
@@ -59,19 +57,19 @@ class List {
   list_payload_get_f  *_payload_get_f;
   int                 _size;
   list_entry_t        *find_hidden(
-    const char              *search_string,
+    const string&           search_string,
     list_payload_get_f      payload_get = NULL) const;
 public:
   List(list_payload_get_f payload_get_f);
   ~List();
-  char *payloadString(const void *payload) const;
+  string payloadString(const void *payload) const;
   list_entry_t *append(void *payload);
   list_entry_t *add(void *payload);
   void *remove(list_entry_t *entry);
   int size() const;
   list_entry_t *next(const list_entry_t *entry) const;
   int find(
-    const char*             search_string,
+    const string&           search_string,
     list_payload_get_f      payload_get_f,
     list_entry_t**          entry_handle) const;
   void show(
@@ -83,7 +81,7 @@ public:
     List                    *list_missing_handle  = NULL,
     list_payloads_compare_f compare_f             = NULL) const;
   int select(
-    const char              *search_string,
+    const string&           search_string,
     list_payload_get_f      payload_get_f,
     List                    *list_selected_handle,
     List                    *list_unselected_handle) const;

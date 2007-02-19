@@ -63,45 +63,42 @@ static List   *db_list = NULL;
 /* Size of path being backed up */
 static int    backup_path_length = 0;
 
-static char *db_data_get(const void *payload) {
+static string db_data_get(const void *payload) {
   const db_data_t *db_data = (const db_data_t *) (payload);
-  char *string = NULL;
+  string path = db_data->filedata->prefix() + " " + db_data->filedata->path();
 
   if (db_data->date_out == 0) {
     /* '@' > '9' */
-    asprintf(&string, "%s %s %c", db_data->filedata->prefix().c_str(),
-      db_data->filedata->path().c_str(), '@');
+    path += " @";
   } else {
     /* ' ' > '0' */
-    asprintf(&string, "%s %s %11ld", db_data->filedata->prefix().c_str(),
-      db_data->filedata->path().c_str(), db_data->date_out);
+    char *date = NULL;
+    asprintf(&date, "%11ld", db_data->date_out);
+    path += " " + string(date);
+    delete date;
   }
-  return string;
+  return path;
 }
 
-static char *close_select(const void *payload) {
+static string close_select(const void *payload) {
   const db_data_t *db_data = (const db_data_t *) (payload);
-  char *string = NULL;
 
   if (db_data->date_out == 0) {
-    asprintf(&string, "@");
+    return "@";
   } else {
-    asprintf(&string, "#");
+    return "#";
   }
-  return string;
 }
 
-static char *parse_select(const void *payload) {
+static string parse_select(const void *payload) {
   const db_data_t *db_data = (const db_data_t *) (payload);
-  char *string = NULL;
 
   if (db_data->date_out != 0) {
     /* This string cannot be matched */
-    asprintf(&string, "\t");
+    return "\t";
   } else {
-    asprintf(&string, "%s", db_data->filedata->path().c_str());
+    return db_data->filedata->path();
   }
-  return string;
 }
 
 /* Need to compare only for matching paths */

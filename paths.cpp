@@ -34,11 +34,8 @@ using namespace std;
 #include "paths.h"
 #include "hbackup.h"
 
-static char *filedata_get(const void* payload) {
-  char *string = NULL;
-
-  asprintf(&string, "%s", ((File *) payload)->path().c_str());
-  return string;
+static string filedata_get(const void* payload) {
+  return ((File *) payload)->path();
 }
 
 int Path::iterate_directory(const string& path, Parser* parser) {
