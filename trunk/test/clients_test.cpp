@@ -112,7 +112,7 @@ int main(void) {
   clients->push_back(client);
   client->setProtocol("smb");
   client->setHostOrIp("Client");
-  client->addOption("", "nocase");
+  client->addOption("nocase");
   client->addOption("username", "user");
   client->addOption("password", "");
   client->setListfile("c:/home/BlaH/Backup.list");

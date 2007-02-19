@@ -122,8 +122,9 @@ Path::Path(const string& path) {
 }
 
 int Path::addFilter(
-    const char *type,
-    const char *string) {
+    const string& in_type,
+    const string& string) {
+  const char *type = in_type.c_str();
   const char *filter_type;
   const char *delim    = strchr(type, '/');
   mode_t     file_type = 0;
@@ -155,15 +156,15 @@ int Path::addFilter(
 
   /* Add specified filter */
   if (! strcmp(filter_type, "path_end")) {
-    _filters.push_back(new Filter(new Condition(file_type, filter_path_end, string)));
+    _filters.push_back(new Filter(new Condition(file_type, filter_path_end, string.c_str())));
   } else if (! strcmp(filter_type, "path_start")) {
-    _filters.push_back(new Filter(new Condition(file_type, filter_path_start, string)));
+    _filters.push_back(new Filter(new Condition(file_type, filter_path_start, string.c_str())));
   } else if (! strcmp(filter_type, "path_regexp")) {
-    _filters.push_back(new Filter(new Condition(file_type, filter_path_regexp, string)));
+    _filters.push_back(new Filter(new Condition(file_type, filter_path_regexp, string.c_str())));
   } else if (! strcmp(filter_type, "size_below")) {
-    _filters.push_back(new Filter(new Condition(0, filter_size_below, strtoul(string, NULL, 10))));
+    _filters.push_back(new Filter(new Condition(0, filter_size_below, strtoul(string.c_str(), NULL, 10))));
   } else if (! strcmp(filter_type, "size_above")) {
-    _filters.push_back(new Filter(new Condition(0, filter_size_above, strtoul(string, NULL, 10))));
+    _filters.push_back(new Filter(new Condition(0, filter_size_above, strtoul(string.c_str(), NULL, 10))));
   } else {
     return 1;
   }

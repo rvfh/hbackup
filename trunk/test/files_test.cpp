@@ -91,63 +91,8 @@ int main(void) {
   printf("Socket : 0%06o\n", File::typeMode('s'));
   printf("Unknown: 0%06o\n", File::typeMode('?'));
 
-  cout << endl << "Test: params_readline" << endl;
-  char   keyword[256];
-  char   type[256];
-  string s;
-
-  line = "";
-  cout << "Read " << params_readline(line, keyword, type, &s)
-    << " parameters from " << line << ": '" << keyword << "' '" << type
-    << "' '" << s << "'" <<  endl;
-  line = "# Normal comment";
-  cout << "Read " << params_readline(line, keyword, type, &s)
-    << " parameters from " << line << ": '" << keyword << "' '" << type
-    << "' '" << s << "'" <<  endl;
-  line = " \t# Displaced comment";
-  cout << "Read " << params_readline(line, keyword, type, &s)
-    << " parameters from " << line << ": '" << keyword << "' '" << type
-    << "' '" << s << "'" <<  endl;
-  line = "\tkey # Comment";
-  cout << "Read " << params_readline(line, keyword, type, &s)
-    << " parameters from " << line << ": '" << keyword << "' '" << type
-    << "' '" << s << "'" <<  endl;
-  line = "key\t \"string\" # Comment";
-  cout << "Read " << params_readline(line, keyword, type, &s)
-    << " parameters from " << line << ": '" << keyword << "' '" << type
-    << "' '" << s << "'" <<  endl;
-  line = "key \ttype\t\"string\" # Comment";
-  cout << "Read " << params_readline(line, keyword, type, &s)
-    << " parameters from " << line << ": '" << keyword << "' '" << type
-    << "' '" << s << "'" <<  endl;
-  line = "key\t string \t# Comment";
-  cout << "Read " << params_readline(line, keyword, type, &s)
-    << " parameters from " << line << ": '" << keyword << "' '" << type
-    << "' '" << s << "'" <<  endl;
-  line = "key \ttype\t string # Comment";
-  cout << "Read " << params_readline(line, keyword, type, &s)
-    << " parameters from " << line << ": '" << keyword << "' '" << type
-    << "' '" << s << "'" <<  endl;
-  line = "key \ttype \t\"string # Comment";
-  cout << "Read " << params_readline(line, keyword, type, &s)
-    << " parameters from " << line << ": '" << keyword << "' '" << type
-    << "' '" << s << "'" <<  endl;
-  line = "key \ttype string\" # Comment";
-  cout << "Read " << params_readline(line, keyword, type, &s)
-    << " parameters from " << line << ": '" << keyword << "' '" << type
-    << "' '" << s << "'" <<  endl;
-  line = "key\t \"this is\ta \tstring\" # Comment";
-  cout << "Read " << params_readline(line, keyword, type, &s)
-    << " parameters from " << line << ": '" << keyword << "' '" << type
-    << "' '" << s << "'" <<  endl;
-  line = "key \ttype\t \"this is\ta \tstring\" # Comment";
-  cout << "Read " << params_readline(line, keyword, type, &s)
-    << " parameters from " << line << ": '" << keyword << "' '" << type
-    << "' '" << s << "'" <<  endl;
-
-  struct tm *time;
-
   cout << "\nmetadata" << endl;
+  struct tm *time;
   File file_data("test/testfile");
   time_t file_time = file_data.mtime();
   time = localtime(&file_time);
@@ -159,81 +104,121 @@ int main(void) {
 
   cout << "\nreadline" << endl;
   vector<string> *params;
+
+  // Start simple: one argument
   line = "a";
   params = new vector<string>;
-  cout << "readline(" << line << ") = " << readline(line, *params) << endl;
+  cout << "readline(" << line << "): " << File::decodeLine(line, *params) << endl;
   for (unsigned int i = 0; i < params->size(); i++) {
     cout << (*params)[i] << endl;
   }
   cout << endl;
   delete params;
 
+  // Two arguments, test blanks
   line = " \ta \tb";
   params = new vector<string>;
-  cout << "readline(" << line << ") = " << readline(line, *params) << endl;
+  cout << "readline(" << line << "): " << File::decodeLine(line, *params) << endl;
   for (unsigned int i = 0; i < params->size(); i++) {
     cout << (*params)[i] << endl;
   }
   cout << endl;
   delete params;
 
+  // Not single character argument
   line = "\t ab";
   params = new vector<string>;
-  cout << "readline(" << line << ") = " << readline(line, *params) << endl;
+  cout << "readline(" << line << "): " << File::decodeLine(line, *params) << endl;
   for (unsigned int i = 0; i < params->size(); i++) {
     cout << (*params)[i] << endl;
   }
   cout << endl;
   delete params;
 
+  // Two of them
   line = "\t ab cd";
   params = new vector<string>;
-  cout << "readline(" << line << ") = " << readline(line, *params) << endl;
+  cout << "readline(" << line << "): " << File::decodeLine(line, *params) << endl;
   for (unsigned int i = 0; i < params->size(); i++) {
     cout << (*params)[i] << endl;
   }
   cout << endl;
   delete params;
 
+  // Three, with comment
   line = "\t ab cd\tef # blah";
   params = new vector<string>;
-  cout << "readline(" << line << ") = " << readline(line, *params) << endl;
+  cout << "readline(" << line << "): " << File::decodeLine(line, *params) << endl;
   for (unsigned int i = 0; i < params->size(); i++) {
     cout << (*params)[i] << endl;
   }
   cout << endl;
   delete params;
 
+  // Single quotes
   line = "\t 'ab' 'cd'\t'ef' # blah";
   params = new vector<string>;
-  cout << "readline(" << line << ") = " << readline(line, *params) << endl;
+  cout << "readline(" << line << "): " << File::decodeLine(line, *params) << endl;
   for (unsigned int i = 0; i < params->size(); i++) {
     cout << (*params)[i] << endl;
   }
   cout << endl;
   delete params;
 
+  // And double quotes
   line = "\t \"ab\" 'cd'\t\"ef\" # blah";
   params = new vector<string>;
-  cout << "readline(" << line << ") = " << readline(line, *params) << endl;
+  cout << "readline(" << line << "): " << File::decodeLine(line, *params) << endl;
   for (unsigned int i = 0; i < params->size(); i++) {
     cout << (*params)[i] << endl;
   }
   cout << endl;
   delete params;
 
+  // With blanks in quotes
   line = "\t ab cd\tef 'gh ij\tkl' \"mn op\tqr\" \t# blah";
   params = new vector<string>;
-  cout << "readline(" << line << ") = " << readline(line, *params) << endl;
+  cout << "readline(" << line << "): " << File::decodeLine(line, *params) << endl;
   for (unsigned int i = 0; i < params->size(); i++) {
     cout << (*params)[i] << endl;
   }
   cout << endl;
   delete params;
 
+  // With quotes in quotes
   line = "\t ab cd\tef 'gh \"ij\\\'\tkl' \"mn 'op\\\"\tqr\" \t# blah";
   params = new vector<string>;
-  cout << "readline(" << line << ") = " << readline(line, *params) << endl;
+  cout << "readline(" << line << "): " << File::decodeLine(line, *params) << endl;
+  for (unsigned int i = 0; i < params->size(); i++) {
+    cout << (*params)[i] << endl;
+  }
+  cout << endl;
+  delete params;
+
+  // With escape characters
+  line = "\t a\\b cd\tef 'g\\h \"ij\\\'\tkl' \"m\\n 'op\\\"\tqr\" \t# blah";
+  params = new vector<string>;
+  cout << "readline(" << line << "): " << File::decodeLine(line, *params) << endl;
+  for (unsigned int i = 0; i < params->size(); i++) {
+    cout << (*params)[i] << endl;
+  }
+  cout << endl;
+  delete params;
+
+  // Missing ending single quote
+  line = "\t a\\b cd\tef 'g\\h \"ij\\\'\tkl";
+  params = new vector<string>;
+  cout << "readline(" << line << "): " << File::decodeLine(line, *params) << endl;
+  for (unsigned int i = 0; i < params->size(); i++) {
+    cout << (*params)[i] << endl;
+  }
+  cout << endl;
+  delete params;
+
+  // Missing ending double quote
+  line = "\t a\\b cd\tef 'g\\h \"ij\\\'\tkl' \"m\\n 'op\\\"\tqr";
+  params = new vector<string>;
+  cout << "readline(" << line << "): " << File::decodeLine(line, *params) << endl;
   for (unsigned int i = 0; i < params->size(); i++) {
     cout << (*params)[i] << endl;
   }

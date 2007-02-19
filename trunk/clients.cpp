@@ -136,43 +136,68 @@ int Client::readListFile(const string& list_path) {
       if (pos != string::npos) {
         buffer.erase(pos);
       }
-      char    keyword[256];
-      char    type[256];
-      string  value;
-      int     params = params_readline(buffer, keyword, type, &value);
+      vector<string> params;
 
       line++;
-      if (params <= 0) {
-        if (params < 0) {
-          errno = EUCLEAN;
-          cerr << "clients: backup: syntax error in list file "
-            << list_path << " line " << line << endl;
+      if (File::decodeLine(buffer, params)) {
+        errno = EUCLEAN;
+        cerr << "Warning: in list file " << list_path << ", line " << line
+          << " missing single- or double-quote" << endl;
+      }
+      if (params.size() >= 1) {
+        if (params[0] == "path") {
+          // Expect exactly two parameters
+          if (params.size() != 2) {
+            cerr << "Error: in list file " << list_path << ", line " << line
+              << " 'path' takes exactly one argument" << endl;
+            failed = 1;
+          }
+          /* New backup path */
+          path = new Path(params[1]);
+          if (verbosity() > 2) {
+            cout << " --> Path: " << path->path() << endl;
+          }
+          _paths.push_back(path);
+        } else if (path != NULL) {
+          if (params[0] == "ignore") {
+            // Expect exactly three parameters
+            if (params.size() != 3) {
+              cerr << "Error: in list file " << list_path << ", line " << line
+                << " 'filter' takes exactly two arguments" << endl;
+              failed = 1;
+            }
+            if (path->addFilter(params[1], params[2])) {
+              cerr << "Error: in list file " << list_path << ", line " << line
+                << " unsupported filter: " << params[1] << endl;
+              failed = 1;
+            }
+          } else
+          if (params[0] == "parser") {
+            // Expect exactly three parameters
+            if (params.size() != 3) {
+              cerr << "Error: in list file " << list_path << ", line " << line
+                << " 'parser' takes exactly two arguments" << endl;
+              failed = 1;
+            }
+            if (path->addParser(params[1], params[2])) {
+              cerr << "Error: in list file " << list_path << ", line " << line
+                << " unsupported parser: " << params[2] << endl;
+              failed = 1;
+            }
+          } else {
+            // What was that?
+            if (params.size() != 2) {
+              cerr << "Error: in list file " << list_path << ", line " << line
+                << " unknown keyword: " << params[0] << endl;
+              failed = 1;
+            }
+          }
+        } else {
+          // What?
+          cerr << "Error: in list file " << list_path << ", line " << line
+            << " unexpected keyword at this level: " << params[0] << endl;
           failed = 1;
         }
-      } else if (! strcmp(keyword, "path")) {
-        /* New backup path */
-        path = new Path(value);
-        if (verbosity() > 2) {
-          cout << " --> Path: " << path->path() << endl;
-        }
-        _paths.push_back(path);
-      } else if (path != NULL) {
-        if (! strcmp(keyword, "ignore")) {
-          if (path->addFilter(type, value.c_str())) {
-            cerr << "clients: backup: unsupported filter in list file "
-              << list_path << " line " << line << endl;
-          }
-        } else if (! strcmp(keyword, "parser")) {
-          if (path->addParser(type, value)) {
-            cerr << "clients: backup: unsupported parser '" << value
-              << "'in list file " << list_path << " line " << line << endl;
-          }
-        }
-      } else {
-        errno = EUCLEAN;
-        cerr << "clients: backup: syntax error in list file "
-          << list_path << " line " << line << endl;
-        failed = 1;
       }
     }
     /* Close list file */
@@ -196,10 +221,6 @@ Client::~Client() {
   for (unsigned int i = 0; i < _paths.size(); i++) {
     delete _paths[i];
   }
-}
-
-void Client::addOption(const string& name, const string& value) {
-  _options.push_back(new Option(name, value));
 }
 
 void Client::setHostOrIp(string value) {
