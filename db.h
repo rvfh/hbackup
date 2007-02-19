@@ -84,7 +84,7 @@ public:
     const string&   path,
     const db_data_t *db_data,
     string&         checksum,
-    int             compress);
+    int             compress = 0);
 };
 
 #endif

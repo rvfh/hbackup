@@ -32,37 +32,6 @@ List 3 element(s):
 -> test/subdir/testfile1
 -> test/testfile
 
-Compare lists
-Lists differ
-Added list only
-List 1 element(s):
--> test/subdir/added
-Missing list only
-List 3 element(s):
--> test
--> test/subdir
--> test/testfile
-Both lists
-List 1 element(s):
--> test/subdir/added
-List 3 element(s):
--> test
--> test/subdir
--> test/testfile
-Both lists with comparison function
-List 2 element(s):
--> test/subdir/added
--> test/subdir/testfile1
-List 4 element(s):
--> test
--> test/subdir
--> test/testfile
--> test/testfile
-List 3 element(s) of original list:
--> test/subdir/added
--> test/subdir/testfile1
--> test/testfile
-
 Select part of list
 List 5 element(s) of original list:
 -> test

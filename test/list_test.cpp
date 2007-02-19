@@ -42,13 +42,6 @@ static string payload2_get(const void *payload_p) {
   return string(payload->dir) + "/" + string(payload->filename);
 }
 
-static int payloads_compare(void *payload_left, void *payload_right) {
-  static int counter = 0;
-
-  if (++counter > 2) counter = -2;
-  return counter;
-}
-
 static payload_t *list_test_new(payload_t payload) {
   payload_t *payload_p = new payload_t;
   *payload_p = payload;
@@ -68,8 +61,6 @@ int main() {
   List          list(payload_get);
   List          *list2 = new List(payload2_get);
   List          list3(payload2_get);
-  List          *added              = NULL;
-  List          *missing            = NULL;
 
   cout << "Fill in list\n";
   strcpy(payload.name, "test");
@@ -119,67 +110,6 @@ int main() {
   strcpy(payload2.filename, "added");
   list2->add(list2_test_new(payload2));
   cout << "List " << list2->size() << " element(s):\n";
-  list2->show();
-
-  cout << "\nCompare lists\n";
-  if (list.compare(list2)) {
-    cout << "Lists differ\n";
-  }
-  added = new List(payload2_get);
-  if (list.compare(list2, added)) {
-    cout << "Added list only\n";
-    cout << "List " << added->size() << " element(s):\n";
-    added->show();
-    if (added->deselect() != 0) {
-      cout << "Added list not empty after deselect\n";
-    }
-  }
-  delete added;
-  missing = new List(payload_get);
-  if (list.compare(list2, NULL, missing)) {
-    cout << "Missing list only\n";
-    cout << "List " << missing->size() << " element(s):\n";
-    missing->show();
-    if (missing->deselect() != 0) {
-      cout << "Missing list not freed\n";
-    }
-  }
-  delete missing;
-  added = new List(payload2_get);
-  missing = new List(payload_get);
-  if (list.compare(list2, added, missing)) {
-    cout << "Both lists\n";
-    cout << "List " << added->size() << " element(s):\n";
-    added->show();
-    if (added->deselect() != 0) {
-      cout << "Added list not freed\n";
-    }
-    cout << "List " << missing->size() << " element(s):\n";
-    missing->show();
-    if (missing->deselect() != 0) {
-      cout << "Missing list not freed\n";
-    }
-  }
-  delete added;
-  delete missing;
-  added = new List(payload2_get);
-  missing = new List(payload_get);
-  if (list.compare(list2, added, missing, payloads_compare)) {
-    cout << "Both lists with comparison function\n";
-    cout << "List " << added->size() << " element(s):\n";
-    added->show();
-    if (added->deselect() != 0) {
-      cout << "Added list not freed\n";
-    }
-    cout << "List " << missing->size() << " element(s):\n";
-    missing->show();
-    if (missing->deselect() != 0) {
-      cout << "Missing list not freed\n";
-    }
-  }
-  delete added;
-  delete missing;
-  cout << "List " << list2->size() << " element(s) of original list:\n";
   list2->show();
 
   cout << "\nSelect part of list\n";

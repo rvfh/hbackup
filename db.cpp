@@ -710,24 +710,66 @@ int Database::parse(
     const string& real_path,
     const string& mount_path,
     List          *file_list) {
-  List          *selected_files_list = new List(db_data_get);
-  List          *added_files_list = new List(db_data_get);
-  List          *removed_files_list = new List(db_data_get);
-  list_entry_t  *entry      = NULL;
-  char          *pathslash  = NULL;
-  int           failed      = 0;
+  List*               selected = new List(db_data_get);
+  vector<File*>       added;
+  vector<db_data_t*>  removed;
+  int                 failed   = 0;
 
   /* Compare list with db list for matching prefix */
   backup_path_length = real_path.size() + 1;
-  asprintf(&pathslash, "%s/", real_path.c_str());
-  db_list->select(pathslash, parse_select, selected_files_list, NULL);
-  free(pathslash);
-  selected_files_list->compare(file_list, added_files_list,
-    removed_files_list, parse_compare);
-  selected_files_list->deselect();
+  db_list->select(real_path + "/", parse_select, selected, NULL);
+
+  /* Point the entries to the start of their respective lists */
+  list_entry_t  *entry_db_list    = selected->next(NULL);
+  list_entry_t  *entry_file_list  = file_list->next(NULL);
+
+  while ((entry_db_list != NULL) || (entry_file_list != NULL)) {
+    db_data_t*  payload_db_list;
+    File*       payload_file_list;
+    int         result;
+
+    if (entry_db_list != NULL) {
+      payload_db_list  = (db_data_t*) list_entry_payload(entry_db_list);
+    } else {
+      payload_db_list  = NULL;
+    }
+    if (entry_file_list != NULL) {
+      payload_file_list = (File*) list_entry_payload(entry_file_list);
+    } else {
+      payload_file_list = NULL;
+    }
+
+    if (payload_db_list == NULL) {
+      result = 1;
+    } else if (payload_file_list == NULL) {
+      result = -1;
+    } else {
+      result = parse_compare(payload_db_list, payload_file_list);
+    }
+    /* left < right => element is missing from right list */
+    if (result < 0) {
+      /* The contents are NOT copied, so the two lists have elements
+       * pointing to the same data! */
+      removed.push_back(payload_db_list);
+    } else
+    /* left > right => element was added in right list */
+    if (result > 0) {
+      /* The contents are NOT copied, so the two lists have elements
+       * pointing to the same data! */
+      added.push_back(payload_file_list);
+    }
+    if (result >= 0) {
+      entry_file_list = file_list->next(entry_file_list);
+    }
+    if (result <= 0) {
+      entry_db_list = selected->next(entry_db_list);
+    }
+  }
+
+  selected->deselect();
 
   /* Deal with new/modified data first */
-  if (added_files_list->size() != 0) {
+  if (added.size() != 0) {
     /* Static to be global to all shares */
     static int    copied        = 0;
     static off_t  volume        = 0;
@@ -738,36 +780,37 @@ int Database::parse(
 
     /* Determine volume to be copied */
     if (verbosity() > 2) {
-      while ((entry = added_files_list->next(entry)) != NULL) {
-        File* filedata = (File*) (list_entry_payload(entry));
-
+      for (unsigned int i = 0; i < added.size(); i++) {
+        /* Same data as in file_list */
         filestobackup++;
-        if (S_ISREG(filedata->type())) {
-          sizetobackup += double(filedata->size());
+        if (S_ISREG(added[i]->type())) {
+          sizetobackup += double(added[i]->size());
         }
       }
       printf(" --> Files to add: %u (%0.f bytes)\n",
-        added_files_list->size(), sizetobackup);
+        added.size(), sizetobackup);
     }
 
-    while (((entry = added_files_list->next(entry)) != NULL) && ! terminating()) {
-      const File* filedata = (File*) (list_entry_payload(entry));
+    for (unsigned int i = 0; i < added.size(); i++) {
+      if (terminating()) {
+        break;
+      }
       db_data_t*  db_data  = new db_data_t;
 
       // Set database data
       db_data->date_in = time(NULL);
       db_data->date_out = 0;
       // Set object data
-      db_data->filedata = new File(*filedata);
+      db_data->filedata = new File(*added[i]);
       db_data->filedata->setPrefix(prefix);
       // Set checksum
       string checksum = "";
-      if (S_ISREG(filedata->type())) {
-        if (filedata->checksum().size() != 0) {
+      if (S_ISREG(db_data->filedata->type())) {
+        if (db_data->filedata->checksum().size() != 0) {
           /* Checksum given by the compare function */
-          checksum = filedata->checksum();
+          checksum = db_data->filedata->checksum();
         } else
-        if (write(mount_path, filedata->path(), db_data, checksum, 0)) {
+        if (write(mount_path, db_data->filedata->path(), db_data, checksum)) {
           /* Write failed, need to go on */
           checksum = "N";
           failed   = 1;
@@ -778,11 +821,11 @@ int Database::parse(
           }
         }
         if (verbosity() > 2) {
-          sizebackedup += double(filedata->size());
+          sizebackedup += double(db_data->filedata->size());
         }
       }
       // Update file path
-      db_data->filedata->setPath(real_path + "/" + filedata->path());
+      db_data->filedata->setPath(real_path + "/" + db_data->filedata->path());
       db_data->filedata->setChecksum(checksum);
       // Save new data
       db_list->add(db_data);
@@ -805,34 +848,25 @@ int Database::parse(
     cout << " --> No files to add" << endl;
   }
 
-  /* This only unlists the data */
-  added_files_list->deselect();
-  delete added_files_list;
-
   /* Deal with removed/modified data */
-  if (removed_files_list->size() != 0) {
+  if (removed.size() != 0) {
     if (verbosity() > 2) {
-      printf(" --> Files to remove: %u\n", removed_files_list->size());
+      printf(" --> Files to remove: %u\n", removed.size());
     }
-    while ((entry = removed_files_list->next(entry)) != NULL) {
-      db_data_t *db_data = (db_data_t *) (list_entry_payload(entry));
-
+    for (unsigned int i = 0; i < removed.size(); i++) {
       /* Same data as in db_list */
-      db_data->date_out = time(NULL);
+      removed[i]->date_out = time(NULL);
 
       /* Update local list */
-      if (S_ISREG(db_data->filedata->type())
-       && (db_data->filedata->checksum().size() != 0)
-       && (db_data->filedata->checksum() != "N")) {
-        obsolete(*db_data->filedata);
+      if (S_ISREG(removed[i]->filedata->type())
+       && (removed[i]->filedata->checksum().size() != 0)
+       && (removed[i]->filedata->checksum() != "N")) {
+        obsolete(*removed[i]->filedata);
       }
     }
   } else if (verbosity() > 2) {
     cout << " --> No files to remove\n";
   }
-  /* This only unlists the data */
-  removed_files_list->deselect();
-  delete removed_files_list;
 
   /* Report errors */
   if (failed) {
