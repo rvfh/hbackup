@@ -60,21 +60,20 @@ class List {
   int                 _size;
   list_entry_t        *find_hidden(
     const char              *search_string,
-    list_payload_get_f      payload_get = NULL);
+    list_payload_get_f      payload_get = NULL) const;
 public:
-  List(list_payload_get_f payload_get_f = NULL);
+  List(list_payload_get_f payload_get_f);
   ~List();
-  bool ordered() const;
   char *payloadString(const void *payload) const;
   list_entry_t *append(void *payload);
   list_entry_t *add(void *payload);
   void *remove(list_entry_t *entry);
-  void drop(list_entry_t *entry);
   int size() const;
-  list_entry_t *first() const { return _first; }
-  list_entry_t *previous(const list_entry_t *entry) const;
   list_entry_t *next(const list_entry_t *entry) const;
-  int find(const char *search_string, list_payload_get_f payload_get_f, list_entry_t **entry_handle);
+  int find(
+    const char*             search_string,
+    list_payload_get_f      payload_get_f,
+    list_entry_t**          entry_handle) const;
   void show(
     list_entry_t            *entry                = NULL,
     list_payload_get_f      payload_get_f         = NULL) const;

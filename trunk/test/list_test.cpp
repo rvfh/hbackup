@@ -239,18 +239,5 @@ int main() {
   cout << "List " << list.size() << " element(s) of original list:\n";
   list.show(NULL, payload_get);
 
-  cout << "\nEmpty list\n";
-  list.drop(entry);
-  cout << "List " << list.size() << " element(s):\n";
-  list.show(NULL, payload_get);
-
-  list.drop(list.previous(NULL));
-  cout << "List " << list.size() << " element(s):\n";
-  list.show(NULL, payload_get);
-
-  list.drop(list.next(NULL));
-  cout << "List " << list.size() << " element(s):\n";
-  list.show(NULL, payload_get);
-
   return 0;
 }

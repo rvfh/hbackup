@@ -45,17 +45,13 @@ List::~List() {
   }
 }
 
-bool List::ordered() const {
-  return _payload_get_f != NULL;
-}
-
 char *List::payloadString(const void *payload) const {
   return _payload_get_f(payload);
 }
 
 list_entry_t *List::find_hidden(
     const char *search_string,
-    list_payload_get_f payload_get) {
+    list_payload_get_f payload_get) const {
   list_entry_t *entry = NULL;
 
   /* Search the list  (hint is only null if the list is empty) */
@@ -193,20 +189,8 @@ void *List::remove(list_entry_t *entry) {
   return payload;
 }
 
-void List::drop(list_entry_t *entry) {
-  free(remove(entry));
-}
-
 int List::size() const {
   return _size;
-}
-
-list_entry_t *List::previous(const list_entry_t *entry) const {
-  if (entry == NULL) {
-    return _last;
-  } else {
-    return entry->previous;
-  }
 }
 
 list_entry_t *List::next(const list_entry_t *entry) const {
@@ -220,7 +204,7 @@ list_entry_t *List::next(const list_entry_t *entry) const {
 int List::find(
     const char *search_string,
     list_payload_get_f payload_get,
-    list_entry_t **entry_handle) {
+    list_entry_t **entry_handle) const {
   list_entry_t    *entry;
   char            *string = NULL;
   int             result;
@@ -293,12 +277,6 @@ int List::compare(
     list_payloads_compare_f compare_f) const {
   /* Comparison result */
   int           differ        = 0;
-
-  /* Impossible to compare without interpreting the payloads */
-  if (! ordered() || ! other->ordered()) {
-    fprintf(stderr, "list: compare: no way to interpret payload\n");
-    return 2;
-  }
 
   /* Point the entries to the start of their respective lists */
   list_entry_t  *entry_this   = next(NULL);

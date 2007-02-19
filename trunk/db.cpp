@@ -659,8 +659,8 @@ int Database::open() {
 }
 
 void Database::close() {
-  List      *active_list = new List();
-  List      *removed_list = new List();
+  List      *active_list = new List(db_data_get);
+  List      *removed_list = new List(db_data_get);
   time_t    localtime;
   struct tm localtime_brokendown;
 
@@ -714,8 +714,8 @@ int Database::parse(
     const string& mount_path,
     List          *file_list) {
   List          *selected_files_list = new List(db_data_get);
-  List          *added_files_list = new List();
-  List          *removed_files_list = new List();
+  List          *added_files_list = new List(db_data_get);
+  List          *removed_files_list = new List(db_data_get);
   list_entry_t  *entry      = NULL;
   char          *pathslash  = NULL;
   int           failed      = 0;
