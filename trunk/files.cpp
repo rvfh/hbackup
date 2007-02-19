@@ -36,16 +36,16 @@ using namespace std;
 #define CHUNK 409600
 
 // TODO test
-File::File(const string& access_path, const string& path) {
+File::File(const string& prefix, const string& path) {
   string full_path;
   if (path.size() != 0) {
-    _access_path = access_path;
-    _path        = path;
-    full_path    = _access_path + "/" + _path;
+    _prefix   = prefix;
+    _path     = path;
+    full_path = _prefix + "/" + _path;
   } else {
-    _access_path = "";
-    _path        = access_path;
-    full_path    = _path;
+    _prefix   = "";
+    _path     = prefix;
+    full_path = _path;
   }
   _checksum    = "";
   _link        = "";
@@ -101,7 +101,7 @@ string File::name() const {
 
 // TODO test
 string File::line(bool nodates) {
-  string  output = _access_path + "\t" + _path + "\t" + typeLetter(_type);
+  string  output = _prefix + "\t" + _path + "\t" + typeLetter(_type);
   char*   numbers = NULL;
   time_t  mtime;
 
