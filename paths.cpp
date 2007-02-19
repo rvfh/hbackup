@@ -122,51 +122,70 @@ Path::Path(const string& path) {
 }
 
 int Path::addFilter(
-    const string& in_type,
-    const string& string) {
-  const char *type = in_type.c_str();
-  const char *filter_type;
-  const char *delim    = strchr(type, '/');
-  mode_t     file_type = 0;
-
-  /* Check whether file type was specified */
-  if (delim != NULL) {
-    filter_type = delim + 1;
-    if (! strncmp(type, "file", delim - type)) {
-      file_type = S_IFREG;
-    } else if (! strncmp(type, "dir", delim - type)) {
-      file_type = S_IFDIR;
-    } else if (! strncmp(type, "char", delim - type)) {
-      file_type = S_IFCHR;
-    } else if (! strncmp(type, "block", delim - type)) {
-      file_type = S_IFBLK;
-    } else if (! strncmp(type, "pipe", delim - type)) {
-      file_type = S_IFIFO;
-    } else if (! strncmp(type, "link", delim - type)) {
-      file_type = S_IFLNK;
-    } else if (! strncmp(type, "socket", delim - type)) {
-      file_type = S_IFSOCK;
-    } else {
-      return 1;
-    }
-  } else {
-    filter_type = type;
-    file_type = S_IFMT;
-  }
+    const string& type,
+    const string& value,
+    bool          append) {
+  Condition *condition;
 
   /* Add specified filter */
-  if (! strcmp(filter_type, "path_end")) {
-    _filters.push_back(new Filter(new Condition(file_type, filter_path_end, string.c_str())));
-  } else if (! strcmp(filter_type, "path_start")) {
-    _filters.push_back(new Filter(new Condition(file_type, filter_path_start, string.c_str())));
-  } else if (! strcmp(filter_type, "path_regexp")) {
-    _filters.push_back(new Filter(new Condition(file_type, filter_path_regexp, string.c_str())));
-  } else if (! strcmp(filter_type, "size_below")) {
-    _filters.push_back(new Filter(new Condition(0, filter_size_below, strtoul(string.c_str(), NULL, 10))));
-  } else if (! strcmp(filter_type, "size_above")) {
-    _filters.push_back(new Filter(new Condition(0, filter_size_above, strtoul(string.c_str(), NULL, 10))));
+  if (type == "type") {
+    mode_t file_type;
+    if (value == "file") {
+      file_type = S_IFREG;
+    } else
+    if (value == "dir") {
+      file_type = S_IFDIR;
+    } else
+    if (value == "char") {
+      file_type = S_IFCHR;
+    } else
+    if (value == "block") {
+      file_type = S_IFBLK;
+    } else
+    if (value == "pipe") {
+      file_type = S_IFIFO;
+    } else
+    if (value == "link") {
+      file_type = S_IFLNK;
+    } else
+    if (value == "socket") {
+      file_type = S_IFSOCK;
+    } else {
+      // Wrong value
+      return 2;
+    }
+    condition = new Condition(filter_type, file_type);
+  } else
+  if (type == "path_end") {
+    condition = new Condition(filter_path_end, value);
+  } else
+  if (type == "path_start") {
+    condition = new Condition(filter_path_start, value);
+  } else
+  if (type == "path_regexp") {
+    condition = new Condition(filter_path_regexp, value);
+  } else
+  if (type == "size_below") {
+    off_t size = strtoul(value.c_str(), NULL, 10);
+    condition = new Condition(filter_size_below, size);
+  } else
+  if (type == "size_above") {
+    off_t size = strtoul(value.c_str(), NULL, 10);
+    condition = new Condition(filter_size_above, size);
   } else {
+    // Wrong type
     return 1;
+  }
+
+  if (append) {
+    if (_filters.size() != 0) {
+      _filters[_filters.size() - 1]->push_back(condition);
+    } else {
+      // Can't append to nothing
+      return 3;
+    }
+  } else {
+    _filters.push_back(new Filter(condition));
   }
   return 0;
 }

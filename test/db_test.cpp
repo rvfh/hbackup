@@ -83,10 +83,14 @@ int main(void) {
   /* Use other modules */
   path = new Path("");
   path->addParser("all", "cvs");
-  path->addFilter("dir/path_start", ".svn");
-  path->addFilter("dir/path_start", "subdir");
-  path->addFilter("file/path_end", "~");
-  path->addFilter("file/path_regexp", "\\.o$");
+  path->addFilter("type", "dir");
+  path->addFilter("path_start", ".svn", true);
+  path->addFilter("type", "dir");
+  path->addFilter("path_start", "subdir", true);
+  path->addFilter("type", "file");
+  path->addFilter("path_end", "~", true);
+  path->addFilter("type", "file");
+  path->addFilter("path_regexp", "\\.o$", true);
   if (path->backup("test////")) {
     cout << "file list is empty" << endl;
     return 0;
@@ -167,10 +171,14 @@ int main(void) {
 
   path = new Path("");
   path->addParser("all", "cvs");
-  path->addFilter("dir/path_start", ".svn");
-  path->addFilter("dir/path_start", "subdir");
-  path->addFilter("file/path_end", "~");
-  path->addFilter("file/path_regexp", "\\.o$");
+  path->addFilter("type", "dir");
+  path->addFilter("path_start", ".svn", true);
+  path->addFilter("type", "dir");
+  path->addFilter("path_start", "subdir", true);
+  path->addFilter("type", "file");
+  path->addFilter("path_end", "~", true);
+  path->addFilter("type", "file");
+  path->addFilter("path_regexp", "\\.o$", true);
   if (path->backup("test2")) {
     cout << "file list is empty" << endl;
     return 0;
@@ -277,10 +285,14 @@ int main(void) {
 
   path = new Path("");
   path->addParser("all", "cvs");
-  path->addFilter("dir/path_start", ".svn");
-  path->addFilter("dir/path_start", "subdir");
-  path->addFilter("file/path_end", "~");
-  path->addFilter("file/path_regexp", "\\.o$");
+  path->addFilter("type", "dir");
+  path->addFilter("path_start", ".svn", true);
+  path->addFilter("type", "dir");
+  path->addFilter("path_start", "subdir", true);
+  path->addFilter("type", "file");
+  path->addFilter("path_end", "~", true);
+  path->addFilter("type", "file");
+  path->addFilter("path_regexp", "\\.o$", true);
   if (path->backup("test////")) {
     cout << "file list is empty" << endl;
     return 0;
@@ -314,10 +326,14 @@ int main(void) {
 
   path = new Path("");
   path->addParser("all", "cvs");
-  path->addFilter("dir/path_start", ".svn");
-  path->addFilter("dir/path_start", "subdir");
-  path->addFilter("file/path_end", "~");
-  path->addFilter("file/path_regexp", "\\.o$");
+  path->addFilter("type", "dir");
+  path->addFilter("path_start", ".svn", true);
+  path->addFilter("type", "dir");
+  path->addFilter("path_start", "subdir", true);
+  path->addFilter("type", "file");
+  path->addFilter("path_end", "~", true);
+  path->addFilter("type", "file");
+  path->addFilter("path_regexp", "\\.o$", true);
   if (path->backup("test////")) {
     cout << "file list is empty" << endl;
     return 0;
@@ -339,10 +355,14 @@ int main(void) {
 
   path = new Path("");
   path->addParser("all", "cvs");
-  path->addFilter("dir/path_start", ".svn");
-  path->addFilter("dir/path_start", "subdir");
-  path->addFilter("file/path_end", "~");
-  path->addFilter("file/path_regexp", "\\.o$");
+  path->addFilter("type", "dir");
+  path->addFilter("path_start", ".svn", true);
+  path->addFilter("type", "dir");
+  path->addFilter("path_start", "subdir", true);
+  path->addFilter("type", "file");
+  path->addFilter("path_end", "~", true);
+  path->addFilter("type", "file");
+  path->addFilter("path_regexp", "\\.o$", true);
   if (path->backup("test////")) {
     cout << "file list is empty" << endl;
     return 0;
@@ -362,10 +382,14 @@ int main(void) {
 
   path = new Path("");
   path->addParser("all", "cvs");
-  path->addFilter("dir/path_start", ".svn");
-  path->addFilter("dir/path_start", "subdir");
-  path->addFilter("file/path_end", "~");
-  path->addFilter("file/path_regexp", "\\.o$");
+  path->addFilter("type", "dir");
+  path->addFilter("path_start", ".svn", true);
+  path->addFilter("type", "dir");
+  path->addFilter("path_start", "subdir", true);
+  path->addFilter("type", "file");
+  path->addFilter("path_end", "~", true);
+  path->addFilter("type", "file");
+  path->addFilter("path_regexp", "\\.o$", true);
   if (path->backup("test2")) {
     cout << "file list is empty" << endl;
     return 0;

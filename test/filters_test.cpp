@@ -16,6 +16,8 @@
      Boston, MA 02111-1307, USA.
 */
 
+// TODO test file type filter
+
 using namespace std;
 
 #include <iostream>
@@ -53,7 +55,7 @@ int main(void) {
 
   cout << "Conditions test\n";
   cout << "filter_path_end_check\n";
-  condition = new Condition(S_IFREG, filter_path_end, ".txt");
+  condition = new Condition(filter_path_end, ".txt");
   file_data = new File("", "to a file.txt", "", "", S_IFREG, 0, 0, 0, 0, 0);
   if (! condition->match(*file_data)) {
     cout << "match 1.1\n";
@@ -68,25 +70,25 @@ int main(void) {
 
   cout << "filter_path_start_check\n";
   file_data = new File("", "this is/a path/to a file.txt", "", "", S_IFREG, 0, 0, 0, 0, 0);
-  condition = new Condition(S_IFREG, filter_path_start, "this is/a");
+  condition = new Condition(filter_path_start, "this is/a");
 
   if (! condition->match(*file_data)) {
     cout << "match 2.1\n";
   }
   delete condition;
-  condition = new Condition(S_IFREG, filter_path_start, "this was/a");
+  condition = new Condition(filter_path_start, "this was/a");
   if (! condition->match(*file_data)) {
     cout << "match 2.2\n";
   }
   delete condition;
 
   cout << "filter_path_regexp_check\n";
-  condition = new Condition(S_IFREG, filter_path_regexp, "^this.*path/.*\\.txt");
+  condition = new Condition(filter_path_regexp, "^this.*path/.*\\.txt");
   if (! condition->match(*file_data)) {
     cout << "match 3.1\n";
   }
   delete condition;
-  condition = new Condition(S_IFREG, filter_path_regexp, "^this.*path/a.*\\.txt");
+  condition = new Condition(filter_path_regexp, "^this.*path/a.*\\.txt");
   if (! condition->match(*file_data)) {
     cout << "match 3.2\n";
   }
@@ -95,7 +97,7 @@ int main(void) {
 
 
   cout << "\nMatch function test\n";
-  condition = new Condition(S_IFREG, filter_size_below, 5000);
+  condition = new Condition(filter_size_below, (off_t) 5000);
   file_data = new File("", "", "", "", S_IFREG, 0, 4000, 0, 0, 0);
   if (condition->match(*file_data)) {
     cout << "Not matching " << file_data->size() << "\n";
@@ -115,11 +117,11 @@ int main(void) {
 
   cout << "\nSimple rules test\n";
   filter = new Filters;
-  filter->push_back(new Filter(new Condition(S_IFREG, filter_path_regexp, "^to a.*\\.txt")));
+  filter->push_back(new Filter(new Condition(filter_path_regexp, "^to a.*\\.txt")));
   cout << ">List " << filter->size() << " rule(s):\n";
   filter_show(*filter);
 
-  filter->push_back(new Filter(new Condition(S_IFREG, filter_path_regexp, "^to a.*\\.t.t")));
+  filter->push_back(new Filter(new Condition(filter_path_regexp, "^to a.*\\.t.t")));
   cout << ">List " << filter->size() << " rule(s):\n";
   filter_show(*filter);
 
@@ -157,11 +159,11 @@ int main(void) {
   delete file_data;
 
 
-  filter2->push_back(new Filter(new Condition(S_IFREG, filter_path_regexp, "^to a.*\\.txt")));
+  filter2->push_back(new Filter(new Condition(filter_path_regexp, "^to a.*\\.txt")));
   cout << ">List " << filter2->size() << " rule(s):\n";
   filter_show(*filter2);
 
-  filter2->push_back(new Filter(new Condition(S_IFREG, filter_path_regexp, "^to a.*\\.t.t")));
+  filter2->push_back(new Filter(new Condition(filter_path_regexp, "^to a.*\\.t.t")));
   cout << ">List " << filter2->size() << " rule(s):\n";
   filter_show(*filter2);
 
@@ -223,7 +225,7 @@ int main(void) {
   delete file_data;
 
   /* File type is always S_IFREG */
-  filter->push_back(new Filter(new Condition(0, filter_size_below, 500)));
+  filter->push_back(new Filter(new Condition(filter_size_below, (off_t) 500)));
   cout << ">List " << filter->size() << " rule(s):\n";
   filter_show(*filter);
 
@@ -250,7 +252,7 @@ int main(void) {
   delete file_data;
 
   /* File type is always S_IFREG */
-  filter->push_back(new Filter(new Condition(0, filter_size_above, 5000)));
+  filter->push_back(new Filter(new Condition(filter_size_above, (off_t) 5000)));
   cout << ">List " << filter->size() << " rule(s):\n";
   filter_show(*filter);
 
@@ -288,11 +290,11 @@ int main(void) {
 
   filter->push_back(rule);
 
-  rule->push_back(new Condition(0, filter_size_below, 500));
+  rule->push_back(new Condition(filter_size_below, (off_t) 500));
   cout << ">List " << filter->size() << " rule(s):\n";
   filter_show(*filter);
 
-  rule->push_back(new Condition(0, filter_size_above, 400));
+  rule->push_back(new Condition(filter_size_above, (off_t) 400));
   cout << ">List " << filter->size() << " rule(s):\n";
   filter_show(*filter);
 

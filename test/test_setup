@@ -104,7 +104,8 @@ cat << EOF > "$CONFIGDIR/localhost.list"
 # Share test
 path "test" # should work
 ignore path_start subdir
-ignore file/path_end ~
+ignore type file
+ignand path_end ~
 ignore path_end ".o"
 ignore size_above 10
 parser all cvs

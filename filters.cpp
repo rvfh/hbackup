@@ -27,39 +27,12 @@ using namespace std;
 #include "files.h"
 #include "filters.h"
 
-Condition::Condition(
-    mode_t file_type,
-    filter_type_t type,
-    ...) {
-  va_list  args;
-
-  _type = type;
-  va_start(args, type);
-  switch (type) {
-    case filter_path_end:
-    case filter_path_start:
-    case filter_path_regexp:
-      _string = va_arg(args, char *);
-      _file_type  = file_type;
-      break;
-    case filter_size_above:
-    case filter_size_below:
-      _size       = va_arg(args, size_t);
-      _file_type  = S_IFREG;
-      break;
-    default:
-      cerr << "filters: add: unknown filter type" << endl;
-  }
-  va_end(args);
-}
-
 int Condition::match(const File& filedata) const {
-  /* Check that file type matches */
-  if ((_file_type & filedata.type()) == 0) {
-    return 1;
-  }
-  /* Run conditions */
   switch(_type) {
+  case filter_type:
+    if ((_file_type & filedata.type()) == 0) {
+      return 1;
+    }
   case filter_path_end: {
     signed int diff = filedata.path().size() - _string.size();
     if (diff < 0) {
@@ -100,10 +73,6 @@ void Condition::show() const {
     default:
       cout << "--> unknown condition type " << _type << endl;
   }
-}
-
-Filter::Filter(Condition *condition) {
-  push_back(condition);
 }
 
 Filter::~Filter() {

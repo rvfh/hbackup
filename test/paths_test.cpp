@@ -49,7 +49,8 @@ int main(void) {
   }
 
   cout << "as previous with subdir in ignore list" << endl;
-  if (path->addFilter("dir/path_start", "subdir")) {
+  if (path->addFilter("type", "dir")
+   || path->addFilter("path_start", "subdir", true)) {
     cout << "Failed to add filter" << endl;
   }
   if (! path->backup("test")) {
@@ -58,7 +59,8 @@ int main(void) {
   }
 
   cout << "as previous with testlink in ignore list" << endl;
-  if (path->addFilter("link/path_start", "testlink")) {
+  if (path->addFilter("type", "link")
+   || path->addFilter("path_start", "testlink", true)) {
     cout << "Failed to add filter" << endl;
   }
   if (! path->backup("test")) {

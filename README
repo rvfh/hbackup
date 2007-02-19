@@ -44,7 +44,8 @@ CLIENT CONFIGURATION
 Each client must provide its own configuration file. Keywords that may be used:
 * path: start of a new backup list, gives the path information.
   Syntax: path "<path to backup>"
-* ignore: files to ignore (see FILTERS below).
+* ignore: add files filter to skip (see FILTERS below).
+* ignand: add AND condition to last files filter (see FILTERS below).
 * parser: files under version control (see PARSERS below).
 
 COMPRESSION
@@ -53,7 +54,15 @@ No compression is enabled for now.
 
 FILTERS
 
-Syntax: ignore [<file type>/]<filter type> "<string>"
+Syntax: [ignore|ignand] <filter type> "<string>"
+
+There are six filter types:
+* type:         match file type
+* path_end:     match end of path
+* path_start:   match start of path
+* path_regexp:  match regular expression on path
+* size_above:   match files which size is above or equals given value
+* size_below:   match files which size is below or equals given value
 
 There are seven file types:
 * file: regular file
@@ -64,12 +73,13 @@ There are seven file types:
 * link: symbolic link
 * socket
 
-There are five filter types:
-* path_end: match end of path
-* path_start: match start of path
-* path_regexp: match regular expression on path
-* size_above: match files which size is above given value (file type n/a)
-* size_below: match files which size is below given value (file type n/a)
+Example:
+ignore path_start abr
+ignand type file
+ignand size_above 5000
+
+This will ignore all regular files which name starts in abr (abr*) and size is
+greater than or equal to 5000.
 
 PARSERS
 

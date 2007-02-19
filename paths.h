@@ -49,9 +49,11 @@ public:
   List* list() {
     return _list;
   }
+  // Set append to true to add as condition to last added filter
   int addFilter(
     const string& type,
-    const string& string);
+    const string& string,
+    bool          append = false);
   int addParser(
     const string& type,
     const string& string);
