@@ -159,14 +159,14 @@ int Client::readListFile(const string& list_path) {
           }
           _paths.push_back(path);
         } else if (path != NULL) {
-          if (params[0] == "ignore") {
+          if ((params[0] == "ignore") || (params[0] == "ignand")) {
             // Expect exactly three parameters
             if (params.size() != 3) {
               cerr << "Error: in list file " << list_path << ", line " << line
                 << " 'filter' takes exactly two arguments" << endl;
               failed = 1;
             }
-            if (path->addFilter(params[1], params[2])) {
+            if (path->addFilter(params[1], params[2], params[0] == "ignand")) {
               cerr << "Error: in list file " << list_path << ", line " << line
                 << " unsupported filter: " << params[1] << endl;
               failed = 1;

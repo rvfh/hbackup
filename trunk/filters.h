@@ -33,11 +33,12 @@
 
 /* Filter types */
 typedef enum {
-  filter_path_end,    /* End of file name */
-  filter_path_start,  /* Start of file name */
-  filter_path_regexp, /* Regular expression on file name */
-  filter_size_above,  /* Minimum size (only applies to regular files) */
-  filter_size_below   /* Maximum size (only applies to regular files) */
+  filter_type,        // File type(s)
+  filter_path_end,    // End of file name
+  filter_path_start,  // Start of file name
+  filter_path_regexp, // Regular expression on file name
+  filter_size_above,  // Minimum size (only applies to regular files)
+  filter_size_below   // Maximum size (only applies to regular files)
 } filter_type_t;
 
 class Condition {
@@ -46,10 +47,15 @@ class Condition {
   off_t         _size;
   string        _string;
 public:
-  Condition(
-    mode_t file_type,
-    filter_type_t type,
-    ...);
+  // File type-based condition
+  Condition(filter_type_t type, mode_t file_type) :
+    _type(type), _file_type(file_type) {}
+  // Size-based condition
+  Condition(filter_type_t type, off_t size) :
+    _type(type), _size(size) {}
+  // Path-based condition
+  Condition(filter_type_t type, const string& str) :
+    _type(type), _string(str) {}
   int  match(const File& file_data) const;
   /* Debug only */
   void show() const;
@@ -58,7 +64,9 @@ public:
 class Filter: public vector<Condition*> {
 public:
   Filter() {}
-  Filter(Condition *condition);
+  Filter(Condition *condition) {
+    push_back(condition);
+  }
   ~Filter();
 };
 
