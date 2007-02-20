@@ -22,7 +22,6 @@ using namespace std;
 #include <vector>
 
 #include "files.h"
-#include "parser.h"
 #include "parsers.h"
 
 class TestParser : public Parser {
@@ -45,11 +44,11 @@ public:
     cout << "Destroying (index " << _index << ")" << endl;
   }
   // Just to know the parser used
-  string name() {
+  string name() const {
     return "test";
   }
   // This will create an appropriate parser for the directory if relevant
-  Parser* isControlled(const string& dir_path) {
+  Parser* isControlled(const string& dir_path) const {
     return new TestParser(_mode, dir_path);
   }
   // That tells use whether to ignore the file, i.e. not back it up

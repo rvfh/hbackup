@@ -19,8 +19,8 @@
 #ifndef CVS_PARSER_H
 #define CVS_PARSER_H
 
-#ifndef PARSER_H
-#error You must include parser.h before cvs_parser.h
+#ifndef PARSERS_H
+#error You must include parsers.h before cvs_parser.h
 #endif
 
 typedef struct {
@@ -37,9 +37,9 @@ public:
   // Constructor for directory parsing
   CvsParser(parser_mode_t mode, const string& dir_path);
   // Just to know the parser used
-  string name();
+  string name() const;
   // This will create an appropriate parser for the directory if relevant
-  Parser* isControlled(const string& dir_path);
+  Parser* isControlled(const string& dir_path) const;
   // That tells use whether to ignore the file, i.e. not back it up
   bool ignore(const File& file_data);
   // For debug purposes

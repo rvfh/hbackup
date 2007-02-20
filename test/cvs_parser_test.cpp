@@ -23,7 +23,7 @@ using namespace std;
 #include <sys/stat.h>
 
 #include "files.h"
-#include "parser.h"
+#include "parsers.h"
 #include "cvs_parser.h"
 
 int terminating(void) {

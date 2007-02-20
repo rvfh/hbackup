@@ -29,7 +29,7 @@ using namespace std;
 #include <sys/stat.h>
 
 #include "files.h"
-#include "parser.h"
+#include "parsers.h"
 #include "cvs_parser.h"
 
 CvsParser::CvsParser(parser_mode_t mode, const string& dir_path) {
@@ -68,11 +68,11 @@ CvsParser::CvsParser(parser_mode_t mode, const string& dir_path) {
   entries.close();
 }
 
-string CvsParser::name() {
+string CvsParser::name() const {
   return "cvs";
 }
 
-Parser *CvsParser::isControlled(const string& dir_path) {
+Parser *CvsParser::isControlled(const string& dir_path) const {
   // Parent under CVS control, this is the control directory
   if (! _dummy
    && (dir_path.size() > 4)
