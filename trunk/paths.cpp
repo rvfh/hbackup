@@ -28,7 +28,6 @@ using namespace std;
 
 #include "files.h"
 #include "filters.h"
-#include "parser.h"
 #include "parsers.h"
 #include "cvs_parser.h"
 #include "paths.h"

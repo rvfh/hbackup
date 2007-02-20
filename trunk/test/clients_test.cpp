@@ -26,7 +26,6 @@ using namespace std;
 #include "files.h"
 #include "list.h"
 #include "filters.h"
-#include "parser.h"
 #include "parsers.h"
 #include "paths.h"
 #include "db.h"
