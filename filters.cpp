@@ -75,30 +75,18 @@ void Condition::show() const {
   }
 }
 
-Filter::~Filter() {
-  for (unsigned int i = 0; i < size(); i++) {
-    delete (*this)[i];
-  }
-}
-
-Filters::~Filters() {
-  for (unsigned int i = 0; i < size(); i++) {
-    delete (*this)[i];
-  }
-}
-
 int Filters::match(const File& filedata) const {
   /* Read through list of rules */
   for (unsigned int i = 0; i < size(); i++) {
-    Filter  *rule = (*this)[i];
-    int   match = 1;
+    Filter  rule  = (*this)[i];
+    int     match = 1;
 
     /* Read through list of conditions in rule */
-    for (unsigned int j = 0; j < rule->size(); j++) {
-      Condition *condition = (*rule)[j];
+    for (unsigned int j = 0; j < rule.size(); j++) {
+      Condition condition = rule[j];
 
       /* All filters must match for rule to match */
-      if (condition->match(filedata)) {
+      if (condition.match(filedata)) {
         match = 0;
         break;
       }

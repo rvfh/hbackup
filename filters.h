@@ -61,18 +61,16 @@ public:
   void show() const;
 };
 
-class Filter: public vector<Condition*> {
+class Filter: public vector<Condition> {
 public:
   Filter() {}
-  Filter(Condition *condition) {
+  Filter(Condition condition) {
     push_back(condition);
   }
-  ~Filter();
 };
 
-class Filters: public vector<Filter*> {
+class Filters: public vector<Filter> {
 public:
-  ~Filters();
   int match(const File& file_data) const;
 };
 
