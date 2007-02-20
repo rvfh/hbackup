@@ -15,22 +15,22 @@ Copied 33 -> 13 bytes: f94b4a4f91902f37f53e9e38fafbb524 -> 59ca0efa9f5633cb0371b
 Copied 524288 -> ? bytes 59071590099d21dd439896592338bf95 -> ?
 Copied ? -> 543 bytes ? -> 29178ac07006174c64c06f39b745a30b
 >List 16 file(s):
--> cvs
--> cvs/CVS
--> cvs/CVS/Entries
--> cvs/dirbad
--> cvs/dirutd
--> cvs/dirutd/CVS
--> cvs/dirutd/CVS/Entries
--> cvs/dirutd/fileutd
--> cvs/filenew.c
--> cvs/fileutd.h
--> dir space
--> dir space/file space
--> test space
--> testdir
--> testfile
--> testlink
+test////	cvs	d	0	1	1000	1000	755		
+test////	cvs/CVS	d	0	1	1000	1000	755		
+test////	cvs/CVS/Entries	f	141	1	1000	1000	644		
+test////	cvs/dirbad	d	0	1	1000	1000	755		
+test////	cvs/dirutd	d	0	1	1000	1000	755		
+test////	cvs/dirutd/CVS	d	0	1	1000	1000	755		
+test////	cvs/dirutd/CVS/Entries	f	42	1	1000	1000	644		
+test////	cvs/dirutd/fileutd	f	0	1	1000	1000	644		
+test////	cvs/filenew.c	f	0	1	1000	1000	644		
+test////	cvs/fileutd.h	f	0	1	1000	1000	644		
+test////	dir space	d	0	1	1000	1000	755		
+test////	dir space/file space	f	0	1	1000	1000	644		
+test////	test space	f	0	1	1000	1000	644		
+test////	testdir	d	0	1	1000	1000	755		
+test////	testfile	f	13	1	1000	1000	644		
+test////	testlink	l	8	1	1000	1000	777	testfile	
 Database initialized
 59ca0efa9f5633cb0371bbc0355478d8-0  test/testfile
 >List 1 element(s):
@@ -95,10 +95,10 @@ Database opened (active contents: 16 files)
 -> file://host	/home/user/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371bbc0355478d8-0	1	0
 -> file://host	/home/user/testlink	l	8	1	1000	1000	777	testfile		1	0
 >List 4 file(s):
--> testdir
--> testfile
--> testfile2
--> testlink
+test2	testdir	d	0	1	1000	1000	755		
+test2	testfile	f	145408	1	1000	1000	644		
+test2	testfile2	f	259072	1	1000	1000	644		
+test2	testlink	l	8	1	1000	1000	777	testfile	
  --> Files to add: 4 (404480 bytes)
  --> Done: 1/4 (0.0%) --> Done: 2/4 (35.9%) --> Done: 3/4 (100.0%) --> Done: 4/4 (100.0%) --> No files to remove
 >List 20 element(s):
@@ -173,22 +173,22 @@ Database opened (active contents: 20 files)
 -> file://host	/home/user2/testfile2	f	259072	1	1000	1000	644		fb00cd74a5f35e89a7fbdd3c1d05375a-0	1	0
 -> file://host	/home/user2/testlink	l	8	1	1000	1000	777	testfile		1	0
 >List 16 file(s):
--> cvs
--> cvs/CVS
--> cvs/CVS/Entries
--> cvs/dirbad
--> cvs/dirutd
--> cvs/dirutd/CVS
--> cvs/dirutd/CVS/Entries
--> cvs/dirutd/fileutd
--> cvs/filenew.c
--> cvs/fileutd.h
--> dir space
--> dir space/file space
--> test space
--> testdir
--> testfile
--> testlink
+test////	cvs	d	0	1	1000	1000	755		
+test////	cvs/CVS	d	0	1	1000	1000	755		
+test////	cvs/CVS/Entries	f	141	1	1000	1000	644		
+test////	cvs/dirbad	d	0	1	1000	1000	755		
+test////	cvs/dirutd	d	0	1	1000	1000	755		
+test////	cvs/dirutd/CVS	d	0	1	1000	1000	755		
+test////	cvs/dirutd/CVS/Entries	f	42	1	1000	1000	644		
+test////	cvs/dirutd/fileutd	f	0	1	1000	1000	644		
+test////	cvs/filenew.c	f	0	1	1000	1000	644		
+test////	cvs/fileutd.h	f	0	1	1000	1000	644		
+test////	dir space	d	0	1	1000	1000	755		
+test////	dir space/file space	f	0	1	1000	1000	644		
+test////	test space	f	0	1	1000	1000	644		
+test////	testdir	d	0	1	1000	1000	755		
+test////	testfile	f	13	1	1000	1000	644		
+test////	testlink	l	8	1	1000	1000	777	testfile	
  --> Files to add: 1 (13 bytes)
  --> Done: 1/1 (100.0%) --> Files to remove: 1
 >List 21 element(s):
@@ -237,21 +237,21 @@ Database opened (active contents: 20 files)
 -> file://host	/home/user2/testfile2	f	259072	1	1000	1000	644		fb00cd74a5f35e89a7fbdd3c1d05375a-0	1	0
 -> file://host	/home/user2/testlink	l	8	1	1000	1000	777	testfile		1	0
 >List 15 file(s):
--> cvs
--> cvs/CVS
--> cvs/CVS/Entries
--> cvs/dirbad
--> cvs/dirutd
--> cvs/dirutd/CVS
--> cvs/dirutd/CVS/Entries
--> cvs/dirutd/fileutd
--> cvs/filenew.c
--> cvs/fileutd.h
--> dir space
--> dir space/file space
--> test space
--> testdir
--> testlink
+test////	cvs	d	0	1	1000	1000	755		
+test////	cvs/CVS	d	0	1	1000	1000	755		
+test////	cvs/CVS/Entries	f	141	1	1000	1000	644		
+test////	cvs/dirbad	d	0	1	1000	1000	755		
+test////	cvs/dirutd	d	0	1	1000	1000	755		
+test////	cvs/dirutd/CVS	d	0	1	1000	1000	755		
+test////	cvs/dirutd/CVS/Entries	f	42	1	1000	1000	644		
+test////	cvs/dirutd/fileutd	f	0	1	1000	1000	644		
+test////	cvs/filenew.c	f	0	1	1000	1000	644		
+test////	cvs/fileutd.h	f	0	1	1000	1000	644		
+test////	dir space	d	0	1	1000	1000	755		
+test////	dir space/file space	f	0	1	1000	1000	644		
+test////	test space	f	0	1	1000	1000	644		
+test////	testdir	d	0	1	1000	1000	755		
+test////	testlink	l	8	1	1000	1000	777	testfile	
  --> No files to add
  --> Files to remove: 1
 >List 20 element(s):
@@ -297,21 +297,21 @@ Database opened (active contents: 20 files)
 -> /home/user2/testfile2
 -> /home/user2/testlink
 >List 15 file(s):
--> cvs
--> cvs/CVS
--> cvs/CVS/Entries
--> cvs/dirbad
--> cvs/dirutd
--> cvs/dirutd/CVS
--> cvs/dirutd/CVS/Entries
--> cvs/dirutd/fileutd
--> cvs/filenew.c
--> cvs/fileutd.h
--> dir space
--> dir space/file space
--> test space
--> testdir
--> testlink
+test////	cvs	d	0	1	1000	1000	755		
+test////	cvs/CVS	d	0	1	1000	1000	755		
+test////	cvs/CVS/Entries	f	141	1	1000	1000	644		
+test////	cvs/dirbad	d	0	1	1000	1000	755		
+test////	cvs/dirutd	d	0	1	1000	1000	755		
+test////	cvs/dirutd/CVS	d	0	1	1000	1000	755		
+test////	cvs/dirutd/CVS/Entries	f	42	1	1000	1000	644		
+test////	cvs/dirutd/fileutd	f	0	1	1000	1000	644		
+test////	cvs/filenew.c	f	0	1	1000	1000	644		
+test////	cvs/fileutd.h	f	0	1	1000	1000	644		
+test////	dir space	d	0	1	1000	1000	755		
+test////	dir space/file space	f	0	1	1000	1000	644		
+test////	test space	f	0	1	1000	1000	644		
+test////	testdir	d	0	1	1000	1000	755		
+test////	testlink	l	8	1	1000	1000	777	testfile	
  --> No files to add
  --> No files to remove
 >List 20 element(s):
@@ -336,10 +336,10 @@ Database opened (active contents: 20 files)
 -> file://host	/home/user2/testfile2	f	259072	1	1000	1000	644		fb00cd74a5f35e89a7fbdd3c1d05375a-0	1	0
 -> file://host	/home/user2/testlink	l	8	1	1000	1000	777	testfile		1	0
 >List 4 file(s):
--> testdir
--> testfile
--> testfile2
--> testlink
+test2	testdir	d	0	1	1000	1000	755		
+test2	testfile	f	145408	1	1000	1000	644		
+test2	testfile2	f	259072	1	1000	1000	644		
+test2	testlink	l	8	1	1000	1000	777	testfile	
  --> No files to add
  --> No files to remove
 >List 20 element(s):

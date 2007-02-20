@@ -35,17 +35,16 @@ using namespace std;
 
 #define CHUNK 409600
 
-// TODO test
 File::File(const string& prefix, const string& path) {
   string full_path;
-  if (path.size() != 0) {
-    _prefix   = prefix;
-    _path     = path;
-    full_path = _prefix + "/" + _path;
-  } else {
+  if (path.empty()) {
     _prefix   = "";
     _path     = prefix;
     full_path = _path;
+  } else {
+    _prefix   = prefix;
+    _path     = path;
+    full_path = _prefix + "/" + _path;
   }
   _checksum    = "";
   _link        = "";
@@ -82,14 +81,19 @@ File::File(const string& prefix, const string& path) {
   }
 }
 
-// TODO test
+// Tested in db's test
 bool File::operator!=(const File& right) {
   return (_type != right._type) || (_mtime != right._mtime)
       || (_size != right._size) || (_uid != right._uid)
       || (_gid != right._gid) || (_mode != right._mode);
 }
 
-// TODO test
+// Tested in db's test
+bool File::operator<(const File& right) {
+  return _path < right._path;
+}
+
+// Tested in cvs_parser's test
 string File::name() const {
   unsigned int pos = _path.rfind("/");
   if (pos == string::npos) {
@@ -99,7 +103,6 @@ string File::name() const {
   }
 }
 
-// TODO test
 string File::line(bool nodates) {
   string  output = _prefix + "\t" + _path + "\t" + typeLetter(_type);
   char*   numbers = NULL;

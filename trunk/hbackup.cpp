@@ -22,6 +22,7 @@ using namespace std;
 #include <fstream>
 #include <string>
 #include <vector>
+#include <list>
 #include <signal.h>
 #include <errno.h>
 

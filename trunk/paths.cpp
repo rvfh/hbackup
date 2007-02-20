@@ -21,11 +21,11 @@ using namespace std;
 #include <iostream>
 #include <string>
 #include <vector>
-#include <errno.h>
+#include <list>
 #include <dirent.h>
 #include <sys/stat.h>
+#include <errno.h>
 
-#include "list.h"
 #include "files.h"
 #include "filters.h"
 #include "parser.h"
@@ -34,16 +34,14 @@ using namespace std;
 #include "paths.h"
 #include "hbackup.h"
 
-static string filedata_get(const void* payload) {
-  return ((File *) payload)->path();
-}
-
 int Path::iterate_directory(const string& path, Parser* parser) {
   if (verbosity() > 3) {
     cout << " ---> Dir: " << path.substr(_mount_path_length) << endl;
   }
   /* Check whether directory is under SCM control */
-  if (_parsers.size() != 0) {
+  if (_parsers.empty()) {
+    parser = NULL;
+  } else {
     // We have a parser, check this directory with it
     if (parser != NULL) {
       parser = parser->isControlled(path);
@@ -52,8 +50,6 @@ int Path::iterate_directory(const string& path, Parser* parser) {
     if (parser == NULL) {
       parser = _parsers.isControlled(path);
     }
-  } else {
-    parser = NULL;
   }
   DIR* directory = opendir(path.c_str());
   if (directory == NULL) {
@@ -80,7 +76,7 @@ int Path::iterate_directory(const string& path, Parser* parser) {
       continue;
     } else
     /* Now pass it through the filters */
-    if ((_filters.size() != 0) && ! _filters.match(file_data)) {
+    if (! _filters.empty() && ! _filters.match(file_data)) {
       continue;
     } else
     if (S_ISDIR(file_data.type())) {
@@ -92,7 +88,7 @@ int Path::iterate_directory(const string& path, Parser* parser) {
         continue;
       }
     }
-    _list->add(new File(file_data));
+    _list.push_back(file_data);
   }
   closedir(directory);
   if (terminating()) {
@@ -103,7 +99,6 @@ int Path::iterate_directory(const string& path, Parser* parser) {
 
 Path::Path(const string& path) {
   _path = path;
-  _list = NULL;
 
   unsigned int pos = 0;
   while ((pos = _path.find("\\", pos)) != string::npos) {
@@ -175,12 +170,11 @@ int Path::addFilter(
   }
 
   if (append) {
-    if (_filters.size() != 0) {
-      _filters[_filters.size() - 1]->push_back(condition);
-    } else {
+    if (_filters.empty()) {
       // Can't append to nothing
       return 3;
     }
+    _filters[_filters.size() - 1]->push_back(condition);
   } else {
     _filters.push_back(new Filter(condition));
   }
@@ -215,13 +209,12 @@ int Path::addParser(
   return 0;
 }
 
-int Path::backup(const string& backup_path) {
-  _list = new List(filedata_get);
+int Path::createList(const string& backup_path) {
   _mount_path_length = backup_path.size();
+  _list.clear();
   if (iterate_directory(backup_path, NULL)) {
-    delete _list;
-    _list = NULL;
     return 1;
   }
+  _list.sort();
   return 0;
 }

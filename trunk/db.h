@@ -55,7 +55,7 @@ public:
     const string& prefix,
     const string& real_path,
     const string& mount_path,
-    List          *list);
+    list<File>*   list);
   /* Read file with given checksum, extract it to path */
   int  read(
     const string& path,

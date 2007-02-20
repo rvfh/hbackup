@@ -37,7 +37,7 @@ filters.o: filters.h
 hbackup.o: list.h files.h db.h filters.h parser.h parsers.h cvs_parser.h \
 	paths.h clients.h hbackup.h version.h
 list.o: list.h
-paths.o: files.h list.h filters.h parser.h parsers.h cvs_parser.h paths.h
+paths.o: files.h filters.h parser.h parsers.h cvs_parser.h paths.h
 files.o: files.h
 
 # Rules

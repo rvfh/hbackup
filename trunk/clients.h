@@ -32,10 +32,10 @@ public:
   string name() { return _name; }
   string value() { return _value; }
   string option() {
-    if (_name.size() != 0)
-      return _name + "=" + _value;
-    else
+    if (_name.empty())
       return _value;
+    else
+      return _name + "=" + _value;
   }
 };
 

@@ -19,15 +19,13 @@
 using namespace std;
 
 #include "db.cpp"
+#include "filters.h"
+#include "parser.h"
 #include "parsers.h"
 #include "cvs_parser.h"
 #include "paths.h"
 
 static int verbose = 3;
-
-static string file_data_show(const void *payload) {
-  return ((File *) payload)->path();
-}
 
 static string db_data_show(const void *payload) {
   const db_data_t *db_data = (db_data_t *) payload;
@@ -86,12 +84,15 @@ int main(void) {
   path->addFilter("path_end", "~", true);
   path->addFilter("type", "file");
   path->addFilter("path_regexp", "\\.o$", true);
-  if (path->backup("test////")) {
+  if (path->createList("test////")) {
     cout << "file list is empty" << endl;
     return 0;
   }
   cout << ">List " << path->list()->size() << " file(s):" << endl;
-  path->list()->show(NULL, file_data_show);
+  for (list<File>::iterator i = path->list()->begin();
+    i != path->list()->end(); i++) {
+    cout << (*i).line(true) << endl;
+  }
 
   Database db("test_db");
 
@@ -174,12 +175,15 @@ int main(void) {
   path->addFilter("path_end", "~", true);
   path->addFilter("type", "file");
   path->addFilter("path_regexp", "\\.o$", true);
-  if (path->backup("test2")) {
+  if (path->createList("test2")) {
     cout << "file list is empty" << endl;
     return 0;
   }
   cout << ">List " << path->list()->size() << " file(s):" << endl;
-  path->list()->show(NULL, file_data_show);
+  for (list<File>::iterator i = path->list()->begin();
+    i != path->list()->end(); i++) {
+    cout << (*i).line(true) << endl;
+  }
 
   if ((status = db.parse("file://host", "/home/user2", "test2",
       path->list()))) {
@@ -288,12 +292,15 @@ int main(void) {
   path->addFilter("path_end", "~", true);
   path->addFilter("type", "file");
   path->addFilter("path_regexp", "\\.o$", true);
-  if (path->backup("test////")) {
+  if (path->createList("test////")) {
     cout << "file list is empty" << endl;
     return 0;
   }
   cout << ">List " << path->list()->size() << " file(s):" << endl;
-  path->list()->show(NULL, file_data_show);
+  for (list<File>::iterator i = path->list()->begin();
+    i != path->list()->end(); i++) {
+    cout << (*i).line(true) << endl;
+  }
 
   if ((status = db.parse("file://host", "/home/user", "test", path->list()))) {
     printf("db.parse error status %u\n", status);
@@ -329,12 +336,15 @@ int main(void) {
   path->addFilter("path_end", "~", true);
   path->addFilter("type", "file");
   path->addFilter("path_regexp", "\\.o$", true);
-  if (path->backup("test////")) {
+  if (path->createList("test////")) {
     cout << "file list is empty" << endl;
     return 0;
   }
   cout << ">List " << path->list()->size() << " file(s):" << endl;
-  path->list()->show(NULL, file_data_show);
+  for (list<File>::iterator i = path->list()->begin();
+    i != path->list()->end(); i++) {
+    cout << (*i).line(true) << endl;
+  }
 
   if ((status = db.parse("file://host", "/home/user", "test",
       path->list()))) {
@@ -358,12 +368,15 @@ int main(void) {
   path->addFilter("path_end", "~", true);
   path->addFilter("type", "file");
   path->addFilter("path_regexp", "\\.o$", true);
-  if (path->backup("test////")) {
+  if (path->createList("test////")) {
     cout << "file list is empty" << endl;
     return 0;
   }
   cout << ">List " << path->list()->size() << " file(s):" << endl;
-  path->list()->show(NULL, file_data_show);
+  for (list<File>::iterator i = path->list()->begin();
+    i != path->list()->end(); i++) {
+    cout << (*i).line(true) << endl;
+  }
 
   if ((status = db.parse("file://host", "/home/user", "test",
       path->list()))) {
@@ -385,12 +398,15 @@ int main(void) {
   path->addFilter("path_end", "~", true);
   path->addFilter("type", "file");
   path->addFilter("path_regexp", "\\.o$", true);
-  if (path->backup("test2")) {
+  if (path->createList("test2")) {
     cout << "file list is empty" << endl;
     return 0;
   }
   cout << ">List " << path->list()->size() << " file(s):" << endl;
-  path->list()->show(NULL, file_data_show);
+  for (list<File>::iterator i = path->list()->begin();
+    i != path->list()->end(); i++) {
+    cout << (*i).line(true) << endl;
+  }
 
   if ((status = db.parse("file://host", "/home/user2", "test2",
       path->list()))) {

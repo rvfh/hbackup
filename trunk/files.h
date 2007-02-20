@@ -55,6 +55,8 @@ public:
       _uid(uid),
       _gid(gid),
       _mode(mode) {}
+  // Need '<' to sort list
+  bool operator<(const File&);
   bool operator!=(const File&);
   string name() const;
   string prefix() const { return _prefix; };
