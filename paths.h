@@ -19,8 +19,8 @@
 #ifndef PATHS_H
 #define PATHS_H
 
-#ifndef LIST_H
-#error You must include list.h before paths.h
+#ifndef FILES_H
+#error You must include files.h before paths.h
 #endif
 
 #ifndef FILTERS_H
@@ -32,22 +32,21 @@
 #endif
 
 class Path {
-  string  _path;
-  Parsers _parsers;
-  Filters _filters;
-  List*   _list;
-  int     _mount_path_length;
+  string      _path;
+  Parsers     _parsers;
+  Filters     _filters;
+  list<File>  _list;
+  int         _mount_path_length;
   int iterate_directory(
     const string&   path,
     Parser*         parser);
 public:
   Path(const string& path);
-  ~Path() { delete _list; }
   string path() {
     return _path;
   }
-  List* list() {
-    return _list;
+  list<File>* list() {
+    return &_list;
   }
   // Set append to true to add as condition to last added filter
   int addFilter(
@@ -57,7 +56,7 @@ public:
   int addParser(
     const string& type,
     const string& string);
-  int backup(const string& backup_path);
+  int createList(const string& backup_path);
 };
 
 #endif

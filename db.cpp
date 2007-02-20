@@ -40,23 +40,17 @@ using namespace std;
 #include <sstream>
 #include <string>
 #include <vector>
+#include <list>
 #include <sys/stat.h>
-#include <sys/types.h>
 #include <signal.h>
 #include <time.h>
 #include <dirent.h>
-#include <unistd.h>
 #include <errno.h>
 
 #include "list.h"
 #include "files.h"
-#include "filters.h"
-#include "parser.h"
-#include "parsers.h"
 #include "db.h"
 #include "hbackup.h"
-
-#define CHUNK 10240
 
 static List   *db_list = NULL;
 
@@ -102,21 +96,17 @@ static string parse_select(const void *payload) {
 }
 
 /* Need to compare only for matching paths */
-static int parse_compare(void *db_data_p, void *file_data_p) {
-  const db_data_t *db_data   = (const db_data_t *) (db_data_p);
-  File            *file_data = (File *) (file_data_p);
-  int             result;
+static int parse_compare(db_data_t *db_data, File& file_data) {
+  int result;
 
   /* If paths differ, that's all we want to check */
-  result = strcmp(db_data->filedata->path().substr(backup_path_length).c_str(),
-    file_data->path().c_str());
+  result = db_data->filedata->path().substr(backup_path_length).compare(
+    file_data.path());
   if (result) {
     return result;
   }
   /* If the file has been modified, just return 1 or -1 and that should do */
-  result = *db_data->filedata != *file_data;
-  if (result) {
-  }
+  result = *db_data->filedata != file_data;
 
   /* If it's a file and size and mtime are the same, copy checksum accross */
   if (S_ISREG(db_data->filedata->type())) {
@@ -124,9 +114,9 @@ static int parse_compare(void *db_data_p, void *file_data_p) {
       /* Checksum missing, add to added list */
       return 1;
     } else
-    if ((db_data->filedata->size() == file_data->size())
-     || (db_data->filedata->mtime() == file_data->mtime())) {
-      file_data->setChecksum(db_data->filedata->checksum());
+    if ((db_data->filedata->size() == file_data.size())
+     || (db_data->filedata->mtime() == file_data.mtime())) {
+      file_data.setChecksum(db_data->filedata->checksum());
     }
   }
   return result;
@@ -709,9 +699,10 @@ int Database::parse(
     const string& prefix,
     const string& real_path,
     const string& mount_path,
-    List          *file_list) {
+    list<File>*   file_list) {
   List*               selected = new List(db_data_get);
   vector<File*>       added;
+  // TODO can it be a checksum-ordered list, for better efficiency?
   vector<db_data_t*>  removed;
   int                 failed   = 0;
 
@@ -721,11 +712,10 @@ int Database::parse(
 
   /* Point the entries to the start of their respective lists */
   list_entry_t  *entry_db_list    = selected->next(NULL);
-  list_entry_t  *entry_file_list  = file_list->next(NULL);
+  list<File>::iterator entry_file_list = file_list->begin();
 
-  while ((entry_db_list != NULL) || (entry_file_list != NULL)) {
+  while ((entry_db_list != NULL) || (entry_file_list != file_list->end())) {
     db_data_t*  payload_db_list;
-    File*       payload_file_list;
     int         result;
 
     if (entry_db_list != NULL) {
@@ -733,18 +723,13 @@ int Database::parse(
     } else {
       payload_db_list  = NULL;
     }
-    if (entry_file_list != NULL) {
-      payload_file_list = (File*) list_entry_payload(entry_file_list);
-    } else {
-      payload_file_list = NULL;
-    }
 
     if (payload_db_list == NULL) {
       result = 1;
-    } else if (payload_file_list == NULL) {
+    } else if (entry_file_list == file_list->end()) {
       result = -1;
     } else {
-      result = parse_compare(payload_db_list, payload_file_list);
+      result = parse_compare(payload_db_list, *entry_file_list);
     }
     /* left < right => element is missing from right list */
     if (result < 0) {
@@ -756,10 +741,10 @@ int Database::parse(
     if (result > 0) {
       /* The contents are NOT copied, so the two lists have elements
        * pointing to the same data! */
-      added.push_back(payload_file_list);
+      added.push_back(&(*entry_file_list));
     }
     if (result >= 0) {
-      entry_file_list = file_list->next(entry_file_list);
+      entry_file_list++;
     }
     if (result <= 0) {
       entry_db_list = selected->next(entry_db_list);
@@ -769,7 +754,7 @@ int Database::parse(
   selected->deselect();
 
   /* Deal with new/modified data first */
-  if (added.size() != 0) {
+  if (! added.empty()) {
     /* Static to be global to all shares */
     static int    copied        = 0;
     static off_t  volume        = 0;
@@ -806,7 +791,7 @@ int Database::parse(
       // Set checksum
       string checksum = "";
       if (S_ISREG(db_data->filedata->type())) {
-        if (db_data->filedata->checksum().size() != 0) {
+        if (! db_data->filedata->checksum().empty()) {
           /* Checksum given by the compare function */
           checksum = db_data->filedata->checksum();
         } else
@@ -849,7 +834,7 @@ int Database::parse(
   }
 
   /* Deal with removed/modified data */
-  if (removed.size() != 0) {
+  if (! removed.empty()) {
     if (verbosity() > 2) {
       printf(" --> Files to remove: %u\n", removed.size());
     }
@@ -859,7 +844,7 @@ int Database::parse(
 
       /* Update local list */
       if (S_ISREG(removed[i]->filedata->type())
-       && (removed[i]->filedata->checksum().size() != 0)
+       && ! removed[i]->filedata->checksum().empty()
        && (removed[i]->filedata->checksum() != "N")) {
         obsolete(*removed[i]->filedata);
       }
@@ -943,7 +928,7 @@ int Database::scan(const string& checksum, bool thorough) {
         printf(" --> Files left to go: %u\n", files);
       }
       files--;
-      if ((db_data->filedata->checksum().size() != 0)
+      if ((! db_data->filedata->checksum().empty())
        && scan(db_data->filedata->checksum(), thorough)) {
         db_data->filedata->setChecksum("N");
         failed = 1;

@@ -21,6 +21,7 @@ using namespace std;
 #include <fstream>
 #include <iostream>
 #include <vector>
+#include <list>
 #include <string>
 #include <errno.h>
 
@@ -274,7 +275,7 @@ int Client::backup(
 
   if (! readListFile(list_path)) {
     /* Backup */
-    if (_paths.size() == 0) {
+    if (_paths.empty()) {
       failed = 1;
     } else if (! configcheck) {
       for (unsigned int i = 0; i < _paths.size(); i++) {
@@ -293,7 +294,7 @@ int Client::backup(
         if (mountPath(_paths[i]->path(), db.mount(), &backup_path)) {
           clientfailed = 1;
         } else {
-          if (_paths[i]->backup(backup_path)) {
+          if (_paths[i]->createList(backup_path)) {
             // prepare_share sets errno
             if (! terminating()) {
               fprintf(stderr, "clients: backup: list creation failed\n");

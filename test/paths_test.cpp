@@ -22,6 +22,7 @@ using namespace std;
 
 #include <iostream>
 #include <vector>
+#include <list>
 #include <string>
 
 #include "files.h"
@@ -43,9 +44,12 @@ int terminating(void) {
 int main(void) {
   Path* path = new Path("");
 
-  if (! path->backup("test")) {
+  if (! path->createList("test")) {
     cout << ">List " << path->list()->size() << " file(s):\n";
-    path->list()->show();
+    for (list<File>::iterator i = path->list()->begin();
+     i != path->list()->end(); i++) {
+      cout << (*i).line(true) << endl;
+    }
   }
 
   cout << "as previous with subdir in ignore list" << endl;
@@ -53,9 +57,12 @@ int main(void) {
    || path->addFilter("path_start", "subdir", true)) {
     cout << "Failed to add filter" << endl;
   }
-  if (! path->backup("test")) {
+  if (! path->createList("test")) {
     cout << ">List " << path->list()->size() << " file(s):\n";
-    path->list()->show();
+    for (list<File>::iterator i = path->list()->begin();
+     i != path->list()->end(); i++) {
+      cout << (*i).line(true) << endl;
+    }
   }
 
   cout << "as previous with testlink in ignore list" << endl;
@@ -63,24 +70,33 @@ int main(void) {
    || path->addFilter("path_start", "testlink", true)) {
     cout << "Failed to add filter" << endl;
   }
-  if (! path->backup("test")) {
+  if (! path->createList("test")) {
     cout << ">List " << path->list()->size() << " file(s):\n";
-    path->list()->show();
+    for (list<File>::iterator i = path->list()->begin();
+     i != path->list()->end(); i++) {
+      cout << (*i).line(true) << endl;
+    }
   }
 
   cout << "as previous with CVS parser" << endl;
   if (path->addParser("all", "cvs")) {
     cout << "Failed to add parser" << endl;
   }
-  if (! path->backup("test")) {
+  if (! path->createList("test")) {
     cout << ">List " << path->list()->size() << " file(s):\n";
-    path->list()->show();
+    for (list<File>::iterator i = path->list()->begin();
+     i != path->list()->end(); i++) {
+      cout << (*i).line(true) << endl;
+    }
   }
 
   cout << "as previous" << endl;
-  if (! path->backup("test")) {
+  if (! path->createList("test")) {
     cout << ">List " << path->list()->size() << " file(s):\n";
-    path->list()->show();
+    for (list<File>::iterator i = path->list()->begin();
+     i != path->list()->end(); i++) {
+      cout << (*i).line(true) << endl;
+    }
   }
 
   delete path;
