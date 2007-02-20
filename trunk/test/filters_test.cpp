@@ -34,14 +34,14 @@ int terminating(void) {
 void filter_show(const Filters& filters) {
   /* Read through list of filters */
   for (unsigned int i = 0; i < filters.size(); i++) {
-    Filter *filter = filters[i];
+    Filter filter = filters[i];
 
-    cout << "-> List " << filter->size() << " condition(s)\n";
+    cout << "-> List " << filter.size() << " condition(s)\n";
     /* Read through list of conditions in filter */
-    for (unsigned int j = 0; j < filter->size(); j++) {
-      Condition *condition = (*filter)[j];
+    for (unsigned int j = 0; j < filter.size(); j++) {
+      Condition condition = filter[j];
 
-      condition->show();
+      condition.show();
     }
   }
 }
@@ -117,11 +117,11 @@ int main(void) {
 
   cout << "\nSimple rules test\n";
   filter = new Filters;
-  filter->push_back(new Filter(new Condition(filter_path_regexp, "^to a.*\\.txt")));
+  filter->push_back(Filter(Condition(filter_path_regexp, "^to a.*\\.txt")));
   cout << ">List " << filter->size() << " rule(s):\n";
   filter_show(*filter);
 
-  filter->push_back(new Filter(new Condition(filter_path_regexp, "^to a.*\\.t.t")));
+  filter->push_back(Filter(Condition(filter_path_regexp, "^to a.*\\.t.t")));
   cout << ">List " << filter->size() << " rule(s):\n";
   filter_show(*filter);
 
@@ -159,11 +159,11 @@ int main(void) {
   delete file_data;
 
 
-  filter2->push_back(new Filter(new Condition(filter_path_regexp, "^to a.*\\.txt")));
+  filter2->push_back(Filter(Condition(filter_path_regexp, "^to a.*\\.txt")));
   cout << ">List " << filter2->size() << " rule(s):\n";
   filter_show(*filter2);
 
-  filter2->push_back(new Filter(new Condition(filter_path_regexp, "^to a.*\\.t.t")));
+  filter2->push_back(Filter(Condition(filter_path_regexp, "^to a.*\\.t.t")));
   cout << ">List " << filter2->size() << " rule(s):\n";
   filter_show(*filter2);
 
@@ -225,7 +225,7 @@ int main(void) {
   delete file_data;
 
   /* File type is always S_IFREG */
-  filter->push_back(new Filter(new Condition(filter_size_below, (off_t) 500)));
+  filter->push_back(Filter(Condition(filter_size_below, (off_t) 500)));
   cout << ">List " << filter->size() << " rule(s):\n";
   filter_show(*filter);
 
@@ -252,7 +252,7 @@ int main(void) {
   delete file_data;
 
   /* File type is always S_IFREG */
-  filter->push_back(new Filter(new Condition(filter_size_above, (off_t) 5000)));
+  filter->push_back(Filter(Condition(filter_size_above, (off_t) 5000)));
   cout << ">List " << filter->size() << " rule(s):\n";
   filter_show(*filter);
 
@@ -283,18 +283,18 @@ int main(void) {
   /* Test complex rules */
   cout << "\nComplex rules test\n";
   filter = new Filters;
-  Filter *rule = new Filter;
 
   cout << ">List " << filter->size() << " rule(s):\n";
   filter_show(*filter);
 
-  filter->push_back(rule);
+  filter->push_back(Filter());
+  Filter *rule = &(*filter)[filter->size() - 1];
 
-  rule->push_back(new Condition(filter_size_below, (off_t) 500));
+  rule->push_back(Condition(filter_size_below, (off_t) 500));
   cout << ">List " << filter->size() << " rule(s):\n";
   filter_show(*filter);
 
-  rule->push_back(new Condition(filter_size_above, (off_t) 400));
+  rule->push_back(Condition(filter_size_above, (off_t) 400));
   cout << ">List " << filter->size() << " rule(s):\n";
   filter_show(*filter);
 

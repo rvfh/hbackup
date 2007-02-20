@@ -119,6 +119,11 @@ int Path::addFilter(
     bool          append) {
   Condition *condition;
 
+  if (append && _filters.empty()) {
+    // Can't append to nothing
+    return 3;
+  }
+
   /* Add specified filter */
   if (type == "type") {
     mode_t file_type;
@@ -170,14 +175,11 @@ int Path::addFilter(
   }
 
   if (append) {
-    if (_filters.empty()) {
-      // Can't append to nothing
-      return 3;
-    }
-    _filters[_filters.size() - 1]->push_back(condition);
+    _filters[_filters.size() - 1].push_back(*condition);
   } else {
-    _filters.push_back(new Filter(condition));
+    _filters.push_back(Filter(*condition));
   }
+  delete condition;
   return 0;
 }
 
