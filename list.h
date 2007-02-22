@@ -19,6 +19,63 @@
 #ifndef LIST_H
 #define LIST_H
 
+template<class T>
+class SortedList : public list<T> {
+  typename list<T>::iterator _hint;
+public:
+  typename list<T>::iterator find(const T& element) {
+    if (this->empty()) {
+      _hint = this->end();
+      return _hint;
+    } else {
+      // List is ordered, so search from hint to hopefully save time
+      list<string>::iterator i = _hint;
+      if (i == this->end()) {
+        i--;
+      }
+      /* Which direction to go? */
+      if (*i < element) {
+        /* List is ordered and hint is before the searched pattern: forward */
+        while ((i != this->end()) && (*i < element)) {
+          i++;
+        }
+      } else {
+        /* List is ordered and hint is after the search pattern: backward */
+        while ((i != this->begin()) && (element < *i)) {
+          i--;
+        }
+        /* We must always give the next when the record was not found */
+        if (*i < element) {
+          i++;
+        }
+      }
+      _hint = i;
+      return i;
+    }
+  }
+  void add(const T& element) {
+    list<string>::iterator i = find(element);
+    if (i == this->end()) {
+      push_back(T(element));
+    } else {
+      insert(i, element);
+    }
+  }
+  list<string>::iterator erase(list<string>::iterator i) {
+    if (i == _hint) {
+      if (this->size() == 1) {
+        _hint = this->end();
+      } else
+      if (_hint == this->begin()) {
+        _hint++;
+      } else {
+        _hint--;
+      }
+    }
+    return list<T>::erase(i);
+  }
+};
+
 // Type for function to convert payload into usable data
 typedef string (list_payload_get_f) (const void *payload);
 
@@ -65,12 +122,6 @@ public:
   void show(
     list_entry_t            *entry                = NULL,
     list_payload_get_f      payload_get_f         = NULL) const;
-  int select(
-    const string&           search_string,
-    list_payload_get_f      payload_get_f,
-    List                    *list_selected_handle,
-    List                    *list_unselected_handle) const;
-  int deselect();
 };
 
 #endif

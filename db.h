@@ -41,6 +41,9 @@ class Database {
   int  save(
     const string& filename,
     List *list);
+  int  save(
+    const string& filename,
+    vector<db_data_t*>& list);
   int  lock();
   void unlock();
 public:

@@ -1,5 +1,43 @@
 Fill in list
 List 1 element(s):
+test/testfile
+List 2 element(s):
+test
+test/testfile
+List 3 element(s):
+test
+test/subdir/testfile1
+test/testfile
+List 4 element(s):
+test
+test/subdir
+test/subdir/testfile1
+test/testfile
+List 5 element(s):
+test
+test/subdir
+test/subdir/testfile1
+test/testfile
+test/testfile
+Empty list
+List 4 element(s):
+test/subdir
+test/subdir/testfile1
+test/testfile
+test/testfile
+List 3 element(s):
+test/subdir
+test/subdir/testfile1
+test/testfile
+List 2 element(s):
+test/subdir
+test/testfile
+List 1 element(s):
+test/testfile
+List 0 element(s):
+
+Fill in list
+List 1 element(s):
 -> test
 List 2 element(s):
 -> test
@@ -30,32 +68,4 @@ List 2 element(s):
 List 3 element(s):
 -> test/subdir/added
 -> test/subdir/testfile1
--> test/testfile
-
-Select part of list
-List 5 element(s) of original list:
--> test
--> test/subdir
--> test/subdir/testfile1
--> test/testfile
--> test/testfile
-List 1 element(s) of selected list:
--> test/subdir/testfile1
-List 4 element(s) of unselected list:
--> test
--> test/subdir
--> test/testfile
--> test/testfile
-List 1 element(s) of selected list:
--> test/subdir/testfile1
-List 4 element(s) of unselected list:
--> test
--> test/subdir
--> test/testfile
--> test/testfile
-List 5 element(s) of original list:
--> test
--> test/subdir
--> test/subdir/testfile1
--> test/testfile
 -> test/testfile

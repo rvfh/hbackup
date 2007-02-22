@@ -122,6 +122,12 @@ test2	testlink	l	8	1	1000	1000	777	testfile
 -> file://host	/home/user2/testfile	f	145408	1	1000	1000	644		3d546a1ce46c6ae10ad34ab8a81c542e-0	1	0
 -> file://host	/home/user2/testfile2	f	259072	1	1000	1000	644		fb00cd74a5f35e89a7fbdd3c1d05375a-0	1	0
 -> file://host	/home/user2/testlink	l	8	1	1000	1000	777	testfile		1	0
+>List 5 element(s):
+-> file://host	cvs/dirutd/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e	1	0
+-> file://host	cvs/filenew.c	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e	1	0
+-> file://host	cvs/fileutd.h	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e	1	0
+-> file://host	dir space/file space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e	1	0
+-> file://host	test space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e	1	0
 Database closed (total contents: 20 files)
 Database opened (active contents: 20 files)
 Scanning database contents: 20 files
