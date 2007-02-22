@@ -74,27 +74,6 @@ static string db_data_get(const void *payload) {
   return path;
 }
 
-static string close_select(const void *payload) {
-  const db_data_t *db_data = (const db_data_t *) (payload);
-
-  if (db_data->date_out == 0) {
-    return "@";
-  } else {
-    return "#";
-  }
-}
-
-static string parse_select(const void *payload) {
-  const db_data_t *db_data = (const db_data_t *) (payload);
-
-  if (db_data->date_out != 0) {
-    /* This string cannot be matched */
-    return "\t";
-  } else {
-    return db_data->filedata->path();
-  }
-}
-
 /* Need to compare only for matching paths */
 static int parse_compare(db_data_t *db_data, File& file_data) {
   int result;
@@ -262,6 +241,30 @@ int Database::save(const string& filename, List *list) {
       fprintf(writefile, "%s\t%ld\t%ld\t-\n",
         db_data->filedata->line().c_str(),
         db_data->date_in, db_data->date_out);
+    }
+    fclose(writefile);
+
+    /* All done */
+    dest_path = _path + "/" + filename;
+    failed = rename(temp_path.c_str(), dest_path.c_str());
+  } else {
+    failed = 2;
+  }
+  return failed;
+}
+
+int Database::save(const string& filename, vector<db_data_t*>& list) {
+  string  temp_path;
+  FILE    *writefile;
+  int     failed = 0;
+
+  temp_path = _path + "/" + filename + ".part";
+  if ((writefile = fopen(temp_path.c_str(), "w")) != NULL) {
+    string        dest_path;
+    vector<db_data_t*>::iterator i;
+    for (i = list.begin(); i != list.end(); i++) {
+      fprintf(writefile, "%s\t%ld\t%ld\t-\n",
+        (*i)->filedata->line().c_str(), (*i)->date_in, (*i)->date_out);
     }
     fclose(writefile);
 
@@ -646,10 +649,10 @@ int Database::open() {
 }
 
 void Database::close() {
-  List      *active_list = new List(db_data_get);
-  List      *removed_list = new List(db_data_get);
-  time_t    localtime;
-  struct tm localtime_brokendown;
+  vector<db_data_t*>  active;
+  vector<db_data_t*>  removed;
+  time_t              localtime;
+  struct tm           localtime_brokendown;
 
   /* Save list for month day */
   if ((time(&localtime) != -1)
@@ -666,27 +669,31 @@ void Database::close() {
   load("removed", db_list);
 
   /* Split list into active and removed records */
-  db_list->select("@", close_select, active_list, removed_list);
+  list_entry_t *entry = NULL;
+  while ((entry = db_list->next(entry)) != NULL) {
+    db_data_t *db_data = (db_data_t *) list_entry_payload(entry);
+
+    if (db_data->date_out == 0) {
+      active.push_back(db_data);
+    } else {
+      removed.push_back(db_data);
+    }
+  }
 
   /* Save active list */
-  if (save("list", active_list)) {
+  if (save("list", active)) {
     cerr << "db: close: failed to save active items list" << endl;
   }
-  active_list->deselect();
-  delete active_list;
 
   /* Save removed list */
-  if (save("removed", removed_list)) {
+  if (save("removed", removed)) {
     cerr << "db: close: failed to save removed items list" << endl;
   }
-  removed_list->deselect();
-  delete removed_list;
 
   /* Release lock */
   unlock();
   if (verbosity() > 0) {
-    cout << "Database closed (total contents: "
-      << db_list->size() << " file";
+    cout << "Database closed (total contents: " << db_list->size() << " file";
     if (db_list->size() != 1) {
       cout << "s";
     }
@@ -700,7 +707,6 @@ int Database::parse(
     const string& real_path,
     const string& mount_path,
     list<File>*   file_list) {
-  List*               selected = new List(db_data_get);
   vector<File*>       added;
   // TODO can it be a checksum-ordered list, for better efficiency?
   vector<db_data_t*>  removed;
@@ -708,10 +714,10 @@ int Database::parse(
 
   /* Compare list with db list for matching prefix */
   backup_path_length = real_path.size() + 1;
-  db_list->select(real_path + "/", parse_select, selected, NULL);
+  string match_path = real_path + "/";
 
   /* Point the entries to the start of their respective lists */
-  list_entry_t  *entry_db_list    = selected->next(NULL);
+  list_entry_t  *entry_db_list    = db_list->next(NULL);
   list<File>::iterator entry_file_list = file_list->begin();
 
   while ((entry_db_list != NULL) || (entry_file_list != file_list->end())) {
@@ -726,19 +732,24 @@ int Database::parse(
 
     if (payload_db_list == NULL) {
       result = 1;
-    } else if (entry_file_list == file_list->end()) {
+    } else
+    if ((payload_db_list->date_out != 0)
+     || (payload_db_list->filedata->path().substr(0, match_path.size()) != match_path)) {
+      result = -2;
+    } else
+    if (entry_file_list == file_list->end()) {
       result = -1;
     } else {
       result = parse_compare(payload_db_list, *entry_file_list);
     }
     /* left < right => element is missing from right list */
-    if (result < 0) {
+    if (result == -1) {
       /* The contents are NOT copied, so the two lists have elements
        * pointing to the same data! */
       removed.push_back(payload_db_list);
     } else
     /* left > right => element was added in right list */
-    if (result > 0) {
+    if (result == 1) {
       /* The contents are NOT copied, so the two lists have elements
        * pointing to the same data! */
       added.push_back(&(*entry_file_list));
@@ -747,11 +758,9 @@ int Database::parse(
       entry_file_list++;
     }
     if (result <= 0) {
-      entry_db_list = selected->next(entry_db_list);
+      entry_db_list = db_list->next(entry_db_list);
     }
   }
-
-  selected->deselect();
 
   /* Deal with new/modified data first */
   if (! added.empty()) {

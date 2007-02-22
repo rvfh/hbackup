@@ -20,6 +20,7 @@ using namespace std;
 
 #include <iostream>
 #include <string>
+#include <list>
 
 #include "list.h"
 
@@ -235,61 +236,4 @@ void List::show(list_entry_t *entry, list_payload_get_f payload_get) const {
     }
     level--;
   }
-}
-
-int List::select(
-    const string&       search_string,
-    list_payload_get_f  payload_get,
-    List                *selected_p,
-    List                *unselected_p) const {
-  list_entry_t  *entry = NULL;
-
-  /* Note: list_find does not garantee to find the first element */
-
-  /* Impossible to search without interpreting the payload */
-  if ((payload_get == NULL) && (_payload_get_f == NULL)) {
-    fprintf(stderr, "list: select: no way to interpret payload\n");
-    return 2;
-  }
-
-  /* Search the complete list, but stop when no more match is found */
-  while ((entry = next(entry)) != NULL) {
-    if (entry->payload != NULL) {
-      string payload_string;
-
-      if (payload_get != NULL) {
-        payload_string = payload_get(entry->payload);
-      } else {
-        payload_string = _payload_get_f(entry->payload);
-      }
-      /* Only compare the portion of string of search_string's length */
-      int result = payload_string.compare(0, search_string.size(),
-        search_string);
-      if (result == 0) {
-        /* Portions of strings match */
-        if (selected_p != NULL) {
-          selected_p->append(entry->payload);
-        }
-      } else if (unselected_p != NULL) {
-        /* Portions of strings do not match */
-        unselected_p->append(entry->payload);
-      } else if ((result == 1) && (payload_get == NULL)) {
-        /* When using the default payload function, time can be saved */
-        break;
-      }
-    } else {
-      fprintf(stderr, "list: select: found null payload, ignoring\n");
-    }
-  }
-  return 0;
-}
-
-int List::deselect() {
-  list_entry_t *entry = NULL;
-
-  while ((entry = next(entry)) != NULL) {
-    free(entry);
-    _size--;
-  }
-  return _size;
 }

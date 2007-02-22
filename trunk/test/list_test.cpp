@@ -20,6 +20,7 @@ using namespace std;
 
 #include <iostream>
 #include <string>
+#include <list>
 
 #include "list.h"
 
@@ -55,6 +56,84 @@ static payload2_t *list2_test_new(payload2_t payload2) {
 }
 
 int main() {
+  SortedList<string> sorted_list;
+  list<string>::iterator i;
+
+  cout << "Fill in list\n";
+  i = sorted_list.find("test");
+  sorted_list.add("test/testfile");
+  cout << "List " << sorted_list.size() << " element(s):\n";
+  for (i = sorted_list.begin(); i != sorted_list.end(); i++) {
+    cout << *i << endl;
+  }
+  i = sorted_list.find("test");
+
+  sorted_list.add("test");
+  cout << "List " << sorted_list.size() << " element(s):\n";
+  for (i = sorted_list.begin(); i != sorted_list.end(); i++) {
+    cout << *i << endl;
+  }
+
+  i = sorted_list.find("test");
+  if (*i != "test") {
+    cout << "test not found???" << endl;
+  }
+
+  sorted_list.add("test/subdir/testfile1");
+  cout << "List " << sorted_list.size() << " element(s):\n";
+  for (i = sorted_list.begin(); i != sorted_list.end(); i++) {
+    cout << *i << endl;
+  }
+
+  sorted_list.add("test/subdir");
+  cout << "List " << sorted_list.size() << " element(s):\n";
+  for (i = sorted_list.begin(); i != sorted_list.end(); i++) {
+    cout << *i << endl;
+  }
+
+  sorted_list.add("test/testfile");
+  cout << "List " << sorted_list.size() << " element(s):\n";
+  for (i = sorted_list.begin(); i != sorted_list.end(); i++) {
+    cout << *i << endl;
+  }
+
+  cout << "Empty list\n";
+  sorted_list.erase(sorted_list.begin());
+  cout << "List " << sorted_list.size() << " element(s):\n";
+  for (i = sorted_list.begin(); i != sorted_list.end(); i++) {
+    cout << *i << endl;
+  }
+
+  i-- = sorted_list.end();
+  sorted_list.erase(i);
+  cout << "List " << sorted_list.size() << " element(s):\n";
+  for (i = sorted_list.begin(); i != sorted_list.end(); i++) {
+    cout << *i << endl;
+  }
+
+  i--;
+  i--;
+  sorted_list.erase(i);
+  cout << "List " << sorted_list.size() << " element(s):\n";
+  for (i = sorted_list.begin(); i != sorted_list.end(); i++) {
+    cout << *i << endl;
+  }
+
+  sorted_list.erase(sorted_list.begin());
+  cout << "List " << sorted_list.size() << " element(s):\n";
+  for (i = sorted_list.begin(); i != sorted_list.end(); i++) {
+    cout << *i << endl;
+  }
+
+  i-- = sorted_list.end();
+  sorted_list.erase(i);
+  cout << "List " << sorted_list.size() << " element(s):\n";
+  for (i = sorted_list.begin(); i != sorted_list.end(); i++) {
+    cout << *i << endl;
+  }
+
+
+
   list_entry_t  *entry              = NULL;
   payload_t     payload;
   payload2_t    payload2;
@@ -62,7 +141,7 @@ int main() {
   List          *list2 = new List(payload2_get);
   List          list3(payload2_get);
 
-  cout << "Fill in list\n";
+  cout << "\nFill in list\n";
   strcpy(payload.name, "test");
   list.add(list_test_new(payload));
   cout << "List " << list.size() << " element(s):\n";
@@ -111,52 +190,6 @@ int main() {
   list2->add(list2_test_new(payload2));
   cout << "List " << list2->size() << " element(s):\n";
   list2->show();
-
-  cout << "\nSelect part of list\n";
-  cout << "List " << list.size() << " element(s) of original list:\n";
-  list.show(NULL, payload_get);
-  List *list_s1 = new List(payload_get);
-  List *list_u1 = new List(payload_get);
-  if (list.select("test/subdir/", NULL, list_s1, list_u1)) {
-    cout << "Select failed\n";
-  } else {
-    cout << "List " << list_s1->size() << " element(s) of selected list:\n";
-    list_s1->show();
-    if (list_s1->deselect() != 0) {
-      cout << "Selected list not freed\n";
-    }
-    cout << "List " << list_u1->size() << " element(s) of unselected list:\n";
-    list_u1->show();
-    if (list_u1->deselect() != 0) {
-      cout << "Selected list not freed\n";
-    }
-  }
-  delete list_s1;
-  delete list_u1;
-  List *list_s2 = new List(payload_get);
-  if (list.select("test/subdir/", NULL, list_s2, NULL)) {
-    cout << "Select failed\n";
-  } else {
-    cout << "List " << list_s2->size() << " element(s) of selected list:\n";
-    list_s2->show();
-    if (list_s2->deselect() != 0) {
-      cout << "Selected list not freed\n";
-    }
-  }
-  delete list_s2;
-  List *list_u2 = new List(payload_get);
-  if (list.select("test/subdir/", NULL, NULL, list_u2)) {
-    cout << "Select failed\n";
-  } else {
-    cout << "List " << list_u2->size() << " element(s) of unselected list:\n";
-    list_u2->show();
-    if (list_u2->deselect() != 0) {
-      cout << "Selected list not freed\n";
-    }
-  }
-  delete list_u2;
-  cout << "List " << list.size() << " element(s) of original list:\n";
-  list.show(NULL, payload_get);
 
   return 0;
 }

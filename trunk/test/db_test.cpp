@@ -35,6 +35,17 @@ static string db_data_show(const void *payload) {
   return db_data->filedata->line(true) + "\t" + d_in + "\t" + d_out;
 }
 
+static string parse_select(const void *payload) {
+  const db_data_t *db_data = (const db_data_t *) (payload);
+
+  if (db_data->date_out != 0) {
+    /* This string cannot be matched */
+    return "\t";
+  } else {
+    return db_data->filedata->path();
+  }
+}
+
 int verbosity(void) {
   return verbose;
 }
@@ -193,6 +204,12 @@ int main(void) {
   cout << ">List " << db_list->size() << " element(s):\n";
   db_list->show(NULL, db_data_show);
   delete path;
+
+  filelist = new List(db_data_show);
+  db.load("data/d41d8cd98f00b204e9800998ecf8427e-0/list", filelist);
+  cout << ">List " << filelist->size() << " element(s):\n";
+  filelist->show(NULL, db_data_show);
+  delete filelist;
 
   verbose = 2;
   if ((status = db.scan("59ca0efa9f5633cb0371bbc0355478d8-0"))) {
