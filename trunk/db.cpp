@@ -52,56 +52,64 @@ using namespace std;
 #include "db.h"
 #include "hbackup.h"
 
-static List   *db_list = NULL;
+bool DbData::operator<(const DbData& right) const {
+  if (_data < right._data) return true;
+  if (right._data < _data) return false;
+  return right._out == 0;
+}
+
+string DbData::line(bool nodates) const {
+  string  output = _data.line(nodates);
+  char*   numbers = NULL;
+  time_t  in, out;
+
+  if (nodates) {
+    in = _in != 0;
+    out = _out != 0;
+  } else {
+    in = _in;
+    out = _out;
+  }
+
+  asprintf(&numbers, "%ld\t%ld", in, out);
+  output += "\t" + string(numbers) + "\t" + "-";
+  delete numbers;
+  return output;
+}
+
+static SortedList<DbData> _active;
 
 /* Size of path being backed up */
 static int    backup_path_length = 0;
 
-static string db_data_get(const void *payload) {
-  const db_data_t *db_data = (const db_data_t *) (payload);
-  string path = db_data->filedata->prefix() + " " + db_data->filedata->path();
-
-  if (db_data->date_out == 0) {
-    /* '@' > '9' */
-    path += " @";
-  } else {
-    /* ' ' > '0' */
-    char *date = NULL;
-    asprintf(&date, "%11ld", db_data->date_out);
-    path += " " + string(date);
-    delete date;
-  }
-  return path;
-}
-
 /* Need to compare only for matching paths */
-static int parse_compare(db_data_t *db_data, File& file_data) {
+static int parse_compare(DbData& db_data, File& file_data) {
   int result;
 
   /* If paths differ, that's all we want to check */
-  result = db_data->filedata->path().substr(backup_path_length).compare(
+  result = db_data.data().path().substr(backup_path_length).compare(
     file_data.path());
   if (result) {
     return result;
   }
   /* If the file has been modified, just return 1 or -1 and that should do */
-  result = *db_data->filedata != file_data;
+  result = db_data.data().metadiffer(file_data);
 
   /* If it's a file and size and mtime are the same, copy checksum accross */
-  if (S_ISREG(db_data->filedata->type())) {
-    if (db_data->filedata->checksum() == "N") {
+  if (S_ISREG(db_data.data().type())) {
+    if (db_data.data().checksum() == "N") {
       /* Checksum missing, add to added list */
       return 1;
     } else
-    if ((db_data->filedata->size() == file_data.size())
-     || (db_data->filedata->mtime() == file_data.mtime())) {
-      file_data.setChecksum(db_data->filedata->checksum());
+    if ((db_data.data().size() == file_data.size())
+     || (db_data.data().mtime() == file_data.mtime())) {
+      file_data.setChecksum(db_data.data().checksum());
     }
   }
   return result;
 }
 
-int Database::load(const string &filename, List *list) {
+int Database::load(const string &filename, SortedList<DbData>& list) {
   string  source_path;
   FILE    *readfile;
   int     failed = 0;
@@ -114,9 +122,6 @@ int Database::load(const string &filename, List *list) {
     size_t size  = 0;
 
     while (getline(&buffer, &size, readfile) >= 0) {
-      db_data_t db_data;
-      // Don't destroy something else!
-      db_data.filedata = NULL;
       char      *start = buffer;
       char      *delim;
       char      *value = new char[size];
@@ -131,6 +136,9 @@ int Database::load(const string &filename, List *list) {
       uid_t     uid;
       gid_t     gid;
       mode_t    mode;
+      // DB data
+      time_t    in;
+      time_t    out;
       int       field = 0;
       int       failed = 1;
 
@@ -184,12 +192,12 @@ int Database::load(const string &filename, List *list) {
             checksum = value;
             break;
           case 11:  /* Date in */
-            if (sscanf(value, "%ld", &db_data.date_in) != 1) {
+            if (sscanf(value, "%ld", &in) != 1) {
               failed = 2;
             }
             break;
           case 12:  /* Date out */
-            if (sscanf(value, "%ld", &db_data.date_out) != 1) {
+            if (sscanf(value, "%ld", &out) != 1) {
               failed = 2;
             }
             break;
@@ -210,10 +218,10 @@ int Database::load(const string &filename, List *list) {
       if (failed) {
         errno = EUCLEAN;
       } else {
-        db_data_t *db_data_p = new db_data_t(db_data);
-        db_data_p->filedata = new File(access_path, path, link, checksum,
+        File    data(access_path, path, link, checksum,
           File::typeMode(letter), mtime, size, uid, gid, mode);
-        list->add(db_data_p);
+        DbData  db_data(data, in, out);
+        list.add(db_data);
       }
     }
     free(buffer);
@@ -225,51 +233,21 @@ int Database::load(const string &filename, List *list) {
   return failed;
 }
 
-int Database::save(const string& filename, List *list) {
+int Database::save(const string& filename, SortedList<DbData>& list) {
   string  temp_path;
   FILE    *writefile;
   int     failed = 0;
 
   temp_path = _path + "/" + filename + ".part";
   if ((writefile = fopen(temp_path.c_str(), "w")) != NULL) {
-    string        dest_path;
-    list_entry_t  *entry = NULL;
-
-    while ((entry = list->next(entry)) != NULL) {
-      db_data_t *db_data = (db_data_t *) (list_entry_payload(entry));
-
-      fprintf(writefile, "%s\t%ld\t%ld\t-\n",
-        db_data->filedata->line().c_str(),
-        db_data->date_in, db_data->date_out);
-    }
-    fclose(writefile);
-
-    /* All done */
-    dest_path = _path + "/" + filename;
-    failed = rename(temp_path.c_str(), dest_path.c_str());
-  } else {
-    failed = 2;
-  }
-  return failed;
-}
-
-int Database::save(const string& filename, vector<db_data_t*>& list) {
-  string  temp_path;
-  FILE    *writefile;
-  int     failed = 0;
-
-  temp_path = _path + "/" + filename + ".part";
-  if ((writefile = fopen(temp_path.c_str(), "w")) != NULL) {
-    string        dest_path;
-    vector<db_data_t*>::iterator i;
+    SortedList<DbData>::iterator i;
     for (i = list.begin(); i != list.end(); i++) {
-      fprintf(writefile, "%s\t%ld\t%ld\t-\n",
-        (*i)->filedata->line().c_str(), (*i)->date_in, (*i)->date_out);
+      fprintf(writefile, "%s\n", (*i).line().c_str());
     }
     fclose(writefile);
 
     /* All done */
-    dest_path = _path + "/" + filename;
+    string dest_path = _path + "/" + filename;
     failed = rename(temp_path.c_str(), dest_path.c_str());
   } else {
     failed = 2;
@@ -340,7 +318,7 @@ int Database::organize(const string& path, int number) {
 int Database::write(
     const string&   mount_path,
     const string&   path,
-    const db_data_t *db_data,
+    const DbData&   db_data,
     string&         checksum,
     int             compress) {
   string  source_path;
@@ -367,7 +345,7 @@ int Database::write(
   } else
 
   /* Check size_source size */
-  if (size_source != db_data->filedata->size()) {
+  if (size_source != db_data.data().size()) {
     cerr << "db: write: file copy incomplete: " << path << endl;
     failed = 1;
   } else
@@ -430,24 +408,19 @@ int Database::write(
 
     if (pos != string::npos) {
       string        listfile;
-      List          *list;
-      list_entry_t  *entry;
-      db_data_t     new_db_data = *db_data;
 
       dest_path.erase(pos);
       /* Now dest_path is /path/to/checksum */
       listfile = dest_path.substr(_path.size() + 1) + "/list";
-      list = new List(db_data_get);
+      SortedList<DbData> list;
       if (load(listfile, list) == 2) {
         cerr << "db: write: failed to open data list" << endl;
       } else {
-        new_db_data.filedata = new File(*db_data->filedata);
-        new_db_data.filedata->setChecksum(checksum_dest);
-        entry = list->add(&new_db_data);
+        DbData new_db_data(db_data);
+        new_db_data.setChecksum(checksum_dest);
+        list.add(new_db_data);
         save(listfile, list);
-        list->remove(entry);
       }
-      delete list;
     }
   }
 
@@ -470,7 +443,6 @@ int Database::obsolete(const File& file_data) {
   string  listfile;
   string  temp_path;
   int     failed = 0;
-  List    *list;
 
   if (getDir(file_data.checksum(), temp_path, false)) {
     cerr << "db: obsolete: failed to get dir for: "
@@ -479,23 +451,23 @@ int Database::obsolete(const File& file_data) {
   }
   listfile = temp_path.substr(_path.size() + 1) + "/list";
 
-  list = new List(db_data_get);
+  SortedList<DbData> list;
   if (load(listfile, list) == 2) {
     cerr << "db: obsolete: failed to open data list" << endl;
   } else {
-    db_data_t     *db_data;
-    list_entry_t  *entry;
-    string        string;
-
-    string = file_data.prefix() + " " + file_data.path() + " @";
-    list->find(string.c_str(), NULL, &entry);
-    if (entry != NULL) {
-      db_data = (db_data_t *) (list_entry_payload(entry));
-      db_data->date_out = time(NULL);
-      save(listfile, list);
+    string search = file_data.prefix() + " " + file_data.path();
+    SortedList<DbData>::iterator i = list.begin();
+    while (i != list.end()) {
+      if (((*i).out() == 0)
+       && (file_data.prefix() == (*i).data().prefix())
+       && (file_data.path() == (*i).data().path())) {
+        (*i).setOut();
+        save(listfile, list);
+        break;
+      }
+      i++;
     }
   }
-  delete list;
 
   return failed;
 }
@@ -607,14 +579,13 @@ int Database::open() {
 
   /* Read database active items list */
   if (status != 2) {
-    db_list = new List(db_data_get);
-    load("list", db_list);
+    load("list", _active);
     switch (errno) {
       case 0:
         if ((verbosity() > 0) && (status == 0)) {
           cout << "Database opened (active contents: "
-            << db_list->size() << " file";
-          if (db_list->size() != 1) {
+            << _active.size() << " file";
+          if (_active.size() != 1) {
             cout << "s";
           }
           cout << ")" << endl;
@@ -649,10 +620,8 @@ int Database::open() {
 }
 
 void Database::close() {
-  vector<db_data_t*>  active;
-  vector<db_data_t*>  removed;
-  time_t              localtime;
-  struct tm           localtime_brokendown;
+  time_t          localtime;
+  struct tm       localtime_brokendown;
 
   /* Save list for month day */
   if ((time(&localtime) != -1)
@@ -660,23 +629,23 @@ void Database::close() {
     char *daily_list = NULL;
 
     asprintf(&daily_list, "list_%02u", localtime_brokendown.tm_mday);
-    save(daily_list, db_list);
+    save(daily_list, _active);
     free(daily_list);
   }
 
   /* Also load previously removed items into list */
   /* TODO What do we do if this fails? Recover? */
-  load("removed", db_list);
+  load("removed", _active);
 
   /* Split list into active and removed records */
-  list_entry_t *entry = NULL;
-  while ((entry = db_list->next(entry)) != NULL) {
-    db_data_t *db_data = (db_data_t *) list_entry_payload(entry);
-
-    if (db_data->date_out == 0) {
-      active.push_back(db_data);
+  SortedList<DbData>::iterator i;
+  SortedList<DbData>           active;
+  SortedList<DbData>           removed;
+  for (i = _active.begin(); i != _active.end(); i++) {
+    if ((*i).out() == 0) {
+      active.add(*i);
     } else {
-      removed.push_back(db_data);
+      removed.add(*i);
     }
   }
 
@@ -691,15 +660,16 @@ void Database::close() {
   }
 
   /* Release lock */
-  unlock();
   if (verbosity() > 0) {
-    cout << "Database closed (total contents: " << db_list->size() << " file";
-    if (db_list->size() != 1) {
+    cout << "Database closed (total contents: " << _active.size() << " file";
+    if (_active.size() != 1) {
       cout << "s";
     }
     cout << ")" << endl;
   }
-  delete db_list;
+  // TODO this must go, obviously
+  _active.clear();
+  unlock();
 }
 
 int Database::parse(
@@ -707,46 +677,40 @@ int Database::parse(
     const string& real_path,
     const string& mount_path,
     list<File>*   file_list) {
-  vector<File*>       added;
+  vector<File*>   added;
   // TODO can it be a checksum-ordered list, for better efficiency?
-  vector<db_data_t*>  removed;
-  int                 failed   = 0;
+  vector<DbData*> removed;
+  int             failed   = 0;
 
   /* Compare list with db list for matching prefix */
   backup_path_length = real_path.size() + 1;
   string match_path = real_path + "/";
 
   /* Point the entries to the start of their respective lists */
-  list_entry_t  *entry_db_list    = db_list->next(NULL);
-  list<File>::iterator entry_file_list = file_list->begin();
+  SortedList<DbData>::iterator  entry_active    = _active.begin();
+  list<File>::iterator          entry_file_list = file_list->begin();
 
-  while ((entry_db_list != NULL) || (entry_file_list != file_list->end())) {
-    db_data_t*  payload_db_list;
+  while ((entry_active != _active.end())
+      || (entry_file_list != file_list->end())) {
     int         result;
 
-    if (entry_db_list != NULL) {
-      payload_db_list  = (db_data_t*) list_entry_payload(entry_db_list);
-    } else {
-      payload_db_list  = NULL;
-    }
-
-    if (payload_db_list == NULL) {
+    if (entry_active == _active.end()) {
       result = 1;
     } else
-    if ((payload_db_list->date_out != 0)
-     || (payload_db_list->filedata->path().substr(0, match_path.size()) != match_path)) {
+    if (((*entry_active).out() != 0)
+     || ((*entry_active).data().path().substr(0, match_path.size()) != match_path)) {
       result = -2;
     } else
     if (entry_file_list == file_list->end()) {
       result = -1;
     } else {
-      result = parse_compare(payload_db_list, *entry_file_list);
+      result = parse_compare(*entry_active, *entry_file_list);
     }
     /* left < right => element is missing from right list */
     if (result == -1) {
       /* The contents are NOT copied, so the two lists have elements
        * pointing to the same data! */
-      removed.push_back(payload_db_list);
+      removed.push_back((&*entry_active));
     } else
     /* left > right => element was added in right list */
     if (result == 1) {
@@ -758,7 +722,7 @@ int Database::parse(
       entry_file_list++;
     }
     if (result <= 0) {
-      entry_db_list = db_list->next(entry_db_list);
+      entry_active++;
     }
   }
 
@@ -789,45 +753,40 @@ int Database::parse(
       if (terminating()) {
         break;
       }
-      db_data_t*  db_data  = new db_data_t;
-
       // Set database data
-      db_data->date_in = time(NULL);
-      db_data->date_out = 0;
-      // Set object data
-      db_data->filedata = new File(*added[i]);
-      db_data->filedata->setPrefix(prefix);
+      File data(*added[i]);
+      data.setPrefix(prefix);
+      data.setPath(real_path + "/" + added[i]->path());
+      DbData db_data(data);
       // Set checksum
       string checksum = "";
-      if (S_ISREG(db_data->filedata->type())) {
-        if (! db_data->filedata->checksum().empty()) {
+      if (S_ISREG(db_data.data().type())) {
+        if (! db_data.data().checksum().empty()) {
           /* Checksum given by the compare function */
-          checksum = db_data->filedata->checksum();
+          checksum = db_data.data().checksum();
         } else
-        if (write(mount_path, db_data->filedata->path(), db_data, checksum)) {
+        if (write(mount_path, added[i]->path(), db_data, checksum)) {
           /* Write failed, need to go on */
           checksum = "N";
           failed   = 1;
           if (! terminating()) {
             /* Don't signal errors on termination */
             cerr << "\r" << strerror(errno) << ": "
-              << db_data->filedata->path() << ", ignoring" << endl;
+              << added[i]->path() << ", ignoring" << endl;
           }
         }
         if (verbosity() > 2) {
-          sizebackedup += double(db_data->filedata->size());
+          sizebackedup += double(db_data.data().size());
         }
       }
-      // Update file path
-      db_data->filedata->setPath(real_path + "/" + db_data->filedata->path());
-      db_data->filedata->setChecksum(checksum);
+      // Set checksum
+      db_data.setChecksum(checksum);
       // Save new data
-      db_list->add(db_data);
+      _active.add(db_data);
       if ((++copied >= 1000)
-      || ((volume += db_data->filedata->size()) >= 100000000)) {
+      || ((volume += db_data.data().size()) >= 100000000)) {
         copied = 0;
         volume = 0;
-        save("list", db_list);
       }
       if (verbosity() > 2) {
         filesbackedup++;
@@ -848,14 +807,17 @@ int Database::parse(
       printf(" --> Files to remove: %u\n", removed.size());
     }
     for (unsigned int i = 0; i < removed.size(); i++) {
-      /* Same data as in db_list */
-      removed[i]->date_out = time(NULL);
+      if (terminating()) {
+        break;
+      }
+      /* Same data as in _active */
+      removed[i]->setOut();
 
       /* Update local list */
-      if (S_ISREG(removed[i]->filedata->type())
-       && ! removed[i]->filedata->checksum().empty()
-       && (removed[i]->filedata->checksum() != "N")) {
-        obsolete(*removed[i]->filedata);
+      if (S_ISREG(removed[i]->data().type())
+       && ! removed[i]->checksum().empty()
+       && (removed[i]->checksum() != "N")) {
+        obsolete(removed[i]->data());
       }
     }
   } else if (verbosity() > 2) {
@@ -915,48 +877,48 @@ int Database::scan(const string& checksum, bool thorough) {
   int     failed = 0;
 
   if (checksum == "") {
-    list_entry_t *entry = NULL;
-    int          files = db_list->size();
+    int files = _active.size();
 
     if (verbosity() > 0) {
       cout << "Scanning database contents";
       if (thorough) {
         cout << " thoroughly";
       }
-      cout << ": " << db_list->size() << " file";
-      if (db_list->size() != 1) {
+      cout << ": " << _active.size() << " file";
+      if (_active.size() != 1) {
         cout << "s";
       }
       cout << endl;
     }
 
-    while ((entry = db_list->next(entry)) != NULL) {
-      db_data_t *db_data = (db_data_t *) (list_entry_payload(entry));
-
+    SortedList<DbData>::iterator i;
+    for (i = _active.begin(); i != _active.end(); i++) {
       if ((verbosity() > 2) && ((files & 0xFF) == 0)) {
         printf(" --> Files left to go: %u\n", files);
       }
       files--;
-      if ((! db_data->filedata->checksum().empty())
-       && scan(db_data->filedata->checksum(), thorough)) {
-        db_data->filedata->setChecksum("N");
+      if ((! (*i).data().checksum().empty())
+       && scan((*i).data().checksum(), thorough)) {
+        (*i).setChecksum("N");
         failed = 1;
         if (! terminating() && verbosity() > 1) {
           struct tm *time;
-          cout << " -> Client:      " << db_data->filedata->prefix() << endl;
-          cout << " -> File name:   " << db_data->filedata->path() << endl;
-          time_t file_mtime = db_data->filedata->mtime();
+          cout << " -> Client:      " << (*i).data().prefix() << endl;
+          cout << " -> File name:   " << (*i).data().path() << endl;
+          time_t file_mtime = (*i).data().mtime();
           time = localtime(&file_mtime);
           printf(" -> Modified:    %04u-%02u-%02u %2u:%02u:%02u\n",
             time->tm_year + 1900, time->tm_mon + 1, time->tm_mday,
             time->tm_hour, time->tm_min, time->tm_sec);
           if (verbosity() > 2) {
-            time = localtime(&db_data->date_in);
+            time_t local = (*i).in();
+            time = localtime(&local);
             printf(" --> Seen first: %04u-%02u-%02u %2u:%02u:%02u\n",
               time->tm_year + 1900, time->tm_mon + 1, time->tm_mday,
               time->tm_hour, time->tm_min, time->tm_sec);
-            if (db_data->date_out != 0) {
-              time = localtime(&db_data->date_out);
+            if ((*i).out() != 0) {
+              time_t local = (*i).out();
+              time = localtime(&local);
               printf(" --> Seen gone:  %04u-%02u-%02u %2u:%02u:%02u\n",
                 time->tm_year + 1900, time->tm_mon + 1, time->tm_mday,
                 time->tm_hour, time->tm_min, time->tm_sec);
@@ -986,23 +948,19 @@ int Database::scan(const string& checksum, bool thorough) {
     if (thorough) {
       string  check_path = path + "/data";
       string  listfile = path.substr(_path.size() + 1) + "/list";
-      List    *list;
+      SortedList<DbData> list;
 
-      list = new List(db_data_get);
       if (load(listfile, list) == 2) {
         errno = EUCLEAN;
         filefailed = true;
         cerr << "db: scan: failed to open list for checksum " << checksum << endl;
       } else {
-        list_entry_t *entry = list->next(NULL);
-
-        if (entry == NULL) {
+        if (list.empty()) {
           errno = EUCLEAN;
           filefailed = true;
           cerr << "db: scan: list empty for checksum " << checksum << endl;
         } else {
-          db_data_t *db_data = (db_data_t *) (list_entry_payload(entry));
-          string  checksum_real;
+          string                       checksum_real;
 
           /* Read file to compute checksum, compare with expected */
           if (File::getChecksum(check_path, checksum_real) == 2) {
@@ -1010,7 +968,7 @@ int Database::scan(const string& checksum, bool thorough) {
             filefailed = true;
             cerr << "db: scan: file data missing for checksum " << checksum << endl;
           } else
-          if (db_data->filedata->checksum().substr(0, checksum_real.size())
+          if ((*list.begin()).data().checksum().substr(0, checksum_real.size())
            != checksum_real) {
             errno = EILSEQ;
             filefailed = true;
@@ -1021,7 +979,6 @@ int Database::scan(const string& checksum, bool thorough) {
           }
         }
       }
-      delete list;
 
       // Remove corrupted file if any
       if (filefailed) {

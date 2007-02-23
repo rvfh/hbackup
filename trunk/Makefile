@@ -25,7 +25,7 @@ check: all
 	@${MAKE} -C test
 
 # Dependencies
-libhbackup.a: clients.o cvs_parser.o db.o filters.o list.o paths.o files.o
+libhbackup.a: clients.o cvs_parser.o db.o filters.o paths.o files.o
 version.h: libhbackup.a Makefile
 hbackup: libhbackup.a version.h
 
@@ -36,7 +36,6 @@ db.o: list.h files.h filters.h parsers.h db.h
 filters.o: filters.h
 hbackup.o: list.h files.h db.h filters.h parsers.h cvs_parser.h paths.h \
 	clients.h hbackup.h version.h
-list.o: list.h
 paths.o: files.h filters.h parsers.h cvs_parser.h paths.h
 files.o: files.h
 

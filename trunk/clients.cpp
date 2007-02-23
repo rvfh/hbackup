@@ -151,7 +151,7 @@ int Client::readListFile(const string& list_path) {
             cerr << "Error: in list file " << list_path << ", line " << line
               << " 'path' takes exactly one argument" << endl;
             failed = 1;
-          }
+          } else
           /* New backup path */
           path = new Path(params[1]);
           if (verbosity() > 2) {
@@ -165,7 +165,7 @@ int Client::readListFile(const string& list_path) {
               cerr << "Error: in list file " << list_path << ", line " << line
                 << " 'filter' takes exactly two arguments" << endl;
               failed = 1;
-            }
+            } else
             if (path->addFilter(params[1], params[2], params[0] == "ignand")) {
               cerr << "Error: in list file " << list_path << ", line " << line
                 << " unsupported filter: " << params[1] << endl;
@@ -178,7 +178,7 @@ int Client::readListFile(const string& list_path) {
               cerr << "Error: in list file " << list_path << ", line " << line
                 << " 'parser' takes exactly two arguments" << endl;
               failed = 1;
-            }
+            } else
             if (path->addParser(params[1], params[2])) {
               cerr << "Error: in list file " << list_path << ", line " << line
                 << " unsupported parser: " << params[2] << endl;

@@ -24,37 +24,6 @@ using namespace std;
 
 #include "list.h"
 
-typedef struct {
-  char name[256];
-} payload_t;
-
-typedef struct {
-  char dir[256];
-  char filename[256];
-} payload2_t;
-
-static string payload_get(const void *payload_p) {
-  const payload_t *payload = (const payload_t *) (payload_p);
-  return payload->name;
-}
-
-static string payload2_get(const void *payload_p) {
-  const payload2_t *payload = (const payload2_t *) (payload_p);
-  return string(payload->dir) + "/" + string(payload->filename);
-}
-
-static payload_t *list_test_new(payload_t payload) {
-  payload_t *payload_p = new payload_t;
-  *payload_p = payload;
-  return payload_p;
-}
-
-static payload2_t *list2_test_new(payload2_t payload2) {
-  payload2_t *payload2_p = new payload2_t;
-  *payload2_p = payload2;
-  return payload2_p;
-}
-
 int main() {
   SortedList<string> sorted_list;
   list<string>::iterator i;
@@ -131,65 +100,6 @@ int main() {
   for (i = sorted_list.begin(); i != sorted_list.end(); i++) {
     cout << *i << endl;
   }
-
-
-
-  list_entry_t  *entry              = NULL;
-  payload_t     payload;
-  payload2_t    payload2;
-  List          list(payload_get);
-  List          *list2 = new List(payload2_get);
-  List          list3(payload2_get);
-
-  cout << "\nFill in list\n";
-  strcpy(payload.name, "test");
-  list.add(list_test_new(payload));
-  cout << "List " << list.size() << " element(s):\n";
-  list.show(NULL, payload_get);
-
-  strcpy(payload.name, "test/testfile");
-  list.add(list_test_new(payload));
-  cout << "List " << list.size() << " element(s):\n";
-  list.show(NULL, payload_get);
-  if (list.find("test", NULL, &entry)) {
-    cout << "test not found???\n";
-  }
-
-  strcpy(payload.name, "test/subdir/testfile1");
-  list.add(list_test_new(payload));
-  cout << "List " << list.size() << " element(s):\n";
-  list.show(NULL, payload_get);
-
-  strcpy(payload.name, "test/subdir");
-  list.add(list_test_new(payload));
-  cout << "List " << list.size() << " element(s):\n";
-  list.show(NULL, payload_get);
-
-  strcpy(payload.name, "test/testfile");
-  list.add(list_test_new(payload));
-  cout << "List " << list.size() << " element(s):\n";
-  list.show(NULL, payload_get);
-  cout << "Reported size: " << list.size() << "\n";
-
-  list.find("test/testfile", NULL, &entry);
-
-  cout << "\nFill in list2\n";
-  strcpy(payload2.dir, "test");
-  strcpy(payload2.filename, "testfile");
-  list2->add(list2_test_new(payload2));
-  cout << "List " << list2->size() << " element(s):\n";
-  list2->show();
-
-  strcpy(payload2.dir, "test/subdir");
-  strcpy(payload2.filename, "testfile1");
-  list2->add(list2_test_new(payload2));
-  cout << "List " << list2->size() << " element(s):\n";
-  list2->show();
-
-  strcpy(payload2.filename, "added");
-  list2->add(list2_test_new(payload2));
-  cout << "List " << list2->size() << " element(s):\n";
-  list2->show();
 
   return 0;
 }

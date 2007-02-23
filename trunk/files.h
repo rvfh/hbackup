@@ -56,8 +56,8 @@ public:
       _gid(gid),
       _mode(mode) {}
   // Need '<' to sort list
-  bool operator<(const File&);
-  bool operator!=(const File&);
+  bool operator<(const File&) const;
+  bool metadiffer(const File&) const;
   string name() const;
   string prefix() const { return _prefix; };
   string path() const { return _path; };
@@ -66,7 +66,7 @@ public:
   time_t mtime() const { return _mtime; };
   off_t  size() const { return _size; };
   // Line containing all data (argument for debug only)
-  string line(bool nodates = false);
+  string line(bool nodates = false) const;
   void setPrefix(const string& prefix) { _prefix = prefix; }
   void setPath(const string& path) { _path = path; }
   void setChecksum(const string& checksum) { _checksum = checksum; }

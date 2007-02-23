@@ -52,7 +52,7 @@ int Path::iterate_directory(const string& path, Parser* parser) {
   }
   DIR* directory = opendir(path.c_str());
   if (directory == NULL) {
-    cerr << "filelist: cannot open directory: " << path << endl;
+    cerr << "paths: cannot open directory: " << path << endl;
     return 2;
   }
   struct dirent *dir_entry;
@@ -67,7 +67,7 @@ int Path::iterate_directory(const string& path, Parser* parser) {
 
     /* Remove mount path and leading slash from records */
     if (file_data.type() == 0) {
-      cerr << "filelist: cannot get metadata: " << file_path << endl;
+      cerr << "paths: cannot get metadata: " << file_path << endl;
       continue;
     } else
     /* Let the parser analyse the file data to know whether to back it up */
@@ -81,7 +81,7 @@ int Path::iterate_directory(const string& path, Parser* parser) {
     if (S_ISDIR(file_data.type())) {
       if (iterate_directory(file_path, parser)) {
         if (! terminating()) {
-          cerr << "filelist: cannot iterate into directory: "
+          cerr << "paths: cannot iterate into directory: "
             << dir_entry->d_name << endl;
         }
         continue;
@@ -188,23 +188,33 @@ int Path::addParser(
   parser_mode_t mode;
 
   /* Determine mode */
-  if (type == "mod") {
-    mode = parser_modified;
-  } else
-  if (type == "mod+oth") {
-    mode = parser_modifiedandothers;
-  } else
-  if (type == "oth") {
-    mode = parser_others;
-  } else {
-    /* Default */
-    mode = parser_controlled;
+  switch (type[0]) {
+    case 'c':
+      // All controlled files
+      mode = parser_controlled;
+      break;
+    case 'l':
+      // Local files
+      mode = parser_modifiedandothers;
+      break;
+    case 'm':
+      // Modified controlled files
+      mode = parser_modified;
+      break;
+    case 'o':
+      // Non controlled files
+      mode = parser_others;
+      break;
+    default:
+      cerr << "Undefined mode " << type << " for parser " << string << endl;
+      return 1;
   }
 
   /* Add specified parser */
   if (string == "cvs") {
     _parsers.push_back(new CvsParser(mode));
   } else {
+    cerr << "Unsupported parser " << string << endl;
     return 1;
   }
   return 0;

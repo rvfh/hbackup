@@ -82,15 +82,15 @@ File::File(const string& prefix, const string& path) {
 }
 
 // Tested in db's test
-bool File::operator!=(const File& right) {
+bool File::metadiffer(const File& right) const {
   return (_type != right._type) || (_mtime != right._mtime)
       || (_size != right._size) || (_uid != right._uid)
       || (_gid != right._gid) || (_mode != right._mode);
 }
 
 // Tested in db's test
-bool File::operator<(const File& right) {
-  return _path < right._path;
+bool File::operator<(const File& right) const {
+  return (_prefix < right._prefix) || (_path < right._path);
 }
 
 // Tested in cvs_parser's test
@@ -103,7 +103,7 @@ string File::name() const {
   }
 }
 
-string File::line(bool nodates) {
+string File::line(bool nodates) const {
   string  output = _prefix + "\t" + _path + "\t" + typeLetter(_type);
   char*   numbers = NULL;
   time_t  mtime;
