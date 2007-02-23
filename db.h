@@ -28,22 +28,31 @@
 #endif
 
 // FIXME This is a temporary ugly hack
-class db_data_t {
+class DbData {
+  time_t  _in;
+  time_t  _out;
+  File    _data;
 public:
-  ~db_data_t() { delete filedata; }
-  File    *filedata;
-  time_t  date_in;
-  time_t  date_out;
+  DbData(const File& data) : _out(0), _data(data) {
+    _in = time(NULL);
+  }
+  DbData(const File& data, time_t in, time_t out) :
+    _in(in), _out(out), _data(data) {}
+  bool operator<(const DbData&) const;
+  time_t in() const { return _in; }
+  time_t out() const { return _out; }
+  string checksum() { return _data.checksum(); }
+  File   data() const { return _data; }
+  void   setOut() { _out = time(NULL); }
+  void   setChecksum(const string& checksum) { _data.setChecksum(checksum); }
+  string line(bool nodates = false) const;
 };
 
 class Database {
   string _path;
   int  save(
-    const string& filename,
-    List *list);
-  int  save(
-    const string& filename,
-    vector<db_data_t*>& list);
+    const string&       filename,
+    SortedList<DbData>& list);
   int  lock();
   void unlock();
 public:
@@ -77,7 +86,7 @@ public:
     bool          create);
   int  load(
     const string &filename,
-    List *list);
+    SortedList<DbData>& list);
   int  obsolete(const File& file_data);
   int  organize(
     const string& path,
@@ -85,7 +94,7 @@ public:
   int  write(
     const string&   mount_path,
     const string&   path,
-    const db_data_t *db_data,
+    const DbData&   db_data,
     string&         checksum,
     int             compress = 0);
 };

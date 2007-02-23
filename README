@@ -85,14 +85,14 @@ PARSERS
 
 Syntax: parser [<mode>] "<parser name>"
 
-There are four modes:
-* mod: backup files under control, that were modified locally
-* oth: backup files not under control
-* mod+oth: backup files in the two cases above
-* anything else or nothing: backup all files under control
+There are four modes (only the first letter matters):
+* m: backup files under control, that were modified locally (m for modified)
+* o: backup files not under control (o for others)
+* l: backup files in the two cases above (l for local)
+* c: backup all files under control (c for controlled)
 
 Only one parser is implemented at the moment:
 * cvs: this parser does not check for file modification
 
 Note: parsers that do not check for file modification backup all controlled
-files if mod was chosen or all files if mod+oth was chosen.
+files if 'modified' was chosen or all files if 'local' was chosen.

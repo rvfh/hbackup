@@ -78,7 +78,7 @@ int main(void) {
   }
 
   cout << "as previous with CVS parser" << endl;
-  if (path->addParser("all", "cvs")) {
+  if (path->addParser("controlled", "cvs")) {
     cout << "Failed to add parser" << endl;
   }
   if (! path->createList("test")) {

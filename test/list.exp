@@ -35,37 +35,3 @@ test/testfile
 List 1 element(s):
 test/testfile
 List 0 element(s):
-
-Fill in list
-List 1 element(s):
--> test
-List 2 element(s):
--> test
--> test/testfile
-List 3 element(s):
--> test
--> test/subdir/testfile1
--> test/testfile
-List 4 element(s):
--> test
--> test/subdir
--> test/subdir/testfile1
--> test/testfile
-List 5 element(s):
--> test
--> test/subdir
--> test/subdir/testfile1
--> test/testfile
--> test/testfile
-Reported size: 5
-
-Fill in list2
-List 1 element(s):
--> test/testfile
-List 2 element(s):
--> test/subdir/testfile1
--> test/testfile
-List 3 element(s):
--> test/subdir/added
--> test/subdir/testfile1
--> test/testfile

@@ -29,7 +29,7 @@ public:
       return _hint;
     } else {
       // List is ordered, so search from hint to hopefully save time
-      list<string>::iterator i = _hint;
+      typename list<T>::iterator i = _hint;
       if (i == this->end()) {
         i--;
       }
@@ -54,14 +54,14 @@ public:
     }
   }
   void add(const T& element) {
-    list<string>::iterator i = find(element);
+    typename list<T>::iterator i = find(element);
     if (i == this->end()) {
       push_back(T(element));
     } else {
       insert(i, element);
     }
   }
-  list<string>::iterator erase(list<string>::iterator i) {
+  typename list<T>::iterator erase(typename list<T>::iterator i) {
     if (i == _hint) {
       if (this->size() == 1) {
         _hint = this->end();
@@ -74,54 +74,6 @@ public:
     }
     return list<T>::erase(i);
   }
-};
-
-// Type for function to convert payload into usable data
-typedef string (list_payload_get_f) (const void *payload);
-
-typedef struct _list_entry_t list_entry_t;
-
-struct _list_entry_t {
-  void                *payload;
-  list_entry_t        *previous;
-  list_entry_t        *next;
-};
-
-/* Functions */
-
-/* Create empty list entry, return it */
-extern list_entry_t *list_entry_new();
-
-/* Get list entry payload */
-extern void *list_entry_payload(const list_entry_t *entry);
-
-/* Classes */
-
-class List {
-  list_entry_t        *_first;
-  list_entry_t        *_last;
-  list_entry_t        *_hint;
-  list_payload_get_f  *_payload_get_f;
-  int                 _size;
-  list_entry_t        *find_hidden(
-    const string&           search_string,
-    list_payload_get_f      payload_get = NULL) const;
-public:
-  List(list_payload_get_f payload_get_f);
-  ~List();
-  string payloadString(const void *payload) const;
-  list_entry_t *append(void *payload);
-  list_entry_t *add(void *payload);
-  void *remove(list_entry_t *entry);
-  int size() const;
-  list_entry_t *next(const list_entry_t *entry) const;
-  int find(
-    const string&           search_string,
-    list_payload_get_f      payload_get_f,
-    list_entry_t**          entry_handle) const;
-  void show(
-    list_entry_t            *entry                = NULL,
-    list_payload_get_f      payload_get_f         = NULL) const;
 };
 
 #endif

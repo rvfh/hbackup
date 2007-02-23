@@ -26,26 +26,6 @@ using namespace std;
 
 static int verbose = 3;
 
-static string db_data_show(const void *payload) {
-  const db_data_t *db_data = (db_data_t *) payload;
-  string d_in;
-  string d_out;
-  if (db_data->date_in == 0) d_in = "0"; else d_in = "1";
-  if (db_data->date_out == 0) d_out = "0"; else d_out = "1";
-  return db_data->filedata->line(true) + "\t" + d_in + "\t" + d_out;
-}
-
-static string parse_select(const void *payload) {
-  const db_data_t *db_data = (const db_data_t *) (payload);
-
-  if (db_data->date_out != 0) {
-    /* This string cannot be matched */
-    return "\t";
-  } else {
-    return db_data->filedata->path();
-  }
-}
-
 int verbosity(void) {
   return verbose;
 }
@@ -58,10 +38,11 @@ int main(void) {
   Path*     path;
   string    checksum;
   string    zchecksum;
-  db_data_t db_data;
+  DbData*   db_data;
   off_t     size;
   off_t     zsize;
-  List      *filelist;
+  SortedList<DbData>* filelist;
+  SortedList<DbData>::iterator i;
   int       status;
 
   /* Test internal functions */
@@ -85,7 +66,7 @@ int main(void) {
 
   /* Use other modules */
   path = new Path("");
-  path->addParser("all", "cvs");
+  path->addParser("c", "cvs");
   path->addFilter("type", "dir");
   path->addFilter("path_start", ".svn", true);
   path->addFilter("type", "dir");
@@ -115,28 +96,30 @@ int main(void) {
   }
 
   /* Write check */
-  db_data.filedata = new File("test/testfile");
-  db_data.date_in = time(NULL);
-  db_data.date_out = 0;
-  if ((status = db.write("test/", "testfile", &db_data, checksum, 0))) {
+  db_data = new DbData(File("test/testfile"));
+  if ((status = db.write("test/", "testfile", *db_data, checksum, 0))) {
     printf("db.write error status %u\n", status);
     db.close();
     return 0;
   }
   cout << checksum << "  test/testfile" << endl;
-  filelist = new List(db_data_show);
-  db.load("data/59ca0efa9f5633cb0371bbc0355478d8-0/list", filelist);
+  filelist = new SortedList<DbData>;
+  db.load("data/59ca0efa9f5633cb0371bbc0355478d8-0/list", *filelist);
   cout << ">List " << filelist->size() << " element(s):\n";
-  filelist->show(NULL, db_data_show);
+  for (i = filelist->begin(); i != filelist->end(); i++) {
+    cout << (*i).line(true) << endl;
+  }
   delete filelist;
 
   /* Obsolete check */
-  db_data.filedata->setChecksum(checksum);
-  db.obsolete(*db_data.filedata);
-  filelist = new List(db_data_show);
-  db.load("data/59ca0efa9f5633cb0371bbc0355478d8-0/list", filelist);
+  db_data->setChecksum(checksum);
+  db.obsolete(db_data->data());
+  filelist = new SortedList<DbData>;
+  db.load("data/59ca0efa9f5633cb0371bbc0355478d8-0/list", *filelist);
   cout << ">List " << filelist->size() << " element(s):\n";
-  filelist->show(NULL, db_data_show);
+  for (i = filelist->begin(); i != filelist->end(); i++) {
+    cout << (*i).line(true) << endl;
+  }
   delete filelist;
 
   /* Read check */
@@ -151,8 +134,10 @@ int main(void) {
     db.close();
     return 0;
   }
-  cout << ">List " << db_list->size() << " element(s):\n";
-  db_list->show(NULL, db_data_show);
+  cout << ">List " << _active.size() << " element(s):\n";
+  for (i = _active.begin(); i != _active.end(); i++) {
+    cout << (*i).line(true) << endl;
+  }
 
   db.close();
 
@@ -163,20 +148,24 @@ int main(void) {
       return 0;
     }
   }
-  cout << ">List " << db_list->size() << " element(s):\n";
-  db_list->show(NULL, db_data_show);
+  cout << ">List " << _active.size() << " element(s):\n";
+  for (i = _active.begin(); i != _active.end(); i++) {
+    cout << (*i).line(true) << endl;
+  }
 
   if ((status = db.parse("file://host", "/home/user", "test", path->list()))) {
     printf("db.parse error status %u\n", status);
     db.close();
     return 0;
   }
-  cout << ">List " << db_list->size() << " element(s):\n";
-  db_list->show(NULL, db_data_show);
+  cout << ">List " << _active.size() << " element(s):\n";
+  for (i = _active.begin(); i != _active.end(); i++) {
+    cout << (*i).line(true) << endl;
+  }
   delete path;
 
   path = new Path("");
-  path->addParser("all", "cvs");
+  path->addParser("c", "cvs");
   path->addFilter("type", "dir");
   path->addFilter("path_start", ".svn", true);
   path->addFilter("type", "dir");
@@ -201,14 +190,18 @@ int main(void) {
     db.close();
     return 0;
   }
-  cout << ">List " << db_list->size() << " element(s):\n";
-  db_list->show(NULL, db_data_show);
+  cout << ">List " << _active.size() << " element(s):\n";
+  for (i = _active.begin(); i != _active.end(); i++) {
+    cout << (*i).line(true) << endl;
+  }
   delete path;
 
-  filelist = new List(db_data_show);
-  db.load("data/d41d8cd98f00b204e9800998ecf8427e-0/list", filelist);
+  filelist = new SortedList<DbData>;
+  db.load("data/d41d8cd98f00b204e9800998ecf8427e-0/list", *filelist);
   cout << ">List " << filelist->size() << " element(s):\n";
-  filelist->show(NULL, db_data_show);
+  for (i = filelist->begin(); i != filelist->end(); i++) {
+    cout << (*i).line(true) << endl;
+  }
   delete filelist;
 
   verbose = 2;
@@ -295,11 +288,13 @@ int main(void) {
       return 0;
     }
   }
-  cout << ">List " << db_list->size() << " element(s):\n";
-  db_list->show(NULL, db_data_show);
+  cout << ">List " << _active.size() << " element(s):\n";
+  for (i = _active.begin(); i != _active.end(); i++) {
+    cout << (*i).line(true) << endl;
+  }
 
   path = new Path("");
-  path->addParser("all", "cvs");
+  path->addParser("c", "cvs");
   path->addFilter("type", "dir");
   path->addFilter("path_start", ".svn", true);
   path->addFilter("type", "dir");
@@ -323,8 +318,10 @@ int main(void) {
     db.close();
     return 0;
   }
-  cout << ">List " << db_list->size() << " element(s):\n";
-  db_list->show(NULL, db_data_show);
+  cout << ">List " << _active.size() << " element(s):\n";
+  for (i = _active.begin(); i != _active.end(); i++) {
+    cout << (*i).line(true) << endl;
+  }
 
   db.close();
 
@@ -337,13 +334,15 @@ int main(void) {
       return 0;
     }
   }
-  cout << ">List " << db_list->size() << " element(s):\n";
-  db_list->show(NULL, db_data_show);
+  cout << ">List " << _active.size() << " element(s):\n";
+  for (i = _active.begin(); i != _active.end(); i++) {
+    cout << (*i).line(true) << endl;
+  }
 
   remove("test/testfile");
 
   path = new Path("");
-  path->addParser("all", "cvs");
+  path->addParser("c", "cvs");
   path->addFilter("type", "dir");
   path->addFilter("path_start", ".svn", true);
   path->addFilter("type", "dir");
@@ -368,14 +367,14 @@ int main(void) {
     db.close();
     return 0;
   }
-  cout << ">List " << db_list->size() << " element(s):\n";
-  db_list->show(NULL, db_data_show);
-  cout << ">List " << db_list->size() << " element(s):\n";
-  db_list->show(NULL, parse_select);
+  cout << ">List " << _active.size() << " element(s):\n";
+  for (i = _active.begin(); i != _active.end(); i++) {
+    cout << (*i).line(true) << endl;
+  }
   delete path;
 
   path = new Path("");
-  path->addParser("all", "cvs");
+  path->addParser("c", "cvs");
   path->addFilter("type", "dir");
   path->addFilter("path_start", ".svn", true);
   path->addFilter("type", "dir");
@@ -400,12 +399,14 @@ int main(void) {
     db.close();
     return 0;
   }
-  cout << ">List " << db_list->size() << " element(s):\n";
-  db_list->show(NULL, db_data_show);
+  cout << ">List " << _active.size() << " element(s):\n";
+  for (i = _active.begin(); i != _active.end(); i++) {
+    cout << (*i).line(true) << endl;
+  }
   delete path;
 
   path = new Path("");
-  path->addParser("all", "cvs");
+  path->addParser("c", "cvs");
   path->addFilter("type", "dir");
   path->addFilter("path_start", ".svn", true);
   path->addFilter("type", "dir");
@@ -430,8 +431,10 @@ int main(void) {
     db.close();
     return 0;
   }
-  cout << ">List " << db_list->size() << " element(s):\n";
-  db_list->show(NULL, db_data_show);
+  cout << ">List " << _active.size() << " element(s):\n";
+  for (i = _active.begin(); i != _active.end(); i++) {
+    cout << (*i).line(true) << endl;
+  }
   delete path;
 
   db.organize("test_db/data", 2);
@@ -446,8 +449,10 @@ int main(void) {
       return 0;
     }
   }
-  cout << ">List " << db_list->size() << " element(s):\n";
-  db_list->show(NULL, db_data_show);
+  cout << ">List " << _active.size() << " element(s):\n";
+  for (i = _active.begin(); i != _active.end(); i++) {
+    cout << (*i).line(true) << endl;
+  }
 
   cout << endl << "Test: getdir" << endl;
   cout << "Check test_db/data dir: " << File::testDir("test_db/data", true) << endl;
