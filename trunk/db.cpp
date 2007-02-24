@@ -77,18 +77,12 @@ string DbData::line(bool nodates) const {
   return output;
 }
 
-static SortedList<DbData> _active;
-
-/* Size of path being backed up */
-static int    backup_path_length = 0;
-
 /* Need to compare only for matching paths */
-static int parse_compare(DbData& db_data, File& file_data) {
+static int parse_compare(DbData& db_data, File& file_data, int length) {
   int result;
 
   /* If paths differ, that's all we want to check */
-  result = db_data.data().path().substr(backup_path_length).compare(
-    file_data.path());
+  result = db_data.data().path().substr(length).compare(file_data.path());
   if (result) {
     return result;
   }
@@ -633,42 +627,36 @@ void Database::close() {
     free(daily_list);
   }
 
-  /* Also load previously removed items into list */
-  /* TODO What do we do if this fails? Recover? */
-  load("removed", _active);
-
-  /* Split list into active and removed records */
-  SortedList<DbData>::iterator i;
-  SortedList<DbData>           active;
-  SortedList<DbData>           removed;
-  for (i = _active.begin(); i != _active.end(); i++) {
-    if ((*i).out() == 0) {
-      active.add(*i);
-    } else {
-      removed.add(*i);
-    }
-  }
-
-  /* Save active list */
-  if (save("list", active)) {
+  // Save active list
+  if (save("list", _active)) {
     cerr << "db: close: failed to save active items list" << endl;
   }
+  int active_size = _active.size();
+  _active.clear();
+
+  /* Load previously removed items into removed list */
+  /* TODO What do we do if this fails? Recover? */
+  load("removed", _removed);
 
   /* Save removed list */
-  if (save("removed", removed)) {
+  if (save("removed", _removed)) {
     cerr << "db: close: failed to save removed items list" << endl;
   }
+  int removed_size = _removed.size();
+  _removed.clear();
 
   /* Release lock */
   if (verbosity() > 0) {
-    cout << "Database closed (total contents: " << _active.size() << " file";
-    if (_active.size() != 1) {
+    cout << "Database closed (active contents: " << active_size << " file";
+    if (active_size != 1) {
+      cout << "s";
+    }
+    cout << ", removed contents: " << removed_size << " file";
+    if (removed_size != 1) {
       cout << "s";
     }
     cout << ")" << endl;
   }
-  // TODO this must go, obviously
-  _active.clear();
   unlock();
 }
 
@@ -677,13 +665,12 @@ int Database::parse(
     const string& real_path,
     const string& mount_path,
     list<File>*   file_list) {
-  vector<File*>   added;
+  vector<list<File>::iterator>          added;
   // TODO can it be a checksum-ordered list, for better efficiency?
-  vector<DbData*> removed;
-  int             failed   = 0;
+  vector<SortedList<DbData>::iterator>  removed;
+  int                                   failed   = 0;
 
   /* Compare list with db list for matching prefix */
-  backup_path_length = real_path.size() + 1;
   string match_path = real_path + "/";
 
   /* Point the entries to the start of their respective lists */
@@ -704,19 +691,18 @@ int Database::parse(
     if (entry_file_list == file_list->end()) {
       result = -1;
     } else {
-      result = parse_compare(*entry_active, *entry_file_list);
+      result = parse_compare(*entry_active, *entry_file_list,
+        real_path.size() + 1);
     }
     /* left < right => element is missing from right list */
     if (result == -1) {
-      /* The contents are NOT copied, so the two lists have elements
-       * pointing to the same data! */
-      removed.push_back((&*entry_active));
+      // Push iterator
+      removed.push_back(entry_active);
     } else
     /* left > right => element was added in right list */
     if (result == 1) {
-      /* The contents are NOT copied, so the two lists have elements
-       * pointing to the same data! */
-      added.push_back(&(*entry_file_list));
+      // Push iterator
+      added.push_back(entry_file_list);
     }
     if (result >= 0) {
       entry_file_list++;
@@ -810,8 +796,12 @@ int Database::parse(
       if (terminating()) {
         break;
       }
-      /* Same data as in _active */
+      // Mark removed
       removed[i]->setOut();
+      // Add to removed list
+      _removed.add(*removed[i]);
+      // Remove from active list
+      _active.erase(removed[i]);
 
       /* Update local list */
       if (S_ISREG(removed[i]->data().type())
