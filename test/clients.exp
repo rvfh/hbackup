@@ -80,7 +80,7 @@ Client unreachable 'Client2' using protocol 'smb'
 Client unreachable 'Client3' using protocol 'smb'
  --> mount -t cifs -o ro,noatime,nocase,username=,password= //Client/c$ test_db/mount > /dev/null 2>&1
 Client unreachable 'Client4' using protocol 'smb'
-Database closed (total contents: 0 files)
+Database closed (active contents: 0 files, removed contents: 0 files)
  --> Client: testhost
 >List 1 client(s):
 -> file://localhost etc/localhost.list
@@ -99,7 +99,7 @@ Backup path 'test2'
  -> Parsing list of files
  --> Files to add: 5 (928768 bytes)
  --> Done: 1/5 (0.0%) --> Done: 2/5 (15.7%) --> Done: 3/5 (43.6%) --> Done: 4/5 (100.0%) --> Done: 5/5 (100.0%) --> No files to remove
-Database closed (total contents: 18 files)
+Database closed (active contents: 18 files, removed contents: 0 files)
  --> Client: testhost
 >List 1 client(s):
 -> file://localhost etc/localhost.list
@@ -118,4 +118,4 @@ Backup path 'test2'
  -> Parsing list of files
  --> No files to add
  --> No files to remove
-Database closed (total contents: 18 files)
+Database closed (active contents: 18 files, removed contents: 0 files)

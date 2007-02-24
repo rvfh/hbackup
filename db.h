@@ -27,7 +27,6 @@
 #error You must include files.h before db.h
 #endif
 
-// FIXME This is a temporary ugly hack
 class DbData {
   time_t  _in;
   time_t  _out;
@@ -49,7 +48,9 @@ public:
 };
 
 class Database {
-  string _path;
+  string             _path;
+  SortedList<DbData> _active;
+  SortedList<DbData> _removed;
   int  save(
     const string&       filename,
     SortedList<DbData>& list);
@@ -97,6 +98,9 @@ public:
     const DbData&   db_data,
     string&         checksum,
     int             compress = 0);
+  // For debug only
+  SortedList<DbData>* active() { return &_active; }
+  SortedList<DbData>* removed() { return &_removed; }
 };
 
 #endif

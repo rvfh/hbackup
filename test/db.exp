@@ -33,13 +33,13 @@ test////	testfile	f	13	1	1000	1000	644
 test////	testlink	l	8	1	1000	1000	777	testfile	
 Database initialized
 59ca0efa9f5633cb0371bbc0355478d8-0  test/testfile
->List 1 element(s):
+Local list: 1 element(s):
 	test/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371bbc0355478d8	1	0	-
->List 1 element(s):
+Local list: 1 element(s):
 	test/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371bbc0355478d8	1	1	-
  --> Files to add: 16 (196 bytes)
  --> Done: 1/16 (0.0%) --> Done: 2/16 (0.0%) --> Done: 3/16 (71.9%) --> Done: 4/16 (71.9%) --> Done: 5/16 (71.9%) --> Done: 6/16 (71.9%) --> Done: 7/16 (93.4%) --> Done: 8/16 (93.4%) --> Done: 9/16 (93.4%) --> Done: 10/16 (93.4%) --> Done: 11/16 (93.4%) --> Done: 12/16 (93.4%) --> Done: 13/16 (93.4%) --> Done: 14/16 (93.4%) --> Done: 15/16 (100.0%) --> Done: 16/16 (100.0%) --> No files to remove
->List 16 element(s):
+Active list: 16 element(s):
 file://host	/home/user/cvs	d	0	1	1000	1000	755			1	0	-
 file://host	/home/user/cvs/CVS	d	0	1	1000	1000	755			1	0	-
 file://host	/home/user/cvs/CVS/Entries	f	141	1	1000	1000	644		63b52e85e7a255c09df5cca819b74a88-0	1	0	-
@@ -56,9 +56,10 @@ file://host	/home/user/test space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998e
 file://host	/home/user/testdir	d	0	1	1000	1000	755			1	0	-
 file://host	/home/user/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371bbc0355478d8-0	1	0	-
 file://host	/home/user/testlink	l	8	1	1000	1000	777	testfile		1	0	-
-Database closed (total contents: 16 files)
+Removed list: 0 element(s):
+Database closed (active contents: 16 files, removed contents: 0 files)
 Database opened (active contents: 16 files)
->List 16 element(s):
+Active list: 16 element(s):
 file://host	/home/user/cvs	d	0	1	1000	1000	755			1	0	-
 file://host	/home/user/cvs/CVS	d	0	1	1000	1000	755			1	0	-
 file://host	/home/user/cvs/CVS/Entries	f	141	1	1000	1000	644		63b52e85e7a255c09df5cca819b74a88-0	1	0	-
@@ -75,9 +76,10 @@ file://host	/home/user/test space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998e
 file://host	/home/user/testdir	d	0	1	1000	1000	755			1	0	-
 file://host	/home/user/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371bbc0355478d8-0	1	0	-
 file://host	/home/user/testlink	l	8	1	1000	1000	777	testfile		1	0	-
+Removed list: 0 element(s):
  --> No files to add
  --> No files to remove
->List 16 element(s):
+Active list: 16 element(s):
 file://host	/home/user/cvs	d	0	1	1000	1000	755			1	0	-
 file://host	/home/user/cvs/CVS	d	0	1	1000	1000	755			1	0	-
 file://host	/home/user/cvs/CVS/Entries	f	141	1	1000	1000	644		63b52e85e7a255c09df5cca819b74a88-0	1	0	-
@@ -94,6 +96,7 @@ file://host	/home/user/test space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998e
 file://host	/home/user/testdir	d	0	1	1000	1000	755			1	0	-
 file://host	/home/user/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371bbc0355478d8-0	1	0	-
 file://host	/home/user/testlink	l	8	1	1000	1000	777	testfile		1	0	-
+Removed list: 0 element(s):
 >List 4 file(s):
 test2	testdir	d	0	1	1000	1000	755		
 test2	testfile	f	145408	1	1000	1000	644		
@@ -101,7 +104,7 @@ test2	testfile2	f	259072	1	1000	1000	644
 test2	testlink	l	8	1	1000	1000	777	testfile	
  --> Files to add: 4 (404480 bytes)
  --> Done: 1/4 (0.0%) --> Done: 2/4 (35.9%) --> Done: 3/4 (100.0%) --> Done: 4/4 (100.0%) --> No files to remove
->List 20 element(s):
+Active list: 20 element(s):
 file://host	/home/user/cvs	d	0	1	1000	1000	755			1	0	-
 file://host	/home/user/cvs/CVS	d	0	1	1000	1000	755			1	0	-
 file://host	/home/user/cvs/CVS/Entries	f	141	1	1000	1000	644		63b52e85e7a255c09df5cca819b74a88-0	1	0	-
@@ -122,42 +125,43 @@ file://host	/home/user2/testdir	d	0	1	1000	1000	755			1	0	-
 file://host	/home/user2/testfile	f	145408	1	1000	1000	644		3d546a1ce46c6ae10ad34ab8a81c542e-0	1	0	-
 file://host	/home/user2/testfile2	f	259072	1	1000	1000	644		fb00cd74a5f35e89a7fbdd3c1d05375a-0	1	0	-
 file://host	/home/user2/testlink	l	8	1	1000	1000	777	testfile		1	0	-
->List 5 element(s):
+Removed list: 0 element(s):
+Local list: 5 element(s):
 file://host	/home/user/cvs/dirutd/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e	1	0	-
 file://host	/home/user/cvs/filenew.c	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e	1	0	-
 file://host	/home/user/cvs/fileutd.h	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e	1	0	-
 file://host	/home/user/dir space/file space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e	1	0	-
 file://host	/home/user/test space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e	1	0	-
-Database closed (total contents: 20 files)
+Database closed (active contents: 20 files, removed contents: 0 files)
 Database opened (active contents: 20 files)
 Scanning database contents: 20 files
-Database closed (total contents: 20 files)
+Database closed (active contents: 20 files, removed contents: 0 files)
 Database opened (active contents: 20 files)
 Scanning database contents thoroughly: 20 files
-Database closed (total contents: 20 files)
+Database closed (active contents: 20 files, removed contents: 0 files)
 Database opened (active contents: 20 files)
 Scanning database contents: 20 files
  -> Client:      file://host
  -> File name:   /home/user/testfile
  -> Modified:    2006-10-22  0:00:00
 full scan error status 1
-Database closed (total contents: 20 files)
+Database closed (active contents: 20 files, removed contents: 0 files)
 Database opened (active contents: 20 files)
 Scanning database contents thoroughly: 20 files
  -> Client:      file://host
  -> File name:   /home/user/testfile
  -> Modified:    2006-10-22  0:00:00
 full thorough scan error status 1
-Database closed (total contents: 20 files)
+Database closed (active contents: 20 files, removed contents: 0 files)
 Database opened (active contents: 20 files)
 Scanning database contents thoroughly: 20 files
  -> Client:      file://host
  -> File name:   /home/user/testfile
  -> Modified:    2006-10-22  0:00:00
 full thorough scan error status 1
-Database closed (total contents: 20 files)
+Database closed (active contents: 20 files, removed contents: 0 files)
 Database opened (active contents: 20 files)
->List 20 element(s):
+Active list: 20 element(s):
 file://host	/home/user/cvs	d	0	1	1000	1000	755			1	0	-
 file://host	/home/user/cvs/CVS	d	0	1	1000	1000	755			1	0	-
 file://host	/home/user/cvs/CVS/Entries	f	141	1	1000	1000	644		63b52e85e7a255c09df5cca819b74a88-0	1	0	-
@@ -178,6 +182,7 @@ file://host	/home/user2/testdir	d	0	1	1000	1000	755			1	0	-
 file://host	/home/user2/testfile	f	145408	1	1000	1000	644		3d546a1ce46c6ae10ad34ab8a81c542e-0	1	0	-
 file://host	/home/user2/testfile2	f	259072	1	1000	1000	644		fb00cd74a5f35e89a7fbdd3c1d05375a-0	1	0	-
 file://host	/home/user2/testlink	l	8	1	1000	1000	777	testfile		1	0	-
+Removed list: 0 element(s):
 >List 16 file(s):
 test////	cvs	d	0	1	1000	1000	755		
 test////	cvs/CVS	d	0	1	1000	1000	755		
@@ -197,7 +202,7 @@ test////	testfile	f	13	1	1000	1000	644
 test////	testlink	l	8	1	1000	1000	777	testfile	
  --> Files to add: 1 (13 bytes)
  --> Done: 1/1 (100.0%) --> Files to remove: 1
->List 21 element(s):
+Active list: 20 element(s):
 file://host	/home/user/cvs	d	0	1	1000	1000	755			1	0	-
 file://host	/home/user/cvs/CVS	d	0	1	1000	1000	755			1	0	-
 file://host	/home/user/cvs/CVS/Entries	f	141	1	1000	1000	644		63b52e85e7a255c09df5cca819b74a88-0	1	0	-
@@ -213,15 +218,16 @@ file://host	/home/user/dir space/file space	f	0	1	1000	1000	644		d41d8cd98f00b20
 file://host	/home/user/test space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	1	0	-
 file://host	/home/user/testdir	d	0	1	1000	1000	755			1	0	-
 file://host	/home/user/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371bbc0355478d8-0	1	0	-
+file://host	/home/user/testlink	l	8	1	1000	1000	777	testfile		1	0	-
+file://host	/home/user2/testdir	d	0	1	1000	1000	755			1	0	-
+file://host	/home/user2/testfile	f	145408	1	1000	1000	644		3d546a1ce46c6ae10ad34ab8a81c542e-0	1	0	-
+file://host	/home/user2/testfile2	f	259072	1	1000	1000	644		fb00cd74a5f35e89a7fbdd3c1d05375a-0	1	0	-
+file://host	/home/user2/testlink	l	8	1	1000	1000	777	testfile		1	0	-
+Removed list: 1 element(s):
 file://host	/home/user/testfile	f	13	1	1000	1000	644		N	1	1	-
-file://host	/home/user/testlink	l	8	1	1000	1000	777	testfile		1	0	-
-file://host	/home/user2/testdir	d	0	1	1000	1000	755			1	0	-
-file://host	/home/user2/testfile	f	145408	1	1000	1000	644		3d546a1ce46c6ae10ad34ab8a81c542e-0	1	0	-
-file://host	/home/user2/testfile2	f	259072	1	1000	1000	644		fb00cd74a5f35e89a7fbdd3c1d05375a-0	1	0	-
-file://host	/home/user2/testlink	l	8	1	1000	1000	777	testfile		1	0	-
-Database closed (total contents: 21 files)
+Database closed (active contents: 20 files, removed contents: 1 file)
 Database opened (active contents: 20 files)
->List 20 element(s):
+Active list: 20 element(s):
 file://host	/home/user/cvs	d	0	1	1000	1000	755			1	0	-
 file://host	/home/user/cvs/CVS	d	0	1	1000	1000	755			1	0	-
 file://host	/home/user/cvs/CVS/Entries	f	141	1	1000	1000	644		63b52e85e7a255c09df5cca819b74a88-0	1	0	-
@@ -242,6 +248,7 @@ file://host	/home/user2/testdir	d	0	1	1000	1000	755			1	0	-
 file://host	/home/user2/testfile	f	145408	1	1000	1000	644		3d546a1ce46c6ae10ad34ab8a81c542e-0	1	0	-
 file://host	/home/user2/testfile2	f	259072	1	1000	1000	644		fb00cd74a5f35e89a7fbdd3c1d05375a-0	1	0	-
 file://host	/home/user2/testlink	l	8	1	1000	1000	777	testfile		1	0	-
+Removed list: 0 element(s):
 >List 15 file(s):
 test////	cvs	d	0	1	1000	1000	755		
 test////	cvs/CVS	d	0	1	1000	1000	755		
@@ -260,7 +267,7 @@ test////	testdir	d	0	1	1000	1000	755
 test////	testlink	l	8	1	1000	1000	777	testfile	
  --> No files to add
  --> Files to remove: 1
->List 20 element(s):
+Active list: 19 element(s):
 file://host	/home/user/cvs	d	0	1	1000	1000	755			1	0	-
 file://host	/home/user/cvs/CVS	d	0	1	1000	1000	755			1	0	-
 file://host	/home/user/cvs/CVS/Entries	f	141	1	1000	1000	644		63b52e85e7a255c09df5cca819b74a88-0	1	0	-
@@ -275,12 +282,13 @@ file://host	/home/user/dir space	d	0	1	1000	1000	755			1	0	-
 file://host	/home/user/dir space/file space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	1	0	-
 file://host	/home/user/test space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	1	0	-
 file://host	/home/user/testdir	d	0	1	1000	1000	755			1	0	-
-file://host	/home/user/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371bbc0355478d8-0	1	1	-
 file://host	/home/user/testlink	l	8	1	1000	1000	777	testfile		1	0	-
 file://host	/home/user2/testdir	d	0	1	1000	1000	755			1	0	-
 file://host	/home/user2/testfile	f	145408	1	1000	1000	644		3d546a1ce46c6ae10ad34ab8a81c542e-0	1	0	-
 file://host	/home/user2/testfile2	f	259072	1	1000	1000	644		fb00cd74a5f35e89a7fbdd3c1d05375a-0	1	0	-
 file://host	/home/user2/testlink	l	8	1	1000	1000	777	testfile		1	0	-
+Removed list: 1 element(s):
+file://host	/home/user/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371bbc0355478d8-0	1	1	-
 >List 15 file(s):
 test////	cvs	d	0	1	1000	1000	755		
 test////	cvs/CVS	d	0	1	1000	1000	755		
@@ -299,7 +307,7 @@ test////	testdir	d	0	1	1000	1000	755
 test////	testlink	l	8	1	1000	1000	777	testfile	
  --> No files to add
  --> No files to remove
->List 20 element(s):
+Active list: 19 element(s):
 file://host	/home/user/cvs	d	0	1	1000	1000	755			1	0	-
 file://host	/home/user/cvs/CVS	d	0	1	1000	1000	755			1	0	-
 file://host	/home/user/cvs/CVS/Entries	f	141	1	1000	1000	644		63b52e85e7a255c09df5cca819b74a88-0	1	0	-
@@ -314,12 +322,13 @@ file://host	/home/user/dir space	d	0	1	1000	1000	755			1	0	-
 file://host	/home/user/dir space/file space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	1	0	-
 file://host	/home/user/test space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	1	0	-
 file://host	/home/user/testdir	d	0	1	1000	1000	755			1	0	-
-file://host	/home/user/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371bbc0355478d8-0	1	1	-
 file://host	/home/user/testlink	l	8	1	1000	1000	777	testfile		1	0	-
 file://host	/home/user2/testdir	d	0	1	1000	1000	755			1	0	-
 file://host	/home/user2/testfile	f	145408	1	1000	1000	644		3d546a1ce46c6ae10ad34ab8a81c542e-0	1	0	-
 file://host	/home/user2/testfile2	f	259072	1	1000	1000	644		fb00cd74a5f35e89a7fbdd3c1d05375a-0	1	0	-
 file://host	/home/user2/testlink	l	8	1	1000	1000	777	testfile		1	0	-
+Removed list: 1 element(s):
+file://host	/home/user/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371bbc0355478d8-0	1	1	-
 >List 4 file(s):
 test2	testdir	d	0	1	1000	1000	755		
 test2	testfile	f	145408	1	1000	1000	644		
@@ -327,7 +336,7 @@ test2	testfile2	f	259072	1	1000	1000	644
 test2	testlink	l	8	1	1000	1000	777	testfile	
  --> No files to add
  --> No files to remove
->List 20 element(s):
+Active list: 19 element(s):
 file://host	/home/user/cvs	d	0	1	1000	1000	755			1	0	-
 file://host	/home/user/cvs/CVS	d	0	1	1000	1000	755			1	0	-
 file://host	/home/user/cvs/CVS/Entries	f	141	1	1000	1000	644		63b52e85e7a255c09df5cca819b74a88-0	1	0	-
@@ -342,15 +351,16 @@ file://host	/home/user/dir space	d	0	1	1000	1000	755			1	0	-
 file://host	/home/user/dir space/file space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	1	0	-
 file://host	/home/user/test space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	1	0	-
 file://host	/home/user/testdir	d	0	1	1000	1000	755			1	0	-
+file://host	/home/user/testlink	l	8	1	1000	1000	777	testfile		1	0	-
+file://host	/home/user2/testdir	d	0	1	1000	1000	755			1	0	-
+file://host	/home/user2/testfile	f	145408	1	1000	1000	644		3d546a1ce46c6ae10ad34ab8a81c542e-0	1	0	-
+file://host	/home/user2/testfile2	f	259072	1	1000	1000	644		fb00cd74a5f35e89a7fbdd3c1d05375a-0	1	0	-
+file://host	/home/user2/testlink	l	8	1	1000	1000	777	testfile		1	0	-
+Removed list: 1 element(s):
 file://host	/home/user/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371bbc0355478d8-0	1	1	-
-file://host	/home/user/testlink	l	8	1	1000	1000	777	testfile		1	0	-
-file://host	/home/user2/testdir	d	0	1	1000	1000	755			1	0	-
-file://host	/home/user2/testfile	f	145408	1	1000	1000	644		3d546a1ce46c6ae10ad34ab8a81c542e-0	1	0	-
-file://host	/home/user2/testfile2	f	259072	1	1000	1000	644		fb00cd74a5f35e89a7fbdd3c1d05375a-0	1	0	-
-file://host	/home/user2/testlink	l	8	1	1000	1000	777	testfile		1	0	-
-Database closed (total contents: 21 files)
+Database closed (active contents: 19 files, removed contents: 2 files)
 Database opened (active contents: 19 files)
->List 19 element(s):
+Active list: 19 element(s):
 file://host	/home/user/cvs	d	0	1	1000	1000	755			1	0	-
 file://host	/home/user/cvs/CVS	d	0	1	1000	1000	755			1	0	-
 file://host	/home/user/cvs/CVS/Entries	f	141	1	1000	1000	644		63b52e85e7a255c09df5cca819b74a88-0	1	0	-
@@ -370,6 +380,7 @@ file://host	/home/user2/testdir	d	0	1	1000	1000	755			1	0	-
 file://host	/home/user2/testfile	f	145408	1	1000	1000	644		3d546a1ce46c6ae10ad34ab8a81c542e-0	1	0	-
 file://host	/home/user2/testfile2	f	259072	1	1000	1000	644		fb00cd74a5f35e89a7fbdd3c1d05375a-0	1	0	-
 file://host	/home/user2/testlink	l	8	1	1000	1000	777	testfile		1	0	-
+Removed list: 0 element(s):
 
 Test: getdir
 Check test_db/data dir: 0
@@ -380,9 +391,9 @@ fetest4 status: 1, getdir_path: test_db/data/fe/te/st4
 fedc76test5 status: 1, getdir_path: test_db/data/fe/dc/76/test5
 fedc76test6 status: 1, getdir_path: test_db/data/fe/dc/76/test6
 fedc76test6 status: 0, getdir_path: test_db/data/fe/dc/76/test6
-Database closed (total contents: 21 files)
+Database closed (active contents: 19 files, removed contents: 2 files)
 Database opened (active contents: 19 files)
-Database closed (total contents: 21 files)
+Database closed (active contents: 19 files, removed contents: 2 files)
 Error: Permission denied
 Error: Permission denied
 Error: Structure needs cleaning

@@ -20,7 +20,7 @@
 #define PARSERS_H
 
 #ifndef FILES_H
-#error You must include files.h before parser.h
+#error You must include files.h before parsers.h
 #endif
 
 typedef enum {
