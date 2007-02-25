@@ -35,18 +35,16 @@ using namespace std;
 
 #define CHUNK 409600
 
-File::File(const string& prefix, const string& path) {
+File::File(const string& access_path, const string& path) {
+  _prefix   = "";
   string full_path;
   if (path.empty()) {
-    _prefix   = "";
-    _path     = prefix;
+    _path     = access_path;
     full_path = _path;
   } else {
-    _prefix   = prefix;
     _path     = path;
-    full_path = _prefix + "/" + _path;
+    full_path = access_path + "/" + _path;
   }
-  _checksum    = "";
   _link        = "";
   struct  stat metadata;
 
@@ -56,11 +54,12 @@ File::File(const string& prefix, const string& path) {
   } else {
     /* Fill in file information */
     _type  = metadata.st_mode & S_IFMT;
-    _mtime = metadata.st_mtime;
     if (S_ISDIR(_type)) {
-      _size = 0;
+      _size  = 0;
+      _mtime = 0;
     } else {
-      _size = metadata.st_size;
+      _size  = metadata.st_size;
+      _mtime = metadata.st_mtime;
     }
     _uid   = metadata.st_uid;
     _gid   = metadata.st_gid;
@@ -83,14 +82,20 @@ File::File(const string& prefix, const string& path) {
 
 // Tested in db's test
 bool File::metadiffer(const File& right) const {
-  return (_type != right._type) || (_mtime != right._mtime)
-      || (_size != right._size) || (_uid != right._uid)
-      || (_gid != right._gid) || (_mode != right._mode);
+  return (_mtime != right._mtime) || (_link != right._link)
+      || (_mtime != right._mtime) || (_size != right._size)
+      || (_uid != right._uid) || (_gid != right._gid)
+      || (_mode != right._mode);
 }
 
 // Tested in db's test
 bool File::operator<(const File& right) const {
   return (_prefix < right._prefix) || (_path < right._path);
+}
+
+bool File::operator!=(const File& right) const {
+  return (_prefix != right._prefix) || (_path != right._path)
+      || metadiffer(right);
 }
 
 // Tested in cvs_parser's test
@@ -115,7 +120,7 @@ string File::line(bool nodates) const {
   }
 
   asprintf(&numbers, "%ld\t%ld\t%u\t%u\t%o", _size, mtime, _uid, _gid, _mode);
-  output += "\t" + string(numbers) + "\t" + _link + "\t" + _checksum;
+  output += "\t" + string(numbers) + "\t" + _link;
   delete numbers;
   return output;
 }

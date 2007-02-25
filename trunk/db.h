@@ -30,20 +30,23 @@
 class DbData {
   time_t  _in;
   time_t  _out;
+  string  _checksum;
   File    _data;
 public:
-  DbData(const File& data) : _out(0), _data(data) {
+  DbData(const File& data) : _out(0), _checksum(""), _data(data) {
     _in = time(NULL);
   }
-  DbData(const File& data, time_t in, time_t out) :
-    _in(in), _out(out), _data(data) {}
+  DbData(time_t in, time_t out, string checksum, const File& data) :
+    _in(in), _out(out), _checksum(checksum), _data(data) {}
   bool operator<(const DbData&) const;
+  bool operator!=(const DbData&) const;
+  bool operator==(const DbData& right) const { return ! (*this != right); }
   time_t in() const { return _in; }
   time_t out() const { return _out; }
-  string checksum() { return _data.checksum(); }
+  string checksum() const { return _checksum; }
   File   data() const { return _data; }
   void   setOut() { _out = time(NULL); }
-  void   setChecksum(const string& checksum) { _data.setChecksum(checksum); }
+  void   setChecksum(const string& checksum) { _checksum = checksum; }
   string line(bool nodates = false) const;
 };
 
@@ -51,17 +54,19 @@ class Database {
   string             _path;
   SortedList<DbData> _active;
   SortedList<DbData> _removed;
+  int  lock();
+  void unlock();
   int  save(
     const string&       filename,
     SortedList<DbData>& list);
-  int  lock();
-  void unlock();
+  // Scan database to recover files list
+  int  recover();
 public:
   Database(const string& path) : _path(path) {}
   /* Open database */
   int  open();
   /* Close database */
-  void close();
+  int  close();
   string mount() { return _path + "/mount"; }
   /* Check what needs to be done for given host & path */
   int  parse(
@@ -88,17 +93,15 @@ public:
   int  load(
     const string &filename,
     SortedList<DbData>& list);
-  int  obsolete(const File& file_data);
+  int  obsolete(const string& checksum, const File& file_data);
   int  organize(
     const string& path,
     int number);
   int  write(
-    const string&   mount_path,
     const string&   path,
-    const DbData&   db_data,
-    string&         checksum,
+    DbData&         db_data,
     int             compress = 0);
-  // For debug only
+// For debug only
   SortedList<DbData>* active() { return &_active; }
   SortedList<DbData>* removed() { return &_removed; }
 };

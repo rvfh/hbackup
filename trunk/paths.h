@@ -57,6 +57,9 @@ public:
     const string& type,
     const string& string);
   int createList(const string& backup_path);
+  void clearList() {
+    _list.clear();
+  }
 };
 
 #endif

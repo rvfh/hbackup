@@ -106,14 +106,17 @@ int main(void) {
 
   /* Write check */
   db_data = new DbData(File("test/testfile"));
-  if ((status = db.write("test/", "testfile", *db_data, checksum, 0))) {
+  if ((status = db.write("test/testfile", *db_data))) {
     printf("db.write error status %u\n", status);
     db.close();
     return 0;
   }
-  cout << checksum << "  test/testfile" << endl;
+  cout << db_data->checksum() << "  test/testfile" << endl;
   filelist = new SortedList<DbData>;
-  db.load("data/59ca0efa9f5633cb0371bbc0355478d8-0/list", *filelist);
+  if (db.load("data/59ca0efa9f5633cb0371bbc0355478d8-0/list", *filelist)) {
+    cout << "load failed: " << strerror(errno) << endl;
+    return 0;
+  }
   cout << "Local list: " << filelist->size() << " element(s):\n";
   for (i = filelist->begin(); i != filelist->end(); i++) {
     cout << (*i).line(true) << endl;
@@ -121,8 +124,7 @@ int main(void) {
   delete filelist;
 
   /* Obsolete check */
-  db_data->setChecksum(checksum);
-  db.obsolete(db_data->data());
+  db.obsolete(db_data->checksum(), db_data->data());
   filelist = new SortedList<DbData>;
   db.load("data/59ca0efa9f5633cb0371bbc0355478d8-0/list", *filelist);
   cout << "Local list: " << filelist->size() << " element(s):\n";
@@ -132,7 +134,7 @@ int main(void) {
   delete filelist;
 
   /* Read check */
-  if ((status = db.read("test_db/blah", checksum))) {
+  if ((status = db.read("test_db/blah", db_data->checksum()))) {
     printf("db.read error status %u\n", status);
     db.close();
     return 0;
@@ -245,8 +247,9 @@ int main(void) {
   }
 
   db.close();
-  db.open();
 
+
+  db.open();
 
   if ((status = db.scan())) {
     printf("full scan error status %u\n", status);
@@ -322,6 +325,8 @@ int main(void) {
     cout << (*i).line(true) << endl;
   }
 
+  system("chmod 0777 test/testdir");
+  system("chmod 0777 test/cvs/dirutd/CVS/Entries");
   path = new Path("");
   path->addParser("c", "cvs");
   path->addFilter("type", "dir");
@@ -540,7 +545,7 @@ int main(void) {
   db.close();
 
 
-  /* List cannot be saved */
+  cout << "List cannot be saved" << endl;
   if ((status = db.open())) {
     printf("db_open error status %u\n", status);
     if (status == 2) {
@@ -553,20 +558,20 @@ int main(void) {
   system("chmod u+w test_db");
   system("rm -f test_db/lock");
 
-  /* List cannot be read */
+  cout << "List cannot be read" << endl;
   system("chmod ugo-r test_db/list");
   if ((status = db.open())) {
     printf("Error: %s\n", strerror(errno));
   }
 
-  /* List is garbaged */
+  cout << "List is garbaged" << endl;
   system("chmod u+r test_db/list");
   system("echo blah >> test_db/list");
   if ((status = db.open())) {
     printf("Error: %s\n", strerror(errno));
   }
 
-  /* List is gone */
+  cout << "List is gone" << endl;
   remove("test_db/list");
   if ((status = db.open())) {
     printf("Error: %s\n", strerror(errno));
