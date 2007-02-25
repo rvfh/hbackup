@@ -224,6 +224,7 @@ int Path::createList(const string& backup_path) {
   _mount_path_length = backup_path.size();
   _list.clear();
   if (iterate_directory(backup_path, NULL)) {
+    _list.clear();
     return 1;
   }
   _list.sort();

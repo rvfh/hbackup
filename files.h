@@ -23,7 +23,6 @@ class File {
   string  _prefix;      // mount or share path or prrefix
   string  _path;        // file path
   string  _link;        // what the link points to (if a link, of course)
-  string  _checksum;    // file checksum
   mode_t  _type;        // file type (0 if metadata not available)
   time_t  _mtime;       // time of last modification
   off_t   _size;        // total size, in bytes
@@ -38,7 +37,6 @@ public:
     const string& prefix,
     const string& path,
     const string& link,
-    const string& checksum,
     mode_t        type,
     time_t        mtime,
     off_t         size,
@@ -48,7 +46,6 @@ public:
       _prefix(prefix),
       _path(path),
       _link(link),
-      _checksum(checksum),
       _type(type),
       _mtime(mtime),
       _size(size),
@@ -57,11 +54,12 @@ public:
       _mode(mode) {}
   // Need '<' to sort list
   bool operator<(const File&) const;
+  bool operator!=(const File&) const;
+  bool operator==(const File& right) const { return ! (*this != right); }
   bool metadiffer(const File&) const;
   string name() const;
   string prefix() const { return _prefix; };
   string path() const { return _path; };
-  string checksum() const { return _checksum; };
   mode_t type() const { return _type; }
   time_t mtime() const { return _mtime; };
   off_t  size() const { return _size; };
@@ -69,7 +67,6 @@ public:
   string line(bool nodates = false) const;
   void setPrefix(const string& prefix) { _prefix = prefix; }
   void setPath(const string& path) { _path = path; }
-  void setChecksum(const string& checksum) { _checksum = checksum; }
 // These are public
   // Test whether dir exists, create it if requested
   static int testDir(const string& path, bool create);

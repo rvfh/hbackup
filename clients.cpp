@@ -308,6 +308,7 @@ int Client::backup(
              backup_path, _paths[i]->list())) {
               failed        = 1;
             }
+            _paths[i]->clearList();
           }
         }
       }
