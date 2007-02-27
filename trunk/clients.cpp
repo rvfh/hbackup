@@ -32,8 +32,8 @@ using namespace std;
 #include "cvs_parser.h"
 #include "paths.h"
 #include "db.h"
-#include "clients.h"
 #include "hbackup.h"
+#include "clients.h"
 
 int Client::mountPath(
     string        backup_path,
@@ -88,8 +88,8 @@ int Client::mountPath(
   }
 
   /* Issue mount command */
-  if (verbosity() > 2) {
-    cout << " --> " << command << endl;
+  if (verbosity() > 3) {
+    cout << " ---> " << command << endl;
   }
   int result = system(command.c_str());
   if (result != 0) {

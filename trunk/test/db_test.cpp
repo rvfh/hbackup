@@ -33,7 +33,7 @@ using namespace std;
 #include "list.h"
 #include "db.h"
 
-static int verbose = 3;
+static int verbose = 4;
 
 int verbosity(void) {
   return verbose;
@@ -91,7 +91,7 @@ int main(void) {
   cout << ">List " << path->list()->size() << " file(s):" << endl;
   for (list<File>::iterator i = path->list()->begin();
     i != path->list()->end(); i++) {
-    cout << (*i).line(true) << endl;
+    cout << i->line(true) << endl;
   }
 
   Database db("test_db");
@@ -119,7 +119,7 @@ int main(void) {
   }
   cout << "Local list: " << filelist->size() << " element(s):\n";
   for (i = filelist->begin(); i != filelist->end(); i++) {
-    cout << (*i).line(true) << endl;
+    cout << i->line(true) << endl;
   }
   delete filelist;
 
@@ -129,7 +129,7 @@ int main(void) {
   db.load("data/59ca0efa9f5633cb0371bbc0355478d8-0/list", *filelist);
   cout << "Local list: " << filelist->size() << " element(s):\n";
   for (i = filelist->begin(); i != filelist->end(); i++) {
-    cout << (*i).line(true) << endl;
+    cout << i->line(true) << endl;
   }
   delete filelist;
 
@@ -147,11 +147,11 @@ int main(void) {
   }
   cout << "Active list: " << db.active()->size() << " element(s):\n";
   for (i = db.active()->begin(); i != db.active()->end(); i++) {
-    cout << (*i).line(true) << endl;
+    cout << i->line(true) << endl;
   }
   cout << "Removed list: " << db.removed()->size() << " element(s):\n";
   for (i = db.removed()->begin(); i != db.removed()->end(); i++) {
-    cout << (*i).line(true) << endl;
+    cout << i->line(true) << endl;
   }
 
   db.close();
@@ -165,11 +165,11 @@ int main(void) {
   }
   cout << "Active list: " << db.active()->size() << " element(s):\n";
   for (i = db.active()->begin(); i != db.active()->end(); i++) {
-    cout << (*i).line(true) << endl;
+    cout << i->line(true) << endl;
   }
   cout << "Removed list: " << db.removed()->size() << " element(s):\n";
   for (i = db.removed()->begin(); i != db.removed()->end(); i++) {
-    cout << (*i).line(true) << endl;
+    cout << i->line(true) << endl;
   }
 
   if ((status = db.parse("file://host", "/home/user", "test", path->list()))) {
@@ -179,11 +179,11 @@ int main(void) {
   }
   cout << "Active list: " << db.active()->size() << " element(s):\n";
   for (i = db.active()->begin(); i != db.active()->end(); i++) {
-    cout << (*i).line(true) << endl;
+    cout << i->line(true) << endl;
   }
   cout << "Removed list: " << db.removed()->size() << " element(s):\n";
   for (i = db.removed()->begin(); i != db.removed()->end(); i++) {
-    cout << (*i).line(true) << endl;
+    cout << i->line(true) << endl;
   }
   delete path;
 
@@ -204,7 +204,7 @@ int main(void) {
   cout << ">List " << path->list()->size() << " file(s):" << endl;
   for (list<File>::iterator i = path->list()->begin();
     i != path->list()->end(); i++) {
-    cout << (*i).line(true) << endl;
+    cout << i->line(true) << endl;
   }
 
   if ((status = db.parse("file://host", "/home/user2", "test2",
@@ -215,11 +215,11 @@ int main(void) {
   }
   cout << "Active list: " << db.active()->size() << " element(s):\n";
   for (i = db.active()->begin(); i != db.active()->end(); i++) {
-    cout << (*i).line(true) << endl;
+    cout << i->line(true) << endl;
   }
   cout << "Removed list: " << db.removed()->size() << " element(s):\n";
   for (i = db.removed()->begin(); i != db.removed()->end(); i++) {
-    cout << (*i).line(true) << endl;
+    cout << i->line(true) << endl;
   }
   delete path;
 
@@ -227,7 +227,7 @@ int main(void) {
   db.load("data/d41d8cd98f00b204e9800998ecf8427e-0/list", *filelist);
   cout << "Local list: " << filelist->size() << " element(s):\n";
   for (i = filelist->begin(); i != filelist->end(); i++) {
-    cout << (*i).line(true) << endl;
+    cout << i->line(true) << endl;
   }
   delete filelist;
 
@@ -303,7 +303,7 @@ int main(void) {
   if ((status = db.scan("", true))) {
     printf("full thorough scan error status %u\n", status);
   }
-  verbose = 3;
+  verbose = 4;
 
   db.close();
 
@@ -318,15 +318,16 @@ int main(void) {
   }
   cout << "Active list: " << db.active()->size() << " element(s):\n";
   for (i = db.active()->begin(); i != db.active()->end(); i++) {
-    cout << (*i).line(true) << endl;
+    cout << i->line(true) << endl;
   }
   cout << "Removed list: " << db.removed()->size() << " element(s):\n";
   for (i = db.removed()->begin(); i != db.removed()->end(); i++) {
-    cout << (*i).line(true) << endl;
+    cout << i->line(true) << endl;
   }
 
   system("chmod 0777 test/testdir");
   system("chmod 0777 test/cvs/dirutd/CVS/Entries");
+
   path = new Path("");
   path->addParser("c", "cvs");
   path->addFilter("type", "dir");
@@ -344,7 +345,7 @@ int main(void) {
   cout << ">List " << path->list()->size() << " file(s):" << endl;
   for (list<File>::iterator i = path->list()->begin();
     i != path->list()->end(); i++) {
-    cout << (*i).line(true) << endl;
+    cout << i->line(true) << endl;
   }
 
   if ((status = db.parse("file://host", "/home/user", "test", path->list()))) {
@@ -354,11 +355,11 @@ int main(void) {
   }
   cout << "Active list: " << db.active()->size() << " element(s):\n";
   for (i = db.active()->begin(); i != db.active()->end(); i++) {
-    cout << (*i).line(true) << endl;
+    cout << i->line(true) << endl;
   }
   cout << "Removed list: " << db.removed()->size() << " element(s):\n";
   for (i = db.removed()->begin(); i != db.removed()->end(); i++) {
-    cout << (*i).line(true) << endl;
+    cout << i->line(true) << endl;
   }
 
   db.close();
@@ -374,14 +375,15 @@ int main(void) {
   }
   cout << "Active list: " << db.active()->size() << " element(s):\n";
   for (i = db.active()->begin(); i != db.active()->end(); i++) {
-    cout << (*i).line(true) << endl;
+    cout << i->line(true) << endl;
   }
   cout << "Removed list: " << db.removed()->size() << " element(s):\n";
   for (i = db.removed()->begin(); i != db.removed()->end(); i++) {
-    cout << (*i).line(true) << endl;
+    cout << i->line(true) << endl;
   }
 
   remove("test/testfile");
+  remove("test/cvs/dirutd/fileutd");
 
   path = new Path("");
   path->addParser("c", "cvs");
@@ -400,7 +402,7 @@ int main(void) {
   cout << ">List " << path->list()->size() << " file(s):" << endl;
   for (list<File>::iterator i = path->list()->begin();
     i != path->list()->end(); i++) {
-    cout << (*i).line(true) << endl;
+    cout << i->line(true) << endl;
   }
 
   if ((status = db.parse("file://host", "/home/user", "test",
@@ -411,11 +413,11 @@ int main(void) {
   }
   cout << "Active list: " << db.active()->size() << " element(s):\n";
   for (i = db.active()->begin(); i != db.active()->end(); i++) {
-    cout << (*i).line(true) << endl;
+    cout << i->line(true) << endl;
   }
   cout << "Removed list: " << db.removed()->size() << " element(s):\n";
   for (i = db.removed()->begin(); i != db.removed()->end(); i++) {
-    cout << (*i).line(true) << endl;
+    cout << i->line(true) << endl;
   }
   delete path;
 
@@ -436,7 +438,7 @@ int main(void) {
   cout << ">List " << path->list()->size() << " file(s):" << endl;
   for (list<File>::iterator i = path->list()->begin();
     i != path->list()->end(); i++) {
-    cout << (*i).line(true) << endl;
+    cout << i->line(true) << endl;
   }
 
   if ((status = db.parse("file://host", "/home/user", "test",
@@ -447,11 +449,11 @@ int main(void) {
   }
   cout << "Active list: " << db.active()->size() << " element(s):\n";
   for (i = db.active()->begin(); i != db.active()->end(); i++) {
-    cout << (*i).line(true) << endl;
+    cout << i->line(true) << endl;
   }
   cout << "Removed list: " << db.removed()->size() << " element(s):\n";
   for (i = db.removed()->begin(); i != db.removed()->end(); i++) {
-    cout << (*i).line(true) << endl;
+    cout << i->line(true) << endl;
   }
   delete path;
 
@@ -472,7 +474,7 @@ int main(void) {
   cout << ">List " << path->list()->size() << " file(s):" << endl;
   for (list<File>::iterator i = path->list()->begin();
     i != path->list()->end(); i++) {
-    cout << (*i).line(true) << endl;
+    cout << i->line(true) << endl;
   }
 
   if ((status = db.parse("file://host", "/home/user2", "test2",
@@ -483,11 +485,11 @@ int main(void) {
   }
   cout << "Active list: " << db.active()->size() << " element(s):\n";
   for (i = db.active()->begin(); i != db.active()->end(); i++) {
-    cout << (*i).line(true) << endl;
+    cout << i->line(true) << endl;
   }
   cout << "Removed list: " << db.removed()->size() << " element(s):\n";
   for (i = db.removed()->begin(); i != db.removed()->end(); i++) {
-    cout << (*i).line(true) << endl;
+    cout << i->line(true) << endl;
   }
   delete path;
 
@@ -505,11 +507,11 @@ int main(void) {
   }
   cout << "Active list: " << db.active()->size() << " element(s):\n";
   for (i = db.active()->begin(); i != db.active()->end(); i++) {
-    cout << (*i).line(true) << endl;
+    cout << i->line(true) << endl;
   }
   cout << "Removed list: " << db.removed()->size() << " element(s):\n";
   for (i = db.removed()->begin(); i != db.removed()->end(); i++) {
-    cout << (*i).line(true) << endl;
+    cout << i->line(true) << endl;
   }
 
   cout << endl << "Test: getdir" << endl;

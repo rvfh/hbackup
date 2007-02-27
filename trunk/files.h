@@ -60,6 +60,7 @@ public:
   string name() const;
   string prefix() const { return _prefix; };
   string path() const { return _path; };
+  string fullPath(int max_size = -1) const;
   mode_t type() const { return _type; }
   time_t mtime() const { return _mtime; };
   off_t  size() const { return _size; };

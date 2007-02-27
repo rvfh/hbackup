@@ -53,13 +53,8 @@ public:
       return i;
     }
   }
-  void add(const T& element) {
-    typename list<T>::iterator i = find(element);
-    if (i == this->end()) {
-      push_back(T(element));
-    } else {
-      insert(i, element);
-    }
+  typename list<T>::iterator add(const T& element) {
+    return insert(find(element), element);
   }
   typename list<T>::iterator erase(typename list<T>::iterator i) {
     if (i == _hint) {

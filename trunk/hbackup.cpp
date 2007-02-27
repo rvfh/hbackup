@@ -26,6 +26,7 @@ using namespace std;
 #include <signal.h>
 #include <errno.h>
 
+#include "hbackup.h"
 #include "list.h"
 #include "files.h"
 #include "db.h"
@@ -34,7 +35,6 @@ using namespace std;
 #include "cvs_parser.h"
 #include "paths.h"
 #include "clients.h"
-#include "hbackup.h"
 #include "version.h"
 
 /* DEFAULTS */
@@ -83,7 +83,11 @@ int terminating(void) {
 }
 
 void sighandler(int signal) {
-  fprintf(stderr, "Received signal, aborting...\n");
+  if (killed) {
+    fprintf(stderr, "Already aborting...\n");
+  } else {
+    fprintf(stderr, "Signal received, aborting...\n");
+  }
   killed = signal;
 }
 
@@ -122,6 +126,8 @@ int main(int argc, char **argv) {
       if (argv[argn][1] == '-') {
         if (! strcmp(&argv[argn][2], "config")) {
           letter = 'c';
+        } else if (! strcmp(&argv[argn][2], "debug")) {
+          letter = 'd';
         } else if (! strcmp(&argv[argn][2], "help")) {
           letter = 'h';
         } else if (! strcmp(&argv[argn][2], "restore")) {
@@ -159,6 +165,9 @@ int main(int argc, char **argv) {
       switch (letter) {
         case 'c':
           expect_configpath = true;
+          break;
+        case 'd':
+          verbose = 9;
           break;
         case 'h':
           show_help();

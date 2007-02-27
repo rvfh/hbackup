@@ -83,35 +83,6 @@ string DbData::line(bool nodates) const {
   return output;
 }
 
-/* Need to compare only for matching paths TODO remove */
-static int parse_compare(
-    const DbData& db_data,
-    const File& file_data,
-    int length) {
-  int result;
-
-  /* If paths differ, that's all we want to check */
-  result = db_data.data().path().substr(length + 1).compare(file_data.path());
-  if (result) {
-    return result;
-  }
-  /* If the file has been modified, just return 1 or -1 and that should do */
-  result = db_data.data().metadiffer(file_data);
-
-  /* If it's a file and size and mtime are the same, copy checksum accross */
-  if (S_ISREG(db_data.data().type())) {
-    if (db_data.checksum() == "N") {
-      /* Checksum missing, add to added list */
-      return 1;
-    } else if (result)
-    if ((db_data.data().size() == file_data.size())
-     || (db_data.data().mtime() == file_data.mtime())) {
-      return 2;
-    }
-  }
-  return result;
-}
-
 int Database::load(const string &filename, SortedList<DbData>& list) {
   string  source_path;
   FILE    *readfile;
@@ -128,6 +99,7 @@ int Database::load(const string &filename, SortedList<DbData>& list) {
       char      *start = buffer;
       char      *delim;
       char      *value = new char[size];
+      int       line = 1;
       // Data
       string    access_path;
       string    path;
@@ -207,14 +179,16 @@ int Database::load(const string &filename, SortedList<DbData>& list) {
             failed = 2;
         }
         start = delim + 1;
+        line++;
       }
       free(value);
       if (field != 12) {
         failed = 1;
       }
       if (failed) {
+        cerr << "db: open: list corrupted line " << line << endl;
         errno = EUCLEAN;
-      } else {
+      } else if (path[1] != '$') {
         File    data(access_path, path, link, File::typeMode(letter), mtime,
           size, uid, gid, mode);
         DbData  db_data(in, out, checksum, data);
@@ -600,7 +574,6 @@ int Database::open() {
         status = 2;
         break;
       case EUCLEAN:
-        cerr << "db: open: list corrupted" << endl;
         status = 2;
         break;
       default:
@@ -670,67 +643,101 @@ int Database::parse(
     const string& mounted_path,
     const string& mount_path,
     list<File>*   file_list) {
-  SortedList<DbData>                    added;
-  // TODO can it be a checksum-ordered list, for better efficiency?
-  vector<SortedList<DbData>::iterator>  removed;
-  int                                   failed   = 0;
+  int failed = 0;
+  SortedList<DbData>                   added;
+  // TODO can I make that a checksum-ordered list somehow?
+  vector<SortedList<DbData>::iterator> removed;
 
-  /* Compare list with db list for matching prefix */
-  string match_path = mounted_path + "/";
-
-  /* Point the entries to the start of their respective lists */
-  SortedList<DbData>::iterator  entry_active    = _active.begin();
-  list<File>::iterator          entry_file_list = file_list->begin();
-
+  string full_path = prefix + "/" + mounted_path + "/";
+  SortedList<DbData>::iterator entry_active = _active.begin();
+  // Jump irrelevant first records
   while ((entry_active != _active.end())
-      || (entry_file_list != file_list->end())) {
-    int         result;
+   && (entry_active->data().fullPath(full_path.size()) < full_path)) {
+    entry_active++;
+  }
+  SortedList<DbData>::iterator active_last = _active.end();
 
-    if (entry_active == _active.end()) {
-      // Added element
-      result = 1;
-    } else
-    if (((*entry_active).out() != 0)
-     || ((*entry_active).data().path().substr(0, match_path.size()) != match_path)) {
-      // Irrelevant element
-      result = -2;
-    } else
-    if (entry_file_list == file_list->end()) {
-      // Removed element
-      result = -1;
-    } else {
-      result = parse_compare(*entry_active, *entry_file_list,
-        mounted_path.size());
-      // -1: db path < file path
-      //  0: db path == file path and metadata match
-      //  1: db path > file path
-      //  or db path == file path and (metadata differ or checksum == "N")
-      //  2: db path == file path and checksum != "N" and size/mtime match
+  list<File>::iterator          entry_file_list = file_list->begin();
+  while (! terminating()) {
+    bool file_add  = false;
+    bool db_remove = false;
+    bool db_erase  = false;
+    bool same_file = false;
+
+    // Check whether db data is (still) relevant
+    if ((entry_active != _active.end()) && (active_last != entry_active)
+     && (entry_active->data().fullPath(full_path.size()) > full_path)) {
+      // Irrelevant rest of list
+      entry_active = _active.end();
+    }
+    active_last = entry_active;
+
+    // Check whether we have more work to do
+    if ((entry_active == _active.end())
+     && (entry_file_list == file_list->end())) {
+      break;
     }
 
-    // Add to lists
-    if (result == -1) {
-      // Push iterator
-      removed.push_back(entry_active);
+    // Deal with each case
+    if (entry_active == _active.end()) {
+      // End of db relevant data reached: add element
+      file_add = true;
     } else
-    if (result >= 1) {
+    if (entry_file_list == file_list->end()) {
+      // End of file data reached: remove element
+      db_remove = true;
+    } else {
+      int result = entry_active->data().path().substr(mounted_path.size() + 1).compare(entry_file_list->path());
+
+      if (result < 0) {
+        db_remove = true;
+      } else
+      if (result > 0) {
+        file_add = true;
+      } else
+      if (entry_active->data().metadiffer(*entry_file_list)) {
+        db_remove = true;
+        file_add = true;
+
+        /* If it's a file and size and mtime are the same, copy checksum accross */
+        if (S_ISREG(entry_active->data().type())
+         && (entry_active->data().size() == entry_file_list->size())
+         && (entry_active->data().mtime() == entry_file_list->mtime())) {
+          // Same file, just ownership changed or something
+          same_file = true;
+         }
+      } else
+      if (S_ISREG(entry_active->data().type())
+       && (entry_active->checksum() == "N")) {
+        // Previously failed write
+        db_erase = true;
+      } else {
+        entry_active++;
+        entry_file_list++;
+      }
+    }
+
+    if (file_add) {
       // Create new record
       File file_data(*entry_file_list);
       file_data.setPrefix(prefix);
       file_data.setPath(mounted_path + "/" + entry_file_list->path());
       DbData db_data(file_data);
-      if (result == 2) {
+      if (same_file) {
         db_data.setChecksum(entry_active->checksum());
       }
       added.push_back(db_data);
-    }
-
-    // Increment
-    if (result >= 0) {
       entry_file_list++;
     }
-    if (result <= 0) {
+
+    // DB data is used above!
+    if (db_remove) {
+      // Push iterator
+      removed.push_back(entry_active);
       entry_active++;
+    } else
+    if (db_erase) {
+      entry_active = _active.erase(entry_active);
     }
   }
 
@@ -807,20 +814,27 @@ int Database::parse(
       if (terminating()) {
         break;
       }
+      /* Update local list */
+      if (S_ISREG(removed[i]->data().type())
+       && ! removed[i]->checksum().empty()
+       && (removed[i]->checksum() != "N")) {
+        obsolete(removed[i]->checksum(), removed[i]->data());
+        if (verbosity() > 3) {
+          cout << " ---> " << removed[i]->checksum()
+            << " (" << i + 1 << "/" << removed.size() << ")\r";
+        }
+      }
+
       // Mark removed
       removed[i]->setOut();
       // Add to removed list
       _removed.add(*removed[i]);
       // Remove from active list
       _active.erase(removed[i]);
-
-      /* Update local list */
-      if (S_ISREG(removed[i]->data().type())
-       && ! removed[i]->checksum().empty()
-       && (removed[i]->checksum() != "N")) {
-        obsolete(removed[i]->checksum(), removed[i]->data());
-      }
     }
+/*    if (verbosity() > 3) {
+      cout << "                                       \r";
+    }*/
   } else if (verbosity() > 2) {
     cout << " --> No files to remove\n";
   }
