@@ -68,17 +68,17 @@ Options: username=
 -> smb://Client c:/home/BlaH/Backup.list
 Options: username= password=
 Database initialized
- --> mount -t nfs -o ro,noatime,nolock myClient:/home/User test_db/mount
+ ---> mount -t nfs -o ro,noatime,nolock myClient:/home/User test_db/mount
 Client unreachable 'myClient' using protocol 'nfs'
- --> mount -t cifs -o ro,noatime,nocase,username=Myself,password=flesyM //myClient/C$ test_db/mount > /dev/null 2>&1
+ ---> mount -t cifs -o ro,noatime,nocase,username=Myself,password=flesyM //myClient/C$ test_db/mount > /dev/null 2>&1
 Client unreachable 'myClient2' using protocol 'smb'
- --> mount -t cifs -o ro,noatime,nocase,username=user,iocharset=utf8 //Client/c$ test_db/mount > /dev/null 2>&1
+ ---> mount -t cifs -o ro,noatime,nocase,username=user,iocharset=utf8 //Client/c$ test_db/mount > /dev/null 2>&1
 Client unreachable 'Client' using protocol 'smb'
- --> mount -t cifs -o ro,noatime,nocase,nocase,username=user,password= //Client/c$ test_db/mount > /dev/null 2>&1
+ ---> mount -t cifs -o ro,noatime,nocase,nocase,username=user,password= //Client/c$ test_db/mount > /dev/null 2>&1
 Client unreachable 'Client2' using protocol 'smb'
- --> mount -t cifs -o ro,noatime,nocase,username= //Client/c$ test_db/mount > /dev/null 2>&1
+ ---> mount -t cifs -o ro,noatime,nocase,username= //Client/c$ test_db/mount > /dev/null 2>&1
 Client unreachable 'Client3' using protocol 'smb'
- --> mount -t cifs -o ro,noatime,nocase,username=,password= //Client/c$ test_db/mount > /dev/null 2>&1
+ ---> mount -t cifs -o ro,noatime,nocase,username=,password= //Client/c$ test_db/mount > /dev/null 2>&1
 Client unreachable 'Client4' using protocol 'smb'
 Database closed (active contents: 0 files, removed contents: 0 files)
  --> Client: testhost
@@ -91,11 +91,21 @@ Backup client 'testhost' using protocol 'file'
  --> Path: test2
 Backup path 'test'
  -> Building list of files
+ ---> Dir: 
+ ---> Dir: /cvs
+ ---> Dir: /cvs/CVS
+ ---> Dir: /cvs/dirbad
+ ---> Dir: /cvs/dirutd
+ ---> Dir: /cvs/dirutd/CVS
+ ---> Dir: /testdir
+ ---> Dir: /dir space
  -> Parsing list of files
  --> Files to add: 13 (0 bytes)
  --> Done: 1/13 --> Done: 2/13 --> Done: 3/13 --> Done: 4/13 --> Done: 5/13 --> Done: 6/13 --> Done: 7/13 --> Done: 8/13 --> Done: 9/13 --> Done: 10/13 --> Done: 11/13 --> Done: 12/13 --> Done: 13/13 --> No files to remove
 Backup path 'test2'
  -> Building list of files
+ ---> Dir: 
+ ---> Dir: /testdir
  -> Parsing list of files
  --> Files to add: 5 (928768 bytes)
  --> Done: 1/5 (0.0%) --> Done: 2/5 (15.7%) --> Done: 3/5 (43.6%) --> Done: 4/5 (100.0%) --> Done: 5/5 (100.0%) --> No files to remove
@@ -110,11 +120,21 @@ Backup client 'testhost' using protocol 'file'
  --> Path: test2
 Backup path 'test'
  -> Building list of files
+ ---> Dir: 
+ ---> Dir: /cvs
+ ---> Dir: /cvs/CVS
+ ---> Dir: /cvs/dirbad
+ ---> Dir: /cvs/dirutd
+ ---> Dir: /cvs/dirutd/CVS
+ ---> Dir: /testdir
+ ---> Dir: /dir space
  -> Parsing list of files
  --> No files to add
  --> No files to remove
 Backup path 'test2'
  -> Building list of files
+ ---> Dir: 
+ ---> Dir: /testdir
  -> Parsing list of files
  --> No files to add
  --> No files to remove

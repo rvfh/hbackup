@@ -23,6 +23,10 @@
 #error You must include paths.h before clients.h
 #endif
 
+#ifndef HBACKUP_H
+#error You must include hbackup.h before clients.h
+#endif
+
 class Option {
   string _name;
   string _value;
@@ -80,6 +84,9 @@ public:
   int backup(Database& db, bool configcheck = false) {
     int failed = 0;
     for (unsigned int i = 0; i < size(); i++) {
+      if (terminating()) {
+        break;
+      }
       if ((*this)[i]->backup(db, configcheck)) {
         failed = 1;
       }

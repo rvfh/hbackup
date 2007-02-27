@@ -108,6 +108,16 @@ string File::name() const {
   }
 }
 
+// Tested in db's test
+string File::fullPath(int size_max) const {
+  // Simple and inefficient
+  string full_path = _prefix + "/" + _path;
+  if (size_max < 0) {
+    return full_path;
+  }
+  return full_path.substr(0, size_max);
+}
+
 string File::line(bool nodates) const {
   string  output = _prefix + "\t" + _path + "\t" + typeLetter(_type);
   char*   numbers = NULL;

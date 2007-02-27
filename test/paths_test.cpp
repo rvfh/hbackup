@@ -33,7 +33,7 @@ using namespace std;
 #include "paths.h"
 
 int verbosity(void) {
-  return 0;
+  return 4;
 }
 
 int terminating(void) {
@@ -47,7 +47,7 @@ int main(void) {
     cout << ">List " << path->list()->size() << " file(s):\n";
     for (list<File>::iterator i = path->list()->begin();
      i != path->list()->end(); i++) {
-      cout << (*i).line(true) << endl;
+      cout << i->line(true) << endl;
     }
   }
 
@@ -60,7 +60,7 @@ int main(void) {
     cout << ">List " << path->list()->size() << " file(s):\n";
     for (list<File>::iterator i = path->list()->begin();
      i != path->list()->end(); i++) {
-      cout << (*i).line(true) << endl;
+      cout << i->line(true) << endl;
     }
   }
 
@@ -73,7 +73,7 @@ int main(void) {
     cout << ">List " << path->list()->size() << " file(s):\n";
     for (list<File>::iterator i = path->list()->begin();
      i != path->list()->end(); i++) {
-      cout << (*i).line(true) << endl;
+      cout << i->line(true) << endl;
     }
   }
 
@@ -85,7 +85,7 @@ int main(void) {
     cout << ">List " << path->list()->size() << " file(s):\n";
     for (list<File>::iterator i = path->list()->begin();
      i != path->list()->end(); i++) {
-      cout << (*i).line(true) << endl;
+      cout << i->line(true) << endl;
     }
   }
 
@@ -94,7 +94,7 @@ int main(void) {
     cout << ">List " << path->list()->size() << " file(s):\n";
     for (list<File>::iterator i = path->list()->begin();
      i != path->list()->end(); i++) {
-      cout << (*i).line(true) << endl;
+      cout << i->line(true) << endl;
     }
   }
 

@@ -41,11 +41,11 @@ clean:
 hbackup.done: ../hbackup hbackup.exp test_setup
 	@echo "RUN	$<"
 	@./test_setup
-	@./$< -vvv -c etc/hbackup.conf >hbackup.out 2>hbackup.err || echo -n
+	@./$< -d -c etc/hbackup.conf >hbackup.out 2>hbackup.err || echo -n
 	@cat `basename $@ .done`.err `basename $@ .done`.out > `basename $@ .done`.all
-	@./$< -vvv -c etc/hbackup.conf -s >hbackup.out 2>hbackup.err || echo -n
+	@./$< -d -c etc/hbackup.conf -s >hbackup.out 2>hbackup.err || echo -n
 	@cat `basename $@ .done`.err `basename $@ .done`.out >> `basename $@ .done`.all
-	@./$< -vvv -c etc/hbackup.conf -t >hbackup.out 2>hbackup.err || echo -n
+	@./$< -d -c etc/hbackup.conf -t >hbackup.out 2>hbackup.err || echo -n
 	@cat `basename $@ .done`.err `basename $@ .done`.out >> `basename $@ .done`.all
 	@rm -f `basename $@ .done`.err `basename $@ .done`.out
 	@diff -q `basename $@ .done`.exp `basename $@ .done`.all

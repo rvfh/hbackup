@@ -23,6 +23,7 @@ using namespace std;
 #include <list>
 #include <errno.h>
 
+#include "hbackup.h"
 #include "files.h"
 #include "list.h"
 #include "filters.h"
@@ -32,7 +33,7 @@ using namespace std;
 #include "clients.h"
 
 int verbosity(void) {
-  return 3;
+  return 4;
 }
 
 int terminating(void) {
