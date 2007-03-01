@@ -320,7 +320,9 @@ int main(int argc, char **argv) {
           db.scan();
         } else {
           /* Backup */
-          if (clients.backup(db, configcheck)) {
+
+          if (clients.setMountPoint(db_path + "/mount")
+           || clients.backup(db, configcheck)) {
             failed = 1;
           }
         }

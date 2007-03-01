@@ -529,12 +529,6 @@ int Database::open() {
     return 2;
   }
 
-  /* Check that mount dir exists, if not create it */
-  if (File::testDir(_path + "/mount", true) == 2) {
-    cerr << "db: open: cannot create mount point" << endl;
-    status = 2;
-  } else
-
   /* Check that data dir and list file exist, if not create them */
   if ((status = File::testDir(_path + "/data", true)) == 1) {
     if (File::testReg(_path + "/list", true) == 2) {

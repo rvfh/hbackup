@@ -48,6 +48,7 @@ int main(void) {
   remove("test_db/list");
 
   clients = new Clients;
+  clients->setMountPoint("test_db/mount");
   printf(">List %u client(s):\n", clients->size());
   for (unsigned int i = 0; i < clients->size(); i++) {
     (*clients)[i]->show();
@@ -65,6 +66,7 @@ int main(void) {
   delete clients;
 
   clients = new Clients;
+  clients->setMountPoint("test_db/mount");
   printf(">List %u client(s):\n", clients->size());
   for (unsigned int i = 0; i < clients->size(); i++) {
     (*clients)[i]->show();
@@ -148,6 +150,7 @@ int main(void) {
   db.close();
 
   clients = new Clients;
+  clients->setMountPoint("test_db/mount");
   client = new Client("testhost");
   clients->push_back(client);
   client->setProtocol("file");
@@ -163,6 +166,7 @@ int main(void) {
   db.close();
 
   clients = new Clients;
+  clients->setMountPoint("test_db/mount");
   client = new Client("testhost");
   clients->push_back(client);
   client->setProtocol("file");

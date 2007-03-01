@@ -51,12 +51,12 @@ class Client {
   string          _protocol;
   vector<Option*> _options;
   vector<Path*>   _paths;
+  string          _mount_point;
   string          _mounted;
   int mountPath(
     string        backup_path,
-    const string& mount_point,
     string        *path);
-  int umount(const string& mount_point);
+  int umount();
   int readListFile(const string& list_path);
 public:
   Client(string name);
@@ -70,24 +70,50 @@ public:
   void setHostOrIp(string value);
   void setProtocol(string value);
   void setListfile(string value);
-  int  backup(Database& db, bool configcheck = false);
+  int  setMountPoint(const string& mount_point, bool check = true) {
+    _mount_point = mount_point;
+    /* Check that mount dir exists, if not create it */
+    if (check && (File::testDir(_mount_point, true) == 2)) {
+      cerr << "Cannot create mount point" << endl;
+      return 2;
+    }
+    return 0;
+  }
+  string mountPoint() { return _mount_point; }
+  int  backup(Database& db, bool config_check = false);
   void show();
 };
 
 class Clients : public vector<Client *> {
+  string _mount_point;
 public:
+  Clients() : _mount_point("") {}
   ~Clients() {
     for (unsigned int i = 0; i < size(); i++) {
       delete (*this)[i];
     }
   }
-  int backup(Database& db, bool configcheck = false) {
+  int setMountPoint(const string& mount_point) {
+    _mount_point = mount_point;
+    /* Check that mount dir exists, if not create it */
+    if (File::testDir(_mount_point, true) == 2) {
+      cerr << "Cannot create mount point" << endl;
+      return 2;
+    }
+    return 0;
+  }
+  string mountPoint() { return _mount_point; }
+  int backup(Database& db, bool config_check = false) {
     int failed = 0;
     for (unsigned int i = 0; i < size(); i++) {
       if (terminating()) {
         break;
       }
-      if ((*this)[i]->backup(db, configcheck)) {
+      if ((_mount_point.size() != 0)
+       && ((*this)[i]->mountPoint().size() == 0)) {
+        (*this)[i]->setMountPoint(_mount_point, false);
+      }
+      if ((*this)[i]->backup(db, config_check)) {
         failed = 1;
       }
     }
