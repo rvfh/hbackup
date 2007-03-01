@@ -58,7 +58,8 @@ class Database {
   void unlock();
   int  save(
     const string&       filename,
-    SortedList<DbData>& list);
+    SortedList<DbData>& list,
+    bool                backup = false);
   // Scan database to recover files list
   int  recover();
 public:
