@@ -204,7 +204,10 @@ int Database::load(const string &filename, SortedList<DbData>& list) {
   return failed;
 }
 
-int Database::save(const string& filename, SortedList<DbData>& list) {
+int Database::save(
+    const string& filename,
+    SortedList<DbData>& list,
+    bool                backup) {
   FILE    *writefile;
   int     failed = 0;
 
@@ -218,7 +221,12 @@ int Database::save(const string& filename, SortedList<DbData>& list) {
     fclose(writefile);
 
     /* All done */
-    failed = rename(temp_path.c_str(), dest_path.c_str());
+    if (backup && rename(dest_path.c_str(), (dest_path + "~").c_str())) {
+      failed = 2;
+    }
+    if (rename(temp_path.c_str(), dest_path.c_str())) {
+      failed = 2;
+    }
   } else {
     failed = 2;
   }
@@ -531,8 +539,9 @@ int Database::open() {
 
   /* Check that data dir and list file exist, if not create them */
   if ((status = File::testDir(_path + "/data", true)) == 1) {
-    if (File::testReg(_path + "/list", true) == 2) {
-      cerr << "db: open: cannot create list file" << endl;
+    if ((File::testReg(_path + "/list", true) == 2)
+     || (File::testReg(_path + "/removed", true) == 2)){
+      cerr << "db: open: cannot create list files" << endl;
       status = 2;
     } else if (verbosity() > 0) {
       cout << "Database initialized" << endl;
@@ -598,7 +607,7 @@ int Database::close() {
   }
 
   // Save active list
-  if (save("list", _active)) {
+  if (save("list", _active, true)) {
     cerr << "db: close: failed to save active items list" << endl;
   }
   int active_size = _active.size();
@@ -610,7 +619,7 @@ int Database::close() {
   _removed.unique();
 
   /* Save removed list */
-  if (save("removed", _removed)) {
+  if (save("removed", _removed, true)) {
     cerr << "db: close: failed to save removed items list" << endl;
   }
   int removed_size = _removed.size();
