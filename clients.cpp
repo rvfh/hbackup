@@ -37,7 +37,6 @@ using namespace std;
 
 int Client::mountPath(
     string        backup_path,
-    const string& mount_point,
     string        *path) {
   string command = "mount ";
   string share;
@@ -49,11 +48,11 @@ int Client::mountPath(
   } else
   if (_protocol == "nfs") {
     share = _host_or_ip + ":" + backup_path;
-    *path  = mount_point;
+    *path  = _mount_point;
   } else
   if (_protocol == "smb") {
     share = "//" + _host_or_ip + "/" + backup_path.substr(0,1) + "$";
-    *path  = mount_point + "/" +  backup_path.substr(3);
+    *path  = _mount_point + "/" +  backup_path.substr(3);
   } else {
     errno = EPROTONOSUPPORT;
     return 2;
@@ -63,7 +62,7 @@ int Client::mountPath(
   if (_mounted != "") {
     if (_mounted != share) {
       /* Different share mounted: unmount */
-      umount(mount_point);
+      umount();
     } else {
       /* Same share mounted: nothing to do */
       return 0;
@@ -75,7 +74,7 @@ int Client::mountPath(
     return 0;
   } else
   if (_protocol == "nfs") {
-    command += "-t nfs -o ro,noatime,nolock "+ share + " " + mount_point;
+    command += "-t nfs -o ro,noatime,nolock "+ share + " " + _mount_point;
   } else
   if (_protocol == "smb") {
     // codepage=858
@@ -84,7 +83,7 @@ int Client::mountPath(
     for (unsigned int i = 0; i < _options.size(); i++ ) {
       command += "," + _options[i]->option();
     }
-    command += " " + share + " " + mount_point + " > /dev/null 2>&1";
+    command += " " + share + " " + _mount_point + " > /dev/null 2>&1";
   }
 
   /* Issue mount command */
@@ -100,11 +99,11 @@ int Client::mountPath(
   return result;
 }
 
-int Client::umount(const string& mount_point) {
+int Client::umount() {
   if (_mounted != "") {
     string command = "umount ";
 
-    command += mount_point;
+    command += _mount_point;
     _mounted = "";
     return system(command.c_str());
   }
@@ -207,8 +206,14 @@ int Client::readListFile(const string& list_path) {
 }
 
 Client::Client(string value) {
-  _name     = value;
-  _mounted  = "";
+  _name         = value;
+  _host_or_ip   = "";
+  _listfilename = "";
+  _listfiledir  = "";
+  _protocol     = "";
+  _mount_point  = "";
+  _mounted      = "";
+
   if (verbosity() > 2) {
     cout << " --> Client: " << _name << endl;
   }
@@ -246,13 +251,13 @@ void Client::setListfile(string value) {
 
 int Client::backup(
     Database& db,
-    bool      configcheck) {
+    bool      config_check) {
   int     failed = 0;
   int     clientfailed  = 0;
   string  share;
   string  list_path;
 
-  if (mountPath(_listfiledir, db.mount(), &list_path)) {
+  if (mountPath(_listfiledir, &list_path)) {
     switch (errno) {
       case EPROTONOSUPPORT:
         cerr << "Protocol not supported: " << _protocol << endl;
@@ -276,7 +281,7 @@ int Client::backup(
     /* Backup */
     if (_paths.empty()) {
       failed = 1;
-    } else if (! configcheck) {
+    } else if (! config_check) {
       for (unsigned int i = 0; i < _paths.size(); i++) {
         if (terminating() || clientfailed) {
           break;
@@ -290,7 +295,7 @@ int Client::backup(
           }
         }
 
-        if (mountPath(_paths[i]->path(), db.mount(), &backup_path)) {
+        if (mountPath(_paths[i]->path(), &backup_path)) {
           clientfailed = 1;
         } else {
           if (_paths[i]->createList(backup_path)) {
@@ -324,7 +329,7 @@ int Client::backup(
     }
     failed = 1;
   }
-  umount(db.mount()); // does not change errno
+  umount(); // does not change errno
   return failed;
 }
 

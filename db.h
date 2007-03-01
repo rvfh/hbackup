@@ -67,7 +67,6 @@ public:
   int  open();
   /* Close database */
   int  close();
-  string mount() { return _path + "/mount"; }
   /* Check what needs to be done for given host & path */
   int  parse(
     const string& prefix,
