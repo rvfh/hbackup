@@ -1,15 +1,3 @@
-Directory should be under CVS control: test/////cvs/dirbad
-db: scan: file data missing for checksum 59ca0efa9f5633cb0371bbc0355478d8-0
-db: scan: file data missing for checksum 59ca0efa9f5633cb0371bbc0355478d8-0
-db: scan: file data corrupted for checksum 59ca0efa9f5633cb0371bbc0355478d8-0 (found to be d41d8cd98f00b204e9800998ecf8427e)
-Directory should be under CVS control: test/////cvs/dirbad
-Directory should be under CVS control: test/////cvs/dirbad
-Directory should be under CVS control: test/////cvs/dirbad
-db: close: failed to save active items list
-db: close: failed to save removed items list
-db: open: permission to read list denied
-db: open: list corrupted line 1
-db: open: list missing
 Copied 13 -> 33 bytes: 59ca0efa9f5633cb0371bbc0355478d8 -> f94b4a4f91902f37f53e9e38fafbb524
 Copied 33 -> 13 bytes: f94b4a4f91902f37f53e9e38fafbb524 -> 59ca0efa9f5633cb0371bbc0355478d8
 Copied 524288 -> ? bytes 59071590099d21dd439896592338bf95 -> ?
@@ -18,6 +6,7 @@ Copied ? -> 543 bytes ? -> 29178ac07006174c64c06f39b745a30b
  ---> Dir: /cvs
  ---> Dir: /cvs/CVS
  ---> Dir: /cvs/dirbad
+Directory should be under CVS control: test/////cvs/dirbad
  ---> Dir: /cvs/dirutd
  ---> Dir: /cvs/dirutd/CVS
  ---> Dir: /testdir
@@ -151,6 +140,7 @@ Scanning database contents thoroughly: 20 files
 Database closed (active contents: 20 files, removed contents: 0 files)
 Database opened (active contents: 20 files)
 Scanning database contents: 20 files
+db: scan: file data missing for checksum 59ca0efa9f5633cb0371bbc0355478d8-0
  -> Client:      file://host
  -> File name:   /home/user/testfile
  -> Modified:    2006-10-22  0:00:00
@@ -158,6 +148,7 @@ full scan error status 1
 Database closed (active contents: 20 files, removed contents: 0 files)
 Database opened (active contents: 20 files)
 Scanning database contents thoroughly: 20 files
+db: scan: file data missing for checksum 59ca0efa9f5633cb0371bbc0355478d8-0
  -> Client:      file://host
  -> File name:   /home/user/testfile
  -> Modified:    2006-10-22  0:00:00
@@ -165,6 +156,7 @@ full thorough scan error status 1
 Database closed (active contents: 20 files, removed contents: 0 files)
 Database opened (active contents: 20 files)
 Scanning database contents thoroughly: 20 files
+db: scan: file data corrupted for checksum 59ca0efa9f5633cb0371bbc0355478d8-0 (found to be d41d8cd98f00b204e9800998ecf8427e)
  -> Client:      file://host
  -> File name:   /home/user/testfile
  -> Modified:    2006-10-22  0:00:00
@@ -197,6 +189,7 @@ Removed list: 0 element(s):
  ---> Dir: /cvs
  ---> Dir: /cvs/CVS
  ---> Dir: /cvs/dirbad
+Directory should be under CVS control: test/////cvs/dirbad
  ---> Dir: /cvs/dirutd
  ---> Dir: /cvs/dirutd/CVS
  ---> Dir: /testdir
@@ -272,6 +265,7 @@ Removed list: 0 element(s):
  ---> Dir: /cvs
  ---> Dir: /cvs/CVS
  ---> Dir: /cvs/dirbad
+Directory should be under CVS control: test/////cvs/dirbad
  ---> Dir: /cvs/dirutd
  ---> Dir: /cvs/dirutd/CVS
  ---> Dir: /testdir
@@ -319,6 +313,7 @@ file://host	/home/user/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371bbc035
  ---> Dir: /cvs
  ---> Dir: /cvs/CVS
  ---> Dir: /cvs/dirbad
+Directory should be under CVS control: test/////cvs/dirbad
  ---> Dir: /cvs/dirutd
  ---> Dir: /cvs/dirutd/CVS
  ---> Dir: /testdir
@@ -428,11 +423,16 @@ fedc76test6 status: 0, getdir_path: test_db/data/fe/dc/76/test6
 Database closed (active contents: 18 files, removed contents: 4 files)
 List cannot be saved
 Database opened (active contents: 18 files)
+db: close: failed to save active items list
+db: close: failed to save removed items list
 Database closed (active contents: 18 files, removed contents: 4 files)
 Error: Permission denied
 List cannot be read
+db: open: permission to read list denied
 Error: Permission denied
 List is garbaged
+db: open: list corrupted line 1
 Error: Structure needs cleaning
 List is gone
+db: open: list missing
 Error: No such file or directory
