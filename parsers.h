@@ -24,7 +24,6 @@
 #endif
 
 typedef enum {
-  parser_disabled,
   parser_controlled,
   parser_modified,
   parser_modifiedandothers,
@@ -44,7 +43,7 @@ public:
   // Again MUST BE INHERITED when classes define a default constructor
   // Example1: MyParser() : Parser() { ... }, inherited
   // Example2: MyParser(blah_t blah) { ... }, called implicitely
-  Parser() : _mode(parser_disabled), _dummy(false) {}
+  Parser() : _mode(parser_controlled), _dummy(false) {}
   // Need a virtual destructor
   virtual ~Parser() {};
   // Just to know the parser used
