@@ -29,6 +29,8 @@ typedef struct {
 } cvs_entry_t;
 
 class CvsParser : public Parser {
+  static char*        _control_dir;
+  static char*        _entries;
   vector<cvs_entry_t> _files;
   bool                _all_files;
 public:

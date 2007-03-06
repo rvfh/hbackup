@@ -32,8 +32,38 @@ using namespace std;
 #include "parsers.h"
 #include "cvs_parser.h"
 
+char* CvsParser::_control_dir = "CVS";
+char* CvsParser::_entries = "Entries";
+
+string CvsParser::name() const {
+  return "CVS";
+}
+
+Parser *CvsParser::isControlled(const string& dir_path) const {
+  // Parent under control, this is the control directory
+  string control_dir = "/" + string(_control_dir);
+  if (! _dummy
+   && (dir_path.size() > control_dir.size())
+   && (dir_path.substr(dir_path.size() - control_dir.size()) == control_dir)) {
+    return NULL;
+  }
+
+  // If control directory exists and contains an entries file, assume control
+  if (File::testReg(dir_path + "/" + _control_dir + "/" + _entries, false)) {
+    if (! _dummy) {
+      cerr << "Directory should be under " << name() << " control: "
+        << dir_path << endl;
+      return new IgnoreParser;
+    } else {
+      return NULL;
+    }
+  } else {
+    return new CvsParser(_mode, dir_path);
+  }
+}
+
 CvsParser::CvsParser(parser_mode_t mode, const string& dir_path) {
-  string    path = dir_path + "/CVS/Entries";
+  string    path = dir_path + "/" + _control_dir + "/" + _entries;
   ifstream  entries(path.c_str());
 
   // Save mode
@@ -68,42 +98,16 @@ CvsParser::CvsParser(parser_mode_t mode, const string& dir_path) {
   entries.close();
 }
 
-string CvsParser::name() const {
-  return "cvs";
-}
-
-Parser *CvsParser::isControlled(const string& dir_path) const {
-  // Parent under CVS control, this is the control directory
-  if (! _dummy
-   && (dir_path.size() > 4)
-   && (dir_path.substr(dir_path.size() - 4) == "/CVS")) {
-    return NULL;
-  }
-
-  // If CVS dir and entries file exist, assume CVS control
-  if (File::testReg(dir_path + "/CVS/Entries", false)) {
-    if (! _dummy) {
-      cerr << "Directory should be under CVS control: " << dir_path << endl;
-      return new IgnoreParser;
-    } else {
-      return NULL;
-    }
-  } else {
-    return new CvsParser(_mode, dir_path);
-  }
-}
-
 bool CvsParser::ignore(const File& file_data) {
   // Deal with no-work cases
-  if (  (_all_files)
+  if (  _all_files
      // We don't know whether controlled files are modified or not
-     || (_mode == parser_modifiedandothers)
-     || (_mode == parser_disabled)) {
+     || (_mode == parser_modifiedandothers)) {
     return false;
   }
 
-  // Do not ignore CVS directory
-  if ((file_data.name() == "CVS") && (file_data.type() == S_IFDIR)) {
+  // Do not ignore control directory
+  if ((file_data.name() == _control_dir) && (file_data.type() == S_IFDIR)) {
     return false;
   }
 
