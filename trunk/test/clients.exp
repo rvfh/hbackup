@@ -1,13 +1,9 @@
-List file not found etc/doesnotexist
-mount: only root can do that
-Protocol not supported: ssh
-Directory should be under CVS control: test/cvs/dirbad
-Directory should be under CVS control: test/cvs/dirbad
 >List 0 client(s):
  --> Client: localhost
 >List 1 client(s):
 -> file://localhost etc/doesnotexist
 Backup client 'localhost' using protocol 'file'
+List file not found etc/doesnotexist
 >List 0 client(s):
  --> Client: myClient
 >List 1 client(s):
@@ -69,9 +65,11 @@ Options: username=
 Options: username= password=
 Database initialized
  ---> mount -t nfs -o ro,noatime,nolock myClient:/home/User test_db/mount
+mount: only root can do that
 Client unreachable 'myClient' using protocol 'nfs'
  ---> mount -t cifs -o ro,noatime,nocase,username=Myself,password=flesyM //myClient/C$ test_db/mount > /dev/null 2>&1
 Client unreachable 'myClient2' using protocol 'smb'
+Protocol not supported: ssh
  ---> mount -t cifs -o ro,noatime,nocase,username=user,iocharset=utf8 //Client/c$ test_db/mount > /dev/null 2>&1
 Client unreachable 'Client' using protocol 'smb'
  ---> mount -t cifs -o ro,noatime,nocase,nocase,username=user,password= //Client/c$ test_db/mount > /dev/null 2>&1
@@ -95,24 +93,25 @@ Backup path 'test'
  ---> Dir: /cvs
  ---> Dir: /cvs/CVS
  ---> Dir: /cvs/dirbad
+Directory should be under CVS control: test/cvs/dirbad
  ---> Dir: /cvs/dirutd
  ---> Dir: /cvs/dirutd/CVS
  ---> Dir: /testdir
  ---> Dir: /dir space
- -> Parsing list of files
+ -> Parsing list of files (13)
  --> Files to add: 13 (0 bytes)
  --> Done: 1/13 --> Done: 2/13 --> Done: 3/13 --> Done: 4/13 --> Done: 5/13 --> Done: 6/13 --> Done: 7/13 --> Done: 8/13 --> Done: 9/13 --> Done: 10/13 --> Done: 11/13 --> Done: 12/13 --> Done: 13/13 --> No files to remove
 Backup path 'test2'
  -> Building list of files
  ---> Dir: 
  ---> Dir: /testdir
- -> Parsing list of files
+ -> Parsing list of files (5)
  --> Files to add: 5 (928768 bytes)
  --> Done: 1/5 (0.0%) --> Done: 2/5 (15.7%) --> Done: 3/5 (43.6%) --> Done: 4/5 (100.0%) --> Done: 5/5 (100.0%) --> No files to remove
 Database closed (active contents: 18 files, removed contents: 0 files)
  --> Client: testhost
 >List 1 client(s):
--> file://localhost etc/localhost.list
+-> file://testhost etc/localhost.list
 Database opened (active contents: 18 files)
 Backup client 'testhost' using protocol 'file'
  -> Reading backup list file
@@ -124,18 +123,19 @@ Backup path 'test'
  ---> Dir: /cvs
  ---> Dir: /cvs/CVS
  ---> Dir: /cvs/dirbad
+Directory should be under CVS control: test/cvs/dirbad
  ---> Dir: /cvs/dirutd
  ---> Dir: /cvs/dirutd/CVS
  ---> Dir: /testdir
  ---> Dir: /dir space
- -> Parsing list of files
+ -> Parsing list of files (13)
  --> No files to add
  --> No files to remove
 Backup path 'test2'
  -> Building list of files
  ---> Dir: 
  ---> Dir: /testdir
- -> Parsing list of files
+ -> Parsing list of files (5)
  --> No files to add
  --> No files to remove
 Database closed (active contents: 18 files, removed contents: 0 files)

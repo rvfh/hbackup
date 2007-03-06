@@ -104,6 +104,9 @@ int Client::umount() {
     string command = "umount ";
 
     command += _mount_point;
+    if (verbosity() > 3) {
+      cout << " ---> " << command << endl;
+    }
     _mounted = "";
     return system(command.c_str());
   }
@@ -207,7 +210,7 @@ int Client::readListFile(const string& list_path) {
 
 Client::Client(string value) {
   _name         = value;
-  _host_or_ip   = "";
+  _host_or_ip   = _name;
   _listfilename = "";
   _listfiledir  = "";
   _protocol     = "";
@@ -307,7 +310,8 @@ int Client::backup(
             clientfailed  = 1;
           } else {
             if (verbosity() > 1) {
-              printf(" -> Parsing list of files\n");
+              cout << " -> Parsing list of files ("
+                << _paths[i]->list()->size() << ")" << endl;
             }
             if (db.parse(_protocol + "://" + _name, _paths[i]->path(),
              backup_path, _paths[i]->list())) {
@@ -334,13 +338,8 @@ int Client::backup(
 }
 
 void Client::show() {
-  cout << "-> " << _protocol << "://";
-  if (_host_or_ip != "") {
-    cout << _host_or_ip;
-  } else {
-    cout << "localhost";
-  }
-  cout << " " << _listfiledir << "/" << _listfilename << endl;
+  cout << "-> " << _protocol << "://" << _host_or_ip << " "
+    << _listfiledir << "/" << _listfilename << endl;
   if (_options.size() > 0) {
     cout << "Options:";
     for (unsigned int i = 0; i < _options.size(); i++ ) {

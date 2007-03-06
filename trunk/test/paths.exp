@@ -1,5 +1,3 @@
-Directory should be under CVS control: test/cvs/dirbad
-Directory should be under CVS control: test/cvs/dirbad
  ---> Dir: 
  ---> Dir: /cvs
  ---> Dir: /cvs/CVS
@@ -110,6 +108,7 @@ as previous with CVS parser
  ---> Dir: /cvs
  ---> Dir: /cvs/CVS
  ---> Dir: /cvs/dirbad
+Directory should be under CVS control: test/cvs/dirbad
  ---> Dir: /cvs/dirutd
  ---> Dir: /cvs/dirutd/CVS
  ---> Dir: /testdir
@@ -137,6 +136,7 @@ as previous
  ---> Dir: /cvs
  ---> Dir: /cvs/CVS
  ---> Dir: /cvs/dirbad
+Directory should be under CVS control: test/cvs/dirbad
  ---> Dir: /cvs/dirutd
  ---> Dir: /cvs/dirutd/CVS
  ---> Dir: /testdir

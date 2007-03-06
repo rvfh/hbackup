@@ -104,6 +104,7 @@ int main(void) {
     }
     delete file_data;
     file_data = new File("", "test/cvs/diroth", "", S_IFDIR, 0, 0, 0, 0, 0);
+    // Use parser so directory appears as child of controlled directory
     if ((parser2 = parser->isControlled(file_data->path())) == NULL) {
       cout << file_data->path() << " is not under CVS control" << endl;
     } else {

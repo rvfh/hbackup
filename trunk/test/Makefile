@@ -31,9 +31,7 @@ clean:
 %.done: %_test %.exp test_setup
 	@echo "RUN	$<"
 	@./test_setup
-	@./$< > `basename $@ .done`.out 2>`basename $@ .done`.err
-	@cat `basename $@ .done`.err `basename $@ .done`.out > `basename $@ .done`.all
-	@rm -f `basename $@ .done`.err `basename $@ .done`.out
+	@./$< > `basename $@ .done`.all 2>&1
 	@diff -q `basename $@ .done`.exp `basename $@ .done`.all
 	@touch $@
 	@rm -f `basename $@ .done`.all
@@ -41,13 +39,9 @@ clean:
 hbackup.done: ../hbackup hbackup.exp test_setup
 	@echo "RUN	$<"
 	@./test_setup
-	@./$< -d -c etc/hbackup.conf >hbackup.out 2>hbackup.err || echo -n
-	@cat `basename $@ .done`.err `basename $@ .done`.out > `basename $@ .done`.all
-	@./$< -d -c etc/hbackup.conf -s >hbackup.out 2>hbackup.err || echo -n
-	@cat `basename $@ .done`.err `basename $@ .done`.out >> `basename $@ .done`.all
-	@./$< -d -c etc/hbackup.conf -t >hbackup.out 2>hbackup.err || echo -n
-	@cat `basename $@ .done`.err `basename $@ .done`.out >> `basename $@ .done`.all
-	@rm -f `basename $@ .done`.err `basename $@ .done`.out
+	@./$< -d -c etc/hbackup.conf >hbackup.all 2>&1 || echo -n
+	@./$< -d -c etc/hbackup.conf -s >>hbackup.all 2>&1 || echo -n
+	@./$< -d -c etc/hbackup.conf -t >>hbackup.all 2>&1 || echo -n
 	@diff -q `basename $@ .done`.exp `basename $@ .done`.all
 	@touch $@
 	@rm -f `basename $@ .done`.all
