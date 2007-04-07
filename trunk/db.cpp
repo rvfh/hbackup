@@ -380,29 +380,7 @@ int Database::write(
     db_data.setChecksum("N");
   }
 
-  /* Save redundant information together with data */
-  if (! failed) {
-    /* dest_path is /path/to/checksum/data */
-    unsigned int pos = dest_path.rfind('/');
-
-    if (pos != string::npos) {
-      string        listfile;
-
-      dest_path.erase(pos);
-      /* Now dest_path is /path/to/checksum */
-      listfile = dest_path.substr(_path.size() + 1) + "/list";
-      SortedList<DbData> list;
-      if (load(listfile, list) == 2) {
-        cerr << "db: write: failed to open data list" << endl;
-        failed = 1;
-      } else {
-        DbData new_db_data(db_data);
-        new_db_data.setChecksum(checksum_dest);
-        list.add(new_db_data);
-        save(listfile, list);
-      }
-    }
-  }
+  // TODO Need to store compression data
 
   /* Make sure we won't exceed the file number limit */
   if (! failed) {
@@ -413,38 +391,6 @@ int Database::write(
       dest_path.erase(pos);
       /* Now dest_path is /path/to */
       organize(dest_path, 256);
-    }
-  }
-
-  return failed;
-}
-
-int Database::obsolete(const string& checksum, const File& file_data) {
-  string  listfile;
-  string  temp_path;
-  int     failed = 0;
-
-  if (getDir(checksum, temp_path, false)) {
-    cerr << "db: obsolete: failed to get dir for: " << checksum << endl;
-    return 2;
-  }
-  listfile = temp_path.substr(_path.size() + 1) + "/list";
-
-  SortedList<DbData> list;
-  if (load(listfile, list) == 2) {
-    cerr << "db: obsolete: failed to open data list" << endl;
-  } else {
-    string search = file_data.prefix() + " " + file_data.path();
-    SortedList<DbData>::iterator i = list.begin();
-    while (i != list.end()) {
-      if ((i->out() == 0)
-       && (file_data.prefix() == i->data().prefix())
-       && (file_data.path() == i->data().path())) {
-        i->setOut();
-        save(listfile, list);
-        break;
-      }
-      i++;
     }
   }
 
@@ -817,17 +763,6 @@ int Database::parse(
       if (terminating()) {
         break;
       }
-      /* Update local list */
-      if (S_ISREG(removed[i]->data().type())
-       && ! removed[i]->checksum().empty()
-       && (removed[i]->checksum() != "N")) {
-        obsolete(removed[i]->checksum(), removed[i]->data());
-        if (verbosity() > 3) {
-          cout << " ---> " << removed[i]->checksum()
-            << " (" << i + 1 << "/" << removed.size() << ")\r";
-        }
-      }
-
       // Mark removed
       removed[i]->setOut();
       // Add to removed list
@@ -964,36 +899,20 @@ int Database::scan(const string& checksum, bool thorough) {
     } else
     if (thorough) {
       string  check_path = path + "/data";
-      string  listfile = path.substr(_path.size() + 1) + "/list";
-      SortedList<DbData> list;
+      string checksum_real;
 
-      if (load(listfile, list) == 2) {
-        errno = EUCLEAN;
+      /* Read file to compute checksum, compare with expected */
+      if (File::getChecksum(check_path, checksum_real) == 2) {
+        errno = ENOENT;
         filefailed = true;
-        cerr << "db: scan: failed to open list for checksum " << checksum << endl;
-      } else {
-        if (list.empty()) {
-          errno = EUCLEAN;
-          filefailed = true;
-          cerr << "db: scan: list empty for checksum " << checksum << endl;
-        } else {
-          string checksum_real;
-
-          /* Read file to compute checksum, compare with expected */
-          if (File::getChecksum(check_path, checksum_real) == 2) {
-            errno = ENOENT;
-            filefailed = true;
-            cerr << "db: scan: file data missing for checksum " << checksum << endl;
-          } else
-          if ((*list.begin()).checksum().substr(0, checksum_real.size())
-           != checksum_real) {
-            errno = EILSEQ;
-            filefailed = true;
-            if (! terminating()) {
-              cerr << "db: scan: file data corrupted for checksum " << checksum
-                << " (found to be " << checksum_real << ")" << endl;
-            }
-          }
+        cerr << "db: scan: file data missing for checksum " << checksum << endl;
+      } else
+      if (checksum.substr(0, checksum_real.size()) != checksum_real) {
+        errno = EILSEQ;
+        filefailed = true;
+        if (! terminating()) {
+          cerr << "db: scan: file data corrupted for checksum " << checksum
+            << " (found to be " << checksum_real << ")" << endl;
         }
       }
 

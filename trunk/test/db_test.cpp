@@ -50,7 +50,6 @@ int main(void) {
   DbData*   db_data;
   off_t     size;
   off_t     zsize;
-  SortedList<DbData>* filelist;
   SortedList<DbData>::iterator i;
   int       status;
 
@@ -112,26 +111,6 @@ int main(void) {
     return 0;
   }
   cout << db_data->checksum() << "  test/testfile" << endl;
-  filelist = new SortedList<DbData>;
-  if (db.load("data/59ca0efa9f5633cb0371bbc0355478d8-0/list", *filelist)) {
-    cout << "load failed: " << strerror(errno) << endl;
-    return 0;
-  }
-  cout << "Local list: " << filelist->size() << " element(s):\n";
-  for (i = filelist->begin(); i != filelist->end(); i++) {
-    cout << i->line(true) << endl;
-  }
-  delete filelist;
-
-  /* Obsolete check */
-  db.obsolete(db_data->checksum(), db_data->data());
-  filelist = new SortedList<DbData>;
-  db.load("data/59ca0efa9f5633cb0371bbc0355478d8-0/list", *filelist);
-  cout << "Local list: " << filelist->size() << " element(s):\n";
-  for (i = filelist->begin(); i != filelist->end(); i++) {
-    cout << i->line(true) << endl;
-  }
-  delete filelist;
 
   /* Read check */
   if ((status = db.read("test_db/blah", db_data->checksum()))) {
@@ -222,14 +201,6 @@ int main(void) {
     cout << i->line(true) << endl;
   }
   delete path;
-
-  filelist = new SortedList<DbData>;
-  db.load("data/d41d8cd98f00b204e9800998ecf8427e-0/list", *filelist);
-  cout << "Local list: " << filelist->size() << " element(s):\n";
-  for (i = filelist->begin(); i != filelist->end(); i++) {
-    cout << i->line(true) << endl;
-  }
-  delete filelist;
 
   verbose = 2;
   if ((status = db.scan("59ca0efa9f5633cb0371bbc0355478d8-0"))) {
