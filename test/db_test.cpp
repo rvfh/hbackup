@@ -33,7 +33,7 @@ using namespace std;
 #include "list.h"
 #include "db.h"
 
-static int verbose = 4;
+static int verbose = 3;
 
 int verbosity(void) {
   return verbose;
@@ -303,7 +303,7 @@ int main(void) {
   if ((status = db.scan("", true))) {
     printf("full thorough scan error status %u\n", status);
   }
-  verbose = 4;
+  verbose = 3;
 
   db.close();
 

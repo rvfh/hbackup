@@ -33,7 +33,7 @@ using namespace std;
 #include "paths.h"
 
 int verbosity(void) {
-  return 4;
+  return 3;
 }
 
 int terminating(void) {

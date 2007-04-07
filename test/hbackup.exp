@@ -9,26 +9,15 @@ Backup client 'cbers11' using protocol 'file'
  --> Path: test2
 Backup path 'test'
  -> Building list of files
- ---> Dir: 
- ---> Dir: /cvs
- ---> Dir: /cvs/CVS
- ---> Dir: /cvs/dirbad
 Directory should be under CVS control: test/cvs/dirbad
- ---> Dir: /cvs/dirutd
- ---> Dir: /cvs/dirutd/CVS
- ---> Dir: /testdir
- ---> Dir: /dir space
  -> Parsing list of files (13)
  --> Files to add: 13 (0 bytes)
  --> Done: 1/13 --> Done: 2/13 --> Done: 3/13 --> Done: 4/13 --> Done: 5/13 --> Done: 6/13 --> Done: 7/13 --> Done: 8/13 --> Done: 9/13 --> Done: 10/13 --> Done: 11/13 --> Done: 12/13 --> Done: 13/13 --> No files to remove
 Backup path 'test2'
  -> Building list of files
- ---> Dir: 
- ---> Dir: /testdir
  -> Parsing list of files (5)
  --> Files to add: 5 (928768 bytes)
  --> Done: 1/5 (0.0%) --> Done: 2/5 (15.7%) --> Done: 3/5 (43.6%) --> Done: 4/5 (100.0%) --> Done: 5/5 (100.0%) --> No files to remove
- ---> mount -t cifs -o ro,noatime,nocase,username=Myself,password=flesyM,nocase //myClient/C$ test_db/mount > /dev/null 2>&1
 Client unreachable 'client' using protocol 'smb'
 Protocol not supported: ssh
 Database closed (active contents: 18 files, removed contents: 0 files)

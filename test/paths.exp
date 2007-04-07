@@ -1,13 +1,3 @@
- ---> Dir: 
- ---> Dir: /cvs
- ---> Dir: /cvs/CVS
- ---> Dir: /cvs/dirbad
- ---> Dir: /cvs/diroth
- ---> Dir: /cvs/dirutd
- ---> Dir: /cvs/dirutd/CVS
- ---> Dir: /testdir
- ---> Dir: /subdir
- ---> Dir: /dir space
 >List 27 file(s):
 	cvs	d	0	0	1000	1000	755	
 	cvs/CVS	d	0	0	1000	1000	755	
@@ -37,15 +27,6 @@
 	testfile~	f	0	1	1000	1000	644	
 	testlink	l	8	1	1000	1000	777	testfile
 as previous with subdir in ignore list
- ---> Dir: 
- ---> Dir: /cvs
- ---> Dir: /cvs/CVS
- ---> Dir: /cvs/dirbad
- ---> Dir: /cvs/diroth
- ---> Dir: /cvs/dirutd
- ---> Dir: /cvs/dirutd/CVS
- ---> Dir: /testdir
- ---> Dir: /dir space
 >List 23 file(s):
 	cvs	d	0	0	1000	1000	755	
 	cvs/CVS	d	0	0	1000	1000	755	
@@ -71,15 +52,6 @@ as previous with subdir in ignore list
 	testfile~	f	0	1	1000	1000	644	
 	testlink	l	8	1	1000	1000	777	testfile
 as previous with testlink in ignore list
- ---> Dir: 
- ---> Dir: /cvs
- ---> Dir: /cvs/CVS
- ---> Dir: /cvs/dirbad
- ---> Dir: /cvs/diroth
- ---> Dir: /cvs/dirutd
- ---> Dir: /cvs/dirutd/CVS
- ---> Dir: /testdir
- ---> Dir: /dir space
 >List 22 file(s):
 	cvs	d	0	0	1000	1000	755	
 	cvs/CVS	d	0	0	1000	1000	755	
@@ -104,15 +76,7 @@ as previous with testlink in ignore list
 	testfile	f	13	1	1000	1000	644	
 	testfile~	f	0	1	1000	1000	644	
 as previous with CVS parser
- ---> Dir: 
- ---> Dir: /cvs
- ---> Dir: /cvs/CVS
- ---> Dir: /cvs/dirbad
 Directory should be under CVS control: test/cvs/dirbad
- ---> Dir: /cvs/dirutd
- ---> Dir: /cvs/dirutd/CVS
- ---> Dir: /testdir
- ---> Dir: /dir space
 >List 17 file(s):
 	cvs	d	0	0	1000	1000	755	
 	cvs/CVS	d	0	0	1000	1000	755	
@@ -132,15 +96,7 @@ Directory should be under CVS control: test/cvs/dirbad
 	testfile	f	13	1	1000	1000	644	
 	testfile~	f	0	1	1000	1000	644	
 as previous
- ---> Dir: 
- ---> Dir: /cvs
- ---> Dir: /cvs/CVS
- ---> Dir: /cvs/dirbad
 Directory should be under CVS control: test/cvs/dirbad
- ---> Dir: /cvs/dirutd
- ---> Dir: /cvs/dirutd/CVS
- ---> Dir: /testdir
- ---> Dir: /dir space
 >List 17 file(s):
 	cvs	d	0	0	1000	1000	755	
 	cvs/CVS	d	0	0	1000	1000	755	
