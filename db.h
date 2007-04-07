@@ -93,7 +93,6 @@ public:
   int  load(
     const string &filename,
     SortedList<DbData>& list);
-  int  obsolete(const string& checksum, const File& file_data);
   int  organize(
     const string& path,
     int number);

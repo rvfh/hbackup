@@ -22,10 +22,6 @@ Directory should be under CVS control: test/////cvs/dirbad
 	testlink	l	8	1	1000	1000	777	testfile
 Database initialized
 59ca0efa9f5633cb0371bbc0355478d8-0  test/testfile
-Local list: 1 element(s):
-	test/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371bbc0355478d8	1	0	
-Local list: 1 element(s):
-	test/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371bbc0355478d8	1	1	
  --> Files to add: 16 (196 bytes)
  --> Done: 1/16 (0.0%) --> Done: 2/16 (0.0%) --> Done: 3/16 (71.9%) --> Done: 4/16 (71.9%) --> Done: 5/16 (71.9%) --> Done: 6/16 (71.9%) --> Done: 7/16 (93.4%) --> Done: 8/16 (93.4%) --> Done: 9/16 (93.4%) --> Done: 10/16 (93.4%) --> Done: 11/16 (93.4%) --> Done: 12/16 (93.4%) --> Done: 13/16 (93.4%) --> Done: 14/16 (93.4%) --> Done: 15/16 (100.0%) --> Done: 16/16 (100.0%) --> No files to remove
 Active list: 16 element(s):
@@ -115,12 +111,6 @@ file://host	/home/user2/testfile	f	145408	1	1000	1000	644		3d546a1ce46c6ae10ad34
 file://host	/home/user2/testfile2	f	259072	1	1000	1000	644		fb00cd74a5f35e89a7fbdd3c1d05375a-0	1	0	
 file://host	/home/user2/testlink	l	8	1	1000	1000	777	testfile		1	0	
 Removed list: 0 element(s):
-Local list: 5 element(s):
-file://host	/home/user/cvs/dirutd/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e	1	0	
-file://host	/home/user/cvs/filenew.c	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e	1	0	
-file://host	/home/user/cvs/fileutd.h	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e	1	0	
-file://host	/home/user/dir space/file space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e	1	0	
-file://host	/home/user/test space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e	1	0	
 Database closed (active contents: 20 files, removed contents: 0 files)
 Database opened (active contents: 20 files)
 Scanning database contents: 20 files
