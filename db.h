@@ -1,5 +1,5 @@
 /*
-     Copyright (C) 2006  Herve Fache
+     Copyright (C) 2006-2007  Herve Fache
 
      This program is free software; you can redistribute it and/or modify
      it under the terms of the GNU General Public License version 2 as
@@ -60,7 +60,10 @@ class Database {
     const string&       filename,
     SortedList<DbData>& list,
     bool                backup = false);
-  // Scan database to recover files list
+  int  save_journal(
+    const string&                         filename,
+    vector<SortedList<DbData>::iterator>& vector);
+  // Recover file lists
   int  recover();
 public:
   Database(const string& path) : _path(path) {}

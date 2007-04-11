@@ -1,5 +1,5 @@
 /*
-     Copyright (C) 2006  Herve Fache
+     Copyright (C) 2006-2007  Herve Fache
 
      This program is free software; you can redistribute it and/or modify
      it under the terms of the GNU General Public License version 2 as
@@ -188,7 +188,7 @@ int Database::load(const string &filename, SortedList<DbData>& list) {
       if (failed) {
         cerr << "db: open: list corrupted line " << line << endl;
         errno = EUCLEAN;
-      } else if (path[1] != '$') {
+      } else {
         File    data(access_path, path, link, File::typeMode(letter), mtime,
           size, uid, gid, mode);
         DbData  db_data(in, out, checksum, data);
@@ -227,6 +227,25 @@ int Database::save(
     if (rename(temp_path.c_str(), dest_path.c_str())) {
       failed = 2;
     }
+  } else {
+    failed = 2;
+  }
+  return failed;
+}
+
+int Database::save_journal(
+    const string&                         filename,
+    vector<SortedList<DbData>::iterator>& vector) {
+  FILE    *writefile;
+  int     failed = 0;
+
+  string dest_path = _path + "/" + filename;
+  if ((writefile = fopen(dest_path.c_str(), "a")) != NULL) {
+    unsigned int i;
+    for (i = 0; i < vector.size(); i++) {
+      fprintf(writefile, "%s\n", vector[i]->line().c_str());
+    }
+    fclose(writefile);
   } else {
     failed = 2;
   }
@@ -564,14 +583,13 @@ int Database::close() {
   load("removed", _removed);
   _removed.unique();
 
-  /* Save removed list */
+  // Update removed list
   if (save("removed", _removed, true)) {
     cerr << "db: close: failed to save removed items list" << endl;
   }
   int removed_size = _removed.size();
   _removed.clear();
 
-  /* Release lock */
   if (verbosity() > 0) {
     cout << "Database closed (active contents: " << active_size << " file";
     if (active_size != 1) {
@@ -583,6 +601,13 @@ int Database::close() {
     }
     cout << ")" << endl;
   }
+
+  // Delete journals
+  remove((_path + "/added.journal").c_str());
+  remove((_path + "/written.journal").c_str());
+  remove((_path + "/removed.journal").c_str());
+
+  // Release lock
   unlock();
   return 0;
 }
@@ -593,8 +618,7 @@ int Database::parse(
     const string& mount_path,
     list<File>*   file_list) {
   int failed = 0;
-  SortedList<DbData>                   added;
-  // TODO can I make that a checksum-ordered list somehow?
+  vector<SortedList<DbData>::iterator> added;
   vector<SortedList<DbData>::iterator> removed;
 
   string full_path = prefix + "/" + mounted_path + "/";
@@ -675,72 +699,92 @@ int Database::parse(
       if (same_file) {
         db_data.setChecksum(entry_active->checksum());
       }
-      added.push_back(db_data);
+      // Add to active list / Push iterator
+      added.push_back(_active.add(db_data));
+      // Go on to next
       entry_file_list++;
     }
 
     // DB data is used above!
     if (db_remove) {
-      // Push iterator
-      removed.push_back(entry_active);
-      entry_active++;
+      // Mark removed
+      entry_active->setOut();
+      // Add to removed list / Push iterator
+      removed.push_back(_removed.add(*entry_active));
+      // Remove from active list / Go on to next
+      entry_active = _active.erase(entry_active);
     } else
     if (db_erase) {
+      // Remove from active list / Go on to next
       entry_active = _active.erase(entry_active);
     }
   }
 
-  /* Deal with new/modified data first */
+  // Append to recovery journals
+  if (save_journal("added.journal", added)
+   || save_journal("removed.journal", removed)) {
+    // Unlikely
+    failed = 1;
+  }
+
+  // Deal with new/modified data
   if (! added.empty()) {
-    /* Static to be global to all shares */
-    static int    copied        = 0;
-    static off_t  volume        = 0;
+    // Static to be global to all shares
     double        sizetobackup  = 0.0;
     double        sizebackedup  = 0.0;
     int           filestobackup = 0;
     int           filesbackedup = 0;
     SortedList<DbData>::iterator i;
 
-    /* Determine volume to be copied */
+    // Determine volume to be copied
     if (verbosity() > 2) {
-      for (i = added.begin(); i != added.end(); i++) {
+      for (unsigned int i = 0; i < added.size(); i++) {
         /* Same data as in file_list */
         filestobackup++;
-        if (S_ISREG(i->data().type()) && i->checksum().empty()) {
-          sizetobackup += double(i->data().size());
+        if (S_ISREG(added[i]->data().type()) && added[i]->checksum().empty()) {
+          sizetobackup += double(added[i]->data().size());
         }
       }
       printf(" --> Files to add: %u (%0.f bytes)\n",
         added.size(), sizetobackup);
     }
 
-    for (i = added.begin(); i != added.end(); i++) {
+    // Create recovery journal for added files
+    FILE  *writefile;
+    bool  journal_ok = true;
+
+    string dest_path = _path + "/written.journal";
+    if ((writefile = fopen(dest_path.c_str(), "a")) == NULL) {
+      journal_ok = false;
+    }
+
+    for (unsigned int i = 0; i < added.size(); i++) {
       if (terminating()) {
         break;
       }
       // Set checksum
-      if (S_ISREG(i->data().type()) && i->checksum().empty()) {
-        if (write(mount_path + i->data().path().substr(mounted_path.size()),
-          *i) != 0) {
+      if (S_ISREG(added[i]->data().type()) && added[i]->checksum().empty()) {
+        if (write(
+          mount_path + added[i]->data().path().substr(mounted_path.size()),
+          *added[i]) != 0) {
           /* Write failed, need to go on */
           failed = 1;
           if (! terminating()) {
             /* Don't signal errors on termination */
             cerr << "\r" << strerror(errno) << ": "
-              << i->data().path() << ", ignoring" << endl;
+              << added[i]->data().path() << ", ignoring" << endl;
           }
         }
         if (verbosity() > 2) {
-          sizebackedup += double(i->data().size());
+          sizebackedup += double(added[i]->data().size());
         }
       }
-      // Save new data
-      _active.add(*i);
-      if ((++copied >= 1000)
-      || ((volume += i->data().size()) >= 100000000)) {
-        copied = 0;
-        volume = 0;
+      if (journal_ok) {
+        // Update journal
+        fprintf(writefile, "%s\n", added[i]->line().c_str());
       }
+
+      // Update/show information
       if (verbosity() > 2) {
         filesbackedup++;
         if (sizetobackup != 0) {
@@ -750,34 +794,19 @@ int Database::parse(
         }
       }
     }
+    if (journal_ok) {
+      fclose(writefile);
+    }
   } else if (verbosity() > 2) {
-    cout << " --> No files to add" << endl;
+    cout << " --> Files to add: 0" << endl;
   }
 
-  /* Deal with removed/modified data */
-  if (! removed.empty()) {
-    if (verbosity() > 2) {
-      printf(" --> Files to remove: %u\n", removed.size());
-    }
-    for (unsigned int i = 0; i < removed.size(); i++) {
-      if (terminating()) {
-        break;
-      }
-      // Mark removed
-      removed[i]->setOut();
-      // Add to removed list
-      _removed.add(*removed[i]);
-      // Remove from active list
-      _active.erase(removed[i]);
-    }
-/*    if (verbosity() > 3) {
-      cout << "                                       \r";
-    }*/
-  } else if (verbosity() > 2) {
-    cout << " --> No files to remove\n";
+  // Deal with removed/modified data
+  if (verbosity() > 2) {
+    cout << " --> Files to remove: " << removed.size() << endl;
   }
 
-  /* Report errors */
+  // Report errors
   if (failed) {
     return 1;
   }
