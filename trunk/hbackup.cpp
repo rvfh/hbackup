@@ -16,8 +16,6 @@
      Boston, MA 02111-1307, USA.
 */
 
-using namespace std;
-
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -25,6 +23,8 @@ using namespace std;
 #include <list>
 #include <signal.h>
 #include <errno.h>
+
+using namespace std;
 
 #include "hbackup.h"
 #include "list.h"

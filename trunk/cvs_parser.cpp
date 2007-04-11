@@ -16,17 +16,13 @@
      Boston, MA 02111-1307, USA.
 */
 
-// TODO: this is incomplete:
-//  * D on its own (_all_files)
-//  * other nice traps?
-
-using namespace std;
-
 #include <fstream>
 #include <iostream>
 #include <vector>
 #include <string>
 #include <sys/stat.h>
+
+using namespace std;
 
 #include "files.h"
 #include "parsers.h"
@@ -70,13 +66,17 @@ CvsParser::CvsParser(parser_mode_t mode, const string& dir_path) {
   _mode = mode;
 
   /* Fill in list of controlled files */
-  _all_files = false;
   while (! entries.eof()) {
     string  buffer;
     getline(entries, buffer);
     cvs_entry_t cvs_entry;
 
     if (buffer.substr(0,1) == "D") {
+      if (buffer.size() == 1) {
+        // If a directory contains no subdirectories, the last line of the
+        // entries file is a single 'D'
+        continue;
+      }
       cvs_entry.type = S_IFDIR;
       buffer.erase(0,1);
     } else {
@@ -99,10 +99,8 @@ CvsParser::CvsParser(parser_mode_t mode, const string& dir_path) {
 }
 
 bool CvsParser::ignore(const File& file_data) {
-  // Deal with no-work cases
-  if (  _all_files
-     // We don't know whether controlled files are modified or not
-     || (_mode == parser_modifiedandothers)) {
+  // No need to check more
+  if (_mode == parser_modifiedandothers) {
     return false;
   }
 

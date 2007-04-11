@@ -32,7 +32,6 @@ class CvsParser : public Parser {
   static char*        _control_dir;
   static char*        _entries;
   vector<cvs_entry_t> _files;
-  bool                _all_files;
 public:
   // Constructor for parsers list
   CvsParser(parser_mode_t mode) : Parser(mode) {}

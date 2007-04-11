@@ -34,8 +34,6 @@
  *  mark
  */
 
-using namespace std;
-
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -46,6 +44,8 @@ using namespace std;
 #include <time.h>
 #include <dirent.h>
 #include <errno.h>
+
+using namespace std;
 
 #include "list.h"
 #include "files.h"
