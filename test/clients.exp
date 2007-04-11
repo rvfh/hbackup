@@ -64,7 +64,6 @@ Options: username=
 -> smb://Client c:/home/BlaH/Backup.list
 Options: username= password=
 Database initialized
-mount: operação exclusiva de root
 Client unreachable 'myClient' using protocol 'nfs'
 Client unreachable 'myClient2' using protocol 'smb'
 Protocol not supported: ssh

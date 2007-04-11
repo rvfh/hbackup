@@ -1,5 +1,5 @@
 /*
-     Copyright (C) 2006  Herve Fache
+     Copyright (C) 2006-2007  Herve Fache
 
      This program is free software; you can redistribute it and/or modify
      it under the terms of the GNU General Public License version 2 as
@@ -74,22 +74,24 @@ int Client::mountPath(
     return 0;
   } else
   if (_protocol == "nfs") {
-    command += "-t nfs -o ro,noatime,nolock "+ share + " " + _mount_point;
+    command += "-t nfs -o ro,noatime,nolock";
   } else
   if (_protocol == "smb") {
     // codepage=858
     command += "-t cifs -o ro,noatime,nocase";
-
-    for (unsigned int i = 0; i < _options.size(); i++ ) {
-      command += "," + _options[i]->option();
-    }
-    command += " " + share + " " + _mount_point + " > /dev/null 2>&1";
   }
+  // Additional options
+  for (unsigned int i = 0; i < _options.size(); i++ ) {
+    command += "," + _options[i]->option();
+  }
+  // Paths
+  command += " " + share + " " + _mount_point;
 
   /* Issue mount command */
   if (verbosity() > 3) {
     cout << " ---> " << command << endl;
   }
+  command += " > /dev/null 2>&1";
   int result = system(command.c_str());
   if (result != 0) {
     errno = ETIMEDOUT;
