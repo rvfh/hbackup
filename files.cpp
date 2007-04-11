@@ -16,8 +16,6 @@
      Boston, MA 02111-1307, USA.
 */
 
-using namespace std;
-
 #include <fstream>
 #include <iostream>
 #include <vector>
@@ -29,6 +27,8 @@ using namespace std;
 #include <openssl/md5.h>
 #include <openssl/evp.h>
 #include <zlib.h>
+
+using namespace std;
 
 #include "files.h"
 #include "hbackup.h"

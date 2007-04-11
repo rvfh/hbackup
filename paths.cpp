@@ -16,8 +16,6 @@
      Boston, MA 02111-1307, USA.
 */
 
-using namespace std;
-
 #include <iostream>
 #include <string>
 #include <vector>
@@ -25,6 +23,8 @@ using namespace std;
 #include <dirent.h>
 #include <sys/stat.h>
 #include <errno.h>
+
+using namespace std;
 
 #include "files.h"
 #include "filters.h"

@@ -16,14 +16,14 @@
      Boston, MA 02111-1307, USA.
 */
 
-using namespace std;
-
 #include <fstream>
 #include <iostream>
 #include <vector>
 #include <list>
 #include <string>
 #include <errno.h>
+
+using namespace std;
 
 #include "files.h"
 #include "list.h"
