@@ -1,5 +1,5 @@
 /*
-     Copyright (C) 2006  Herve Fache
+     Copyright (C) 2006-2007  Herve Fache
 
      This program is free software; you can redistribute it and/or modify
      it under the terms of the GNU General Public License version 2 as
@@ -51,6 +51,7 @@ int main(void) {
   off_t     size;
   off_t     zsize;
   SortedList<DbData>::iterator i;
+  SortedList<DbData> journal;
   int       status;
 
   /* Test internal functions */
@@ -124,6 +125,24 @@ int main(void) {
     db.close();
     return 0;
   }
+  db.load("added.journal", journal);
+  cout << "Added journal list: " << journal.size() << " element(s):\n";
+  for (i = journal.begin(); i != journal.end(); i++) {
+    cout << i->line(true) << endl;
+  }
+  journal.clear();
+  db.load("removed.journal", journal);
+  cout << "Removed journal list: " << journal.size() << " element(s):\n";
+  for (i = journal.begin(); i != journal.end(); i++) {
+    cout << i->line(true) << endl;
+  }
+  journal.clear();
+  db.load("written.journal", journal);
+  cout << "Really added journal list: " << journal.size() << " element(s):\n";
+  for (i = journal.begin(); i != journal.end(); i++) {
+    cout << i->line(true) << endl;
+  }
+  journal.clear();
   cout << "Active list: " << db.active()->size() << " element(s):\n";
   for (i = db.active()->begin(); i != db.active()->end(); i++) {
     cout << i->line(true) << endl;
@@ -156,6 +175,24 @@ int main(void) {
     db.close();
     return 0;
   }
+  db.load("added.journal", journal);
+  cout << "Added journal list: " << journal.size() << " element(s):\n";
+  for (i = journal.begin(); i != journal.end(); i++) {
+    cout << i->line(true) << endl;
+  }
+  journal.clear();
+  db.load("removed.journal", journal);
+  cout << "Removed journal list: " << journal.size() << " element(s):\n";
+  for (i = journal.begin(); i != journal.end(); i++) {
+    cout << i->line(true) << endl;
+  }
+  journal.clear();
+  db.load("written.journal", journal);
+  cout << "Really added journal list: " << journal.size() << " element(s):\n";
+  for (i = journal.begin(); i != journal.end(); i++) {
+    cout << i->line(true) << endl;
+  }
+  journal.clear();
   cout << "Active list: " << db.active()->size() << " element(s):\n";
   for (i = db.active()->begin(); i != db.active()->end(); i++) {
     cout << i->line(true) << endl;
@@ -192,6 +229,24 @@ int main(void) {
     db.close();
     return 0;
   }
+  db.load("added.journal", journal);
+  cout << "Added journal list: " << journal.size() << " element(s):\n";
+  for (i = journal.begin(); i != journal.end(); i++) {
+    cout << i->line(true) << endl;
+  }
+  journal.clear();
+  db.load("removed.journal", journal);
+  cout << "Removed journal list: " << journal.size() << " element(s):\n";
+  for (i = journal.begin(); i != journal.end(); i++) {
+    cout << i->line(true) << endl;
+  }
+  journal.clear();
+  db.load("written.journal", journal);
+  cout << "Really added journal list: " << journal.size() << " element(s):\n";
+  for (i = journal.begin(); i != journal.end(); i++) {
+    cout << i->line(true) << endl;
+  }
+  journal.clear();
   cout << "Active list: " << db.active()->size() << " element(s):\n";
   for (i = db.active()->begin(); i != db.active()->end(); i++) {
     cout << i->line(true) << endl;
@@ -324,6 +379,67 @@ int main(void) {
     db.close();
     return 0;
   }
+  db.load("added.journal", journal);
+  cout << "Added journal list: " << journal.size() << " element(s):\n";
+  for (i = journal.begin(); i != journal.end(); i++) {
+    cout << i->line(true) << endl;
+  }
+  journal.clear();
+  db.load("removed.journal", journal);
+  cout << "Removed journal list: " << journal.size() << " element(s):\n";
+  for (i = journal.begin(); i != journal.end(); i++) {
+    cout << i->line(true) << endl;
+  }
+  journal.clear();
+  db.load("written.journal", journal);
+  cout << "Really added journal list: " << journal.size() << " element(s):\n";
+  for (i = journal.begin(); i != journal.end(); i++) {
+    cout << i->line(true) << endl;
+  }
+  journal.clear();
+  cout << "Active list: " << db.active()->size() << " element(s):\n";
+  for (i = db.active()->begin(); i != db.active()->end(); i++) {
+    cout << i->line(true) << endl;
+  }
+  cout << "Removed list: " << db.removed()->size() << " element(s):\n";
+  for (i = db.removed()->begin(); i != db.removed()->end(); i++) {
+    cout << i->line(true) << endl;
+  }
+
+  remove("test/dir space/file space");
+  if (path->createList("test////")) {
+    cout << "file list is empty" << endl;
+    return 0;
+  }
+  cout << ">List " << path->list()->size() << " file(s):" << endl;
+  for (list<File>::iterator i = path->list()->begin();
+    i != path->list()->end(); i++) {
+    cout << i->line(true) << endl;
+  }
+
+  if ((status = db.parse("file://host", "/home/user", "test", path->list()))) {
+    printf("db.parse error status %u\n", status);
+    db.close();
+    return 0;
+  }
+  db.load("added.journal", journal);
+  cout << "Added journal list: " << journal.size() << " element(s):\n";
+  for (i = journal.begin(); i != journal.end(); i++) {
+    cout << i->line(true) << endl;
+  }
+  journal.clear();
+  db.load("removed.journal", journal);
+  cout << "Removed journal list: " << journal.size() << " element(s):\n";
+  for (i = journal.begin(); i != journal.end(); i++) {
+    cout << i->line(true) << endl;
+  }
+  journal.clear();
+  db.load("written.journal", journal);
+  cout << "Really added journal list: " << journal.size() << " element(s):\n";
+  for (i = journal.begin(); i != journal.end(); i++) {
+    cout << i->line(true) << endl;
+  }
+  journal.clear();
   cout << "Active list: " << db.active()->size() << " element(s):\n";
   for (i = db.active()->begin(); i != db.active()->end(); i++) {
     cout << i->line(true) << endl;
@@ -382,6 +498,24 @@ int main(void) {
     db.close();
     return 0;
   }
+  db.load("added.journal", journal);
+  cout << "Added journal list: " << journal.size() << " element(s):\n";
+  for (i = journal.begin(); i != journal.end(); i++) {
+    cout << i->line(true) << endl;
+  }
+  journal.clear();
+  db.load("removed.journal", journal);
+  cout << "Removed journal list: " << journal.size() << " element(s):\n";
+  for (i = journal.begin(); i != journal.end(); i++) {
+    cout << i->line(true) << endl;
+  }
+  journal.clear();
+  db.load("written.journal", journal);
+  cout << "Really added journal list: " << journal.size() << " element(s):\n";
+  for (i = journal.begin(); i != journal.end(); i++) {
+    cout << i->line(true) << endl;
+  }
+  journal.clear();
   cout << "Active list: " << db.active()->size() << " element(s):\n";
   for (i = db.active()->begin(); i != db.active()->end(); i++) {
     cout << i->line(true) << endl;
@@ -418,6 +552,24 @@ int main(void) {
     db.close();
     return 0;
   }
+  db.load("added.journal", journal);
+  cout << "Added journal list: " << journal.size() << " element(s):\n";
+  for (i = journal.begin(); i != journal.end(); i++) {
+    cout << i->line(true) << endl;
+  }
+  journal.clear();
+  db.load("removed.journal", journal);
+  cout << "Removed journal list: " << journal.size() << " element(s):\n";
+  for (i = journal.begin(); i != journal.end(); i++) {
+    cout << i->line(true) << endl;
+  }
+  journal.clear();
+  db.load("written.journal", journal);
+  cout << "Really added journal list: " << journal.size() << " element(s):\n";
+  for (i = journal.begin(); i != journal.end(); i++) {
+    cout << i->line(true) << endl;
+  }
+  journal.clear();
   cout << "Active list: " << db.active()->size() << " element(s):\n";
   for (i = db.active()->begin(); i != db.active()->end(); i++) {
     cout << i->line(true) << endl;
@@ -454,6 +606,24 @@ int main(void) {
     db.close();
     return 0;
   }
+  db.load("added.journal", journal);
+  cout << "Added journal list: " << journal.size() << " element(s):\n";
+  for (i = journal.begin(); i != journal.end(); i++) {
+    cout << i->line(true) << endl;
+  }
+  journal.clear();
+  db.load("removed.journal", journal);
+  cout << "Removed journal list: " << journal.size() << " element(s):\n";
+  for (i = journal.begin(); i != journal.end(); i++) {
+    cout << i->line(true) << endl;
+  }
+  journal.clear();
+  db.load("written.journal", journal);
+  cout << "Really added journal list: " << journal.size() << " element(s):\n";
+  for (i = journal.begin(); i != journal.end(); i++) {
+    cout << i->line(true) << endl;
+  }
+  journal.clear();
   cout << "Active list: " << db.active()->size() << " element(s):\n";
   for (i = db.active()->begin(); i != db.active()->end(); i++) {
     cout << i->line(true) << endl;

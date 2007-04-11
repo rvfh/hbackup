@@ -85,12 +85,12 @@ Backup path 'test'
 Directory should be under CVS control: test/cvs/dirbad
  -> Parsing list of files (13)
  --> Files to add: 13 (0 bytes)
- --> Done: 1/13 --> Done: 2/13 --> Done: 3/13 --> Done: 4/13 --> Done: 5/13 --> Done: 6/13 --> Done: 7/13 --> Done: 8/13 --> Done: 9/13 --> Done: 10/13 --> Done: 11/13 --> Done: 12/13 --> Done: 13/13 --> No files to remove
+ --> Done: 1/13 --> Done: 2/13 --> Done: 3/13 --> Done: 4/13 --> Done: 5/13 --> Done: 6/13 --> Done: 7/13 --> Done: 8/13 --> Done: 9/13 --> Done: 10/13 --> Done: 11/13 --> Done: 12/13 --> Done: 13/13 --> Files to remove: 0
 Backup path 'test2'
  -> Building list of files
  -> Parsing list of files (5)
  --> Files to add: 5 (928768 bytes)
- --> Done: 1/5 (0.0%) --> Done: 2/5 (15.7%) --> Done: 3/5 (43.6%) --> Done: 4/5 (100.0%) --> Done: 5/5 (100.0%) --> No files to remove
+ --> Done: 1/5 (0.0%) --> Done: 2/5 (15.7%) --> Done: 3/5 (43.6%) --> Done: 4/5 (100.0%) --> Done: 5/5 (100.0%) --> Files to remove: 0
 Database closed (active contents: 18 files, removed contents: 0 files)
  --> Client: testhost
 >List 1 client(s):
@@ -104,11 +104,11 @@ Backup path 'test'
  -> Building list of files
 Directory should be under CVS control: test/cvs/dirbad
  -> Parsing list of files (13)
- --> No files to add
- --> No files to remove
+ --> Files to add: 0
+ --> Files to remove: 0
 Backup path 'test2'
  -> Building list of files
  -> Parsing list of files (5)
- --> No files to add
- --> No files to remove
+ --> Files to add: 0
+ --> Files to remove: 0
 Database closed (active contents: 18 files, removed contents: 0 files)
