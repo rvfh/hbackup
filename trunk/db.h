@@ -39,6 +39,7 @@ public:
   DbData(time_t in, time_t out, string checksum, const File& data) :
     _in(in), _out(out), _checksum(checksum), _data(data) {}
   bool operator<(const DbData&) const;
+  // Equality and difference exclude _out
   bool operator!=(const DbData&) const;
   bool operator==(const DbData& right) const { return ! (*this != right); }
   time_t in() const { return _in; }
@@ -63,8 +64,9 @@ class Database {
   int  save_journal(
     const string&                         filename,
     vector<SortedList<DbData>::iterator>& vector);
-  // Recover file lists
-  int  recover();
+  int  save_journal(
+    const string&       filename,
+    SortedList<DbData>& list);
 public:
   Database(const string& path) : _path(path) {}
   /* Open database */
@@ -93,12 +95,14 @@ public:
     const string& checksum,
     string&       path,
     bool          create);
+  // Load list, skipping offset elements
   int  load(
-    const string &filename,
-    SortedList<DbData>& list);
+    const string&       filename,
+    SortedList<DbData>& list,
+    int                 offset = 0);
   int  organize(
     const string& path,
-    int number);
+    int           number);
   int  write(
     const string&   path,
     DbData&         db_data,
