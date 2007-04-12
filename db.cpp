@@ -662,19 +662,6 @@ int Database::open() {
 }
 
 int Database::close() {
-  time_t          localtime;
-  struct tm       localtime_brokendown;
-
-  /* Save list for month day */
-  if ((time(&localtime) != -1)
-   && (localtime_r(&localtime, &localtime_brokendown) != NULL)) {
-    char *daily_list = NULL;
-
-    asprintf(&daily_list, "list_%02u", localtime_brokendown.tm_mday);
-    save(daily_list, _active);
-    free(daily_list);
-  }
-
   // Save active list
   if (save("list", _active, true)) {
     cerr << "db: close: failed to save active items list" << endl;
@@ -682,17 +669,21 @@ int Database::close() {
   int active_size = _active.size();
   _active.clear();
 
-  /* Load previously removed items into removed list */
-  /* TODO What do we do if this fails? Recover? */
-  load("removed", _removed);
-  _removed.unique();
+  // Load previously removed items into removed list
+  int removed_size = 0;
+  if (! load("removed", _removed)) {
+    _removed.unique();
 
-  // Update removed list
-  if (save("removed", _removed, true)) {
-    cerr << "db: close: failed to save removed items list" << endl;
+    // Update removed list
+    if (save("removed", _removed, true)) {
+      cerr << "db: close: failed to save removed items list" << endl;
+    }
+    removed_size = _removed.size();
+    _removed.clear();
+  } else {
+    // This should not fail
+    cerr << "db: close: failed to load removed items list" << endl;
   }
-  int removed_size = _removed.size();
-  _removed.clear();
 
   if (verbosity() > 0) {
     cout << "Database closed (active contents: " << active_size << " file";
