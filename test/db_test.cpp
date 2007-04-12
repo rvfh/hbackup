@@ -335,7 +335,7 @@ int main(void) {
 
 
 
-  /* Re-open database => correct missing file */
+  /* Re-open database */
   if ((status = db.open())) {
     printf("db_open error status %u\n", status);
     if (status == 2) {
@@ -350,6 +350,130 @@ int main(void) {
   for (i = db.removed()->begin(); i != db.removed()->end(); i++) {
     cout << i->line(true) << endl;
   }
+
+  system("chmod 0775 test/testdir");
+  system("chmod 0775 test/cvs/dirutd/CVS/Entries");
+
+  path = new Path("");
+  path->addParser("c", "cvs");
+  path->addFilter("type", "dir");
+  path->addFilter("path_start", ".svn", true);
+  path->addFilter("type", "dir");
+  path->addFilter("path_start", "subdir", true);
+  path->addFilter("type", "file");
+  path->addFilter("path_end", "~", true);
+  path->addFilter("type", "file");
+  path->addFilter("path_regexp", "\\.o$", true);
+  if (path->createList("test////")) {
+    cout << "file list is empty" << endl;
+    return 0;
+  }
+  cout << ">List " << path->list()->size() << " file(s):" << endl;
+  for (list<File>::iterator i = path->list()->begin();
+    i != path->list()->end(); i++) {
+    cout << i->line(true) << endl;
+  }
+
+  if ((status = db.parse("file://host", "/home/user", "test", path->list()))) {
+    printf("db.parse error status %u\n", status);
+    db.close();
+    return 0;
+  }
+  db.load("added.journal", journal);
+  cout << "Added journal list: " << journal.size() << " element(s):\n";
+  for (i = journal.begin(); i != journal.end(); i++) {
+    cout << i->line(true) << endl;
+  }
+  journal.clear();
+  db.load("removed.journal", journal);
+  cout << "Removed journal list: " << journal.size() << " element(s):\n";
+  for (i = journal.begin(); i != journal.end(); i++) {
+    cout << i->line(true) << endl;
+  }
+  journal.clear();
+  db.load("written.journal", journal);
+  cout << "Really added journal list: " << journal.size() << " element(s):\n";
+  for (i = journal.begin(); i != journal.end(); i++) {
+    cout << i->line(true) << endl;
+  }
+  journal.clear();
+  cout << "Active list: " << db.active()->size() << " element(s):\n";
+  for (i = db.active()->begin(); i != db.active()->end(); i++) {
+    cout << i->line(true) << endl;
+  }
+  cout << "Removed list: " << db.removed()->size() << " element(s):\n";
+  for (i = db.removed()->begin(); i != db.removed()->end(); i++) {
+    cout << i->line(true) << endl;
+  }
+
+  remove("test/dir space/file space");
+  if (path->createList("test////")) {
+    cout << "file list is empty" << endl;
+    return 0;
+  }
+  cout << ">List " << path->list()->size() << " file(s):" << endl;
+  for (list<File>::iterator i = path->list()->begin();
+    i != path->list()->end(); i++) {
+    cout << i->line(true) << endl;
+  }
+
+  if ((status = db.parse("file://host", "/home/user", "test", path->list()))) {
+    printf("db.parse error status %u\n", status);
+    db.close();
+    return 0;
+  }
+  db.load("added.journal", journal);
+  cout << "Added journal list: " << journal.size() << " element(s):\n";
+  for (i = journal.begin(); i != journal.end(); i++) {
+    cout << i->line(true) << endl;
+  }
+  journal.clear();
+  db.load("removed.journal", journal);
+  cout << "Removed journal list: " << journal.size() << " element(s):\n";
+  for (i = journal.begin(); i != journal.end(); i++) {
+    cout << i->line(true) << endl;
+  }
+  journal.clear();
+  db.load("written.journal", journal);
+  cout << "Really added journal list: " << journal.size() << " element(s):\n";
+  for (i = journal.begin(); i != journal.end(); i++) {
+    cout << i->line(true) << endl;
+  }
+  journal.clear();
+  cout << "Active list: " << db.active()->size() << " element(s):\n";
+  for (i = db.active()->begin(); i != db.active()->end(); i++) {
+    cout << i->line(true) << endl;
+  }
+  cout << "Removed list: " << db.removed()->size() << " element(s):\n";
+  for (i = db.removed()->begin(); i != db.removed()->end(); i++) {
+    cout << i->line(true) << endl;
+  }
+
+  db.close();
+
+
+
+  /* Re-open database */
+  if ((status = db.open())) {
+    printf("db_open error status %u\n", status);
+    if (status == 2) {
+      return 0;
+    }
+  }
+  cout << "Active list: " << db.active()->size() << " element(s):\n";
+  for (i = db.active()->begin(); i != db.active()->end(); i++) {
+    cout << i->line(true) << endl;
+  }
+  cout << "Removed list: " << db.removed()->size() << " element(s):\n";
+  for (i = db.removed()->begin(); i != db.removed()->end(); i++) {
+    cout << i->line(true) << endl;
+  }
+  db.load("removed", journal);
+  cout << "Official removed list: " << journal.size() << " element(s):\n";
+  for (i = journal.begin(); i != journal.end(); i++) {
+    cout << i->line(true) << endl;
+  }
+  journal.clear();
 
   system("chmod 0777 test/testdir");
   system("chmod 0777 test/cvs/dirutd/CVS/Entries");
@@ -449,7 +573,20 @@ int main(void) {
     cout << i->line(true) << endl;
   }
 
-  db.close();
+  // Test recovery
+  cout << "Recovery test" << endl;
+  system("head -2 test_db/written.journal > tmp");
+  system("mv tmp test_db/written.journal");
+  system("echo blah >> test_db/written.journal");
+  db.load("written.journal", journal);
+  cout << "Really added journal list: " << journal.size() << " element(s):\n";
+  for (i = journal.begin(); i != journal.end(); i++) {
+    cout << i->line(true) << endl;
+  }
+  journal.clear();
+
+  // Simulate crash
+  system("echo 1234567890 > test_db/lock");
 
 
 
@@ -635,6 +772,13 @@ int main(void) {
   delete path;
 
   db.organize("test_db/data", 2);
+
+  db.load("removed", journal);
+  cout << "Official removed list: " << journal.size() << " element(s):\n";
+  for (i = journal.begin(); i != journal.end(); i++) {
+    cout << i->line(true) << endl;
+  }
+  journal.clear();
 
   db.close();
 

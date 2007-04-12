@@ -82,15 +82,19 @@ File::File(const string& access_path, const string& path) {
 
 // Tested in db's test
 bool File::metadiffer(const File& right) const {
-  return (_mtime != right._mtime) || (_link != right._link)
-      || (_mtime != right._mtime) || (_size != right._size)
-      || (_uid != right._uid) || (_gid != right._gid)
-      || (_mode != right._mode);
+  return (_mtime != right._mtime)   || (_size != right._size)
+      || (_uid != right._uid)       || (_gid != right._gid)
+      || (_mode != right._mode)     || (_link != right._link);
 }
 
 // Tested in db's test
 bool File::operator<(const File& right) const {
-  return (_prefix < right._prefix) || (_path < right._path);
+  if ((_prefix == right._prefix) && (_path == right._path)) {
+    return (_mtime < right._mtime)  || (_size < right._size)
+        || (_uid < right._uid)      || (_gid < right._gid)
+        || (_mode < right._mode)    || (_link < right._link);
+  }
+  return (_prefix < right._prefix)  || (_path < right._path);
 }
 
 bool File::operator!=(const File& right) const {
@@ -151,20 +155,21 @@ int File::testDir(const string& path, bool create) {
 }
 
 int File::testReg(const string& path, bool create) {
-  fstream file(path.c_str(), fstream::in);
+  // Don't use C++ stuff: no errno set
+  FILE  *readfile;
 
-  if (! file.is_open()) {
+  if ((readfile = fopen(path.c_str(), "r")) == NULL) {
+    // File does not exist
     if (create) {
-      file.open(path.c_str(), fstream::out);
-      if (! file.is_open()) {
-        cerr << "db: failed to create file: " << path << endl;
+      if ((readfile = fopen(path.c_str(), "w")) == NULL) {
+        cerr << "Failed to create file: " << path << endl;
         return 2;
       }
-      file.close();
+      fclose(readfile);
     }
     return 1;
   }
-  file.close();
+  fclose(readfile);
   return 0;
 }
 
