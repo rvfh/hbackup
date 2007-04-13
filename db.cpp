@@ -234,12 +234,21 @@ int Database::save(
 
     /* All done */
     if (backup && rename(dest_path.c_str(), (dest_path + "~").c_str())) {
+      if (verbosity() > 3) {
+        cerr << "db: save: cannot create backup" << endl;
+      }
       failed = 2;
     }
     if (rename(temp_path.c_str(), dest_path.c_str())) {
+      if (verbosity() > 3) {
+        cerr << "db: save: cannot rename file" << endl;
+      }
       failed = 2;
     }
   } else {
+    if (verbosity() > 3) {
+      cerr << "db: save: cannot create file" << endl;
+    }
     failed = 2;
   }
   return failed;
@@ -525,7 +534,7 @@ int Database::open() {
   } else
   if (status == 1) {
     // Create files
-    if ((File::testReg(_path + "/list", true) == 2)
+    if ((File::testReg(_path + "/active", true) == 2)
      || (File::testReg(_path + "/removed", true) == 2)) {
       cerr << "db: open: cannot create list files" << endl;
       status = 2;
@@ -534,11 +543,11 @@ int Database::open() {
     }
   } else {
     // Check files presence
-    if (File::testReg(_path + "/list", false)) {
+    if (File::testReg(_path + "/active", false)) {
       cerr << "db: open: active files list not accessible: ";
-      if (File::testReg(_path + "/list~", false)) {
+      if (File::testReg(_path + "/active~", false)) {
         cerr << "using backup" << endl;
-        rename((_path + "/list~").c_str(), (_path + "/list").c_str());
+        rename((_path + "/active~").c_str(), (_path + "/active").c_str());
       } else {
         cerr << "no backup accessible, aborting" << endl;
         status = 2;
@@ -571,7 +580,7 @@ int Database::open() {
 
       if ((errno == 0)
        && ! load("added.journal", active, active.size())
-       && ! load("list", active)) {
+       && ! load("active", active)) {
         cerr << "db: open: removing " << removed.size()
           << " files from active list" << endl;
         // Remove removed items from active list
@@ -582,7 +591,7 @@ int Database::open() {
             active.erase(j);
           }
         }
-        save("list", active);
+        save("active", active);
         cerr << "db: open: new active list size: " << active.size() << endl;
       }
       active.clear();
@@ -606,7 +615,7 @@ int Database::open() {
 
   // Read database active items list
   if (status != 2) {
-    load("list", _active);
+    load("active", _active);
 
     // TODO fix that!
     switch (errno) {
@@ -648,8 +657,9 @@ int Database::open() {
 
 int Database::close() {
   // Save active list
-  if (save("list", _active, true)) {
+  if (save("active", _active, true)) {
     cerr << "db: close: failed to save active items list" << endl;
+    return 2;
   }
   int active_size = _active.size();
   _active.clear();
@@ -973,7 +983,7 @@ int Database::read(const string& path, const string& checksum) {
 }
 
 int Database::scan(const string& checksum, bool thorough) {
-  int     failed = 0;
+  int failed = 0;
 
   if (checksum == "") {
     int files = _active.size();
@@ -1029,7 +1039,7 @@ int Database::scan(const string& checksum, bool thorough) {
         break;
       }
     }
-  } else if (checksum[0] != 'N') {
+  } else {
     string  path;
     bool    filefailed = false;
 

@@ -33,7 +33,7 @@ using namespace std;
 #include "list.h"
 #include "db.h"
 
-static int verbose = 3;
+static int verbose = 4;
 
 int verbosity(void) {
   return verbose;
@@ -84,10 +84,12 @@ int main(void) {
   path->addFilter("path_end", "~", true);
   path->addFilter("type", "file");
   path->addFilter("path_regexp", "\\.o$", true);
+  verbose = 3;
   if (path->createList("test////")) {
     cout << "file list is empty" << endl;
     return 0;
   }
+  verbose = 4;
   cout << ">List " << path->list()->size() << " file(s):" << endl;
   for (list<File>::iterator i = path->list()->begin();
     i != path->list()->end(); i++) {
@@ -213,10 +215,12 @@ int main(void) {
   path->addFilter("path_end", "~", true);
   path->addFilter("type", "file");
   path->addFilter("path_regexp", "\\.o$", true);
+  verbose = 3;
   if (path->createList("test2")) {
     cout << "file list is empty" << endl;
     return 0;
   }
+  verbose = 4;
   cout << ">List " << path->list()->size() << " file(s):" << endl;
   for (list<File>::iterator i = path->list()->begin();
     i != path->list()->end(); i++) {
@@ -257,91 +261,91 @@ int main(void) {
   }
   delete path;
 
-
+  verbose = 3;
   if ((status = db.scan("59ca0efa9f5633cb0371bbc0355478d8-0"))) {
     printf("scan error status %u\n", status);
     if (status) {
       return 0;
     }
   }
+  verbose = 4;
 
-
-
+  verbose = 3;
   if ((status = db.scan("59ca0efa9f5633cb0371bbc0355478d8-0", true))) {
     printf("scan error status %u\n", status);
     if (status) {
       return 0;
     }
   }
-
+  verbose = 4;
 
   db.close();
 
 
   db.open();
 
-
+  verbose = 3;
   if ((status = db.scan())) {
     printf("full scan error status %u\n", status);
     if (status) {
       return 0;
     }
   }
-
+  verbose = 4;
 
   db.close();
   db.open();
 
-
+  verbose = 3;
   if ((status = db.scan("", true))) {
     printf("full thorough scan error status %u\n", status);
     if (status) {
       return 0;
     }
   }
-
+  verbose = 4;
 
   db.close();
 
   // Save list
-  File::zcopy("test_db/list", "test_db/list.save", NULL, NULL, NULL, NULL, 0);
+  File::zcopy("test_db/active", "test_db/active.save", NULL, NULL, NULL, NULL, 0);
 
   db.open();
 
   remove("test_db/data/59ca0efa9f5633cb0371bbc0355478d8-0/data");
-
+  verbose = 3;
   if ((status = db.scan())) {
     printf("full scan error status %u\n", status);
   }
-
+  verbose = 4;
 
   db.close();
 
   // Restore list
-  File::zcopy("test_db/list.save", "test_db/list", NULL, NULL, NULL, NULL, 0);
+  File::zcopy("test_db/active.save", "test_db/active", NULL, NULL, NULL, NULL, 0);
 
   db.open();
 
-
+  verbose = 3;
   if ((status = db.scan("", true))) {
     printf("full thorough scan error status %u\n", status);
   }
-
+  verbose = 4;
 
   db.close();
 
   // Restore list
-  File::zcopy("test_db/list.save", "test_db/list", NULL, NULL, NULL, NULL, 0);
+  File::zcopy("test_db/active.save", "test_db/active", NULL, NULL, NULL, NULL, 0);
 
   db.open();
 
   File::testDir("test_db/data/59ca0efa9f5633cb0371bbc0355478d8-0", 1);
   File::testReg("test_db/data/59ca0efa9f5633cb0371bbc0355478d8-0/data", 1);
-
+  verbose = 3;
   if ((status = db.scan("", true))) {
     printf("full thorough scan error status %u\n", status);
   }
-
+  verbose = 4;
 
   db.close();
 
@@ -376,10 +380,12 @@ int main(void) {
   path->addFilter("path_end", "~", true);
   path->addFilter("type", "file");
   path->addFilter("path_regexp", "\\.o$", true);
+  verbose = 3;
   if (path->createList("test////")) {
     cout << "file list is empty" << endl;
     return 0;
   }
+  verbose = 4;
   cout << ">List " << path->list()->size() << " file(s):" << endl;
   for (list<File>::iterator i = path->list()->begin();
     i != path->list()->end(); i++) {
@@ -419,10 +425,12 @@ int main(void) {
   }
 
   remove("test/dir space/file space");
+  verbose = 3;
   if (path->createList("test////")) {
     cout << "file list is empty" << endl;
     return 0;
   }
+  verbose = 4;
   cout << ">List " << path->list()->size() << " file(s):" << endl;
   for (list<File>::iterator i = path->list()->begin();
     i != path->list()->end(); i++) {
@@ -500,10 +508,12 @@ int main(void) {
   path->addFilter("path_end", "~", true);
   path->addFilter("type", "file");
   path->addFilter("path_regexp", "\\.o$", true);
+  verbose = 3;
   if (path->createList("test////")) {
     cout << "file list is empty" << endl;
     return 0;
   }
+  verbose = 4;
   cout << ">List " << path->list()->size() << " file(s):" << endl;
   for (list<File>::iterator i = path->list()->begin();
     i != path->list()->end(); i++) {
@@ -543,10 +553,12 @@ int main(void) {
   }
 
   remove("test/dir space/file space");
+  verbose = 3;
   if (path->createList("test////")) {
     cout << "file list is empty" << endl;
     return 0;
   }
+  verbose = 4;
   cout << ">List " << path->list()->size() << " file(s):" << endl;
   for (list<File>::iterator i = path->list()->begin();
     i != path->list()->end(); i++) {
@@ -631,10 +643,12 @@ int main(void) {
   path->addFilter("path_end", "~", true);
   path->addFilter("type", "file");
   path->addFilter("path_regexp", "\\.o$", true);
+  verbose = 3;
   if (path->createList("test////")) {
     cout << "file list is empty" << endl;
     return 0;
   }
+  verbose = 4;
   cout << ">List " << path->list()->size() << " file(s):" << endl;
   for (list<File>::iterator i = path->list()->begin();
     i != path->list()->end(); i++) {
@@ -685,10 +699,12 @@ int main(void) {
   path->addFilter("path_end", "~", true);
   path->addFilter("type", "file");
   path->addFilter("path_regexp", "\\.o$", true);
+  verbose = 3;
   if (path->createList("test////")) {
     cout << "file list is empty" << endl;
     return 0;
   }
+  verbose = 4;
   cout << ">List " << path->list()->size() << " file(s):" << endl;
   for (list<File>::iterator i = path->list()->begin();
     i != path->list()->end(); i++) {
@@ -739,10 +755,12 @@ int main(void) {
   path->addFilter("path_end", "~", true);
   path->addFilter("type", "file");
   path->addFilter("path_regexp", "\\.o$", true);
+  verbose = 3;
   if (path->createList("test2")) {
     cout << "file list is empty" << endl;
     return 0;
   }
+  verbose = 4;
   cout << ">List " << path->list()->size() << " file(s):" << endl;
   for (list<File>::iterator i = path->list()->begin();
     i != path->list()->end(); i++) {
@@ -858,20 +876,20 @@ int main(void) {
   system("rm -f test_db/lock");
 
   cout << "List cannot be read" << endl;
-  system("chmod ugo-r test_db/list");
+  system("chmod ugo-r test_db/active");
   if ((status = db.open())) {
     printf("Error: %s\n", strerror(errno));
   }
 
   cout << "List is garbaged" << endl;
-  system("chmod u+r test_db/list");
-  system("echo blah >> test_db/list");
+  system("chmod u+r test_db/active");
+  system("echo blah >> test_db/active");
   if ((status = db.open())) {
     printf("Error: %s\n", strerror(errno));
   }
 
   cout << "List is gone" << endl;
-  remove("test_db/list");
+  remove("test_db/active");
   if ((status = db.open())) {
     printf("Error: %s\n", strerror(errno));
   }
