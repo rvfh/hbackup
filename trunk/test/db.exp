@@ -656,8 +656,8 @@ fedc76test6 status: 0, getdir_path: test_db/data/fe/dc/76/test6
  --> Database closed (active contents: 17 files)
 List cannot be saved
  --> Database opened (active contents: 17 files)
+db: save: cannot create file
 db: close: failed to save active items list
- --> Database closed (active contents: 17 files)
 Error: Permission denied
 List cannot be read
 db: open: active files list not accessible: no backup accessible, aborting
