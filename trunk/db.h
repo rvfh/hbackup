@@ -62,11 +62,9 @@ class Database {
     SortedList<DbData>& list,
     bool                backup = false);
   int  save_journal(
-    const string&                         filename,
-    vector<SortedList<DbData>::iterator>& vector);
-  int  save_journal(
     const string&       filename,
-    SortedList<DbData>& list);
+    SortedList<DbData>& list,
+    unsigned int        offset = 0);
 public:
   Database(const string& path) : _path(path) {}
   /* Open database */
@@ -99,7 +97,12 @@ public:
   int  load(
     const string&       filename,
     SortedList<DbData>& list,
-    int                 offset = 0);
+    unsigned int        offset = 0);
+  void select(
+    const string&                         prefix,
+    const string&                         path,
+    SortedList<DbData>&                   list,
+    vector<SortedList<DbData>::iterator>& selection);
   int  organize(
     const string& path,
     int           number);

@@ -10,8 +10,8 @@ that are on a server somewhere, itself with its own backup system?
 
 II. SERVER CONFIGURATION
 
-The default configuration file is /etc/hbackup.conf, and can be overriden using
-the -c option. The following keywords are acceptable there:
+The default configuration file is /etc/hbackup/hbackup.conf, and can be
+overriden using the -c option. The following keywords are acceptable there:
 * db gives the backup database path. The default is '/hbackup'.
   Syntax:  db "<path to backup database>"
   Example: db "/backup"

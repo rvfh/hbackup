@@ -86,7 +86,7 @@ string DbData::line(bool nodates) const {
 int Database::load(
     const string&       filename,
     SortedList<DbData>& list,
-    int                 offset) {
+    unsigned int        offset) {
   string  source_path;
   FILE    *readfile;
   int     failed = 0;
@@ -95,9 +95,9 @@ int Database::load(
   source_path = _path + "/" + filename;
   if ((readfile = fopen(source_path.c_str(), "r")) != NULL) {
     /* Read the file into memory */
-    char    *buffer = NULL;
-    size_t  size    = 0;
-    int     line    = 0;
+    char          *buffer = NULL;
+    size_t        size    = 0;
+    unsigned int  line    = 0;
 
     while ((getline(&buffer, &size, readfile) >= 0) && ! failed) {
       if (++line <= offset) {
@@ -212,6 +212,7 @@ int Database::load(
     // errno set by fopen
     failed = 1;
   }
+  list.unique();
   return failed;
 }
 
@@ -245,35 +246,20 @@ int Database::save(
 }
 
 int Database::save_journal(
-    const string&                         filename,
-    vector<SortedList<DbData>::iterator>& vector) {
-  FILE    *writefile;
-  int     failed = 0;
-
-  string dest_path = _path + "/" + filename;
-  if ((writefile = fopen(dest_path.c_str(), "a")) != NULL) {
-    unsigned int i;
-    for (i = 0; i < vector.size(); i++) {
-      fprintf(writefile, "%s\n", vector[i]->line().c_str());
-    }
-    fclose(writefile);
-  } else {
-    failed = 2;
-  }
-  return failed;
-}
-
-int Database::save_journal(
     const string&       filename,
-    SortedList<DbData>& list) {
-  FILE    *writefile;
-  int     failed = 0;
+    SortedList<DbData>& list,
+    unsigned int        offset) {
+  FILE          *writefile;
+  int           failed = 0;
+  unsigned int  line = 0;
 
   string dest_path = _path + "/" + filename;
   if ((writefile = fopen(dest_path.c_str(), "a")) != NULL) {
     SortedList<DbData>::iterator i;
     for (i = list.begin(); i != list.end(); i++) {
-      fprintf(writefile, "%s\n", i->line().c_str());
+      if (++line > offset) {
+        fprintf(writefile, "%s\n", i->line().c_str());
+      }
     }
     fclose(writefile);
   } else {
@@ -543,8 +529,8 @@ int Database::open() {
      || (File::testReg(_path + "/removed", true) == 2)) {
       cerr << "db: open: cannot create list files" << endl;
       status = 2;
-    } else if (verbosity() > 0) {
-      cout << "Database initialized" << endl;
+    } else if (verbosity() > 2) {
+      cout << " --> Database initialized" << endl;
     }
   } else {
     // Check files presence
@@ -601,7 +587,7 @@ int Database::open() {
       }
       active.clear();
 
-      if (! load("removed", removed)) {
+      if ((removed.size() != 0) && ! load("removed", removed)) {
         save("removed", removed);
         cerr << "db: open: new removed list size: " << removed.size() << endl;
       }
@@ -625,8 +611,8 @@ int Database::open() {
     // TODO fix that!
     switch (errno) {
       case 0:
-        if ((verbosity() > 0) && (status == 0)) {
-          cout << "Database opened (active contents: "
+        if ((verbosity() > 2) && (status == 0)) {
+          cout << " --> Database opened (active contents: "
             << _active.size() << " file";
           if (_active.size() != 1) {
             cout << "s";
@@ -636,7 +622,6 @@ int Database::open() {
         break;
       case ENOENT:
         if (! status) {
-          /* TODO There was a data directory, but no list. Attempt recovery */
           cerr << "db: open: list missing" << endl;
           status = 2;
         }
@@ -670,29 +655,32 @@ int Database::close() {
   _active.clear();
 
   // Load previously removed items into removed list
-  int removed_size = 0;
-  if (! load("removed", _removed)) {
-    _removed.unique();
-
-    // Update removed list
-    if (save("removed", _removed, true)) {
-      cerr << "db: close: failed to save removed items list" << endl;
+  int removed_size = -1;
+  if (_removed.size() != 0) {
+    if (! load("removed", _removed)) {
+      // Update removed list
+      if (save("removed", _removed, true)) {
+        cerr << "db: close: failed to save removed items list" << endl;
+      }
+      removed_size = _removed.size();
+      _removed.clear();
+    } else {
+      // This should not fail
+      cerr << "db: close: failed to load removed items list" << endl;
     }
-    removed_size = _removed.size();
-    _removed.clear();
-  } else {
-    // This should not fail
-    cerr << "db: close: failed to load removed items list" << endl;
   }
 
-  if (verbosity() > 0) {
-    cout << "Database closed (active contents: " << active_size << " file";
+  if (verbosity() > 2) {
+    cout << " --> Database closed (active contents: " << active_size
+      << " file";
     if (active_size != 1) {
       cout << "s";
     }
-    cout << ", removed contents: " << removed_size << " file";
-    if (removed_size != 1) {
-      cout << "s";
+    if (removed_size >= 0) {
+      cout << ", removed contents: " << removed_size << " file";
+      if (removed_size != 1) {
+        cout << "s";
+      }
     }
     cout << ")" << endl;
   }
@@ -707,14 +695,48 @@ int Database::close() {
   return 0;
 }
 
+// Select some records out of given list
+void Database::select(
+    const string&                         prefix,
+    const string&                         path,
+    SortedList<DbData>&                   list,
+    vector<SortedList<DbData>::iterator>& selection) {
+  SortedList<DbData>::iterator it;
+
+  selection.clear();
+  for (it = _active.begin(); it != _active.end(); it++) {
+    // Prefix not reached
+    if (it->data().prefix() < prefix) {
+      continue;
+    } else
+    // Prefix exceeded
+    if (it->data().prefix() > prefix) {
+      break;
+    } else
+    // Prefix reached
+    // Path not reached
+    if (it->data().path() < path) {
+      continue;
+    } else
+    // Path exceeded
+    if (it->data().path() > path) {
+      break;
+    } else
+    // Path reached
+    {
+      selection.push_back(it);
+    }
+  }
+}
+
 int Database::parse(
     const string& prefix,
     const string& mounted_path,
     const string& mount_path,
     list<File>*   file_list) {
   int failed = 0;
+  int removed_size = _removed.size();
   SortedList<DbData>                   added;
-  vector<SortedList<DbData>::iterator> removed;
 
   string full_path = prefix + "/" + mounted_path + "/";
   SortedList<DbData>::iterator entry_active = _active.begin();
@@ -805,8 +827,8 @@ int Database::parse(
     if (db_remove) {
       // Mark removed
       entry_active->setOut();
-      // Add to removed list / Push iterator
-      removed.push_back(_removed.add(*entry_active));
+      // Append to removed list
+      _removed.push_back(*entry_active);
       // Remove from active list / Go on to next
       entry_active = _active.erase(entry_active);
     }
@@ -814,7 +836,7 @@ int Database::parse(
 
   // Append to recovery journals
   if (save_journal("added.journal", added)
-   || save_journal("removed.journal", removed)) {
+   || save_journal("removed.journal", _removed, removed_size)) {
     // Unlikely
     failed = 1;
   }
@@ -889,13 +911,16 @@ int Database::parse(
     if (journal_ok) {
       fclose(writefile);
     }
+    if ((verbosity() > 2) && (filesbackedup != 0.0)) {
+      cout << endl;
+    }
   } else if (verbosity() > 2) {
     cout << " --> Files to add: 0" << endl;
   }
 
   // Deal with removed/modified data
   if (verbosity() > 2) {
-    cout << " --> Files to remove: " << removed.size() << endl;
+    cout << " --> Files to remove: " << _removed.size() - removed_size << endl;
   }
 
   // Report errors
@@ -953,8 +978,8 @@ int Database::scan(const string& checksum, bool thorough) {
   if (checksum == "") {
     int files = _active.size();
 
-    if (verbosity() > 0) {
-      cout << "Scanning database contents";
+    if (verbosity() > 2) {
+      cout << " --> Scanning database contents";
       if (thorough) {
         cout << " thoroughly";
       }
@@ -974,16 +999,16 @@ int Database::scan(const string& checksum, bool thorough) {
       if ((! i->checksum().empty()) && scan(i->checksum(), thorough)) {
         i->setChecksum("");
         failed = 1;
-        if (! terminating() && verbosity() > 1) {
+        if (! terminating() && verbosity() > 2) {
           struct tm *time;
-          cout << " -> Client:      " << i->data().prefix() << endl;
-          cout << " -> File name:   " << i->data().path() << endl;
+          cout << " --> Client:      " << i->data().prefix() << endl;
+          cout << " --> File name:   " << i->data().path() << endl;
           time_t file_mtime = i->data().mtime();
           time = localtime(&file_mtime);
-          printf(" -> Modified:    %04u-%02u-%02u %2u:%02u:%02u\n",
+          printf(" --> Modified:    %04u-%02u-%02u %2u:%02u:%02u\n",
             time->tm_year + 1900, time->tm_mon + 1, time->tm_mday,
             time->tm_hour, time->tm_min, time->tm_sec);
-          if (verbosity() > 2) {
+          if (verbosity() > 3) {
             time_t local = i->in();
             time = localtime(&local);
             printf(" --> Seen first: %04u-%02u-%02u %2u:%02u:%02u\n",

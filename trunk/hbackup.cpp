@@ -43,7 +43,7 @@ using namespace std;
 static int verbose = 0;
 
 /* Configuration path */
-static string default_config_path = "/etc/hbackup.conf";
+static string default_config_path = "/etc/hbackup/hbackup.conf";
 
 /* Configuration path */
 static string default_db_path = "/hbackup";
@@ -53,25 +53,26 @@ static string default_db_path = "/hbackup";
 static int killed = 0;
 
 static void show_version(void) {
-  printf("(c) 2006-2007 Hervé Fache, version %u.%u", VERSION_MAJOR, VERSION_MINOR);
+  cout << "(c) 2006-2007 Hervé Fache, version "
+    << VERSION_MAJOR << "." << VERSION_MINOR;
   if (VERSION_BUGFIX != 0) {
-    printf(".%u", VERSION_BUGFIX);
+    cout << "." << VERSION_BUGFIX;
   }
   if (BUILD != 0) {
-    printf(" (build %u)", BUILD);
+    cout << " (build " << BUILD << ")";
   }
-  printf("\n");
+  cout << endl;
 }
 
 static void show_help(void) {
   show_version();
-  printf("Options are:\n");
-  printf(" -h or --help     to print this help and exit\n");
-  printf(" -v or --version  to print version and exit\n");
-  printf(" -c or --config   to specify a configuration file other than \
-/etc/hbackup.conf\n");
-  printf(" -s or --scan     to scan the database for missing data\n");
-  printf(" -t or --check    to check the database for corrupted data\n");
+  cout << "Options are:" << endl;
+  cout << " -h or --help     to print this help and exit" << endl;
+  cout << " -v or --version  to print version and exit" << endl;
+  cout << " -c or --config   to specify a configuration file other than \
+/etc/hbackup.conf" << endl;
+  cout << " -s or --scan     to scan the database for missing data" << endl;
+  cout << " -t or --check    to check the database for corrupted data" << endl;
 }
 
 int verbosity(void) {
@@ -84,9 +85,9 @@ int terminating(void) {
 
 void sighandler(int signal) {
   if (killed) {
-    fprintf(stderr, "Already aborting...\n");
+    cerr << "Already aborting..." << endl;
   } else {
-    fprintf(stderr, "Signal received, aborting...\n");
+    cerr << "Signal received, aborting..." << endl;
   }
   killed = signal;
 }
@@ -195,7 +196,7 @@ int main(int argc, char **argv) {
   }
 
   if (expect_configpath) {
-    fprintf(stderr, "Missing config path\n");
+    cerr << "Missing config path" << endl;
     return 2;
   }
 
@@ -217,7 +218,7 @@ int main(int argc, char **argv) {
     int     line    = 0;
 
     if (verbosity() > 1) {
-      printf(" -> Reading configuration file\n");
+      cout << " -> Reading configuration file" << endl;
     }
 
     while (! config_file.eof() && ! failed) {
@@ -310,13 +311,22 @@ int main(int argc, char **argv) {
       if (db_path == "") {
         db_path = default_db_path;
       }
-      /* Open backup database */
+      // Open backup database
       Database db(db_path);
+      if (verbosity() > 1) {
+        cout << " -> Opening database" << endl;
+      }
       if (! db.open()) {
         if (check) {
+          if (verbosity() > 1) {
+            cout << " -> Checking database" << endl;
+          }
           db.scan("", true);
         } else
         if (scan) {
+          if (verbosity() > 1) {
+            cout << " -> Scanning database" << endl;
+          }
           db.scan();
         } else {
           /* Backup */
@@ -325,6 +335,9 @@ int main(int argc, char **argv) {
            || clients.backup(db, configcheck)) {
             failed = 1;
           }
+        }
+        if (verbosity() > 1) {
+          cout << " -> Closing database" << endl;
         }
         db.close();
       } else {

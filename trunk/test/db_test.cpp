@@ -223,7 +223,7 @@ int main(void) {
     cout << i->line(true) << endl;
   }
 
-  if ((status = db.parse("file://host", "/home/user2", "test2",
+  if ((status = db.parse("file://client", "/home/user2", "test2",
       path->list()))) {
     printf("db.parse error status %u\n", status);
     db.close();
@@ -257,13 +257,15 @@ int main(void) {
   }
   delete path;
 
-  verbose = 2;
+
   if ((status = db.scan("59ca0efa9f5633cb0371bbc0355478d8-0"))) {
     printf("scan error status %u\n", status);
     if (status) {
       return 0;
     }
   }
+
+
 
   if ((status = db.scan("59ca0efa9f5633cb0371bbc0355478d8-0", true))) {
     printf("scan error status %u\n", status);
@@ -272,10 +274,12 @@ int main(void) {
     }
   }
 
+
   db.close();
 
 
   db.open();
+
 
   if ((status = db.scan())) {
     printf("full scan error status %u\n", status);
@@ -284,8 +288,10 @@ int main(void) {
     }
   }
 
+
   db.close();
   db.open();
+
 
   if ((status = db.scan("", true))) {
     printf("full thorough scan error status %u\n", status);
@@ -293,6 +299,7 @@ int main(void) {
       return 0;
     }
   }
+
 
   db.close();
 
@@ -302,9 +309,11 @@ int main(void) {
   db.open();
 
   remove("test_db/data/59ca0efa9f5633cb0371bbc0355478d8-0/data");
+
   if ((status = db.scan())) {
     printf("full scan error status %u\n", status);
   }
+
 
   db.close();
 
@@ -313,9 +322,11 @@ int main(void) {
 
   db.open();
 
+
   if ((status = db.scan("", true))) {
     printf("full thorough scan error status %u\n", status);
   }
+
 
   db.close();
 
@@ -326,10 +337,11 @@ int main(void) {
 
   File::testDir("test_db/data/59ca0efa9f5633cb0371bbc0355478d8-0", 1);
   File::testReg("test_db/data/59ca0efa9f5633cb0371bbc0355478d8-0/data", 1);
+
   if ((status = db.scan("", true))) {
     printf("full thorough scan error status %u\n", status);
   }
-  verbose = 3;
+
 
   db.close();
 
@@ -737,7 +749,7 @@ int main(void) {
     cout << i->line(true) << endl;
   }
 
-  if ((status = db.parse("file://host", "/home/user2", "test2",
+  if ((status = db.parse("file://client", "/home/user2", "test2",
       path->list()))) {
     printf("db.parse error status %u\n", status);
     db.close();
