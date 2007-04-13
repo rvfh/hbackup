@@ -301,26 +301,27 @@ int Client::backup(
         }
 
         if (mountPath(_paths[i]->path(), &backup_path)) {
-          clientfailed = 1;
-        } else {
-          if (_paths[i]->createList(backup_path)) {
-            // prepare_share sets errno
-            if (! terminating()) {
-              fprintf(stderr, "clients: backup: list creation failed\n");
-            }
-            failed        = 1;
-            clientfailed  = 1;
-          } else {
-            if (verbosity() > 1) {
-              cout << " -> Parsing list of files ("
-                << _paths[i]->list()->size() << ")" << endl;
-            }
-            if (db.parse(_protocol + "://" + _name, _paths[i]->path(),
-             backup_path, _paths[i]->list())) {
-              failed        = 1;
-            }
-            _paths[i]->clearList();
+          cerr << "clients: backup: mount failed for "
+            << _paths[i]->path() << endl;
+          failed = 1;
+        } else
+        if (_paths[i]->createList(backup_path)) {
+          // prepare_share sets errno
+          if (! terminating()) {
+            cerr << "clients: backup: list creation failed" << endl;
           }
+          failed        = 1;
+          clientfailed  = 1;
+        } else {
+          if (verbosity() > 1) {
+            cout << " -> Parsing list of files ("
+              << _paths[i]->list()->size() << ")" << endl;
+          }
+          if (db.parse(_protocol + "://" + _name, _paths[i]->path(),
+            backup_path, _paths[i]->list())) {
+            failed        = 1;
+          }
+          _paths[i]->clearList();
         }
       }
     }

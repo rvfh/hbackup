@@ -94,7 +94,8 @@ bool File::operator<(const File& right) const {
         || (_uid < right._uid)      || (_gid < right._gid)
         || (_mode < right._mode)    || (_link < right._link);
   }
-  return (_prefix < right._prefix)  || (_path < right._path);
+  return ((_prefix < right._prefix)
+       || ((_prefix == right._prefix) && (_path < right._path)));
 }
 
 bool File::operator!=(const File& right) const {

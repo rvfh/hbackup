@@ -23,6 +23,9 @@ template<class T>
 class SortedList : public list<T> {
   typename list<T>::iterator _hint;
 public:
+  SortedList() {
+    _hint = this->end();
+  }
   typename list<T>::iterator find(const T& element) {
     if (this->empty()) {
       _hint = this->end();
@@ -68,6 +71,18 @@ public:
       }
     }
     return list<T>::erase(i);
+  }
+  void clear() {
+    _hint = this->end();
+    list<T>::clear();
+  }
+  void sort() {
+    _hint = this->end();
+    list<T>::sort();
+  }
+  void unique() {
+    _hint = this->end();
+    list<T>::unique();
   }
 };
 
