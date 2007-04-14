@@ -36,20 +36,20 @@ int main(void) {
 
   cout << endl << "Test: zcopy" << endl;
   system("dd if=/dev/zero of=test/zcopy_source bs=1M count=10 status=noxfer 2> /dev/null");
-  off_t   size_in   = 125;
-  off_t   size_out  = 250;
+  long long size_in  = 125;
+  long long size_out = 250;
   string  check_in  = "bart";
   string  check_out = "ernest";
-  File::zcopy("test/zcopy_source", "test/zcopy_dest", &size_in, &size_out, &check_in,
-    &check_out, 5);
+  File::zcopy("test/zcopy_source", "test/zcopy_dest", &size_in, &size_out,
+    &check_in, &check_out, 5);
   cout << "In: " << size_in << " bytes, checksum: " << check_in << endl;
   cout << "Out: " << size_out << " bytes, checksum: " << check_out << endl;
   size_in  = 125;
   size_out = 250;
   check_in  = "bart";
   check_out = "ernest";
-  File::zcopy("test/zcopy_source", "test/zcopy_dest", &size_in, &size_out, &check_in,
-    &check_out, 0);
+  File::zcopy("test/zcopy_source", "test/zcopy_dest", &size_in, &size_out,
+    &check_in, &check_out, 0);
   cout << "In: " << size_in << " bytes, checksum: " << check_in << endl;
   cout << "Out: " << size_out << " bytes, checksum: " << check_out << endl;
 
@@ -128,7 +128,8 @@ int main(void) {
   // Not single character argument
   line = "\t ab";
   params = new vector<string>;
-  cout << "readline(" << line << "): " << File::decodeLine(line, *params) << endl;
+  cout << "readline(" << line << "): " << File::decodeLine(line, *params)
+    << endl;
   for (unsigned int i = 0; i < params->size(); i++) {
     cout << (*params)[i] << endl;
   }
@@ -138,7 +139,8 @@ int main(void) {
   // Two of them
   line = "\t ab cd";
   params = new vector<string>;
-  cout << "readline(" << line << "): " << File::decodeLine(line, *params) << endl;
+  cout << "readline(" << line << "): " << File::decodeLine(line, *params)
+    << endl;
   for (unsigned int i = 0; i < params->size(); i++) {
     cout << (*params)[i] << endl;
   }
@@ -148,7 +150,8 @@ int main(void) {
   // Three, with comment
   line = "\t ab cd\tef # blah";
   params = new vector<string>;
-  cout << "readline(" << line << "): " << File::decodeLine(line, *params) << endl;
+  cout << "readline(" << line << "): " << File::decodeLine(line, *params)
+    << endl;
   for (unsigned int i = 0; i < params->size(); i++) {
     cout << (*params)[i] << endl;
   }
@@ -158,7 +161,8 @@ int main(void) {
   // Single quotes
   line = "\t 'ab' 'cd'\t'ef' # blah";
   params = new vector<string>;
-  cout << "readline(" << line << "): " << File::decodeLine(line, *params) << endl;
+  cout << "readline(" << line << "): " << File::decodeLine(line, *params)
+    << endl;
   for (unsigned int i = 0; i < params->size(); i++) {
     cout << (*params)[i] << endl;
   }
@@ -168,7 +172,8 @@ int main(void) {
   // And double quotes
   line = "\t \"ab\" 'cd'\t\"ef\" # blah";
   params = new vector<string>;
-  cout << "readline(" << line << "): " << File::decodeLine(line, *params) << endl;
+  cout << "readline(" << line << "): " << File::decodeLine(line, *params)
+    << endl;
   for (unsigned int i = 0; i < params->size(); i++) {
     cout << (*params)[i] << endl;
   }
@@ -178,7 +183,8 @@ int main(void) {
   // With blanks in quotes
   line = "\t ab cd\tef 'gh ij\tkl' \"mn op\tqr\" \t# blah";
   params = new vector<string>;
-  cout << "readline(" << line << "): " << File::decodeLine(line, *params) << endl;
+  cout << "readline(" << line << "): " << File::decodeLine(line, *params)
+    << endl;
   for (unsigned int i = 0; i < params->size(); i++) {
     cout << (*params)[i] << endl;
   }
@@ -188,7 +194,8 @@ int main(void) {
   // With quotes in quotes
   line = "\t ab cd\tef 'gh \"ij\\\'\tkl' \"mn 'op\\\"\tqr\" \t# blah";
   params = new vector<string>;
-  cout << "readline(" << line << "): " << File::decodeLine(line, *params) << endl;
+  cout << "readline(" << line << "): " << File::decodeLine(line, *params)
+    << endl;
   for (unsigned int i = 0; i < params->size(); i++) {
     cout << (*params)[i] << endl;
   }
@@ -198,7 +205,8 @@ int main(void) {
   // With escape characters
   line = "\t a\\b cd\tef 'g\\h \"ij\\\'\tkl' \"m\\n 'op\\\"\tqr\" \t# blah";
   params = new vector<string>;
-  cout << "readline(" << line << "): " << File::decodeLine(line, *params) << endl;
+  cout << "readline(" << line << "): " << File::decodeLine(line, *params)
+    << endl;
   for (unsigned int i = 0; i < params->size(); i++) {
     cout << (*params)[i] << endl;
   }
@@ -208,7 +216,8 @@ int main(void) {
   // Missing ending single quote
   line = "\t a\\b cd\tef 'g\\h \"ij\\\'\tkl";
   params = new vector<string>;
-  cout << "readline(" << line << "): " << File::decodeLine(line, *params) << endl;
+  cout << "readline(" << line << "): " << File::decodeLine(line, *params)
+    << endl;
   for (unsigned int i = 0; i < params->size(); i++) {
     cout << (*params)[i] << endl;
   }
@@ -218,7 +227,8 @@ int main(void) {
   // Missing ending double quote
   line = "\t a\\b cd\tef 'g\\h \"ij\\\'\tkl' \"m\\n 'op\\\"\tqr";
   params = new vector<string>;
-  cout << "readline(" << line << "): " << File::decodeLine(line, *params) << endl;
+  cout << "readline(" << line << "): " << File::decodeLine(line, *params)
+    << endl;
   for (unsigned int i = 0; i < params->size(); i++) {
     cout << (*params)[i] << endl;
   }

@@ -21,7 +21,7 @@ Backup path 'test2'
  --> Files to add: 5 (928768 bytes)
  --> Done: 1/5 (0.0%) --> Done: 2/5 (15.7%) --> Done: 3/5 (43.6%) --> Done: 4/5 (100.0%) --> Done: 5/5 (100.0%)
  --> Files to remove: 0
-Client unreachable 'client' using protocol 'smb'
+Client unreachable 'client' using protocol 'smb' (Connection timed out)
 Protocol not supported: ssh
  -> Closing database
  --> Database closed (active contents: 18 files)

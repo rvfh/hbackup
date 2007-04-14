@@ -1,5 +1,5 @@
 /*
-     Copyright (C) 2006  Herve Fache
+     Copyright (C) 2006-2007  Herve Fache
 
      This program is free software; you can redistribute it and/or modify
      it under the terms of the GNU General Public License version 2 as
@@ -20,15 +20,15 @@
 #define FILES_H
 
 class File {
-  string  _prefix;      // mount or share path or prrefix
-  string  _path;        // file path
-  string  _link;        // what the link points to (if a link, of course)
-  mode_t  _type;        // file type (0 if metadata not available)
-  time_t  _mtime;       // time of last modification
-  off_t   _size;        // total size, in bytes
-  uid_t   _uid;         // user ID of owner
-  gid_t   _gid;         // group ID of owner
-  mode_t  _mode;        // permissions
+  string    _prefix;  // mount or share path or prrefix
+  string    _path;    // file path
+  string    _link;    // what the link points to (if a link, of course)
+  mode_t    _type;    // file type (0 if metadata not available)
+  time_t    _mtime;   // time of last modification
+  long long _size;    // total size, in bytes
+  uid_t     _uid;     // user ID of owner
+  gid_t     _gid;     // group ID of owner
+  mode_t    _mode;    // permissions
 public:
   // Constructor for existing file (if only one argument, it will be the path)
   File(const string& access_path, const string& path = "");
@@ -39,7 +39,7 @@ public:
     const string& link,
     mode_t        type,
     time_t        mtime,
-    off_t         size,
+    long long     size,
     uid_t         uid,
     gid_t         gid,
     mode_t        mode) :
@@ -63,7 +63,7 @@ public:
   string fullPath(int max_size = -1) const;
   mode_t type() const { return _type; }
   time_t mtime() const { return _mtime; };
-  off_t  size() const { return _size; };
+  long long size() const { return _size; };
   // Line containing all data (argument for debug only)
   string line(bool nodates = false) const;
   void setPrefix(const string& prefix) { _prefix = prefix; }
@@ -86,8 +86,8 @@ public:
   static int zcopy(
     const string& source_path,
     const string& dest_path,
-    off_t*        size_in,
-    off_t*        size_out,
+    long long*    size_in,
+    long long*    size_out,
     string*       checksum_in,
     string*       checksum_out,
     int           compress);

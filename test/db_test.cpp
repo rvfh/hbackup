@@ -43,16 +43,21 @@ int terminating(void) {
   return 0;
 }
 
+time_t time(time_t *t) {
+  static time_t my_time = 0;
+  return ++my_time;
+}
+
 int main(void) {
-  Path*     path;
-  string    checksum;
-  string    zchecksum;
-  DbData*   db_data;
-  off_t     size;
-  off_t     zsize;
-  SortedList<DbData>::iterator i;
-  SortedList<DbData> journal;
-  int       status;
+  Path*                         path;
+  string                        checksum;
+  string                        zchecksum;
+  DbData*                       db_data;
+  long long                     size;
+  long long                     zsize;
+  SortedList<DbData>::iterator  i;
+  SortedList<DbData>            journal;
+  int                           status;
 
   /* Test internal functions */
   File::zcopy("test/testfile", "test_db/testfile.gz", &size, &zsize, &checksum,
@@ -811,6 +816,100 @@ int main(void) {
   journal.clear();
 
   db.close();
+
+
+
+  // Test list uncluttering
+  cout << "List uncluttering test" << endl;
+  if ((status = db.open())) {
+    printf("db_open error status %u\n", status);
+    if (status == 2) {
+      return 0;
+    }
+  }
+  db.load("removed", journal);
+  cout << "Original removed list: " << journal.size() << " element(s):\n";
+  for (i = journal.begin(); i != journal.end(); i++) {
+    cout << i->line(true) << endl;
+  }
+  i = journal.begin();
+  // Add second element again, different times and checksum
+  i++;
+  db_data = new DbData(i->data());
+  db_data->setChecksum("BLAH");
+  db_data->setOut();
+  journal.push_back(*db_data);
+  // Add third element again, different times
+  i++;
+  db_data = new DbData(i->data());
+  db_data->setChecksum(i->checksum());
+  db_data->setOut();
+  journal.push_back(*db_data);
+  // Add third element again, different times and checksum
+  db_data = new DbData(i->data());
+  db_data->setChecksum("BLIH");
+  db_data->setOut();
+  journal.push_back(*db_data);
+  // Add third element again, different times
+  db_data = new DbData(i->data());
+  db_data->setChecksum(i->checksum());
+  db_data->setOut();
+  journal.push_back(*db_data);
+  // Add fourth element again, different time out
+  i++;
+  db_data = new DbData(*i);
+  db_data->setOut();
+  journal.push_back(*db_data);
+  // Add fifth element again, different times
+  i++;
+  db_data = new DbData(i->data());
+  db_data->setChecksum(i->checksum());
+  db_data->setOut();
+  journal.push_back(*db_data);
+  // Add sixth element again
+  i++;
+  journal.push_back(*i);
+  // Add eigth element again, different times
+  i++;
+  i++;
+  db_data = new DbData(i->data());
+  db_data->setChecksum(i->checksum());
+  db_data->setOut();
+  journal.push_back(*db_data);
+  // Add eigth element again, different times and checksum
+  db_data = new DbData(i->data());
+  db_data->setChecksum("BLOH");
+  db_data->setOut();
+  journal.push_back(*db_data);
+  // Add eigth element again, different times
+  db_data = new DbData(i->data());
+  db_data->setChecksum(i->checksum());
+  db_data->setOut();
+  journal.push_back(*db_data);
+  // Add eigth element again, different times
+  db_data = new DbData(i->data());
+  db_data->setChecksum(i->checksum());
+  db_data->setOut();
+  journal.push_back(*db_data);
+  // Sort and show
+  journal.sort();
+  cout << "Cluttered removed list: " << journal.size() << " element(s):\n";
+  for (i = journal.begin(); i != journal.end(); i++) {
+    cout << i->line(true) << endl;
+  }
+  // Save
+  db.save("clutter", journal);
+  journal.clear();
+  // Load (includes sorting and uncluttering)
+  db.load("clutter", journal);
+  // Show
+  cout << "Uncluttered removed list: " << journal.size() << " element(s):\n";
+  for (i = journal.begin(); i != journal.end(); i++) {
+    cout << i->line(true) << endl;
+  }
+  journal.clear();
+  db.close();
+
 
 
   /* Re-open database => one less active item */

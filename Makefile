@@ -5,7 +5,7 @@ BUGFIX = 0
 AR := ar
 RANLIB := ranlib
 STRIP := strip
-CXXFLAGS := -Wall -O2 -ansi -pedantic
+CXXFLAGS := -Wall -O2 -ansi
 LDFLAGS := -lssl -lz
 PREFIX := /usr/local/bin
 

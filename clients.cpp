@@ -270,7 +270,8 @@ int Client::backup(
       case ETIMEDOUT:
         if (verbosity() > 0) {
           cout << "Client unreachable '" << _name
-            << "' using protocol '" << _protocol << "'" << endl;
+            << "' using protocol '" << _protocol << "' ("
+            <<  strerror(errno) << ")" << endl;
         }
         return 0;
     }
