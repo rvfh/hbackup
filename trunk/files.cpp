@@ -1,5 +1,5 @@
 /*
-     Copyright (C) 2006  Herve Fache
+     Copyright (C) 2006-2007  Herve Fache
 
      This program is free software; you can redistribute it and/or modify
      it under the terms of the GNU General Public License version 2 as
@@ -46,9 +46,9 @@ File::File(const string& access_path, const string& path) {
     full_path = access_path + "/" + _path;
   }
   _link        = "";
-  struct  stat metadata;
+  struct stat64 metadata;
 
-  if (lstat(full_path.c_str(), &metadata)) {
+  if (lstat64(full_path.c_str(), &metadata)) {
     // errno set by lstat
     _type = 0;
   } else {
@@ -134,7 +134,7 @@ string File::line(bool nodates) const {
     mtime = _mtime;
   }
 
-  asprintf(&numbers, "%ld\t%ld\t%u\t%u\t%o", _size, mtime, _uid, _gid, _mode);
+  asprintf(&numbers, "%lld\t%ld\t%u\t%u\t%o", _size, mtime, _uid, _gid, _mode);
   output += "\t" + string(numbers) + "\t" + _link;
   delete numbers;
   return output;
@@ -218,8 +218,8 @@ void File::md5sum(
 int File::zcopy(
     const string& source_path,
     const string& dest_path,
-    off_t*        size_in,
-    off_t*        size_out,
+    long long*    size_in,
+    long long*    size_out,
     string*       checksum_in,
     string*       checksum_out,
     int           compress) {
@@ -237,12 +237,12 @@ int File::zcopy(
   if (size_out != NULL) *size_out = 0;
 
   /* Open file to read from */
-  if ((readfile = fopen(source_path.c_str(), "r")) == NULL) {
+  if ((readfile = fopen64(source_path.c_str(), "r")) == NULL) {
     return 2;
   }
 
   /* Open file to write to */
-  if ((writefile = fopen(dest_path.c_str(), "w")) == NULL) {
+  if ((writefile = fopen64(dest_path.c_str(), "w")) == NULL) {
     fclose(readfile);
     return 2;
   }

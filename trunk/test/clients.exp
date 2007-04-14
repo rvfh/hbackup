@@ -64,13 +64,13 @@ Options: username=
 -> smb://Client c:/home/BlaH/Backup.list
 Options: username= password=
  --> Database initialized
-Client unreachable 'myClient' using protocol 'nfs'
-Client unreachable 'myClient2' using protocol 'smb'
+Client unreachable 'myClient' using protocol 'nfs' (Connection timed out)
+Client unreachable 'myClient2' using protocol 'smb' (Connection timed out)
 Protocol not supported: ssh
-Client unreachable 'Client' using protocol 'smb'
-Client unreachable 'Client2' using protocol 'smb'
-Client unreachable 'Client3' using protocol 'smb'
-Client unreachable 'Client4' using protocol 'smb'
+Client unreachable 'Client' using protocol 'smb' (Connection timed out)
+Client unreachable 'Client2' using protocol 'smb' (Connection timed out)
+Client unreachable 'Client3' using protocol 'smb' (Connection timed out)
+Client unreachable 'Client4' using protocol 'smb' (Connection timed out)
  --> Database closed (active contents: 0 files)
  --> Client: testhost
 >List 1 client(s):

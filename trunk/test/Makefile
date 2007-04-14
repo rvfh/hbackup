@@ -1,6 +1,6 @@
 AR := ar
 RANLIB := ranlib
-CXXFLAGS := -Wall -O2 -ansi -pedantic -I..
+CXXFLAGS := -Wall -O2 -ansi -I..
 LDFLAGS := -lssl -lz
 
 all: test

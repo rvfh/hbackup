@@ -56,7 +56,9 @@ bool DbData::operator<(const DbData& right) const {
   if (_data < right._data) return true;
   if (right._data < _data) return false;
   // Equal then...
-  return _in < right._in;
+  return (_in < right._in)
+      || ((_in == right._in) && (_checksum < right._checksum));
+  // Note: checking for _out would break the journal replay stuff (uses find)
 }
 
 bool DbData::operator!=(const DbData& right) const {
@@ -64,20 +66,19 @@ bool DbData::operator!=(const DbData& right) const {
    || (_data != right._data);
 }
 
+void DbData::setOut(time_t out) {
+  if (out != 0) {
+    _out = out;
+  } else {
+    _out = time(NULL);
+  }
+}
+
 string DbData::line(bool nodates) const {
   string  output = _data.line(nodates) + "\t" + _checksum;
   char*   numbers = NULL;
-  time_t  in, out;
 
-  if (nodates) {
-    in = _in != 0;
-    out = _out != 0;
-  } else {
-    in = _in;
-    out = _out;
-  }
-
-  asprintf(&numbers, "%ld\t%ld", in, out);
+  asprintf(&numbers, "%ld\t%ld", _in, _out);
   output += "\t" + string(numbers) + "\t";
   delete numbers;
   return output;
@@ -96,17 +97,17 @@ int Database::load(
   if ((readfile = fopen(source_path.c_str(), "r")) != NULL) {
     /* Read the file into memory */
     char          *buffer = NULL;
-    size_t        size    = 0;
+    size_t        bsize   = 0;
     unsigned int  line    = 0;
 
-    while ((getline(&buffer, &size, readfile) >= 0) && ! failed) {
+    while ((getline(&buffer, &bsize, readfile) >= 0) && ! failed) {
       if (++line <= offset) {
         continue;
       }
 
       char      *start = buffer;
       char      *delim;
-      char      *value = new char[size];
+      char      *value = new char[bsize];
       // Data
       string    access_path;
       string    path;
@@ -114,7 +115,7 @@ int Database::load(
       string    checksum;
       char      letter;
       time_t    mtime;
-      off_t     size;
+      long long fsize;
       uid_t     uid;
       gid_t     gid;
       mode_t    mode;
@@ -142,7 +143,7 @@ int Database::load(
             }
             break;
           case 4:   /* Size */
-            if (sscanf(value, "%ld", &size) != 1) {
+            if (sscanf(value, "%lld", &fsize) != 1) {
               failed = 2;
             }
             break;
@@ -201,18 +202,34 @@ int Database::load(
         errno = EUCLEAN;
       } else {
         File    data(access_path, path, link, File::typeMode(letter), mtime,
-          size, uid, gid, mode);
+          fsize, uid, gid, mode);
         DbData  db_data(in, out, checksum, data);
         list.add(db_data);
       }
     }
     free(buffer);
     fclose(readfile);
+
+    // Unclutter
+    if (list.size() > 0) {
+      SortedList<DbData>::iterator prev = list.begin();
+      SortedList<DbData>::iterator i = prev;
+      i++;
+      while (i != list.end()) {
+        if ((i->data() == prev->data())
+         && (i->checksum() == prev->checksum())) {
+          prev->setOut(i->out());
+          i = list.erase(i);
+        } else {
+          i++;
+          prev++;
+        }
+      }
+    }
   } else {
     // errno set by fopen
     failed = 1;
   }
-  list.unique();
   return failed;
 }
 
@@ -341,16 +358,16 @@ int Database::write(
     const string&   path,
     DbData&         db_data,
     int             compress) {
-  string  temp_path;
-  string  dest_path;
-  string  checksum_source;
-  string  checksum_dest;
-  string  checksum;
-  int     index = 0;
-  int     deleteit = 0;
-  int     failed = 0;
-  off_t   size_source;
-  off_t   size_dest;
+  string    temp_path;
+  string    dest_path;
+  string    checksum_source;
+  string    checksum_dest;
+  string    checksum;
+  int       index = 0;
+  int       deleteit = 0;
+  int       failed = 0;
+  long long size_source;
+  long long size_dest;
 
   /* Temporary file to write to */
   temp_path = _path + "/filedata";
@@ -362,7 +379,8 @@ int Database::write(
 
   /* Check size_source size */
   if (size_source != db_data.data().size()) {
-    cerr << "db: write: file copy incomplete: " << path << endl;
+    cerr << "db: write: size mismatch: " << path << " (" << size_source
+      << "/" << db_data.data().size() << ")" << endl;
     failed = 1;
   } else
 
@@ -854,10 +872,10 @@ int Database::parse(
   // Deal with new/modified data
   if (! added.empty()) {
     // Static to be global to all shares
-    double        sizetobackup  = 0.0;
-    double        sizebackedup  = 0.0;
-    int           filestobackup = 0;
-    int           filesbackedup = 0;
+    long long sizetobackup  = 0;
+    long long sizebackedup  = 0;
+    int       filestobackup = 0;
+    int       filesbackedup = 0;
     SortedList<DbData>::iterator i;
 
     // Determine volume to be copied
@@ -866,10 +884,10 @@ int Database::parse(
         /* Same data as in file_list */
         filestobackup++;
         if (S_ISREG(i->data().type()) && i->checksum().empty()) {
-          sizetobackup += double(i->data().size());
+          sizetobackup += i->data().size();
         }
       }
-      printf(" --> Files to add: %u (%0.f bytes)\n",
+      printf(" --> Files to add: %u (%lld bytes)\n",
         added.size(), sizetobackup);
     }
 
@@ -899,7 +917,7 @@ int Database::parse(
           }
         }
         if (verbosity() > 2) {
-          sizebackedup += double(i->data().size());
+          sizebackedup += i->data().size();
         }
       }
       _active.add(*i);
@@ -912,7 +930,8 @@ int Database::parse(
       if (verbosity() > 2) {
         filesbackedup++;
         if (sizetobackup != 0) {
-          printf(" --> Done: %d/%d (%.1f%%)\r", filesbackedup, filestobackup, (sizebackedup / sizetobackup) * 100.0);
+          printf(" --> Done: %d/%d (%.1f%%)\r", filesbackedup, filestobackup,
+            100.0 * sizebackedup / sizetobackup);
         } else {
           printf(" --> Done: %d/%d\r", filesbackedup, filestobackup);
         }

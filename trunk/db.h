@@ -46,7 +46,7 @@ public:
   time_t out() const { return _out; }
   string checksum() const { return _checksum; }
   File   data() const { return _data; }
-  void   setOut() { _out = time(NULL); }
+  void   setOut(time_t out = 0);
   void   setChecksum(const string& checksum) { _checksum = checksum; }
   string line(bool nodates = false) const;
 };
@@ -57,10 +57,6 @@ class Database {
   SortedList<DbData> _removed;
   int  lock();
   void unlock();
-  int  save(
-    const string&       filename,
-    SortedList<DbData>& list,
-    bool                backup = false);
   int  save_journal(
     const string&       filename,
     SortedList<DbData>& list,
@@ -88,7 +84,7 @@ public:
   int  scan(
     const string& checksum = "",
     bool thorough = false);
-// So I can test them
+// So I can test them/use them in tests
   int getDir(
     const string& checksum,
     string&       path,
@@ -98,6 +94,10 @@ public:
     const string&       filename,
     SortedList<DbData>& list,
     unsigned int        offset = 0);
+  int  save(
+    const string&       filename,
+    SortedList<DbData>& list,
+    bool                backup = false);
   void select(
     const string&                         prefix,
     const string&                         path,
