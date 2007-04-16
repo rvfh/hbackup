@@ -39,12 +39,18 @@ using namespace std;
 
 /* DEFAULTS */
 
+/* Verbosity */
+static int verbose = 0;
+
 /* Configuration path */
 static string default_config_path = "/etc/hbackup/hbackup.conf";
 
 /* Configuration path */
 static string default_db_path = "/hbackup";
 
+
+/* Signal received? */
+static int killed = 0;
 
 static void show_version(void) {
   cout << "(c) 2006-2007 Hervé Fache, version "
@@ -67,6 +73,14 @@ static void show_help(void) {
 /etc/hbackup.conf" << endl;
   cout << " -s or --scan     to scan the database for missing data" << endl;
   cout << " -t or --check    to check the database for corrupted data" << endl;
+}
+
+int verbosity(void) {
+  return verbose;
+}
+
+int terminating(void) {
+  return killed;
 }
 
 void sighandler(int signal) {
