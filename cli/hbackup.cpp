@@ -37,6 +37,8 @@ using namespace std;
 #include "clients.h"
 #include "version.h"
 
+using namespace hbackup;
+
 /* DEFAULTS */
 
 /* Verbosity */

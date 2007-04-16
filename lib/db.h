@@ -27,6 +27,8 @@
 #error You must include files.h before db.h
 #endif
 
+namespace hbackup {
+
 class DbData {
   time_t  _in;
   time_t  _out;
@@ -114,5 +116,7 @@ public:
   SortedList<DbData>* active() { return &_active; }
   SortedList<DbData>* removed() { return &_removed; }
 };
+
+}
 
 #endif

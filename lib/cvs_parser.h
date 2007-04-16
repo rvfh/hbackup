@@ -1,5 +1,5 @@
 /*
-     Copyright (C) 2006  Herve Fache
+     Copyright (C) 2006-2007  Herve Fache
 
      This program is free software; you can redistribute it and/or modify
      it under the terms of the GNU General Public License version 2 as
@@ -22,6 +22,8 @@
 #ifndef PARSERS_H
 #error You must include parsers.h before cvs_parser.h
 #endif
+
+namespace hbackup {
 
 typedef struct {
   string  name;   /* File name */
@@ -51,5 +53,7 @@ public:
     }
   }
 };
+
+}
 
 #endif

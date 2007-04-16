@@ -1,5 +1,5 @@
 /*
-     Copyright (C) 2006  Herve Fache
+     Copyright (C) 2006-2007  Herve Fache
 
      This program is free software; you can redistribute it and/or modify
      it under the terms of the GNU General Public License version 2 as
@@ -31,6 +31,8 @@
 #error You must include parsers.h before paths.h
 #endif
 
+namespace hbackup {
+
 class Path {
   string      _path;
   Parsers     _parsers;
@@ -61,5 +63,7 @@ public:
     _list.clear();
   }
 };
+
+}
 
 #endif

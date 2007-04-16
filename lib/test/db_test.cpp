@@ -33,6 +33,8 @@ using namespace std;
 #include "list.h"
 #include "db.h"
 
+using namespace hbackup;
+
 static int verbose = 4;
 
 int verbosity(void) {

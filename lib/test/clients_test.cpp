@@ -32,6 +32,8 @@ using namespace std;
 #include "db.h"
 #include "clients.h"
 
+using namespace hbackup;
+
 int verbosity(void) {
   return 3;
 }

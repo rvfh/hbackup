@@ -19,7 +19,6 @@
 using namespace std;
 using namespace hbackup;
 
-#include "hbackup.h"
 #include "list.h"
 #include "files.h"
 #include "db.h"
@@ -29,4 +28,5 @@ using namespace hbackup;
 #include "paths.h"
 #include "clients.h"
 #include "version.h"
+#include "hbackup.h"
 

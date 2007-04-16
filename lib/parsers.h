@@ -1,5 +1,5 @@
 /*
-     Copyright (C) 2006  Herve Fache
+     Copyright (C) 2006-2007  Herve Fache
 
      This program is free software; you can redistribute it and/or modify
      it under the terms of the GNU General Public License version 2 as
@@ -22,6 +22,8 @@
 #ifndef FILES_H
 #error You must include files.h before parsers.h
 #endif
+
+namespace hbackup {
 
 typedef enum {
   parser_controlled,
@@ -100,5 +102,7 @@ public:
     }
   }
 };
+
+}
 
 #endif

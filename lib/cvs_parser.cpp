@@ -1,5 +1,5 @@
 /*
-     Copyright (C) 2006  Herve Fache
+     Copyright (C) 2006-2007  Herve Fache
 
      This program is free software; you can redistribute it and/or modify
      it under the terms of the GNU General Public License version 2 as
@@ -27,6 +27,8 @@ using namespace std;
 #include "files.h"
 #include "parsers.h"
 #include "cvs_parser.h"
+
+using namespace hbackup;
 
 char* CvsParser::_control_dir = "CVS";
 char* CvsParser::_entries = "Entries";
