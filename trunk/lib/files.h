@@ -19,6 +19,8 @@
 #ifndef FILES_H
 #define FILES_H
 
+namespace hbackup {
+
 class File {
   string    _prefix;  // mount or share path or prrefix
   string    _path;    // file path
@@ -96,5 +98,7 @@ public:
   // Read parameters from line
   static int decodeLine(const string& line, vector<string>& params);
 };
+
+}
 
 #endif

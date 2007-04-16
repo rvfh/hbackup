@@ -35,6 +35,8 @@ using namespace std;
 #include "hbackup.h"
 #include "clients.h"
 
+using namespace hbackup;
+
 int Client::mountPath(
     string        backup_path,
     string        *path) {

@@ -52,6 +52,8 @@ using namespace std;
 #include "db.h"
 #include "hbackup.h"
 
+using namespace hbackup;
+
 bool DbData::operator<(const DbData& right) const {
   if (_data < right._data) return true;
   if (right._data < _data) return false;

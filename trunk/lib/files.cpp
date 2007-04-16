@@ -33,6 +33,8 @@ using namespace std;
 #include "files.h"
 #include "hbackup.h"
 
+using namespace hbackup;
+
 #define CHUNK 409600
 
 File::File(const string& access_path, const string& path) {
