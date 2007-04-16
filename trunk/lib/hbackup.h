@@ -19,25 +19,10 @@
 #ifndef HBACKUP_H
 #define HBACKUP_H
 
-/* Interface to Hbackup library */
-class Hbackup {
-  /* Verbosity level */
-  static int verbose = 0;
-  /* Termination required */
-  static bool killed = 0;
-public:
-  static void setVerbosity(int verbose) {
-    _verbose = verbose;
-  }
-  static int verbosity(void) {
-    return _verbose;
-  }
-  static void setTerminating(bool killed) {
-    _killed = killed;
-  }
-  static bool terminating(void) {
-    return _killed;
-  }
-};
+/* Verbosity level */
+extern int verbosity(void);
+
+/* Termination required */
+extern int terminating(void);
 
 #endif
