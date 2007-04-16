@@ -1,4 +1,4 @@
-/*
+ /*
      Copyright (C) 2006-2007  Herve Fache
 
      This program is free software; you can redistribute it and/or modify
@@ -16,28 +16,17 @@
      Boston, MA 02111-1307, USA.
 */
 
-#ifndef HBACKUP_H
-#define HBACKUP_H
+using namespace std;
+using namespace hbackup;
 
-/* Interface to Hbackup library */
-class Hbackup {
-  /* Verbosity level */
-  static int verbose = 0;
-  /* Termination required */
-  static bool killed = 0;
-public:
-  static void setVerbosity(int verbose) {
-    _verbose = verbose;
-  }
-  static int verbosity(void) {
-    return _verbose;
-  }
-  static void setTerminating(bool killed) {
-    _killed = killed;
-  }
-  static bool terminating(void) {
-    return _killed;
-  }
-};
+#include "hbackup.h"
+#include "list.h"
+#include "files.h"
+#include "db.h"
+#include "filters.h"
+#include "parsers.h"
+#include "cvs_parser.h"
+#include "paths.h"
+#include "clients.h"
+#include "version.h"
 
-#endif
