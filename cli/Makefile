@@ -20,20 +20,30 @@ install: hbackup
 	@cp $^ ${PREFIX}
 
 clean:
-	@rm -f *.[oa] *~ hbackup
+	@rm -f *.[oa] *~ hbackup version.h
 	@${MAKE} -C test clean
 
 check: all
 	@${MAKE} -C test
 
 # Dependencies
-hbackup: ../lib/libhbackup.a ../lib/version.h
+version.h: ../lib/libhbackup.a Makefile
+hbackup: ../lib/libhbackup.a
 
-hbackup.o: ../lib/list.h ../lib/files.h ../lib/db.h ../lib/filters.h \
-	../lib/parsers.h ../lib/cvs_parser.h ../lib/paths.h ../lib/clients.h \
-	../lib/hbackup.h ../lib/version.h
+hbackup.o: ../lib/hbackup.h version.h
 
 # Rules
+version.h:
+	@echo "CREATE	$@"
+	@echo "/* This file is auto-generated, do not edit. */" > version.h
+	@echo "\n#ifndef VERSION_H\n#define VERSION_H\n" >> version.h
+	@echo "#define VERSION_MAJOR $(MAJOR)" >> version.h
+	@echo "#define VERSION_MINOR $(MINOR)" >> version.h
+	@echo "#define VERSION_BUGFIX $(BUGFIX)" >> version.h
+	@echo -n "#define BUILD " >> version.h
+	@date -u +"%s" >> version.h
+	@echo "\n#endif" >> version.h
+
 %o: %cpp
 	@echo "CXX	$<"
 	@$(CXX) $(CXXFLAGS) -c -o $@ $<
