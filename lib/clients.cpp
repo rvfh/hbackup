@@ -135,7 +135,6 @@ int Client::readListFile(const string& list_path) {
     }
 
     /* Read list file */
-    Path* path = NULL;
     while (! list_file.eof() && ! failed) {
       getline(list_file, buffer);
       unsigned int pos = buffer.find("\r");
@@ -157,14 +156,14 @@ int Client::readListFile(const string& list_path) {
             cerr << "Error: in list file " << list_path << ", line " << line
               << " 'path' takes exactly one argument" << endl;
             failed = 1;
-          } else
+          } else {
           /* New backup path */
-          path = new Path(params[1]);
-          if (verbosity() > 2) {
-            cout << " --> Path: " << path->path() << endl;
+            _paths.push_back(Path(params[1]));
+            if (verbosity() > 2) {
+              cout << " --> Path: " << _paths.back().path() << endl;
+            }
           }
-          _paths.push_back(path);
-        } else if (path != NULL) {
+        } else if (_paths.size() != 0) {
           if ((params[0] == "ignore") || (params[0] == "ignand")) {
             // Expect exactly three parameters
             if (params.size() != 3) {
@@ -172,7 +171,8 @@ int Client::readListFile(const string& list_path) {
                 << " 'filter' takes exactly two arguments" << endl;
               failed = 1;
             } else
-            if (path->addFilter(params[1], params[2], params[0] == "ignand")) {
+            if (_paths.back().addFilter(params[1], params[2], params[0]
+             == "ignand")) {
               cerr << "Error: in list file " << list_path << ", line " << line
                 << " unsupported filter: " << params[1] << endl;
               failed = 1;
@@ -185,7 +185,7 @@ int Client::readListFile(const string& list_path) {
                 << " 'parser' takes exactly two arguments" << endl;
               failed = 1;
             } else
-            if (path->addParser(params[1], params[2])) {
+            if (_paths.back().addParser(params[1], params[2])) {
               cerr << "Error: in list file " << list_path << ", line " << line
                 << " unsupported parser: " << params[2] << endl;
               failed = 1;
@@ -223,12 +223,6 @@ Client::Client(string value) {
 
   if (verbosity() > 2) {
     cout << " --> Client: " << _name << endl;
-  }
-}
-
-Client::~Client() {
-  for (unsigned int i = 0; i < _paths.size(); i++) {
-    delete _paths[i];
   }
 }
 
@@ -287,25 +281,24 @@ int Client::backup(
     if (_paths.empty()) {
       failed = 1;
     } else if (! config_check) {
-      for (unsigned int i = 0; i < _paths.size(); i++) {
+      for (list<Path>::iterator i = _paths.begin(); i != _paths.end(); i++) {
         if (terminating() || clientfailed) {
           break;
         }
         string  backup_path;
 
         if (verbosity() > 0) {
-          cout << "Backup path '" << _paths[i]->path() << "'" << endl;
+          cout << "Backup path '" << i->path() << "'" << endl;
           if (verbosity() > 1) {
             cout << " -> Building list of files" << endl;
           }
         }
 
-        if (mountPath(_paths[i]->path(), &backup_path)) {
-          cerr << "clients: backup: mount failed for "
-            << _paths[i]->path() << endl;
+        if (mountPath(i->path(), &backup_path)) {
+          cerr << "clients: backup: mount failed for " << i->path() << endl;
           failed = 1;
         } else
-        if (_paths[i]->createList(backup_path)) {
+        if (i->createList(backup_path)) {
           // prepare_share sets errno
           if (! terminating()) {
             cerr << "clients: backup: list creation failed" << endl;
@@ -314,14 +307,14 @@ int Client::backup(
           clientfailed  = 1;
         } else {
           if (verbosity() > 1) {
-            cout << " -> Parsing list of files ("
-              << _paths[i]->list()->size() << ")" << endl;
+            cout << " -> Parsing list of files (" << i->list()->size()
+              << ")" << endl;
           }
-          if (db.parse(_protocol + "://" + _name, _paths[i]->path(),
-            backup_path, _paths[i]->list())) {
+          if (db.parse(_protocol + "://" + _name, i->path(), backup_path,
+           i->list())) {
             failed        = 1;
           }
-          _paths[i]->clearList();
+          i->clearList();
         }
       }
     }
@@ -341,6 +334,7 @@ int Client::backup(
 }
 
 void Client::show() {
+  cout << "Client: " << _name << endl;
   cout << "-> " << _protocol << "://" << _host_or_ip << " "
     << _listfiledir << "/" << _listfilename << endl;
   if (_options.size() > 0) {
@@ -349,5 +343,12 @@ void Client::show() {
       cout << " " + _options[i].option();
     }
     cout << endl;
+  }
+  if (_paths.size() > 0) {
+    cout << "Paths:" << endl;
+    for (list<Path>::iterator i = _paths.begin(); i != _paths.end(); i++) {
+      cout << " -> " << i->path() << endl;
+      i->showParsers();
+    }
   }
 }

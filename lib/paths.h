@@ -62,6 +62,10 @@ public:
   void clearList() {
     _list.clear();
   }
+  // Information
+  void showParsers() {
+    _parsers.list();
+  }
 };
 
 }

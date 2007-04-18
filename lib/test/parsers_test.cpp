@@ -20,6 +20,7 @@ using namespace std;
 
 #include <iostream>
 #include <vector>
+#include <list>
 
 #include "files.h"
 #include "parsers.h"

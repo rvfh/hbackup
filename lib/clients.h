@@ -52,7 +52,7 @@ class Client {
   string          _listfiledir;
   string          _protocol;
   vector<Option>  _options;
-  vector<Path*>   _paths;
+  list<Path>      _paths;
   string          _mount_point;
   string          _mounted;
   int mountPath(
@@ -62,7 +62,6 @@ class Client {
   int readListFile(const string& list_path);
 public:
   Client(string name);
-  ~Client();
   void addOption(const string& value) {
     _options.push_back(Option("", value));
   }

@@ -20,6 +20,7 @@ using namespace std;
 
 #include <iostream>
 #include <vector>
+#include <list>
 #include <sys/stat.h>
 
 #include "files.h"

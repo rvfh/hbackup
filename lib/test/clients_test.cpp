@@ -96,7 +96,6 @@ int main(void) {
   for (vector<Client>::iterator i = clients.begin(); i != clients.end(); i++) {
     i->show();
   }
-// return 0;
   client = clients.insert(clients.end(), Client("Client"));
   client->setProtocol("smb");
   client->setHostOrIp("Client");

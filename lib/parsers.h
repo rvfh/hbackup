@@ -78,27 +78,27 @@ public:
   };
 };
 
-class Parsers : public vector<Parser*> {
+class Parsers : public list<Parser*> {
 public:
   ~Parsers() {
-    for (unsigned int i = 0; i < this->size(); i++) {
-      delete (*this)[i];
+    for (Parsers::iterator i = begin(); i != end(); i++) {
+      delete *i;
     }
   }
   Parser* isControlled(const string& dir_path) const {
     Parser *parser;
-    for (unsigned int i = 0; i < this->size(); i++) {
-      parser = (*this)[i]->isControlled(dir_path);
+    for (Parsers::const_iterator i = begin(); i != end(); i++) {
+      parser = (*i)->isControlled(dir_path);
       if (parser != NULL) {
         return parser;
       }
     }
     return NULL;
   }
-  void list() {
-    cout << "List: " << this->size() << " parser(s)" << endl;
-    for (unsigned int i = 0; i < this->size(); i++) {
-      cout << "-> " << (*this)[i]->name() << endl;
+  void list() const {
+    cout << "List: " << size() << " parser(s)" << endl;
+    for (Parsers::const_iterator i = begin(); i != end(); i++) {
+      cout << "-> " << (*i)->name() << endl;
     }
   }
 };
