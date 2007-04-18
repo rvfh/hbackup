@@ -730,7 +730,7 @@ void Database::select(
     const string&                         prefix,
     const string&                         path,
     SortedList<DbData>&                   list,
-    vector<SortedList<DbData>::iterator>& selection) {
+    list<SortedList<DbData>::iterator>& selection) {
   SortedList<DbData>::iterator it;
 
   selection.clear();
