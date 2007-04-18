@@ -46,18 +46,16 @@ public:
 };
 
 class Client {
-  string          _name;
-  string          _host_or_ip;
-  string          _listfilename;
-  string          _listfiledir;
-  string          _protocol;
-  vector<Option>  _options;
-  list<Path>      _paths;
-  string          _mount_point;
-  string          _mounted;
-  int mountPath(
-    string        backup_path,
-    string        *path);
+  string        _name;
+  string        _host_or_ip;
+  string        _listfilename;
+  string        _listfiledir;
+  string        _protocol;
+  list<Option>  _options;
+  list<Path>    _paths;
+  string        _mount_point;
+  string        _mounted;
+  int mountPath(string  backup_path, string  *path);
   int umount();
   int readListFile(const string& list_path);
 public:

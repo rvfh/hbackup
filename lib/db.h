@@ -104,7 +104,7 @@ public:
     const string&                         prefix,
     const string&                         path,
     SortedList<DbData>&                   list,
-    vector<SortedList<DbData>::iterator>& selection);
+    list<SortedList<DbData>::iterator>& selection);
   int  organize(
     const string& path,
     int           number);

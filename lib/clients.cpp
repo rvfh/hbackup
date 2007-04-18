@@ -83,8 +83,8 @@ int Client::mountPath(
     command += "-t cifs -o ro,noatime,nocase";
   }
   // Additional options
-  for (unsigned int i = 0; i < _options.size(); i++ ) {
-    command += "," + _options[i].option();
+  for (list<Option>::iterator i = _options.begin(); i != _options.end(); i++ ){
+    command += "," + i->option();
   }
   // Paths
   command += " " + share + " " + _mount_point;
@@ -339,8 +339,9 @@ void Client::show() {
     << _listfiledir << "/" << _listfilename << endl;
   if (_options.size() > 0) {
     cout << "Options:";
-    for (unsigned int i = 0; i < _options.size(); i++ ) {
-      cout << " " + _options[i].option();
+    for (list<Option>::iterator i = _options.begin(); i != _options.end();
+     i++ ) {
+      cout << " " + i->option();
     }
     cout << endl;
   }
