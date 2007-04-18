@@ -60,6 +60,7 @@ class Client {
   int readListFile(const string& list_path);
 public:
   Client(string name);
+  string name() { return _name; }
   void addOption(const string& value) {
     _options.push_back(Option("", value));
   }

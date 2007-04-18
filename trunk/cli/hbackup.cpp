@@ -75,6 +75,8 @@ static void show_help(void) {
 /etc/hbackup.conf" << endl;
   cout << " -s or --scan     to scan the database for missing data" << endl;
   cout << " -t or --check    to check the database for corrupted data" << endl;
+  cout << " -C or --client   specify client to backup (more than one allowed)"
+    << endl;
 }
 
 int verbosity(void) {
@@ -95,14 +97,16 @@ void sighandler(int signal) {
 }
 
 int main(int argc, char **argv) {
+  list<string>      requested_clients;
   string            config_path       = "";
   string            db_path           = "";
   int               failed            = 0;
   int               argn              = 0;
   bool              scan              = false;
   bool              check             = false;
-  bool              config_check       = false;
+  bool              config_check      = false;
   bool              expect_configpath = false;
+  bool              expect_client     = false;
   struct sigaction  action;
 
   /* Set signal catcher */
@@ -123,6 +127,12 @@ int main(int argc, char **argv) {
       expect_configpath = false;
     }
 
+    /* Get config path if request */
+    if (expect_client) {
+      requested_clients.push_back(argv[argn]);
+      expect_client = false;
+    }
+
     /* -* */
     if (argv[argn][0] == '-') {
       /* --* */
@@ -139,10 +149,12 @@ int main(int argc, char **argv) {
           letter = 's';
         } else if (! strcmp(&argv[argn][2], "check")) {
           letter = 't';
-        } else if (! strcmp(&argv[argn][2], "config_check")) {
+        } else if (! strcmp(&argv[argn][2], "configcheck")) {
           letter = 'u';
         } else if (! strcmp(&argv[argn][2], "verbose")) {
           letter = 'v';
+        } else if (! strcmp(&argv[argn][2], "client")) {
+          letter = 'C';
         } else if (! strcmp(&argv[argn][2], "version")) {
           letter = 'V';
         }
@@ -186,6 +198,9 @@ int main(int argc, char **argv) {
           break;
         case 'v':
           verbose++;
+          break;
+        case 'C':
+          expect_client = true;
           break;
         case 'V':
           show_version();
@@ -335,6 +350,21 @@ int main(int argc, char **argv) {
             if (terminating()) {
               break;
             }
+            // Skip unrequested clients
+            if (requested_clients.size() != 0) {
+              bool found = false;
+              for (list<string>::iterator i = requested_clients.begin();
+               i != requested_clients.end(); i++) {
+                if (*i == client->name()) {
+                  found = true;
+                  break;
+                }
+              }
+              if (! found) {
+                continue;
+              }
+            }
+
             if (client->setMountPoint(db_path + "/mount")
              || client->backup(db, config_check)) {
               failed = 1;

@@ -31,6 +31,30 @@ Protocol not supported: ssh
  --> Client: other
  -> Opening database
  --> Database opened (active contents: 18 files)
+Backup client 'cbers11' using protocol 'file'
+ -> Reading backup list file
+ --> Path: test
+ --> Path: test2
+Backup path 'test'
+ -> Building list of files
+Directory should be under CVS control: test/cvs/dirbad
+ -> Parsing list of files (13)
+ --> Files to add: 0
+ --> Files to remove: 0
+Backup path 'test2'
+ -> Building list of files
+ -> Parsing list of files (5)
+ --> Files to add: 0
+ --> Files to remove: 0
+Client unreachable 'client' using protocol 'smb' (Connection timed out)
+ -> Closing database
+ --> Database closed (active contents: 18 files)
+ -> Reading configuration file
+ --> Client: cbers11
+ --> Client: client
+ --> Client: other
+ -> Opening database
+ --> Database opened (active contents: 18 files)
  -> Scanning database
  --> Scanning database contents: 18 files
  -> Closing database
