@@ -84,7 +84,7 @@ int Client::mountPath(
   }
   // Additional options
   for (unsigned int i = 0; i < _options.size(); i++ ) {
-    command += "," + _options[i]->option();
+    command += "," + _options[i].option();
   }
   // Paths
   command += " " + share + " " + _mount_point;
@@ -227,9 +227,6 @@ Client::Client(string value) {
 }
 
 Client::~Client() {
-  for (unsigned int i = 0; i < _options.size(); i++) {
-    delete _options[i];
-  }
   for (unsigned int i = 0; i < _paths.size(); i++) {
     delete _paths[i];
   }
@@ -349,7 +346,7 @@ void Client::show() {
   if (_options.size() > 0) {
     cout << "Options:";
     for (unsigned int i = 0; i < _options.size(); i++ ) {
-      cout << " " + _options[i]->option();
+      cout << " " + _options[i].option();
     }
     cout << endl;
   }
