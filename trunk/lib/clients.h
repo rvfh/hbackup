@@ -51,7 +51,7 @@ class Client {
   string          _listfilename;
   string          _listfiledir;
   string          _protocol;
-  vector<Option*> _options;
+  vector<Option>  _options;
   vector<Path*>   _paths;
   string          _mount_point;
   string          _mounted;
@@ -64,10 +64,10 @@ public:
   Client(string name);
   ~Client();
   void addOption(const string& value) {
-    _options.push_back(new Option("", value));
+    _options.push_back(Option("", value));
   }
   void addOption(const string& name, const string& value) {
-    _options.push_back(new Option(name, value));
+    _options.push_back(Option(name, value));
   }
   void setHostOrIp(string value);
   void setProtocol(string value);
@@ -84,43 +84,6 @@ public:
   string mountPoint() { return _mount_point; }
   int  backup(Database& db, bool config_check = false);
   void show();
-};
-
-class Clients : public vector<Client *> {
-  string _mount_point;
-public:
-  Clients() : _mount_point("") {}
-  ~Clients() {
-    for (unsigned int i = 0; i < size(); i++) {
-      delete (*this)[i];
-    }
-  }
-  int setMountPoint(const string& mount_point) {
-    _mount_point = mount_point;
-    /* Check that mount dir exists, if not create it */
-    if (File::testDir(_mount_point, true) == 2) {
-      cerr << "Cannot create mount point" << endl;
-      return 2;
-    }
-    return 0;
-  }
-  string mountPoint() { return _mount_point; }
-  int backup(Database& db, bool config_check = false) {
-    int failed = 0;
-    for (unsigned int i = 0; i < size(); i++) {
-      if (terminating()) {
-        break;
-      }
-      if ((_mount_point.size() != 0)
-       && ((*this)[i]->mountPoint().size() == 0)) {
-        (*this)[i]->setMountPoint(_mount_point, false);
-      }
-      if ((*this)[i]->backup(db, config_check)) {
-        failed = 1;
-      }
-    }
-    return failed;
-  }
 };
 
 }

@@ -101,7 +101,7 @@ int main(int argc, char **argv) {
   int               argn              = 0;
   bool              scan              = false;
   bool              check             = false;
-  bool              configcheck       = false;
+  bool              config_check       = false;
   bool              expect_configpath = false;
   struct sigaction  action;
 
@@ -139,7 +139,7 @@ int main(int argc, char **argv) {
           letter = 's';
         } else if (! strcmp(&argv[argn][2], "check")) {
           letter = 't';
-        } else if (! strcmp(&argv[argn][2], "configcheck")) {
+        } else if (! strcmp(&argv[argn][2], "config_check")) {
           letter = 'u';
         } else if (! strcmp(&argv[argn][2], "verbose")) {
           letter = 'v';
@@ -182,7 +182,7 @@ int main(int argc, char **argv) {
           check = true;
           break;
         case 'u':
-          configcheck = true;
+          config_check = true;
           break;
         case 'v':
           verbose++;
@@ -214,8 +214,8 @@ int main(int argc, char **argv) {
     failed = 2;
   } else {
     /* Read configuration file */
-    Clients clients;
-    Client  *client = NULL;
+    vector<Client> clients;
+    vector<Client>::iterator client = clients.end();
     string  buffer;
     int     line    = 0;
 
@@ -256,9 +256,8 @@ int main(int argc, char **argv) {
               << " '" << params[0] << "' takes exactly one argument" << endl;
             failed = 2;
           }
-          client = new Client(params[1]);
-          clients.push_back(client);
-        } else if (client != NULL) {
+          client = clients.insert(clients.end(), Client(params[1]));
+        } else if (client != clients.end()) {
           if (params[0] == "hostname") {
             if (params.size() > 2) {
               cerr << "Error: in file " << config_path << ", line " << line
@@ -332,10 +331,14 @@ int main(int argc, char **argv) {
           db.scan();
         } else {
           /* Backup */
-
-          if (clients.setMountPoint(db_path + "/mount")
-           || clients.backup(db, configcheck)) {
-            failed = 1;
+          for (client = clients.begin(); client != clients.end(); client++) {
+            if (terminating()) {
+              break;
+            }
+            if (client->setMountPoint(db_path + "/mount")
+             || client->backup(db, config_check)) {
+              failed = 1;
+            }
           }
         }
         if (verbosity() > 1) {
