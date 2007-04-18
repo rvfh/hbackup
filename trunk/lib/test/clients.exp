@@ -1,66 +1,95 @@
 >List 0 client(s):
  --> Client: localhost
 >List 1 client(s):
+Client: localhost
 -> file://localhost etc/doesnotexist
 Backup client 'localhost' using protocol 'file'
 List file not found etc/doesnotexist
 >List 0 client(s):
  --> Client: myClient
 >List 1 client(s):
+Client: myClient
 -> nfs://myClient /home/User/hbackup.list
  --> Client: myClient2
 >List 2 client(s):
+Client: myClient
 -> nfs://myClient /home/User/hbackup.list
+Client: myClient2
 -> smb://myClient C:/Backup/Backup.LST
 Options: username=Myself password=flesyM
  --> Client: otherClient
 >List 3 client(s):
+Client: myClient
 -> nfs://myClient /home/User/hbackup.list
+Client: myClient2
 -> smb://myClient C:/Backup/Backup.LST
 Options: username=Myself password=flesyM
+Client: otherClient
 -> ssh://otherClient c:/home/backup/Backup.list
  --> Client: Client
 >List 4 client(s):
+Client: myClient
 -> nfs://myClient /home/User/hbackup.list
+Client: myClient2
 -> smb://myClient C:/Backup/Backup.LST
 Options: username=Myself password=flesyM
+Client: otherClient
 -> ssh://otherClient c:/home/backup/Backup.list
+Client: Client
 -> smb://Client c:/home/BlaH/Backup.list
 Options: username=user iocharset=utf8
  --> Client: Client2
 >List 5 client(s):
+Client: myClient
 -> nfs://myClient /home/User/hbackup.list
+Client: myClient2
 -> smb://myClient C:/Backup/Backup.LST
 Options: username=Myself password=flesyM
+Client: otherClient
 -> ssh://otherClient c:/home/backup/Backup.list
+Client: Client
 -> smb://Client c:/home/BlaH/Backup.list
 Options: username=user iocharset=utf8
+Client: Client2
 -> smb://Client c:/home/BlaH/Backup.list
 Options: nocase username=user password=
  --> Client: Client3
 >List 6 client(s):
+Client: myClient
 -> nfs://myClient /home/User/hbackup.list
+Client: myClient2
 -> smb://myClient C:/Backup/Backup.LST
 Options: username=Myself password=flesyM
+Client: otherClient
 -> ssh://otherClient c:/home/backup/Backup.list
+Client: Client
 -> smb://Client c:/home/BlaH/Backup.list
 Options: username=user iocharset=utf8
+Client: Client2
 -> smb://Client c:/home/BlaH/Backup.list
 Options: nocase username=user password=
+Client: Client3
 -> smb://Client c:/home/BlaH/Backup.list
 Options: username=
  --> Client: Client4
 >List 7 client(s):
+Client: myClient
 -> nfs://myClient /home/User/hbackup.list
+Client: myClient2
 -> smb://myClient C:/Backup/Backup.LST
 Options: username=Myself password=flesyM
+Client: otherClient
 -> ssh://otherClient c:/home/backup/Backup.list
+Client: Client
 -> smb://Client c:/home/BlaH/Backup.list
 Options: username=user iocharset=utf8
+Client: Client2
 -> smb://Client c:/home/BlaH/Backup.list
 Options: nocase username=user password=
+Client: Client3
 -> smb://Client c:/home/BlaH/Backup.list
 Options: username=
+Client: Client4
 -> smb://Client c:/home/BlaH/Backup.list
 Options: username= password=
  --> Database initialized
@@ -74,6 +103,7 @@ Client unreachable 'Client4' using protocol 'smb' (Connection timed out)
  --> Database closed (active contents: 0 files)
  --> Client: testhost
 >List 1 client(s):
+Client: testhost
 -> file://localhost etc/localhost.list
  --> Database opened (active contents: 0 files)
 Backup client 'testhost' using protocol 'file'
@@ -96,6 +126,7 @@ Backup path 'test2'
  --> Database closed (active contents: 18 files)
  --> Client: testhost
 >List 1 client(s):
+Client: testhost
 -> file://testhost etc/localhost.list
  --> Database opened (active contents: 18 files)
 Backup client 'testhost' using protocol 'file'
