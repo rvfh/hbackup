@@ -99,7 +99,8 @@ int Path::iterate_directory(const string& path, Parser* parser) {
 }
 
 Path::Path(const string& path) {
-  _path = path;
+  _path       = path;
+  _expiration = 0;
 
   unsigned int pos = 0;
   while ((pos = _path.find("\\", pos)) != string::npos) {

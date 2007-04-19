@@ -103,6 +103,7 @@ EOF
 cat << EOF > "$CONFIGDIR/localhost.list"
 # Share test
 path "test" # should work
+expire 1
 ignore path_start subdir
 ignore type file
 ignand path_end ~

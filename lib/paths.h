@@ -35,6 +35,7 @@ namespace hbackup {
 
 class Path {
   string      _path;
+  int         _expiration;
   Parsers     _parsers;
   Filters     _filters;
   list<File>  _list;
@@ -44,9 +45,9 @@ class Path {
     Parser*         parser);
 public:
   Path(const string& path);
-  string path() {
-    return _path;
-  }
+  string path() { return _path; }
+  int expiration() { return _expiration; }
+  void setExpiration(int expiration) { _expiration = expiration; }
   list<File>* list() {
     return &_list;
   }
