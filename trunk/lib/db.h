@@ -54,9 +54,11 @@ public:
 };
 
 class Database {
-  string             _path;
-  SortedList<DbData> _active;
-  SortedList<DbData> _removed;
+  string              _path;
+  SortedList<DbData>  _active;
+  SortedList<DbData>  _removed;
+  bool                _active_open;
+  bool                _removed_open;
   int  lock();
   void unlock();
   int  save_journal(
@@ -64,9 +66,18 @@ class Database {
     SortedList<DbData>& list,
     unsigned int        offset = 0);
 public:
-  Database(const string& path) : _path(path) {}
+  Database(const string& path) : _path(path), _active_open(false),
+    _removed_open(false) {}
   /* Open database */
   int  open();
+  /* Open active records part of database */
+  int  open_active();
+  /* Open removed records part of database */
+  int  open_removed();
+  /* Close active records part of database */
+  int  close_active();
+  /* Close removed records part of database */
+  int  close_removed();
   /* Close database */
   int  close();
   /* Check what needs to be done for given host & path */

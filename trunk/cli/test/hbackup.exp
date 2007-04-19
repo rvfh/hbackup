@@ -4,6 +4,7 @@
  --> Client: other
  -> Opening database
  --> Database initialized
+ --> Database active items part open (contents: 0 files)
 Backup client 'cbers11' using protocol 'file'
  -> Reading backup list file
  --> Path: test
@@ -24,13 +25,13 @@ Backup path 'test2'
 Client unreachable 'client' using protocol 'smb' (Connection timed out)
 Protocol not supported: ssh
  -> Closing database
- --> Database closed (active contents: 18 files)
+ --> Database active items part closed (contents: 18 files)
  -> Reading configuration file
  --> Client: cbers11
  --> Client: client
  --> Client: other
  -> Opening database
- --> Database opened (active contents: 18 files)
+ --> Database active items part open (contents: 18 files)
 Backup client 'cbers11' using protocol 'file'
  -> Reading backup list file
  --> Path: test
@@ -48,24 +49,24 @@ Backup path 'test2'
  --> Files to remove: 0
 Client unreachable 'client' using protocol 'smb' (Connection timed out)
  -> Closing database
- --> Database closed (active contents: 18 files)
+ --> Database active items part closed (contents: 18 files)
  -> Reading configuration file
  --> Client: cbers11
  --> Client: client
  --> Client: other
  -> Opening database
- --> Database opened (active contents: 18 files)
+ --> Database active items part open (contents: 18 files)
  -> Scanning database
  --> Scanning database contents: 18 files
  -> Closing database
- --> Database closed (active contents: 18 files)
+ --> Database active items part closed (contents: 18 files)
  -> Reading configuration file
  --> Client: cbers11
  --> Client: client
  --> Client: other
  -> Opening database
- --> Database opened (active contents: 18 files)
+ --> Database active items part open (contents: 18 files)
  -> Checking database
  --> Scanning database contents thoroughly: 18 files
  -> Closing database
- --> Database closed (active contents: 18 files)
+ --> Database active items part closed (contents: 18 files)

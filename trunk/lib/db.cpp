@@ -200,7 +200,8 @@ int Database::load(
         failed = 1;
       }
       if (failed) {
-        cerr << "db: open: list corrupted line " << line << endl;
+        cerr << "db: load: " << filename << ": Corrupted, line " << line
+          << endl;
         errno = EUCLEAN;
       } else {
         File    data(access_path, path, link, File::typeMode(letter), mtime,
@@ -231,7 +232,9 @@ int Database::load(
   } else {
     // errno set by fopen
     failed = 1;
+    cerr << "db: load: " << filename << ": " << strerror(errno) << endl;
   }
+
   return failed;
 }
 
@@ -635,36 +638,8 @@ int Database::open() {
 
   // Read database active items list
   if (status != 2) {
-    load("active", _active);
-
-    // TODO fix that!
-    switch (errno) {
-      case 0:
-        if ((verbosity() > 2) && (status == 0)) {
-          cout << " --> Database opened (active contents: "
-            << _active.size() << " file";
-          if (_active.size() != 1) {
-            cout << "s";
-          }
-          cout << ")" << endl;
-        }
-        break;
-      case ENOENT:
-        if (! status) {
-          cerr << "db: open: list missing" << endl;
-          status = 2;
-        }
-        break;
-      case EACCES:
-        cerr << "db: open: permission to read list denied" << endl;
-        status = 2;
-        break;
-      case EUCLEAN:
-        status = 2;
-        break;
-      default:
-        cerr << "db: open: " << strerror(errno) << endl;
-        status = 2;
+    if (open_active()) {
+      status = 2;
     }
   }
 
@@ -675,44 +650,105 @@ int Database::open() {
   return 0;
 }
 
-int Database::close() {
-  // Save active list
+int Database::open_active() {
+  if (load("active", _active)) {
+    // This should not fail
+    cerr << "db: failed to load active items list" << endl;
+    return 2;
+  }
+  _active_open = true;
+
+  if (verbosity() > 2) {
+    cout << " --> Database active items part open (contents: "
+      << _active.size() << " file";
+    if (_active.size() != 1) {
+      cout << "s";
+    }
+    cout << ")" << endl;
+  }
+  return 0;
+}
+
+int Database::open_removed() {
+  if (load("removed", _removed)) {
+    // This should not fail
+    cerr << "db: failed to load removed items list" << endl;
+    return 2;
+  }
+  _removed_open = true;
+
+  if (verbosity() > 2) {
+    cout << " --> Database removed items part open (contents: "
+      << _removed.size() << " file";
+    if (_removed.size() != 1) {
+      cout << "s";
+    }
+    cout << ")" << endl;
+  }
+  return 0;
+}
+
+int Database::close_active() {
+  if (! _active_open) {
+    cerr << "db: cannot close active items list, not open" << endl;
+    return 2;
+  }
   if (save("active", _active, true)) {
-    cerr << "db: close: failed to save active items list" << endl;
+    cerr << "db: failed to save active items list" << endl;
     return 2;
   }
   int active_size = _active.size();
   _active.clear();
-
-  // Load previously removed items into removed list
-  int removed_size = -1;
-  if (_removed.size() != 0) {
-    if (! load("removed", _removed)) {
-      // Update removed list
-      if (save("removed", _removed, true)) {
-        cerr << "db: close: failed to save removed items list" << endl;
-      }
-      removed_size = _removed.size();
-      _removed.clear();
-    } else {
-      // This should not fail
-      cerr << "db: close: failed to load removed items list" << endl;
-    }
-  }
+  _active_open = false;
 
   if (verbosity() > 2) {
-    cout << " --> Database closed (active contents: " << active_size
-      << " file";
+    cout << " --> Database active items part closed (contents: "
+      << active_size << " file";
     if (active_size != 1) {
       cout << "s";
     }
+    cout << ")" << endl;
+  }
+  return 0;
+}
+
+int Database::close_removed() {
+  if (! _removed_open) {
+    cerr << "db: cannot close removed items list, not open" << endl;
+    return 2;
+  }
+  // Update removed list
+  if (save("removed", _removed, true)) {
+    cerr << "db: failed to save removed items list" << endl;
+    return 2;
+  }
+  int removed_size = _removed.size();
+  _removed.clear();
+  _removed_open = false;
+
+  if (verbosity() > 2) {
     if (removed_size >= 0) {
-      cout << ", removed contents: " << removed_size << " file";
+      cout << " --> Database removed items part closed (contents: "
+        << removed_size << " file";
       if (removed_size != 1) {
         cout << "s";
       }
+      cout << ")" << endl;
     }
-    cout << ")" << endl;
+  }
+  return 0;
+}
+
+int Database::close() {
+  // Save active list
+  close_active();
+
+  // Save removed list
+  if (_removed.size() != 0) {
+    // Load previously removed items into removed list
+    if (! open_removed()) {
+      close_removed();
+    }
   }
 
   // Delete journals

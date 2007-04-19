@@ -164,6 +164,7 @@ int Client::readListFile(const string& list_path) {
             }
           }
         } else if (_paths.size() != 0) {
+          // Path attributes
           if ((params[0] == "ignore") || (params[0] == "ignand")) {
             // Expect exactly three parameters
             if (params.size() != 3) {
@@ -190,13 +191,17 @@ int Client::readListFile(const string& list_path) {
                 << " unsupported parser: " << params[2] << endl;
               failed = 1;
             }
+          } else
+          if (params[0] == "expire") {
+            int time_out;
+            if (sscanf(params[1].c_str(), "%d", &time_out) != 0) {
+              _paths.back().setExpiration(time_out);
+            }
           } else {
             // What was that?
-            if (params.size() != 2) {
-              cerr << "Error: in list file " << list_path << ", line " << line
-                << " unknown keyword: " << params[0] << endl;
-              failed = 1;
-            }
+            cerr << "Error: in list file " << list_path << ", line " << line
+              << " unknown keyword: " << params[0] << endl;
+            failed = 1;
           }
         } else {
           // What?
@@ -349,7 +354,6 @@ void Client::show() {
     cout << "Paths:" << endl;
     for (list<Path>::iterator i = _paths.begin(); i != _paths.end(); i++) {
       cout << " -> " << i->path() << endl;
-      i->showParsers();
     }
   }
 }
