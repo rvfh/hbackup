@@ -30,6 +30,7 @@ using namespace std;
 #include "list.h"
 #include "files.h"
 #include "dbdata.h"
+#include "dblist.h"
 #include "db.h"
 #include "filters.h"
 #include "parsers.h"
@@ -371,7 +372,7 @@ int main(int argc, char **argv) {
             }
           }
         }
-        switch (db.open_removed()) {
+        switch (db.expire_init()) {
           case 2:
             failed = 1;
             break;

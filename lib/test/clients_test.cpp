@@ -30,6 +30,7 @@ using namespace std;
 #include "parsers.h"
 #include "paths.h"
 #include "dbdata.h"
+#include "dblist.h"
 #include "db.h"
 #include "clients.h"
 

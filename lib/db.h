@@ -23,41 +23,26 @@
 #error You must include dbdata.h before db.h
 #endif
 
-#ifndef FILES_H
-#error You must include files.h before db.h
+#ifndef DBLIST_H
+#error You must include dblist.h before db.h
 #endif
 
-#ifndef LIST_H
-#error You must include list.h before db.h
+#ifndef FILES_H
+#error You must include files.h before db.h
 #endif
 
 namespace hbackup {
 
 class Database {
-  string              _path;
-  SortedList<DbData>  _active;
-  SortedList<DbData>  _removed;
-  bool                _active_open;
-  bool                _removed_open;
+  string  _path;
+  DbList  _active;
+  DbList  _removed;
   int  lock();
   void unlock();
-  int  save_journal(
-    const string&       filename,
-    SortedList<DbData>& list,
-    unsigned int        offset = 0);
 public:
-  Database(const string& path) : _path(path), _active_open(false),
-    _removed_open(false) {}
-  /* Open database (calls open_active for now) */
+  Database(const string& path) : _path(path) {}
+  /* Open database */
   int  open();
-  /* Open active records part of database */
-  int  open_active();
-  /* Open removed records part of database */
-  int  open_removed();
-  /* Close active records part of database */
-  int  close_active();
-  /* Close removed records part of database */
-  int  close_removed();
   /* Close database */
   int  close();
   /* Check what needs to be done for given host & path */
@@ -66,6 +51,9 @@ public:
     const string& real_path,
     const string& mount_path,
     list<File>*   list);
+  int expire_init() {
+    return _removed.open(_path, "removed");
+  }
   // Expire data older then given time out (seconds)
   int expire(
     const string&   prefix,
@@ -87,15 +75,6 @@ public:
     const string& checksum,
     string&       path,
     bool          create);
-  // Load list, skipping offset elements
-  int  load(
-    const string&       filename,
-    SortedList<DbData>& list,
-    unsigned int        offset = 0);
-  int  save(
-    const string&       filename,
-    SortedList<DbData>& list,
-    bool                backup = false);
   int  organize(
     const string& path,
     int           number);
@@ -104,8 +83,8 @@ public:
     DbData&         db_data,
     int             compress = 0);
 // For debug only
-  SortedList<DbData>* active() { return &_active; }
-  SortedList<DbData>* removed() { return &_removed; }
+  DbList* active() { return &_active; }
+  DbList* removed() { return &_removed; }
 };
 
 }

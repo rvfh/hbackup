@@ -101,7 +101,7 @@ file://host	/home/user/testlink	l	8	1	1000	1000	777	testfile		17	0
 Removed list: 0 element(s):
  --> Files to add: 0
  --> Files to remove: 0
-db: load: written.journal: No such file or directory
+dblist: load: written.journal: No such file or directory
 Added journal list: 0 element(s):
 Removed journal list: 0 element(s):
 Really added journal list: 0 element(s):
@@ -467,13 +467,13 @@ Removed list: 2 element(s):
 file://host	/home/user/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	775		5252f242d27b8c2c9fdbdcbb33545d07-0	22	30	
 file://host	/home/user/testdir	d	0	0	1000	1000	775			24	32	
 Recovery test
-db: load: written.journal: Corrupted, line 3
+dblist: load: written.journal: Corrupted, line 3
 Really added journal list: 2 element(s):
 file://host	/home/user/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	777		5252f242d27b8c2c9fdbdcbb33545d07-0	29	0	
 file://host	/home/user/testdir	d	0	0	1000	1000	777			31	0	
 db: lock: lock reset
 db: open: journal found, attempting crash recovery
-db: load: written.journal: Corrupted, line 3
+dblist: load: written.journal: Corrupted, line 3
 db: open: adding 2 valid files to active list
 db: open: removing 2 files from active list
 db: open: new active list size: 19
@@ -521,7 +521,7 @@ Added journal list: 0 element(s):
 Removed journal list: 2 element(s):
 file://host	/home/user/cvs/dirutd/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	9	33	
 file://host	/home/user/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371bbc0355478d8-0	26	34	
-db: load: written.journal: No such file or directory
+dblist: load: written.journal: No such file or directory
 Really added journal list: 0 element(s):
 Active list: 17 element(s):
 file://client	/home/user2/testdir	d	0	0	1000	1000	755			18	0	
@@ -565,7 +565,7 @@ Added journal list: 0 element(s):
 Removed journal list: 2 element(s):
 file://host	/home/user/cvs/dirutd/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	9	33	
 file://host	/home/user/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371bbc0355478d8-0	26	34	
-db: load: written.journal: No such file or directory
+dblist: load: written.journal: No such file or directory
 Really added journal list: 0 element(s):
 Active list: 17 element(s):
 file://client	/home/user2/testdir	d	0	0	1000	1000	755			18	0	
@@ -599,7 +599,7 @@ Added journal list: 0 element(s):
 Removed journal list: 2 element(s):
 file://host	/home/user/cvs/dirutd/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	9	33	
 file://host	/home/user/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371bbc0355478d8-0	26	34	
-db: load: written.journal: No such file or directory
+dblist: load: written.journal: No such file or directory
 Really added journal list: 0 element(s):
 Active list: 17 element(s):
 file://client	/home/user2/testdir	d	0	0	1000	1000	755			18	0	
@@ -713,15 +713,15 @@ fedc76test6 status: 0, getdir_path: test_db/data/fe/dc/76/test6
  --> Database active items part closed (contents: 17 files)
 List cannot be saved
  --> Database active items part open (contents: 17 files)
-db: save: cannot create file
-db: failed to save active items list
+dblist: save: cannot create file
+dblist: failed to save active items list
 Error: Permission denied
 List cannot be read
 db: open: active files list not accessible: no backup accessible, aborting
 Error: Permission denied
 List is garbaged
-db: load: active: Corrupted, line 18
-db: failed to load active items list
+dblist: load: active: Corrupted, line 18
+dblist: failed to load active items list
 Error: Structure needs cleaning
 List is gone
 db: open: active files list not accessible: no backup accessible, aborting
