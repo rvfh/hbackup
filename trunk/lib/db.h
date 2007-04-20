@@ -19,39 +19,19 @@
 #ifndef DB_H
 #define DB_H
 
-#ifndef LIST_H
-#error You must include list.h before db.h
+#ifndef DBDATA_H
+#error You must include dbdata.h before db.h
 #endif
 
 #ifndef FILES_H
 #error You must include files.h before db.h
 #endif
 
-namespace hbackup {
+#ifndef LIST_H
+#error You must include list.h before db.h
+#endif
 
-class DbData {
-  time_t  _in;
-  time_t  _out;
-  string  _checksum;
-  File    _data;
-public:
-  DbData(const File& data) : _out(0), _checksum(""), _data(data) {
-    _in = time(NULL);
-  }
-  DbData(time_t in, time_t out, string checksum, const File& data) :
-    _in(in), _out(out), _checksum(checksum), _data(data) {}
-  bool operator<(const DbData&) const;
-  // Equality and difference exclude _out
-  bool operator!=(const DbData&) const;
-  bool operator==(const DbData& right) const { return ! (*this != right); }
-  time_t in() const { return _in; }
-  time_t out() const { return _out; }
-  string checksum() const { return _checksum; }
-  File   data() const { return _data; }
-  void   setOut(time_t out = 0);
-  void   setChecksum(const string& checksum) { _checksum = checksum; }
-  string line(bool nodates = false) const;
-};
+namespace hbackup {
 
 class Database {
   string              _path;
@@ -68,7 +48,7 @@ class Database {
 public:
   Database(const string& path) : _path(path), _active_open(false),
     _removed_open(false) {}
-  /* Open database */
+  /* Open database (calls open_active for now) */
   int  open();
   /* Open active records part of database */
   int  open_active();
@@ -86,6 +66,11 @@ public:
     const string& real_path,
     const string& mount_path,
     list<File>*   list);
+  // Expire data older then given time out (seconds)
+  int expire(
+    const string&   prefix,
+    const string&   path,
+    time_t          time_out);
   /* Read file with given checksum, extract it to path */
   int  read(
     const string& path,
@@ -111,11 +96,6 @@ public:
     const string&       filename,
     SortedList<DbData>& list,
     bool                backup = false);
-  void select(
-    const string&                         prefix,
-    const string&                         path,
-    SortedList<DbData>&                   list,
-    list<SortedList<DbData>::iterator>& selection);
   int  organize(
     const string& path,
     int           number);

@@ -29,6 +29,7 @@ using namespace std;
 #include "hbackup.h"
 #include "list.h"
 #include "files.h"
+#include "dbdata.h"
 #include "db.h"
 #include "filters.h"
 #include "parsers.h"
@@ -364,12 +365,39 @@ int main(int argc, char **argv) {
                 continue;
               }
             }
-
             if (client->setMountPoint(db_path + "/mount")
              || client->backup(db, config_check)) {
               failed = 1;
             }
           }
+        }
+        switch (db.open_removed()) {
+          case 2:
+            failed = 1;
+            break;
+          case 0:
+            for (client = clients.begin(); client != clients.end(); client++) {
+              if (terminating()) {
+                break;
+              }
+              // Skip unrequested clients
+              if (requested_clients.size() != 0) {
+                bool found = false;
+                for (list<string>::iterator i = requested_clients.begin();
+                i != requested_clients.end(); i++) {
+                  if (*i == client->name()) {
+                    found = true;
+                    break;
+                  }
+                }
+                if (! found) {
+                  continue;
+                }
+              }
+              if (client->expire(db)) {
+                failed = 1;
+              }
+            }
         }
         if (verbosity() > 1) {
           cout << " -> Closing database" << endl;
