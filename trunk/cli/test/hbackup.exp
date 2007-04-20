@@ -24,9 +24,14 @@ Backup path 'test2'
  --> Files to remove: 0
 Client unreachable 'client' using protocol 'smb' (Connection timed out)
 Protocol not supported: ssh
- --> Database removed items part open (contents: 0 files)
- -> Closing database
  --> Database active items part closed (contents: 18 files)
+ --> Database removed items part open (contents: 0 files)
+Expire path 'test'
+Expire path 'test2'
+ -> Removing expired records
+ --> Expired data: 0
+ -> Closing database
+ --> Database removed items part closed (contents: 0 files)
  -> Reading configuration file
  --> Client: cbers11
  --> Client: client
@@ -49,9 +54,14 @@ Backup path 'test2'
  --> Files to add: 0
  --> Files to remove: 0
 Client unreachable 'client' using protocol 'smb' (Connection timed out)
- --> Database removed items part open (contents: 0 files)
- -> Closing database
  --> Database active items part closed (contents: 18 files)
+ --> Database removed items part open (contents: 0 files)
+Expire path 'test'
+Expire path 'test2'
+ -> Removing expired records
+ --> Expired data: 0
+ -> Closing database
+ --> Database removed items part closed (contents: 0 files)
  -> Reading configuration file
  --> Client: cbers11
  --> Client: client
@@ -60,9 +70,12 @@ Client unreachable 'client' using protocol 'smb' (Connection timed out)
  --> Database active items part open (contents: 18 files)
  -> Scanning database
  --> Scanning database contents: 18 files
- --> Database removed items part open (contents: 0 files)
- -> Closing database
  --> Database active items part closed (contents: 18 files)
+ --> Database removed items part open (contents: 0 files)
+ -> Removing expired records
+ --> Expired data: 0
+ -> Closing database
+ --> Database removed items part closed (contents: 0 files)
  -> Reading configuration file
  --> Client: cbers11
  --> Client: client
@@ -71,6 +84,9 @@ Client unreachable 'client' using protocol 'smb' (Connection timed out)
  --> Database active items part open (contents: 18 files)
  -> Checking database
  --> Scanning database contents thoroughly: 18 files
- --> Database removed items part open (contents: 0 files)
- -> Closing database
  --> Database active items part closed (contents: 18 files)
+ --> Database removed items part open (contents: 0 files)
+ -> Removing expired records
+ --> Expired data: 0
+ -> Closing database
+ --> Database removed items part closed (contents: 0 files)

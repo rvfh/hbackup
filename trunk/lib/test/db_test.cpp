@@ -810,7 +810,7 @@ int main(void) {
   }
   delete path;
 
-  db.organize("test_db/data", 2);
+  db.organise("test_db/data", 2);
 
   journal.load("test_db", "removed");
   cout << "Official removed list: " << journal.size() << " element(s):\n";
@@ -818,12 +818,6 @@ int main(void) {
     cout << i->line(true) << endl;
   }
   journal.clear();
-
-  // Test expiration
-  cout << "Expiration test" << endl;
-  db.expire("file://client", "/home/user2", 10);
-  db.expire_init();
-  db.expire("file://client", "/home/user2", 10);
 
   db.close();
 
@@ -967,6 +961,25 @@ int main(void) {
   mkdir("test_db/data/fe/dc/76/test6", 0755);
   cout << "fedc76test6 status: " << db.getDir("fedc76test6", getdir_path, true)
     << ", getdir_path: " << getdir_path << endl;
+
+  // Test expiration
+  cout << "Expiration test" << endl;
+  db.expire_share("file://host", "/home/user", 1);
+  db.expire_finalise();
+  // Modify the specific record I need
+  journal.load("test_db", "removed");
+  journal.back().setOut(1);
+  cout << "Modified removed list: " << journal.size() << " element(s):\n";
+  for (i = journal.begin(); i != journal.end(); i++) {
+    cout << i->line(true) << endl;
+  }
+  journal.save("test_db", "removed");
+  journal.clear();
+  db.expire_init();
+  db.close_active();
+  db.open_removed();
+  db.expire_share("file://host", "/home/user", 30);
+  db.expire_finalise();
 
   db.close();
 

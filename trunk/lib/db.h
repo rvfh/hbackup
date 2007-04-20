@@ -37,12 +37,18 @@ class Database {
   string  _path;
   DbList  _active;
   DbList  _removed;
+  list<string> _active_checksums;
+  bool    _expire_inited;
   int  lock();
   void unlock();
 public:
-  Database(const string& path) : _path(path) {}
+  Database(const string& path) : _path(path), _expire_inited(false) {}
   /* Open database */
   int  open();
+  /* Open removed part of database */
+  int  open_removed();
+  /* Close active part of database */
+  int  close_active();
   /* Close database */
   int  close();
   /* Check what needs to be done for given host & path */
@@ -51,14 +57,15 @@ public:
     const string& real_path,
     const string& mount_path,
     list<File>*   list);
-  int expire_init() {
-    return _removed.open(_path, "removed");
-  }
+  // Run this before closing active list to enable expiration
+  int expire_init();
   // Expire data older then given time out (seconds)
-  int expire(
+  int expire_share(
     const string&   prefix,
     const string&   path,
     time_t          time_out);
+  // That's where the job gets done
+  int expire_finalise();
   /* Read file with given checksum, extract it to path */
   int  read(
     const string& path,
@@ -75,7 +82,7 @@ public:
     const string& checksum,
     string&       path,
     bool          create);
-  int  organize(
+  int  organise(
     const string& path,
     int           number);
   int  write(

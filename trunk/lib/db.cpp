@@ -56,13 +56,13 @@ using namespace std;
 
 using namespace hbackup;
 
-int Database::organize(const string& path, int number) {
+int Database::organise(const string& path, int number) {
   DIR           *directory;
   struct dirent *dir_entry;
   string        nofiles;
   int           failed   = 0;
 
-  /* Already organized? */
+  /* Already organised? */
   nofiles = path + "/.nofiles";
   if (! File::testReg(nofiles, 0)) {
     return 0;
@@ -86,7 +86,7 @@ int Database::organize(const string& path, int number) {
       File file_data(path, dir_entry->d_name);
       string source_path = path + "/" + dir_entry->d_name;
       if (file_data.type() == 0) {
-        cerr << "db: organize: cannot get metadata: " << source_path << endl;
+        cerr << "db: organise: cannot get metadata: " << source_path << endl;
         failed = 2;
       } else
       if (S_ISDIR(file_data.type())
@@ -212,7 +212,7 @@ int Database::write(
     if (pos != string::npos) {
       dest_path.erase(pos);
       /* Now dest_path is /path/to */
-      organize(dest_path, 256);
+      organise(dest_path, 256);
     }
   }
 
@@ -281,8 +281,7 @@ int Database::getDir(
   // Two cases: either there are files, or a .nofiles file and directories
   do {
     // If we can find a .nofiles file, then go down one more directory
-    string  temp_path = path + "/.nofiles";
-    if (! File::testReg(temp_path, false)) {
+    if (! File::testReg(path + "/.nofiles", false)) {
       path += "/" + checksum.substr(level, 2);
       level += 2;
       if (File::testDir(path, create) == 2) {
@@ -295,6 +294,10 @@ int Database::getDir(
   // Return path
   path += "/" + checksum.substr(level);
   return File::testDir(path, false);
+}
+
+int Database::open_removed() {
+  return _removed.open(_path, "removed");
 }
 
 int Database::open() {
@@ -407,6 +410,10 @@ int Database::open() {
   return 0;
 }
 
+int Database::close_active() {
+  return _active.close(_path, "active");
+}
+
 int Database::close() {
   int status = 0;
 
@@ -423,9 +430,9 @@ int Database::close() {
     if (! _removed.isOpen()) {
       status = _removed.open(_path, "removed");
     }
-    if (status != 2) {
-      status = _removed.close(_path, "removed");
-    }
+  }
+  if (_removed.isOpen() && (status != 2)) {
+    status = _removed.close(_path, "removed");
   }
 
   // Delete journals
@@ -438,42 +445,158 @@ int Database::close() {
   return status;
 }
 
-int Database::expire(
+int Database::expire_init() {
+  if (! _active.isOpen()) {
+    cerr << "db: cannot initialise expiration module unless active items lists"
+    " is open" << endl;
+    return 2;
+  }
+  SortedList<DbData>::iterator it;
+  for (it = _active.begin(); it != _active.end(); it++) {
+    if (it->checksum().size() != 0) {
+      _active_checksums.push_back(it->checksum());
+    }
+  }
+  _expire_inited = true;
+  return 0;
+}
+
+int Database::expire_share(
     const string&   prefix,
     const string&   path,
     time_t          time_out) {
+  if (! _expire_inited) {
+    cerr << "db: expiration module not initialised" << endl;
+    return 2;
+  }
   if (! _removed.isOpen()) {
     cerr << "db: cannot expire unless removed items lists is open" << endl;
     return 2;
   }
-  SortedList<DbData>::iterator  it;
-  time_t                        now = time(NULL);
+  if (_removed.size() != 0) {
+    SortedList<DbData>::iterator  it;
+    time_t                        now = time(NULL);
 
-  for (it = _removed.begin(); it != _removed.end(); it++) {
-    // Prefix not reached
-    if (it->data().prefix() < prefix) {
-      continue;
-    } else
-    // Prefix exceeded
-    if (it->data().prefix() > prefix) {
-      break;
-    } else
-    // Prefix reached
-    // Path not reached
-    if (it->data().path() < path) {
-      continue;
-    } else
-    // Path exceeded
-    if (it->data().path() > path) {
-      break;
-    } else
-    // Path reached
-    {
-      if ((now - it->out()) > time_out) {
-        // Add to expired list
+    for (it = _removed.begin(); it != _removed.end(); it++) {
+      // Prefix not reached
+      if (it->data().prefix().substr(0, prefix.size()) < prefix) {
+        continue;
+      } else
+      // Prefix exceeded
+      if (it->data().prefix().substr(0, prefix.size()) > prefix) {
+        break;
+      } else
+      // Prefix reached
+      // Path not reached
+      if (it->data().path().substr(0, path.size()) < path) {
+        continue;
+      } else
+      // Path exceeded
+      if (it->data().path().substr(0, path.size()) > path) {
+        break;
+      } else
+      // Path reached
+      {
+        if ((now - it->out()) > time_out) {
+          it->setExpired();
+        } else {
+          it->resetExpired();
+        }
       }
     }
   }
+  return 0;
+}
+
+int Database::expire_finalise() {
+  if (! _expire_inited) {
+    cerr << "db: expiration module not initialised" << endl;
+    return 2;
+  }
+  if (! _removed.isOpen()) {
+    cerr << "db: cannot expire unless removed items lists is open" << endl;
+    return 2;
+  }
+  if (verbosity() > 1) {
+    cout << " -> Removing expired records" << endl;
+  }
+  // Complete list of active records, create list of expired
+  list<string> expired_checksums;
+  SortedList<DbData>::iterator it;
+  for (it = _removed.begin(); it != _removed.end();) {
+    if (it->checksum().size() != 0) {
+      if (it->expired()) {
+        expired_checksums.push_back(it->checksum());
+      } else {
+        _active_checksums.push_back(it->checksum());
+      }
+    }
+    if (it->expired()) {
+      it = _removed.erase(it);
+    } else {
+      it++;
+    }
+  }
+  // Sort and remove duplicates in each list
+  expired_checksums.sort();
+  expired_checksums.unique();
+  if (verbosity() > 2) {
+    cout << " --> Expired data: " << expired_checksums.size() << endl;
+    if (verbosity() > 3) {
+      list<string>::iterator it;
+      for (it = expired_checksums.begin(); it != expired_checksums.end();
+       it++) {
+        cout << " ---> Checksum: " << *it << endl;
+      }
+    }
+  }
+  if (expired_checksums.size() != 0) {
+    _active_checksums.sort();
+    _active_checksums.unique();
+    if (verbosity() > 2) {
+      cout << " --> Active data : " << _active_checksums.size() << endl;
+      if (verbosity() > 3) {
+        list<string>::iterator it;
+        for (it = _active_checksums.begin(); it != _active_checksums.end();
+        it++) {
+          cout << " ---> Checksum: " << *it << endl;
+        }
+      }
+    }
+    // Compare list to find expired that are not also in active list
+    list<string>::iterator ex;
+    list<string>::iterator ac = _active_checksums.begin();
+    for (ex = expired_checksums.begin(); ex != expired_checksums.end();) {
+      while ((ac != _active_checksums.end()) && (*ac < *ex)) {
+        ac++;
+      }
+      if ((ac != _active_checksums.end()) && (*ac == *ex)) {
+        // Removed from list
+        ex = expired_checksums.erase(ex);
+      } else {
+        ex++;
+      }
+    }
+    if (verbosity() > 2) {
+      cout << " --> Erased data : " << expired_checksums.size() << endl;
+    }
+    list<string>::iterator it;
+    for (it = expired_checksums.begin(); it != expired_checksums.end();
+    it++) {
+      if (verbosity() > 3) {
+        cout << " ---> Checksum: " << *it << endl;
+      }
+      string path;
+      if (getDir(*it, path, false) != 0) {
+        cerr << "db: expired data not found" << endl;
+      } else {
+        // Remove data from DB
+        remove((path + "/data").c_str());
+        remove(path.c_str());
+      }
+    }
+  }
+  _expire_inited = false;
   return 0;
 }
 
@@ -547,7 +670,6 @@ int Database::parse(
       if (S_ISREG(entry_active->data().type())
        && (entry_active->checksum().size() == 0)) {
         // Previously failed write
-        // TODO Anyway better way to avoid filling up removed?
         db_remove = true;
         file_add = true;
       } else {

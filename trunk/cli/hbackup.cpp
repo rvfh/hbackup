@@ -377,6 +377,8 @@ int main(int argc, char **argv) {
             failed = 1;
             break;
           case 0:
+            db.close_active();
+            db.open_removed();
             for (client = clients.begin(); client != clients.end(); client++) {
               if (terminating()) {
                 break;
@@ -399,6 +401,7 @@ int main(int argc, char **argv) {
                 failed = 1;
               }
             }
+            db.expire_finalise();
         }
         if (verbosity() > 1) {
           cout << " -> Closing database" << endl;
