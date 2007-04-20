@@ -349,10 +349,12 @@ int Client::expire(Database& db) {
       if (terminating()) {
         break;
       }
-      if (verbosity() > 0) {
-        cout << "Expire path '" << i->path() << "'" << endl;
+      if (i->expiration() > 0) {
+        if (verbosity() > 0) {
+          cout << "Expire path '" << i->path() << "'" << endl;
+        }
+        db.expire_share(_protocol + "://" + _name, i->path(), i->expiration());
       }
-      db.expire_share(_protocol + "://" + _name, i->path(), i->expiration());
     }
   }
   return 0;

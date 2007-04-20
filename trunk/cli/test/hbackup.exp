@@ -27,7 +27,6 @@ Protocol not supported: ssh
  --> Database active items part closed (contents: 18 files)
  --> Database removed items part open (contents: 0 files)
 Expire path 'test'
-Expire path 'test2'
  -> Removing expired records
  --> Expired data: 0
  -> Closing database
@@ -57,7 +56,6 @@ Client unreachable 'client' using protocol 'smb' (Connection timed out)
  --> Database active items part closed (contents: 18 files)
  --> Database removed items part open (contents: 0 files)
 Expire path 'test'
-Expire path 'test2'
  -> Removing expired records
  --> Expired data: 0
  -> Closing database
