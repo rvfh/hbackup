@@ -32,6 +32,7 @@ using namespace std;
 #include "paths.h"
 #include "list.h"
 #include "dbdata.h"
+#include "dblist.h"
 #include "db.h"
 
 using namespace hbackup;
@@ -52,15 +53,15 @@ time_t time(time_t *t) {
 }
 
 int main(void) {
-  Path*                         path;
-  string                        checksum;
-  string                        zchecksum;
-  DbData*                       db_data;
-  long long                     size;
-  long long                     zsize;
-  SortedList<DbData>::iterator  i;
-  SortedList<DbData>            journal;
-  int                           status;
+  Path*             path;
+  string            checksum;
+  string            zchecksum;
+  DbData*           db_data;
+  long long         size;
+  long long         zsize;
+  DbList::iterator  i;
+  DbList            journal;
+  int               status;
 
   /* Test internal functions */
   File::zcopy("test/testfile", "test_db/testfile.gz", &size, &zsize, &checksum,
@@ -135,19 +136,19 @@ int main(void) {
     db.close();
     return 0;
   }
-  db.load("added.journal", journal);
+  journal.load("test_db", "added.journal");
   cout << "Added journal list: " << journal.size() << " element(s):\n";
   for (i = journal.begin(); i != journal.end(); i++) {
     cout << i->line(true) << endl;
   }
   journal.clear();
-  db.load("removed.journal", journal);
+  journal.load("test_db", "removed.journal");
   cout << "Removed journal list: " << journal.size() << " element(s):\n";
   for (i = journal.begin(); i != journal.end(); i++) {
     cout << i->line(true) << endl;
   }
   journal.clear();
-  db.load("written.journal", journal);
+  journal.load("test_db", "written.journal");
   cout << "Really added journal list: " << journal.size() << " element(s):\n";
   for (i = journal.begin(); i != journal.end(); i++) {
     cout << i->line(true) << endl;
@@ -185,19 +186,19 @@ int main(void) {
     db.close();
     return 0;
   }
-  db.load("added.journal", journal);
+  journal.load("test_db", "added.journal");
   cout << "Added journal list: " << journal.size() << " element(s):\n";
   for (i = journal.begin(); i != journal.end(); i++) {
     cout << i->line(true) << endl;
   }
   journal.clear();
-  db.load("removed.journal", journal);
+  journal.load("test_db", "removed.journal");
   cout << "Removed journal list: " << journal.size() << " element(s):\n";
   for (i = journal.begin(); i != journal.end(); i++) {
     cout << i->line(true) << endl;
   }
   journal.clear();
-  db.load("written.journal", journal);
+  journal.load("test_db", "written.journal");
   cout << "Really added journal list: " << journal.size() << " element(s):\n";
   for (i = journal.begin(); i != journal.end(); i++) {
     cout << i->line(true) << endl;
@@ -241,19 +242,19 @@ int main(void) {
     db.close();
     return 0;
   }
-  db.load("added.journal", journal);
+  journal.load("test_db", "added.journal");
   cout << "Added journal list: " << journal.size() << " element(s):\n";
   for (i = journal.begin(); i != journal.end(); i++) {
     cout << i->line(true) << endl;
   }
   journal.clear();
-  db.load("removed.journal", journal);
+  journal.load("test_db", "removed.journal");
   cout << "Removed journal list: " << journal.size() << " element(s):\n";
   for (i = journal.begin(); i != journal.end(); i++) {
     cout << i->line(true) << endl;
   }
   journal.clear();
-  db.load("written.journal", journal);
+  journal.load("test_db", "written.journal");
   cout << "Really added journal list: " << journal.size() << " element(s):\n";
   for (i = journal.begin(); i != journal.end(); i++) {
     cout << i->line(true) << endl;
@@ -405,19 +406,19 @@ int main(void) {
     db.close();
     return 0;
   }
-  db.load("added.journal", journal);
+  journal.load("test_db", "added.journal");
   cout << "Added journal list: " << journal.size() << " element(s):\n";
   for (i = journal.begin(); i != journal.end(); i++) {
     cout << i->line(true) << endl;
   }
   journal.clear();
-  db.load("removed.journal", journal);
+  journal.load("test_db", "removed.journal");
   cout << "Removed journal list: " << journal.size() << " element(s):\n";
   for (i = journal.begin(); i != journal.end(); i++) {
     cout << i->line(true) << endl;
   }
   journal.clear();
-  db.load("written.journal", journal);
+  journal.load("test_db", "written.journal");
   cout << "Really added journal list: " << journal.size() << " element(s):\n";
   for (i = journal.begin(); i != journal.end(); i++) {
     cout << i->line(true) << endl;
@@ -450,19 +451,19 @@ int main(void) {
     db.close();
     return 0;
   }
-  db.load("added.journal", journal);
+  journal.load("test_db", "added.journal");
   cout << "Added journal list: " << journal.size() << " element(s):\n";
   for (i = journal.begin(); i != journal.end(); i++) {
     cout << i->line(true) << endl;
   }
   journal.clear();
-  db.load("removed.journal", journal);
+  journal.load("test_db", "removed.journal");
   cout << "Removed journal list: " << journal.size() << " element(s):\n";
   for (i = journal.begin(); i != journal.end(); i++) {
     cout << i->line(true) << endl;
   }
   journal.clear();
-  db.load("written.journal", journal);
+  journal.load("test_db", "written.journal");
   cout << "Really added journal list: " << journal.size() << " element(s):\n";
   for (i = journal.begin(); i != journal.end(); i++) {
     cout << i->line(true) << endl;
@@ -496,7 +497,7 @@ int main(void) {
   for (i = db.removed()->begin(); i != db.removed()->end(); i++) {
     cout << i->line(true) << endl;
   }
-  db.load("removed", journal);
+  journal.load("test_db", "removed");
   cout << "Official removed list: " << journal.size() << " element(s):\n";
   for (i = journal.begin(); i != journal.end(); i++) {
     cout << i->line(true) << endl;
@@ -533,19 +534,19 @@ int main(void) {
     db.close();
     return 0;
   }
-  db.load("added.journal", journal);
+  journal.load("test_db", "added.journal");
   cout << "Added journal list: " << journal.size() << " element(s):\n";
   for (i = journal.begin(); i != journal.end(); i++) {
     cout << i->line(true) << endl;
   }
   journal.clear();
-  db.load("removed.journal", journal);
+  journal.load("test_db", "removed.journal");
   cout << "Removed journal list: " << journal.size() << " element(s):\n";
   for (i = journal.begin(); i != journal.end(); i++) {
     cout << i->line(true) << endl;
   }
   journal.clear();
-  db.load("written.journal", journal);
+  journal.load("test_db", "written.journal");
   cout << "Really added journal list: " << journal.size() << " element(s):\n";
   for (i = journal.begin(); i != journal.end(); i++) {
     cout << i->line(true) << endl;
@@ -578,19 +579,19 @@ int main(void) {
     db.close();
     return 0;
   }
-  db.load("added.journal", journal);
+  journal.load("test_db", "added.journal");
   cout << "Added journal list: " << journal.size() << " element(s):\n";
   for (i = journal.begin(); i != journal.end(); i++) {
     cout << i->line(true) << endl;
   }
   journal.clear();
-  db.load("removed.journal", journal);
+  journal.load("test_db", "removed.journal");
   cout << "Removed journal list: " << journal.size() << " element(s):\n";
   for (i = journal.begin(); i != journal.end(); i++) {
     cout << i->line(true) << endl;
   }
   journal.clear();
-  db.load("written.journal", journal);
+  journal.load("test_db", "written.journal");
   cout << "Really added journal list: " << journal.size() << " element(s):\n";
   for (i = journal.begin(); i != journal.end(); i++) {
     cout << i->line(true) << endl;
@@ -610,7 +611,7 @@ int main(void) {
   system("head -2 test_db/written.journal > tmp");
   system("mv tmp test_db/written.journal");
   system("echo blah >> test_db/written.journal");
-  db.load("written.journal", journal);
+  journal.load("test_db", "written.journal");
   cout << "Really added journal list: " << journal.size() << " element(s):\n";
   for (i = journal.begin(); i != journal.end(); i++) {
     cout << i->line(true) << endl;
@@ -669,19 +670,19 @@ int main(void) {
     db.close();
     return 0;
   }
-  db.load("added.journal", journal);
+  journal.load("test_db", "added.journal");
   cout << "Added journal list: " << journal.size() << " element(s):\n";
   for (i = journal.begin(); i != journal.end(); i++) {
     cout << i->line(true) << endl;
   }
   journal.clear();
-  db.load("removed.journal", journal);
+  journal.load("test_db", "removed.journal");
   cout << "Removed journal list: " << journal.size() << " element(s):\n";
   for (i = journal.begin(); i != journal.end(); i++) {
     cout << i->line(true) << endl;
   }
   journal.clear();
-  db.load("written.journal", journal);
+  journal.load("test_db", "written.journal");
   cout << "Really added journal list: " << journal.size() << " element(s):\n";
   for (i = journal.begin(); i != journal.end(); i++) {
     cout << i->line(true) << endl;
@@ -725,19 +726,19 @@ int main(void) {
     db.close();
     return 0;
   }
-  db.load("added.journal", journal);
+  journal.load("test_db", "added.journal");
   cout << "Added journal list: " << journal.size() << " element(s):\n";
   for (i = journal.begin(); i != journal.end(); i++) {
     cout << i->line(true) << endl;
   }
   journal.clear();
-  db.load("removed.journal", journal);
+  journal.load("test_db", "removed.journal");
   cout << "Removed journal list: " << journal.size() << " element(s):\n";
   for (i = journal.begin(); i != journal.end(); i++) {
     cout << i->line(true) << endl;
   }
   journal.clear();
-  db.load("written.journal", journal);
+  journal.load("test_db", "written.journal");
   cout << "Really added journal list: " << journal.size() << " element(s):\n";
   for (i = journal.begin(); i != journal.end(); i++) {
     cout << i->line(true) << endl;
@@ -781,19 +782,19 @@ int main(void) {
     db.close();
     return 0;
   }
-  db.load("added.journal", journal);
+  journal.load("test_db", "added.journal");
   cout << "Added journal list: " << journal.size() << " element(s):\n";
   for (i = journal.begin(); i != journal.end(); i++) {
     cout << i->line(true) << endl;
   }
   journal.clear();
-  db.load("removed.journal", journal);
+  journal.load("test_db", "removed.journal");
   cout << "Removed journal list: " << journal.size() << " element(s):\n";
   for (i = journal.begin(); i != journal.end(); i++) {
     cout << i->line(true) << endl;
   }
   journal.clear();
-  db.load("written.journal", journal);
+  journal.load("test_db", "written.journal");
   cout << "Really added journal list: " << journal.size() << " element(s):\n";
   for (i = journal.begin(); i != journal.end(); i++) {
     cout << i->line(true) << endl;
@@ -811,7 +812,7 @@ int main(void) {
 
   db.organize("test_db/data", 2);
 
-  db.load("removed", journal);
+  journal.load("test_db", "removed");
   cout << "Official removed list: " << journal.size() << " element(s):\n";
   for (i = journal.begin(); i != journal.end(); i++) {
     cout << i->line(true) << endl;
@@ -821,7 +822,7 @@ int main(void) {
   // Test expiration
   cout << "Expiration test" << endl;
   db.expire("file://client", "/home/user2", 10);
-  db.open_removed();
+  db.expire_init();
   db.expire("file://client", "/home/user2", 10);
 
   db.close();
@@ -836,7 +837,7 @@ int main(void) {
       return 0;
     }
   }
-  db.load("removed", journal);
+  journal.load("test_db", "removed");
   cout << "Original removed list: " << journal.size() << " element(s):\n";
   for (i = journal.begin(); i != journal.end(); i++) {
     cout << i->line(true) << endl;
@@ -907,10 +908,10 @@ int main(void) {
     cout << i->line(true) << endl;
   }
   // Save
-  db.save("clutter", journal);
+  journal.save("test_db", "clutter");
   journal.clear();
   // Load (includes sorting and uncluttering)
-  db.load("clutter", journal);
+  journal.load("test_db", "clutter");
   // Show
   cout << "Uncluttered removed list: " << journal.size() << " element(s):\n";
   for (i = journal.begin(); i != journal.end(); i++) {

@@ -50,223 +50,11 @@ using namespace std;
 #include "list.h"
 #include "files.h"
 #include "dbdata.h"
+#include "dblist.h"
 #include "db.h"
 #include "hbackup.h"
 
 using namespace hbackup;
-
-int Database::load(
-    const string&       filename,
-    SortedList<DbData>& list,
-    unsigned int        offset) {
-  string  source_path;
-  FILE    *readfile;
-  int     failed = 0;
-
-  errno = 0;
-  source_path = _path + "/" + filename;
-  if ((readfile = fopen(source_path.c_str(), "r")) != NULL) {
-    /* Read the file into memory */
-    char          *buffer = NULL;
-    size_t        bsize   = 0;
-    unsigned int  line    = 0;
-
-    while ((getline(&buffer, &bsize, readfile) >= 0) && ! failed) {
-      if (++line <= offset) {
-        continue;
-      }
-
-      char      *start = buffer;
-      char      *delim;
-      char      *value = new char[bsize];
-      // Data
-      string    access_path;
-      string    path;
-      string    link;
-      string    checksum;
-      char      letter;
-      time_t    mtime;
-      long long fsize;
-      uid_t     uid;
-      gid_t     gid;
-      mode_t    mode;
-      // DB data
-      time_t    in;
-      time_t    out;
-      int       field = 0;
-
-      while (((delim = strchr(start, '\t')) != NULL) && ! failed) {
-        /* Get string portion */
-        strncpy(value, start, delim - start);
-        value[delim - start] = '\0';
-        /* Extract data */
-        failed = 0;
-        switch (++field) {
-          case 1:   /* Prefix */
-            access_path = value;
-            break;
-          case 2:   /* Path */
-            path = value;
-            break;
-          case 3:   /* Type */
-            if (sscanf(value, "%c", &letter) != 1) {
-              failed = 2;
-            }
-            break;
-          case 4:   /* Size */
-            if (sscanf(value, "%lld", &fsize) != 1) {
-              failed = 2;
-            }
-            break;
-          case 5:   /* Modification time */
-            if (sscanf(value, "%ld", &mtime) != 1) {
-              failed = 2;
-            }
-            break;
-          case 6:   /* User */
-            if (sscanf(value, "%u", &uid) != 1) {
-              failed = 2;
-            }
-            break;
-          case 7:   /* Group */
-            if (sscanf(value, "%u", &gid) != 1) {
-              failed = 2;
-            }
-            break;
-          case 8:   /* Permissions */
-            if (sscanf(value, "%o", &mode) != 1) {
-              failed = 2;
-            }
-            break;
-          case 9:   /* Link */
-            link = value;
-            break;
-          case 10:  /* Checksum */
-            // TODO remove
-            if (value != "N") {
-              checksum = value;
-            } else {
-              checksum = "";
-            }
-            break;
-          case 11:  /* Date in */
-            if (sscanf(value, "%ld", &in) != 1) {
-              failed = 2;
-            }
-            break;
-          case 12:  /* Date out */
-            if (sscanf(value, "%ld", &out) != 1) {
-              failed = 2;
-            }
-            break;
-          default:
-            failed = 2;
-        }
-        start = delim + 1;
-      }
-      free(value);
-      if (field != 12) {
-        failed = 1;
-      }
-      if (failed) {
-        cerr << "db: load: " << filename << ": Corrupted, line " << line
-          << endl;
-        errno = EUCLEAN;
-      } else {
-        File    data(access_path, path, link, File::typeMode(letter), mtime,
-          fsize, uid, gid, mode);
-        DbData  db_data(in, out, checksum, data);
-        list.add(db_data);
-      }
-    }
-    free(buffer);
-    fclose(readfile);
-
-    // Unclutter
-    if (list.size() > 0) {
-      SortedList<DbData>::iterator prev = list.begin();
-      SortedList<DbData>::iterator i = prev;
-      i++;
-      while (i != list.end()) {
-        if ((i->data() == prev->data())
-         && (i->checksum() == prev->checksum())) {
-          prev->setOut(i->out());
-          i = list.erase(i);
-        } else {
-          i++;
-          prev++;
-        }
-      }
-    }
-  } else {
-    // errno set by fopen
-    failed = 1;
-    cerr << "db: load: " << filename << ": " << strerror(errno) << endl;
-  }
-
-  return failed;
-}
-
-int Database::save(
-    const string& filename,
-    SortedList<DbData>& list,
-    bool                backup) {
-  FILE    *writefile;
-  int     failed = 0;
-
-  string dest_path = _path + "/" + filename;
-  string temp_path = dest_path + ".part";
-  if ((writefile = fopen(temp_path.c_str(), "w")) != NULL) {
-    SortedList<DbData>::iterator i;
-    for (i = list.begin(); i != list.end(); i++) {
-      fprintf(writefile, "%s\n", i->line().c_str());
-    }
-    fclose(writefile);
-
-    /* All done */
-    if (backup && rename(dest_path.c_str(), (dest_path + "~").c_str())) {
-      if (verbosity() > 3) {
-        cerr << "db: save: cannot create backup" << endl;
-      }
-      failed = 2;
-    }
-    if (rename(temp_path.c_str(), dest_path.c_str())) {
-      if (verbosity() > 3) {
-        cerr << "db: save: cannot rename file" << endl;
-      }
-      failed = 2;
-    }
-  } else {
-    if (verbosity() > 3) {
-      cerr << "db: save: cannot create file" << endl;
-    }
-    failed = 2;
-  }
-  return failed;
-}
-
-int Database::save_journal(
-    const string&       filename,
-    SortedList<DbData>& list,
-    unsigned int        offset) {
-  FILE          *writefile;
-  int           failed = 0;
-  unsigned int  line = 0;
-
-  string dest_path = _path + "/" + filename;
-  if ((writefile = fopen(dest_path.c_str(), "a")) != NULL) {
-    SortedList<DbData>::iterator i;
-    for (i = list.begin(); i != list.end(); i++) {
-      if (++line > offset) {
-        fprintf(writefile, "%s\n", i->line().c_str());
-      }
-    }
-    fclose(writefile);
-  } else {
-    failed = 2;
-  }
-  return failed;
-}
 
 int Database::organize(const string& path, int number) {
   DIR           *directory;
@@ -559,20 +347,20 @@ int Database::open() {
   // Recover lists
   if ((status != 2) && ! File::testReg(_path + "/written.journal", false)) {
     cerr << "db: open: journal found, attempting crash recovery" << endl;
-    SortedList<DbData> active;
-    SortedList<DbData> removed;
+    DbList  active;
+    DbList  removed;
 
     // Add written and missing items to active list
-    if (! load("written.journal", active) || (errno == EUCLEAN)) {
+    if (! active.load(_path, "written.journal") || (errno == EUCLEAN)) {
       cerr << "db: open: adding " << active.size()
         << " valid files to active list" << endl;
 
       // Get removed items journal
-      load("removed.journal", removed);
+      removed.load(_path, "removed.journal");
 
       if ((errno == 0)
-       && ! load("added.journal", active, active.size())
-       && ! load("active", active)) {
+       && ! active.load(_path, "added.journal", active.size())
+       && ! active.load(_path, "active")) {
         cerr << "db: open: removing " << removed.size()
           << " files from active list" << endl;
         // Remove removed items from active list
@@ -583,13 +371,13 @@ int Database::open() {
             active.erase(j);
           }
         }
-        save("active", active);
+        active.save(_path, "active");
         cerr << "db: open: new active list size: " << active.size() << endl;
       }
       active.clear();
 
-      if ((removed.size() != 0) && ! load("removed", removed)) {
-        save("removed", removed);
+      if ((removed.size() != 0) && ! removed.load(_path, "removed")) {
+        removed.save(_path, "removed");
         cerr << "db: open: new removed list size: " << removed.size() << endl;
       }
       removed.clear();
@@ -607,7 +395,7 @@ int Database::open() {
 
   // Read database active items list
   if (status != 2) {
-    if (open_active() == 2) {
+    if (_active.open(_path, "active") == 2) {
       status = 2;
     }
   }
@@ -619,109 +407,12 @@ int Database::open() {
   return 0;
 }
 
-int Database::open_active() {
-  if (load("active", _active)) {
-    // This should not fail
-    cerr << "db: failed to load active items list" << endl;
-    return 2;
-  }
-  _active_open = true;
-
-  if (verbosity() > 2) {
-    cout << " --> Database active items part open (contents: "
-      << _active.size() << " file";
-    if (_active.size() != 1) {
-      cout << "s";
-    }
-    cout << ")" << endl;
-  }
-
-  if (_active.size() == 0) {
-    return 1;
-  }
-  return 0;
-}
-
-int Database::open_removed() {
-  if (load("removed", _removed)) {
-    // This should not fail
-    cerr << "db: failed to load removed items list" << endl;
-    return 2;
-  }
-  _removed_open = true;
-
-  if (verbosity() > 2) {
-    cout << " --> Database removed items part open (contents: "
-      << _removed.size() << " file";
-    if (_removed.size() != 1) {
-      cout << "s";
-    }
-    cout << ")" << endl;
-  }
-
-  if (_removed.size() == 0) {
-    return 1;
-  }
-  return 0;
-}
-
-int Database::close_active() {
-  if (! _active_open) {
-    cerr << "db: cannot close active items list, not open" << endl;
-    return 2;
-  }
-  if (save("active", _active, true)) {
-    cerr << "db: failed to save active items list" << endl;
-    return 2;
-  }
-  int active_size = _active.size();
-  _active.clear();
-  _active_open = false;
-
-  if (verbosity() > 2) {
-    cout << " --> Database active items part closed (contents: "
-      << active_size << " file";
-    if (active_size != 1) {
-      cout << "s";
-    }
-    cout << ")" << endl;
-  }
-  return 0;
-}
-
-int Database::close_removed() {
-  if (! _removed_open) {
-    cerr << "db: cannot close removed items list, not open" << endl;
-    return 2;
-  }
-  // Update removed list
-  if (save("removed", _removed, true)) {
-    cerr << "db: failed to save removed items list" << endl;
-    return 2;
-  }
-  int removed_size = _removed.size();
-  _removed.clear();
-  _removed_open = false;
-
-  if (verbosity() > 2) {
-    if (removed_size >= 0) {
-      cout << " --> Database removed items part closed (contents: "
-        << removed_size << " file";
-      if (removed_size != 1) {
-        cout << "s";
-      }
-      cout << ")" << endl;
-    }
-  }
-  return 0;
-}
-
 int Database::close() {
   int status = 0;
 
   // Save active list
-  if (_active_open) {
-    if (close_active() != 0) {
+  if (_active.isOpen()) {
+    if (_active.close(_path, "active") != 0) {
       return 2;
     }
   }
@@ -729,11 +420,11 @@ int Database::close() {
   // Save removed list
   if (_removed.size() != 0) {
     // Load previously removed items into removed list
-    if (! _removed_open) {
-      status = open_removed();
+    if (! _removed.isOpen()) {
+      status = _removed.open(_path, "removed");
     }
     if (status != 2) {
-      status = close_removed();
+      status = _removed.close(_path, "removed");
     }
   }
 
@@ -751,7 +442,7 @@ int Database::expire(
     const string&   prefix,
     const string&   path,
     time_t          time_out) {
-  if (! _removed_open) {
+  if (! _removed.isOpen()) {
     cerr << "db: cannot expire unless removed items lists is open" << endl;
     return 2;
   }
@@ -791,9 +482,9 @@ int Database::parse(
     const string& mounted_path,
     const string& mount_path,
     list<File>*   file_list) {
-  int failed = 0;
-  int removed_size = _removed.size();
-  SortedList<DbData>                   added;
+  int     failed        = 0;
+  int     removed_size  = _removed.size();
+  DbList  added;
 
   string full_path = prefix + "/" + mounted_path + "/";
   SortedList<DbData>::iterator entry_active = _active.begin();
@@ -892,8 +583,8 @@ int Database::parse(
   }
 
   // Append to recovery journals
-  if (save_journal("added.journal", added)
-   || save_journal("removed.journal", _removed, removed_size)) {
+  if (added.save_journal(_path, "added.journal")
+   || _removed.save_journal(_path, "removed.journal", removed_size)) {
     // Unlikely
     failed = 1;
   }
