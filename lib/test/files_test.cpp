@@ -81,7 +81,8 @@ int main(void) {
   printf("FIFO   : %c\n", File::typeLetter(S_IFIFO));
   printf("Link   : %c\n", File::typeLetter(S_IFLNK));
   printf("Socket : %c\n", File::typeLetter(S_IFSOCK));
-  printf("Unknown: %c\n", File::typeLetter(0));
+  printf("Zero   : %c\n", File::typeLetter(0));
+  printf("Unknown: %c\n", File::typeLetter(-1));
 
   cout << endl << "Test: typeMode" << endl;
   printf("File   : 0%06o\n", File::typeMode('f'));
@@ -94,15 +95,28 @@ int main(void) {
   printf("Unknown: 0%06o\n", File::typeMode('?'));
 
   cout << "\nmetadata" << endl;
-  struct tm *time;
-  File file_data("test/testfile");
-  time_t file_time = file_data.mtime();
-  time = localtime(&file_time);
-  cout << "Line: " << file_data.line() << endl;;
-  printf(" * type: 0x%08x\n", file_data.type());
-  printf(" * mtime: %04u-%02u-%02u %2u:%02u:%02u\n",
-    time->tm_year + 1900, time->tm_mon + 1, time->tm_mday,
-    time->tm_hour, time->tm_min, time->tm_sec);
+  {
+    struct tm *time;
+    File file_data("test/testfile");
+    time_t file_time = file_data.mtime();
+    time = localtime(&file_time);
+    cout << "Line: " << file_data.line() << endl;;
+    printf(" * type: 0x%08x\n", file_data.type());
+    printf(" * mtime: %04u-%02u-%02u %2u:%02u:%02u\n",
+      time->tm_year + 1900, time->tm_mon + 1, time->tm_mday,
+      time->tm_hour, time->tm_min, time->tm_sec);
+  }
+
+  cout << "\nline constructor" << endl;
+  {
+    File file_data("test/testlink");
+    file_data.setPrefix("prefix");
+    cout << "Line: " << file_data.line(true) << endl;;
+    char* new_line = new char[80];
+    strcpy(new_line, (file_data.line(true) + "\t").c_str());
+    File file_line(new_line, 80);
+    cout << "Line: " << file_line.line() << endl;;
+  }
 
   cout << "\nreadline" << endl;
   vector<string> *params;

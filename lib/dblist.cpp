@@ -17,14 +17,9 @@
 */
 
 #include <iostream>
-#include <sstream>
 #include <string>
 #include <vector>
 #include <list>
-#include <sys/stat.h>
-#include <signal.h>
-#include <time.h>
-#include <dirent.h>
 #include <errno.h>
 
 using namespace std;
@@ -58,106 +53,13 @@ int DbList::load(
         continue;
       }
 
-      char      *start = buffer;
-      char      *delim;
-      char      *value = new char[bsize];
-      // Data
-      string    access_path;
-      string    path;
-      string    link;
-      string    checksum;
-      char      letter;
-      time_t    mtime;
-      long long fsize;
-      uid_t     uid;
-      gid_t     gid;
-      mode_t    mode;
-      // DB data
-      time_t    in;
-      time_t    out;
-      int       field = 0;
-
-      while (((delim = strchr(start, '\t')) != NULL) && ! failed) {
-        /* Get string portion */
-        strncpy(value, start, delim - start);
-        value[delim - start] = '\0';
-        /* Extract data */
-        failed = 0;
-        switch (++field) {
-          case 1:   /* Prefix */
-            access_path = value;
-            break;
-          case 2:   /* Path */
-            path = value;
-            break;
-          case 3:   /* Type */
-            if (sscanf(value, "%c", &letter) != 1) {
-              failed = 2;
-            }
-            break;
-          case 4:   /* Size */
-            if (sscanf(value, "%lld", &fsize) != 1) {
-              failed = 2;
-            }
-            break;
-          case 5:   /* Modification time */
-            if (sscanf(value, "%ld", &mtime) != 1) {
-              failed = 2;
-            }
-            break;
-          case 6:   /* User */
-            if (sscanf(value, "%u", &uid) != 1) {
-              failed = 2;
-            }
-            break;
-          case 7:   /* Group */
-            if (sscanf(value, "%u", &gid) != 1) {
-              failed = 2;
-            }
-            break;
-          case 8:   /* Permissions */
-            if (sscanf(value, "%o", &mode) != 1) {
-              failed = 2;
-            }
-            break;
-          case 9:   /* Link */
-            link = value;
-            break;
-          case 10:  /* Checksum */
-            // TODO remove
-            if (value != "N") {
-              checksum = value;
-            } else {
-              checksum = "";
-            }
-            break;
-          case 11:  /* Date in */
-            if (sscanf(value, "%ld", &in) != 1) {
-              failed = 2;
-            }
-            break;
-          case 12:  /* Date out */
-            if (sscanf(value, "%ld", &out) != 1) {
-              failed = 2;
-            }
-            break;
-          default:
-            failed = 2;
-        }
-        start = delim + 1;
-      }
-      free(value);
-      if (field != 12) {
+      DbData  db_data(buffer, bsize);
+      if (db_data.in() == 0) {
         failed = 1;
-      }
-      if (failed) {
         cerr << "dblist: load: " << filename << ": Corrupted, line " << line
           << endl;
         errno = EUCLEAN;
       } else {
-        File    data(access_path, path, link, File::typeMode(letter), mtime,
-          fsize, uid, gid, mode);
-        DbData  db_data(in, out, checksum, data);
         add(db_data);
       }
     }

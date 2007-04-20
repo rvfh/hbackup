@@ -25,6 +25,7 @@ Block  : b
 FIFO   : p
 Link   : l
 Socket : s
+Zero   : !
 Unknown: ?
 
 Test: typeMode
@@ -41,6 +42,10 @@ metadata
 Line: 	test/testfile	f	13	1161486000	1000	1000	644	
  * type: 0x00008000
  * mtime: 2006-10-22  0:00:00
+
+line constructor
+Line: prefix	test/testlink	l	8	1	1000	1000	777	testfile
+Line: prefix	test/testlink	l	8	1	1000	1000	777	testfile
 
 readline
 readline(a): 0
