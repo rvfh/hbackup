@@ -196,7 +196,8 @@ int Client::readListFile(const string& list_path) {
           } else
           if (params[0] == "expire") {
             int time_out;
-            if (sscanf(params[1].c_str(), "%d", &time_out) != 0) {
+            if ((sscanf(params[1].c_str(), "%d", &time_out) != 0)
+             && (time_out != 0)) {
               _paths.back().setExpiration(time_out * 3600);
             }
           } else {
@@ -351,7 +352,7 @@ int Client::expire(Database& db) {
       if (verbosity() > 0) {
         cout << "Expire path '" << i->path() << "'" << endl;
       }
-      db.expire(_protocol + "://" + _name, i->path(), i->expiration());
+      db.expire_share(_protocol + "://" + _name, i->path(), i->expiration());
     }
   }
   return 0;

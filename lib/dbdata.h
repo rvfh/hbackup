@@ -30,11 +30,12 @@ class DbData {
   string  _checksum;
   time_t  _in;
   time_t  _out;
+  bool    _expired;
 public:
   DbData(const File& data) :
-    _data(data), _checksum(""), _out(0) { _in = time(NULL); }
+    _data(data), _checksum(""), _out(0), _expired(false) { _in = time(NULL); }
   // line gets modified
-  DbData(char* line, size_t size) : _data(line, size) {
+  DbData(char* line, size_t size) : _data(line, size), _expired(false) {
     char* start  = line;
     char* value  = new char[size];
     int   failed = 0;
@@ -92,9 +93,12 @@ public:
   string checksum() const { return _checksum; }
   time_t in() const { return _in; }
   time_t out() const { return _out; }
+  bool   expired() { return _expired; }
   void   setChecksum(const string& checksum) { _checksum = checksum; }
   void   setOut() { _out = time(NULL); }
   void   setOut(time_t out) { _out = out; }
+  void   resetExpired() { _expired = false; }
+  void   setExpired() { _expired = true; }
   string line(bool nodates = false) const {
     string  output = _data.line(nodates) + "\t" + _checksum;
     char*   numbers = NULL;
