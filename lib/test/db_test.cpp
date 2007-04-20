@@ -31,6 +31,7 @@ using namespace std;
 #include "cvs_parser.h"
 #include "paths.h"
 #include "list.h"
+#include "dbdata.h"
 #include "db.h"
 
 using namespace hbackup;
@@ -816,6 +817,12 @@ int main(void) {
     cout << i->line(true) << endl;
   }
   journal.clear();
+
+  // Test expiration
+  cout << "Expiration test" << endl;
+  db.expire("file://client", "/home/user2", 10);
+  db.open_removed();
+  db.expire("file://client", "/home/user2", 10);
 
   db.close();
 

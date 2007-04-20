@@ -52,6 +52,8 @@ class Client {
   string        _listfiledir;
   string        _protocol;
   list<Option>  _options;
+  //
+  bool          _initialised;
   list<Path>    _paths;
   string        _mount_point;
   string        _mounted;
@@ -70,6 +72,9 @@ public:
   void setHostOrIp(string value);
   void setProtocol(string value);
   void setListfile(string value);
+  //
+  bool initialised() { return _initialised; }
+  void setInitialised() { _initialised = true; }
   int  setMountPoint(const string& mount_point, bool check = true) {
     _mount_point = mount_point;
     /* Check that mount dir exists, if not create it */
@@ -81,6 +86,7 @@ public:
   }
   string mountPoint() { return _mount_point; }
   int  backup(Database& db, bool config_check = false);
+  int  expire(Database& db);
   void show();
 };
 

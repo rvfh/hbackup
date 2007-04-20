@@ -629,8 +629,10 @@ file://host	/home/user/dir space/file space	f	0	1	1000	1000	644		d41d8cd98f00b20
 file://host	/home/user/testdir	d	0	0	1000	1000	755			15	25	
 file://host	/home/user/testdir	d	0	0	1000	1000	775			24	32	
 file://host	/home/user/testfile	f	13	1	1000	1000	644			16	27	
- --> Database active items part closed (contents: 17 files)
+Expiration test
+db: cannot expire unless removed items lists is open
  --> Database removed items part open (contents: 8 files)
+ --> Database active items part closed (contents: 17 files)
  --> Database removed items part closed (contents: 8 files)
 List uncluttering test
  --> Database active items part open (contents: 17 files)
@@ -646,37 +648,37 @@ file://host	/home/user/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371bbc035
 Cluttered removed list: 19 element(s):
 file://host	/home/user/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	644		5252f242d27b8c2c9fdbdcbb33545d07-0	8	23	
 file://host	/home/user/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	775		5252f242d27b8c2c9fdbdcbb33545d07-0	22	30	
-file://host	/home/user/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	775		BLAH	35	36	
+file://host	/home/user/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	775		BLAH	36	37	
 file://host	/home/user/cvs/dirutd/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	9	33	
-file://host	/home/user/cvs/dirutd/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	37	38	
-file://host	/home/user/cvs/dirutd/fileutd	f	0	1	1000	1000	644		BLIH	39	40	
-file://host	/home/user/cvs/dirutd/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	41	42	
+file://host	/home/user/cvs/dirutd/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	38	39	
+file://host	/home/user/cvs/dirutd/fileutd	f	0	1	1000	1000	644		BLIH	40	41	
+file://host	/home/user/cvs/dirutd/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	42	43	
 file://host	/home/user/dir space/file space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	13	28	
-file://host	/home/user/dir space/file space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	13	43	
+file://host	/home/user/dir space/file space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	13	44	
 file://host	/home/user/testdir	d	0	0	1000	1000	755			15	25	
-file://host	/home/user/testdir	d	0	0	1000	1000	755			44	45	
+file://host	/home/user/testdir	d	0	0	1000	1000	755			45	46	
 file://host	/home/user/testdir	d	0	0	1000	1000	775			24	32	
 file://host	/home/user/testdir	d	0	0	1000	1000	775			24	32	
 file://host	/home/user/testfile	f	13	1	1000	1000	644			16	27	
 file://host	/home/user/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371bbc0355478d8-0	26	34	
-file://host	/home/user/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371bbc0355478d8-0	46	47	
-file://host	/home/user/testfile	f	13	1	1000	1000	644		BLOH	48	49	
-file://host	/home/user/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371bbc0355478d8-0	50	51	
-file://host	/home/user/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371bbc0355478d8-0	52	53	
+file://host	/home/user/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371bbc0355478d8-0	47	48	
+file://host	/home/user/testfile	f	13	1	1000	1000	644		BLOH	49	50	
+file://host	/home/user/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371bbc0355478d8-0	51	52	
+file://host	/home/user/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371bbc0355478d8-0	53	54	
 Uncluttered removed list: 13 element(s):
 file://host	/home/user/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	644		5252f242d27b8c2c9fdbdcbb33545d07-0	8	23	
 file://host	/home/user/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	775		5252f242d27b8c2c9fdbdcbb33545d07-0	22	30	
-file://host	/home/user/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	775		BLAH	35	36	
-file://host	/home/user/cvs/dirutd/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	9	38	
-file://host	/home/user/cvs/dirutd/fileutd	f	0	1	1000	1000	644		BLIH	39	40	
-file://host	/home/user/cvs/dirutd/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	41	42	
+file://host	/home/user/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	775		BLAH	36	37	
+file://host	/home/user/cvs/dirutd/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	9	39	
+file://host	/home/user/cvs/dirutd/fileutd	f	0	1	1000	1000	644		BLIH	40	41	
+file://host	/home/user/cvs/dirutd/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	42	43	
 file://host	/home/user/dir space/file space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	13	28	
-file://host	/home/user/testdir	d	0	0	1000	1000	755			15	45	
+file://host	/home/user/testdir	d	0	0	1000	1000	755			15	46	
 file://host	/home/user/testdir	d	0	0	1000	1000	775			24	32	
 file://host	/home/user/testfile	f	13	1	1000	1000	644			16	27	
-file://host	/home/user/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371bbc0355478d8-0	26	47	
-file://host	/home/user/testfile	f	13	1	1000	1000	644		BLOH	48	49	
-file://host	/home/user/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371bbc0355478d8-0	50	53	
+file://host	/home/user/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371bbc0355478d8-0	26	48	
+file://host	/home/user/testfile	f	13	1	1000	1000	644		BLOH	49	50	
+file://host	/home/user/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371bbc0355478d8-0	51	54	
  --> Database active items part closed (contents: 17 files)
  --> Database active items part open (contents: 17 files)
 Active list: 17 element(s):

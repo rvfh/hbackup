@@ -49,42 +49,11 @@ using namespace std;
 
 #include "list.h"
 #include "files.h"
+#include "dbdata.h"
 #include "db.h"
 #include "hbackup.h"
 
 using namespace hbackup;
-
-bool DbData::operator<(const DbData& right) const {
-  if (_data < right._data) return true;
-  if (right._data < _data) return false;
-  // Equal then...
-  return (_in < right._in)
-      || ((_in == right._in) && (_checksum < right._checksum));
-  // Note: checking for _out would break the journal replay stuff (uses find)
-}
-
-bool DbData::operator!=(const DbData& right) const {
-  return (_in != right._in) || (_checksum != right._checksum)
-   || (_data != right._data);
-}
-
-void DbData::setOut(time_t out) {
-  if (out != 0) {
-    _out = out;
-  } else {
-    _out = time(NULL);
-  }
-}
-
-string DbData::line(bool nodates) const {
-  string  output = _data.line(nodates) + "\t" + _checksum;
-  char*   numbers = NULL;
-
-  asprintf(&numbers, "%ld\t%ld", _in, _out);
-  output += "\t" + string(numbers) + "\t";
-  delete numbers;
-  return output;
-}
 
 int Database::load(
     const string&       filename,
@@ -638,7 +607,7 @@ int Database::open() {
 
   // Read database active items list
   if (status != 2) {
-    if (open_active()) {
+    if (open_active() == 2) {
       status = 2;
     }
   }
@@ -666,6 +635,10 @@ int Database::open_active() {
     }
     cout << ")" << endl;
   }
+
+  if (_active.size() == 0) {
+    return 1;
+  }
   return 0;
 }
 
@@ -684,6 +657,10 @@ int Database::open_removed() {
       cout << "s";
     }
     cout << ")" << endl;
+  }
+
+  if (_removed.size() == 0) {
+    return 1;
   }
   return 0;
 }
@@ -740,14 +717,23 @@ int Database::close_removed() {
 }
 
 int Database::close() {
+  int status = 0;
+
   // Save active list
-  close_active();
+  if (_active_open) {
+    if (close_active() != 0) {
+      return 2;
+    }
+  }
 
   // Save removed list
   if (_removed.size() != 0) {
     // Load previously removed items into removed list
-    if (! open_removed()) {
-      close_removed();
+    if (! _removed_open) {
+      status = open_removed();
+    }
+    if (status != 2) {
+      status = close_removed();
     }
   }
 
@@ -758,19 +744,21 @@ int Database::close() {
 
   // Release lock
   unlock();
-  return 0;
+  return status;
 }
 
-// Select some records out of given list
-void Database::select(
-    const string&                         prefix,
-    const string&                         path,
-    SortedList<DbData>&                   list,
-    list<SortedList<DbData>::iterator>& selection) {
-  SortedList<DbData>::iterator it;
+int Database::expire(
+    const string&   prefix,
+    const string&   path,
+    time_t          time_out) {
+  if (! _removed_open) {
+    cerr << "db: cannot expire unless removed items lists is open" << endl;
+    return 2;
+  }
+  SortedList<DbData>::iterator  it;
+  time_t                        now = time(NULL);
 
-  selection.clear();
-  for (it = _active.begin(); it != _active.end(); it++) {
+  for (it = _removed.begin(); it != _removed.end(); it++) {
     // Prefix not reached
     if (it->data().prefix() < prefix) {
       continue;
@@ -790,9 +778,12 @@ void Database::select(
     } else
     // Path reached
     {
-      selection.push_back(it);
+      if ((now - it->out()) > time_out) {
+        // Add to expired list
+      }
     }
   }
+  return 0;
 }
 
 int Database::parse(

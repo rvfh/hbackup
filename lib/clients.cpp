@@ -31,6 +31,7 @@ using namespace std;
 #include "parsers.h"
 #include "cvs_parser.h"
 #include "paths.h"
+#include "dbdata.h"
 #include "db.h"
 #include "hbackup.h"
 #include "clients.h"
@@ -195,7 +196,7 @@ int Client::readListFile(const string& list_path) {
           if (params[0] == "expire") {
             int time_out;
             if (sscanf(params[1].c_str(), "%d", &time_out) != 0) {
-              _paths.back().setExpiration(time_out);
+              _paths.back().setExpiration(time_out * 3600);
             }
           } else {
             // What was that?
@@ -225,6 +226,7 @@ Client::Client(string value) {
   _protocol     = "";
   _mount_point  = "";
   _mounted      = "";
+  _initialised  = false;
 
   if (verbosity() > 2) {
     cout << " --> Client: " << _name << endl;
@@ -282,6 +284,7 @@ int Client::backup(
   }
 
   if (! readListFile(list_path)) {
+    setInitialised();
     /* Backup */
     if (_paths.empty()) {
       failed = 1;
@@ -336,6 +339,21 @@ int Client::backup(
   }
   umount(); // does not change errno
   return failed;
+}
+
+int Client::expire(Database& db) {
+  if (initialised()) {
+    for (list<Path>::iterator i = _paths.begin(); i != _paths.end(); i++) {
+      if (terminating()) {
+        break;
+      }
+      if (verbosity() > 0) {
+        cout << "Expire path '" << i->path() << "'" << endl;
+      }
+      db.expire(_protocol + "://" + _name, i->path(), i->expiration());
+    }
+  }
+  return 0;
 }
 
 void Client::show() {

@@ -24,6 +24,7 @@ Backup path 'test2'
  --> Files to remove: 0
 Client unreachable 'client' using protocol 'smb' (Connection timed out)
 Protocol not supported: ssh
+ --> Database removed items part open (contents: 0 files)
  -> Closing database
  --> Database active items part closed (contents: 18 files)
  -> Reading configuration file
@@ -48,6 +49,7 @@ Backup path 'test2'
  --> Files to add: 0
  --> Files to remove: 0
 Client unreachable 'client' using protocol 'smb' (Connection timed out)
+ --> Database removed items part open (contents: 0 files)
  -> Closing database
  --> Database active items part closed (contents: 18 files)
  -> Reading configuration file
@@ -58,6 +60,7 @@ Client unreachable 'client' using protocol 'smb' (Connection timed out)
  --> Database active items part open (contents: 18 files)
  -> Scanning database
  --> Scanning database contents: 18 files
+ --> Database removed items part open (contents: 0 files)
  -> Closing database
  --> Database active items part closed (contents: 18 files)
  -> Reading configuration file
@@ -68,5 +71,6 @@ Client unreachable 'client' using protocol 'smb' (Connection timed out)
  --> Database active items part open (contents: 18 files)
  -> Checking database
  --> Scanning database contents thoroughly: 18 files
+ --> Database removed items part open (contents: 0 files)
  -> Closing database
  --> Database active items part closed (contents: 18 files)
