@@ -33,8 +33,47 @@ class DbData {
 public:
   DbData(const File& data) :
     _data(data), _checksum(""), _out(0) { _in = time(NULL); }
-  DbData(time_t in, time_t out, string checksum, const File& data) :
-    _data(data), _checksum(checksum), _in(in), _out(out) {}
+  // line gets modified
+  DbData(char* line, size_t size) : _data(line, size) {
+    char* start  = line;
+    char* value  = new char[size];
+    int   failed = 0;
+
+    for (int field = 1; field <= 12; field++) {
+      // Get tabulation position
+      char* delim = strchr(start, '\t');
+      if (delim == NULL) {
+        failed = 1;
+      } else {
+        // Get string portion
+        strncpy(value, start, delim - start);
+        value[delim - start] = '\0';
+        /* Extract data */
+        switch (field) {
+          case 10:  /* Checksum */
+            _checksum = value;
+            break;
+          case 11:  /* Date in */
+            if (sscanf(value, "%ld", &_in) != 1) {
+              failed = 2;
+            }
+            break;
+          case 12:  /* Date out */
+            if (sscanf(value, "%ld", &_out) != 1) {
+              failed = 2;
+            }
+        }
+        start = delim + 1;
+      }
+      if (failed) {
+        break;
+      }
+    }
+    free(value);
+    if ((failed != 0) || (_data.type() == 0)) {
+      _in = 0;
+    }
+  }
   bool operator<(const DbData& right) const {
     if (_data < right._data) return true;
     if (right._data < _data) return false;
@@ -48,19 +87,14 @@ public:
     return (_in != right._in) || (_checksum != right._checksum)
     || (_data != right._data);
   }
-  bool operator==(const DbData& right) const { return ! (*this != right); }
+  bool   operator==(const DbData& right) const { return ! (*this != right); }
   File   data() const { return _data; }
   string checksum() const { return _checksum; }
   time_t in() const { return _in; }
   time_t out() const { return _out; }
   void   setChecksum(const string& checksum) { _checksum = checksum; }
-  void   setOut(time_t out = 0) {
-    if (out != 0) {
-      _out = out;
-    } else {
-      _out = time(NULL);
-    }
-  }
+  void   setOut() { _out = time(NULL); }
+  void   setOut(time_t out) { _out = out; }
   string line(bool nodates = false) const {
     string  output = _data.line(nodates) + "\t" + _checksum;
     char*   numbers = NULL;

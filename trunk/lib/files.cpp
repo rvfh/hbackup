@@ -82,6 +82,76 @@ File::File(const string& access_path, const string& path) {
   }
 }
 
+File::File(char* line, size_t size) {
+  char      *start = line;
+  char      *delim;
+  char      *value = new char[size];
+  char      letter;
+  int       failed = 0;
+
+  for (int field = 1; field <= 9; field++) {
+    // Get tabulation position
+    delim = strchr(start, '\t');
+    if (delim == NULL) {
+      failed = 1;
+    } else {
+      // Get string portion
+      strncpy(value, start, delim - start);
+      value[delim - start] = '\0';
+      /* Extract data */
+      switch (field) {
+        case 1:   /* Prefix */
+          _prefix = value;
+          break;
+        case 2:   /* Path */
+          _path = value;
+          break;
+        case 3:   /* Type */
+          if (sscanf(value, "%c", &letter) != 1) {
+            failed = 2;
+          }
+          _type = File::typeMode(letter);
+          break;
+        case 4:   /* Size */
+          if (sscanf(value, "%lld", &_size) != 1) {
+            failed = 2;
+          }
+          break;
+        case 5:   /* Modification time */
+          if (sscanf(value, "%ld", &_mtime) != 1) {
+            failed = 2;
+          }
+          break;
+        case 6:   /* User */
+          if (sscanf(value, "%u", &_uid) != 1) {
+            failed = 2;
+          }
+          break;
+        case 7:   /* Group */
+          if (sscanf(value, "%u", &_gid) != 1) {
+            failed = 2;
+          }
+          break;
+        case 8:   /* Permissions */
+          if (sscanf(value, "%o", &_mode) != 1) {
+            failed = 2;
+          }
+          break;
+        case 9:   /* Link */
+          _link = value;
+      }
+      start = delim + 1;
+    }
+    if (failed) {
+      break;
+    }
+  }
+  free(value);
+  if (failed != 0) {
+    _type = 0;
+  }
+}
+
 // Tested in db's test
 bool File::metadiffer(const File& right) const {
   return (_mtime != right._mtime)   || (_size != right._size)
@@ -184,6 +254,7 @@ char File::typeLetter(mode_t mode) {
   if (S_ISFIFO(mode)) return 'p';
   if (S_ISLNK(mode))  return 'l';
   if (S_ISSOCK(mode)) return 's';
+  if (mode == 0)      return '!';
   return '?';
 }
 
