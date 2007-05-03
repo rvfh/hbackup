@@ -176,7 +176,6 @@ Removed list: 0 element(s):
 db: scan: file data missing for checksum 59ca0efa9f5633cb0371bbc0355478d8-0
  --> Client:      file://host
  --> File name:   /home/user/testfile
- --> Modified:    2006-10-22  0:00:00
 full scan error status 1
  --> Database active items part closed (contents: 20 files)
  --> Database active items part open (contents: 20 files)
@@ -184,7 +183,6 @@ full scan error status 1
 db: scan: file data missing for checksum 59ca0efa9f5633cb0371bbc0355478d8-0
  --> Client:      file://host
  --> File name:   /home/user/testfile
- --> Modified:    2006-10-22  0:00:00
 full thorough scan error status 1
  --> Database active items part closed (contents: 20 files)
  --> Database active items part open (contents: 20 files)
@@ -192,7 +190,6 @@ full thorough scan error status 1
 db: scan: file data corrupted for checksum 59ca0efa9f5633cb0371bbc0355478d8-0 (found to be d41d8cd98f00b204e9800998ecf8427e)
  --> Client:      file://host
  --> File name:   /home/user/testfile
- --> Modified:    2006-10-22  0:00:00
 full thorough scan error status 1
  --> Database active items part closed (contents: 20 files)
  --> Database active items part open (contents: 20 files)
