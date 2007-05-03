@@ -873,23 +873,23 @@ int Database::scan(const string& checksum, bool thorough) {
           struct tm *time;
           cout << " --> Client:      " << i->data().prefix() << endl;
           cout << " --> File name:   " << i->data().path() << endl;
-          time_t file_mtime = i->data().mtime();
-          time = localtime(&file_mtime);
-          printf(" --> Modified:    %04u-%02u-%02u %2u:%02u:%02u\n",
-            time->tm_year + 1900, time->tm_mon + 1, time->tm_mday,
-            time->tm_hour, time->tm_min, time->tm_sec);
           if (verbosity() > 3) {
-            time_t local = i->in();
-            time = localtime(&local);
-            printf(" --> Seen first: %04u-%02u-%02u %2u:%02u:%02u\n",
+            time_t file_mtime = i->data().mtime();
+            time = localtime(&file_mtime);
+            printf(" --> Modified:    %04u-%02u-%02u %2u:%02u:%02u %s\n",
               time->tm_year + 1900, time->tm_mon + 1, time->tm_mday,
-              time->tm_hour, time->tm_min, time->tm_sec);
+              time->tm_hour, time->tm_min, time->tm_sec, time->tm_zone);
+              time_t local = i->in();
+              time = localtime(&local);
+            printf(" --> Seen first: %04u-%02u-%02u %2u:%02u:%02u %s\n",
+              time->tm_year + 1900, time->tm_mon + 1, time->tm_mday,
+              time->tm_hour, time->tm_min, time->tm_sec, time->tm_zone);
             if (i->out() != 0) {
               time_t local = i->out();
               time = localtime(&local);
-              printf(" --> Seen gone:  %04u-%02u-%02u %2u:%02u:%02u\n",
+              printf(" --> Seen gone:  %04u-%02u-%02u %2u:%02u:%02u %s\n",
                 time->tm_year + 1900, time->tm_mon + 1, time->tm_mday,
-                time->tm_hour, time->tm_min, time->tm_sec);
+                time->tm_hour, time->tm_min, time->tm_sec, time->tm_zone);
             }
           }
         }
