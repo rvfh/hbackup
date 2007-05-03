@@ -184,8 +184,7 @@ int Database::write(
     } while (true);
 
     /* Now move the file in its place */
-    dest_path += "/data";
-    if (rename(temp_path.c_str(), dest_path.c_str())) {
+    if (rename(temp_path.c_str(), (dest_path + "/data").c_str())) {
       cerr << "db: write: failed to move file " << temp_path
         << " to " << dest_path << ": " << strerror(errno);
       failed = 1;
