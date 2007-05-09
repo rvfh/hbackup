@@ -29,36 +29,34 @@ using namespace std;
 
 using namespace hbackup;
 
-int Condition::match(const File& filedata) const {
+bool Condition::match(const File& filedata) const {
   switch(_type) {
   case filter_type:
-    if ((_file_type & filedata.type()) == 0) {
-      return 1;
-    }
+    return (_file_type & filedata.type()) != 0;
+  case filter_path:
+    return filedata.path() == _string;
   case filter_path_end: {
     signed int diff = filedata.path().size() - _string.size();
     if (diff < 0) {
-      return 1;
+      return false;
     }
-    return _string != filedata.path().substr(diff); }
+    return _string == filedata.path().substr(diff); }
   case filter_path_start:
-    return filedata.path().substr(0, _string.size()) != _string;
+    return filedata.path().substr(0, _string.size()) == _string;
   case filter_path_regexp:
     regex_t regex;
-    if (regcomp(&regex, _string.c_str(), REG_EXTENDED)) {
-      cerr << "filters: regexp: incorrect expression" << endl;
-      return 2;
+    if (! regcomp(&regex, _string.c_str(), REG_EXTENDED)) {
+      return ! regexec(&regex, filedata.path().c_str(), 0, NULL, 0);
     }
-    return regexec(&regex, filedata.path().c_str(), 0, NULL, 0);
+    cerr << "filters: regexp: incorrect expression" << endl;
   case filter_size_above:
-    return filedata.size() < _size;
+    return filedata.size() >= _size;
   case filter_size_below:
-    return filedata.size() > _size;
+    return filedata.size() <= _size;
   default:
     cerr << "filters: match: unknown condition type" << endl;
-    return 2;
   }
-  return 1;
+  return false;
 }
 
 void Condition::show() const {
@@ -77,27 +75,27 @@ void Condition::show() const {
   }
 }
 
-int Filters::match(const File& filedata) const {
+bool Filters::match(const File& filedata) const {
   /* Read through list of rules */
   for (unsigned int i = 0; i < size(); i++) {
     Filter  rule  = (*this)[i];
-    int     match = 1;
+    bool    match = true;
 
     /* Read through list of conditions in rule */
     for (unsigned int j = 0; j < rule.size(); j++) {
       Condition condition = rule[j];
 
       /* All filters must match for rule to match */
-      if (condition.match(filedata)) {
-        match = 0;
+      if (! condition.match(filedata)) {
+        match = false;
         break;
       }
     }
     /* If all conditions matched, or the rule is empty, we have a rule match */
     if (match) {
-      return 0;
+      return true;
     }
   }
   /* No match */
-  return 1;
+  return false;
 }

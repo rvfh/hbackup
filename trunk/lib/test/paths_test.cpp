@@ -55,7 +55,7 @@ int main(void) {
 
   cout << "as previous with subdir in ignore list" << endl;
   if (path->addFilter("type", "dir")
-   || path->addFilter("path_start", "subdir", true)) {
+   || path->addFilter("path", "subdir", true)) {
     cout << "Failed to add filter" << endl;
   }
   if (! path->createList("test")) {

@@ -30,14 +30,15 @@ namespace hbackup {
  *    rule = condition AND condition AND ... AND condition
  * A match is obtained if any rule matches (OR)
  *    result = rule OR rule OR ... OR rule
- * Zero is returned when a match was found, non-zero otherwise (a la strcmp).
+ * True is returned when a match was found.
  */
 
 /* Filter types */
 typedef enum {
   filter_type,        // File type(s)
-  filter_path_end,    // End of file name
+  filter_path,        // Exact file name
   filter_path_start,  // Start of file name
+  filter_path_end,    // End of file name
   filter_path_regexp, // Regular expression on file name
   filter_size_above,  // Minimum size (only applies to regular files)
   filter_size_below   // Maximum size (only applies to regular files)
@@ -58,7 +59,7 @@ public:
   // Path-based condition
   Condition(filter_type_t type, const string& str) :
     _type(type), _string(str) {}
-  int  match(const File& file_data) const;
+  bool match(const File& file_data) const;
   /* Debug only */
   void show() const;
 };
@@ -73,7 +74,7 @@ public:
 
 class Filters: public vector<Filter> {
 public:
-  int match(const File& file_data) const;
+  bool match(const File& file_data) const;
 };
 
 }
