@@ -77,7 +77,7 @@ int Path::iterate_directory(const string& path, Parser* parser) {
       continue;
     } else
     /* Now pass it through the filters */
-    if (! _filters.empty() && ! _filters.match(file_data)) {
+    if (! _filters.empty() && _filters.match(file_data)) {
       continue;
     } else
     if (S_ISDIR(file_data.type())) {
@@ -129,25 +129,25 @@ int Path::addFilter(
   /* Add specified filter */
   if (type == "type") {
     mode_t file_type;
-    if (value == "file") {
+    if ((value == "file") || (value == "f")) {
       file_type = S_IFREG;
     } else
-    if (value == "dir") {
+    if ((value == "dir") || (value == "d")) {
       file_type = S_IFDIR;
     } else
-    if (value == "char") {
+    if ((value == "char") || (value == "c")) {
       file_type = S_IFCHR;
     } else
-    if (value == "block") {
+    if ((value == "block") || (value == "b")) {
       file_type = S_IFBLK;
     } else
-    if (value == "pipe") {
+    if ((value == "pipe") || (value == "p")) {
       file_type = S_IFIFO;
     } else
-    if (value == "link") {
+    if ((value == "link") || (value == "l")) {
       file_type = S_IFLNK;
     } else
-    if (value == "socket") {
+    if ((value == "socket") || (value == "s")) {
       file_type = S_IFSOCK;
     } else {
       // Wrong value
@@ -155,11 +155,14 @@ int Path::addFilter(
     }
     condition = new Condition(filter_type, file_type);
   } else
-  if (type == "path_end") {
-    condition = new Condition(filter_path_end, value);
+  if (type == "path") {
+    condition = new Condition(filter_path, value);
   } else
   if (type == "path_start") {
     condition = new Condition(filter_path_start, value);
+  } else
+  if (type == "path_end") {
+    condition = new Condition(filter_path_end, value);
   } else
   if (type == "path_regexp") {
     condition = new Condition(filter_path_regexp, value);
