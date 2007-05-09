@@ -89,20 +89,21 @@ Syntax: [ignore|ignand] <filter type> "<string>"
 
 There are six filter types:
 * type:         match file type
-* path_end:     match end of path
+* path:         match path
 * path_start:   match start of path
+* path_end:     match end of path
 * path_regexp:  match regular expression on path
 * size_above:   match files which size is above or equals given value
 * size_below:   match files which size is below or equals given value
 
 There are seven file types:
-* file: regular file
-* dir: directory
-* char: character device
-* block: block device
-* pipe: FIFO
-* link: symbolic link
-* socket
+* f or file:    regular file
+* d or dir:     directory
+* c or char:    character device
+* b or block:   block device
+* p or pipe:    named pipe or FIFO
+* l or link:    symbolic link
+* s or socket:  socket
 
 Example:
 ignore path_start abr
