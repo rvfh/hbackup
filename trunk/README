@@ -40,8 +40,8 @@ The client keyword can be followed by the following keywords:
   Example: option username "herve"
   Example: option iocharset "utf8"
 
-Note for the SMB protocol users: hbackup uses CIFS, and as such will NOT use the
-SMB protocol to resolve client names.
+Note for the SMB protocol users: hbackup uses CIFS, and as such will NOT use
+the SMB protocol to resolve client names.
 
 III. CLIENT CONFIGURATION
 
@@ -73,11 +73,12 @@ Instructions:
 B. Configuration file
 
 Each client must provide its own configuration file. Keywords that may be used:
-* path: start of a new backup list, gives the path information.
+* path:   start of a new backup list, gives the path information.
   Syntax: path "<path to backup>"
 * ignore: add files filter to skip (see FILTERS below).
 * ignand: add AND condition to last files filter (see FILTERS below).
 * parser: files under version control (see PARSERS below).
+* expire: delay in days after which removed files can be erased from database
 
 1. COMPRESSION
 
