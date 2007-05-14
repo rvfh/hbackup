@@ -198,7 +198,7 @@ int Client::readListFile(const string& list_path) {
             int time_out;
             if ((sscanf(params[1].c_str(), "%d", &time_out) != 0)
              && (time_out != 0)) {
-              _paths.back().setExpiration(time_out * 3600);
+              _paths.back().setExpiration(time_out * 3600 * 24);
             }
           } else {
             // What was that?
