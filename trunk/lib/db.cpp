@@ -299,6 +299,26 @@ int Database::open_removed() {
   return _removed.open(_path, "removed");
 }
 
+int Database::move_journals() {
+  int status = 0;
+
+  if (rename((_path + "/added.journal").c_str(),
+    (_path + "/added").c_str())) {
+    remove((_path + "/added.journal").c_str());
+    status |= 1;
+  }
+  if (rename((_path + "/gone.journal").c_str(),
+    (_path + "/gone").c_str())) {
+    remove((_path + "/gone.journal").c_str());
+    status |= 1;
+  }
+  if (remove((_path + "/written.journal").c_str())) {
+    status |= 1;
+  }
+
+  return status;
+}
+
 int Database::open() {
   int status;
 
@@ -358,7 +378,7 @@ int Database::open() {
         << " valid files to active list" << endl;
 
       // Get removed items journal
-      removed.load(_path, "removed.journal");
+      removed.load(_path, "gone.journal");
 
       if ((errno == 0)
        && ! active.load(_path, "added.journal", active.size())
@@ -385,10 +405,8 @@ int Database::open() {
       removed.clear();
     }
 
-    // Delete journals
-    remove((_path + "/added.journal").c_str());
-    remove((_path + "/removed.journal").c_str());
-    remove((_path + "/written.journal").c_str());
+    // Move/delete journals
+    move_journals();
   }
 
   // Make sure we start clean
@@ -435,9 +453,7 @@ int Database::close() {
   }
 
   // Delete journals
-  remove((_path + "/added.journal").c_str());
-  remove((_path + "/written.journal").c_str());
-  remove((_path + "/removed.journal").c_str());
+  move_journals();
 
   // Release lock
   unlock();
@@ -705,7 +721,7 @@ int Database::parse(
 
   // Append to recovery journals
   if (added.save_journal(_path, "added.journal")
-   || _removed.save_journal(_path, "removed.journal", removed_size)) {
+   || _removed.save_journal(_path, "gone.journal", removed_size)) {
     // Unlikely
     failed = 1;
   }

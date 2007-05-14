@@ -34,11 +34,11 @@
 namespace hbackup {
 
 class Database {
-  string  _path;
-  DbList  _active;
-  DbList  _removed;
-  list<string> _active_checksums;
-  bool    _expire_inited;
+  string        _path;
+  DbList        _active;
+  DbList        _removed;
+  list<string>  _active_checksums;
+  bool          _expire_inited;
   int  lock();
   void unlock();
 public:
@@ -49,6 +49,8 @@ public:
   int  open_removed();
   /* Close active part of database */
   int  close_active();
+  /* Save journals for review */
+  int  move_journals();
   /* Close database */
   int  close();
   /* Check what needs to be done for given host & path */

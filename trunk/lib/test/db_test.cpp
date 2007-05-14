@@ -92,7 +92,7 @@ int main(void) {
   path->addFilter("type", "file");
   path->addFilter("path_end", "~", true);
   path->addFilter("type", "file");
-  path->addFilter("path_regexp", "\\.o$", true);
+  path->addFilter("path_regex", "\\.o$", true);
   verbose = 3;
   if (path->createList("test////")) {
     cout << "file list is empty" << endl;
@@ -142,7 +142,7 @@ int main(void) {
     cout << i->line(true) << endl;
   }
   journal.clear();
-  journal.load("test_db", "removed.journal");
+  journal.load("test_db", "gone.journal");
   cout << "Removed journal list: " << journal.size() << " element(s):\n";
   for (i = journal.begin(); i != journal.end(); i++) {
     cout << i->line(true) << endl;
@@ -192,7 +192,7 @@ int main(void) {
     cout << i->line(true) << endl;
   }
   journal.clear();
-  journal.load("test_db", "removed.journal");
+  journal.load("test_db", "gone.journal");
   cout << "Removed journal list: " << journal.size() << " element(s):\n";
   for (i = journal.begin(); i != journal.end(); i++) {
     cout << i->line(true) << endl;
@@ -223,7 +223,7 @@ int main(void) {
   path->addFilter("type", "file");
   path->addFilter("path_end", "~", true);
   path->addFilter("type", "file");
-  path->addFilter("path_regexp", "\\.o$", true);
+  path->addFilter("path_regex", "\\.o$", true);
   verbose = 3;
   if (path->createList("test2")) {
     cout << "file list is empty" << endl;
@@ -248,7 +248,7 @@ int main(void) {
     cout << i->line(true) << endl;
   }
   journal.clear();
-  journal.load("test_db", "removed.journal");
+  journal.load("test_db", "gone.journal");
   cout << "Removed journal list: " << journal.size() << " element(s):\n";
   for (i = journal.begin(); i != journal.end(); i++) {
     cout << i->line(true) << endl;
@@ -388,7 +388,7 @@ int main(void) {
   path->addFilter("type", "file");
   path->addFilter("path_end", "~", true);
   path->addFilter("type", "file");
-  path->addFilter("path_regexp", "\\.o$", true);
+  path->addFilter("path_regex", "\\.o$", true);
   verbose = 3;
   if (path->createList("test////")) {
     cout << "file list is empty" << endl;
@@ -412,7 +412,7 @@ int main(void) {
     cout << i->line(true) << endl;
   }
   journal.clear();
-  journal.load("test_db", "removed.journal");
+  journal.load("test_db", "gone.journal");
   cout << "Removed journal list: " << journal.size() << " element(s):\n";
   for (i = journal.begin(); i != journal.end(); i++) {
     cout << i->line(true) << endl;
@@ -457,7 +457,7 @@ int main(void) {
     cout << i->line(true) << endl;
   }
   journal.clear();
-  journal.load("test_db", "removed.journal");
+  journal.load("test_db", "gone.journal");
   cout << "Removed journal list: " << journal.size() << " element(s):\n";
   for (i = journal.begin(); i != journal.end(); i++) {
     cout << i->line(true) << endl;
@@ -516,7 +516,7 @@ int main(void) {
   path->addFilter("type", "file");
   path->addFilter("path_end", "~", true);
   path->addFilter("type", "file");
-  path->addFilter("path_regexp", "\\.o$", true);
+  path->addFilter("path_regex", "\\.o$", true);
   verbose = 3;
   if (path->createList("test////")) {
     cout << "file list is empty" << endl;
@@ -540,7 +540,7 @@ int main(void) {
     cout << i->line(true) << endl;
   }
   journal.clear();
-  journal.load("test_db", "removed.journal");
+  journal.load("test_db", "gone.journal");
   cout << "Removed journal list: " << journal.size() << " element(s):\n";
   for (i = journal.begin(); i != journal.end(); i++) {
     cout << i->line(true) << endl;
@@ -585,7 +585,7 @@ int main(void) {
     cout << i->line(true) << endl;
   }
   journal.clear();
-  journal.load("test_db", "removed.journal");
+  journal.load("test_db", "gone.journal");
   cout << "Removed journal list: " << journal.size() << " element(s):\n";
   for (i = journal.begin(); i != journal.end(); i++) {
     cout << i->line(true) << endl;
@@ -651,7 +651,7 @@ int main(void) {
   path->addFilter("type", "file");
   path->addFilter("path_end", "~", true);
   path->addFilter("type", "file");
-  path->addFilter("path_regexp", "\\.o$", true);
+  path->addFilter("path_regex", "\\.o$", true);
   verbose = 3;
   if (path->createList("test////")) {
     cout << "file list is empty" << endl;
@@ -676,7 +676,7 @@ int main(void) {
     cout << i->line(true) << endl;
   }
   journal.clear();
-  journal.load("test_db", "removed.journal");
+  journal.load("test_db", "gone.journal");
   cout << "Removed journal list: " << journal.size() << " element(s):\n";
   for (i = journal.begin(); i != journal.end(); i++) {
     cout << i->line(true) << endl;
@@ -707,7 +707,7 @@ int main(void) {
   path->addFilter("type", "file");
   path->addFilter("path_end", "~", true);
   path->addFilter("type", "file");
-  path->addFilter("path_regexp", "\\.o$", true);
+  path->addFilter("path_regex", "\\.o$", true);
   verbose = 3;
   if (path->createList("test////")) {
     cout << "file list is empty" << endl;
@@ -732,7 +732,7 @@ int main(void) {
     cout << i->line(true) << endl;
   }
   journal.clear();
-  journal.load("test_db", "removed.journal");
+  journal.load("test_db", "gone.journal");
   cout << "Removed journal list: " << journal.size() << " element(s):\n";
   for (i = journal.begin(); i != journal.end(); i++) {
     cout << i->line(true) << endl;
@@ -763,7 +763,7 @@ int main(void) {
   path->addFilter("type", "file");
   path->addFilter("path_end", "~", true);
   path->addFilter("type", "file");
-  path->addFilter("path_regexp", "\\.o$", true);
+  path->addFilter("path_regex", "\\.o$", true);
   verbose = 3;
   if (path->createList("test2")) {
     cout << "file list is empty" << endl;
@@ -788,7 +788,7 @@ int main(void) {
     cout << i->line(true) << endl;
   }
   journal.clear();
-  journal.load("test_db", "removed.journal");
+  journal.load("test_db", "gone.journal");
   cout << "Removed journal list: " << journal.size() << " element(s):\n";
   for (i = journal.begin(); i != journal.end(); i++) {
     cout << i->line(true) << endl;

@@ -155,6 +155,18 @@ int Path::addFilter(
     }
     condition = new Condition(filter_type, file_type);
   } else
+  if (type == "name") {
+    condition = new Condition(filter_name, value);
+  } else
+  if (type == "name_start") {
+    condition = new Condition(filter_name_start, value);
+  } else
+  if (type == "name_end") {
+    condition = new Condition(filter_name_end, value);
+  } else
+  if (type == "name_regex") {
+    condition = new Condition(filter_name_regex, value);
+  } else
   if (type == "path") {
     condition = new Condition(filter_path, value);
   } else
@@ -164,8 +176,8 @@ int Path::addFilter(
   if (type == "path_end") {
     condition = new Condition(filter_path_end, value);
   } else
-  if (type == "path_regexp") {
-    condition = new Condition(filter_path_regexp, value);
+  if (type == "path_regex") {
+    condition = new Condition(filter_path_regex, value);
   } else
   if (type == "size_below") {
     off_t size = strtoul(value.c_str(), NULL, 10);

@@ -36,10 +36,14 @@ namespace hbackup {
 /* Filter types */
 typedef enum {
   filter_type,        // File type(s)
-  filter_path,        // Exact file name
-  filter_path_start,  // Start of file name
-  filter_path_end,    // End of file name
-  filter_path_regexp, // Regular expression on file name
+  filter_name,        // Exact file name
+  filter_name_start,  // Start of file name
+  filter_name_end,    // End of file name
+  filter_name_regex,  // Regular expression on file name
+  filter_path,        // Exact path
+  filter_path_start,  // Start of path
+  filter_path_end,    // End of path
+  filter_path_regex,  // Regular expression on path
   filter_size_above,  // Minimum size (only applies to regular files)
   filter_size_below   // Maximum size (only applies to regular files)
 } filter_type_t;
