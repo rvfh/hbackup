@@ -89,10 +89,14 @@ Syntax: [ignore|ignand] <filter type> "<string>"
 
 There are six filter types:
 * type:         match file type
+* name:         match file name
+* name_start:   match start of file name
+* name_end:     match end of file name
+* name_regex:   match regular expression on file name
 * path:         match path
 * path_start:   match start of path
 * path_end:     match end of path
-* path_regexp:  match regular expression on path
+* path_regex:   match regular expression on path
 * size_above:   match files which size is above or equals given value
 * size_below:   match files which size is below or equals given value
 
