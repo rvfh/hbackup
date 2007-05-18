@@ -136,7 +136,7 @@ int main(void) {
     db.close();
     return 0;
   }
-  journal.load("test_db", "added.journal");
+  journal.load("test_db", "seen.journal");
   cout << "Added journal list: " << journal.size() << " element(s):\n";
   for (i = journal.begin(); i != journal.end(); i++) {
     cout << i->line(true) << endl;
@@ -186,7 +186,7 @@ int main(void) {
     db.close();
     return 0;
   }
-  journal.load("test_db", "added.journal");
+  journal.load("test_db", "seen.journal");
   cout << "Added journal list: " << journal.size() << " element(s):\n";
   for (i = journal.begin(); i != journal.end(); i++) {
     cout << i->line(true) << endl;
@@ -242,7 +242,7 @@ int main(void) {
     db.close();
     return 0;
   }
-  journal.load("test_db", "added.journal");
+  journal.load("test_db", "seen.journal");
   cout << "Added journal list: " << journal.size() << " element(s):\n";
   for (i = journal.begin(); i != journal.end(); i++) {
     cout << i->line(true) << endl;
@@ -406,7 +406,7 @@ int main(void) {
     db.close();
     return 0;
   }
-  journal.load("test_db", "added.journal");
+  journal.load("test_db", "seen.journal");
   cout << "Added journal list: " << journal.size() << " element(s):\n";
   for (i = journal.begin(); i != journal.end(); i++) {
     cout << i->line(true) << endl;
@@ -451,7 +451,7 @@ int main(void) {
     db.close();
     return 0;
   }
-  journal.load("test_db", "added.journal");
+  journal.load("test_db", "seen.journal");
   cout << "Added journal list: " << journal.size() << " element(s):\n";
   for (i = journal.begin(); i != journal.end(); i++) {
     cout << i->line(true) << endl;
@@ -534,7 +534,7 @@ int main(void) {
     db.close();
     return 0;
   }
-  journal.load("test_db", "added.journal");
+  journal.load("test_db", "seen.journal");
   cout << "Added journal list: " << journal.size() << " element(s):\n";
   for (i = journal.begin(); i != journal.end(); i++) {
     cout << i->line(true) << endl;
@@ -579,7 +579,7 @@ int main(void) {
     db.close();
     return 0;
   }
-  journal.load("test_db", "added.journal");
+  journal.load("test_db", "seen.journal");
   cout << "Added journal list: " << journal.size() << " element(s):\n";
   for (i = journal.begin(); i != journal.end(); i++) {
     cout << i->line(true) << endl;
@@ -670,7 +670,7 @@ int main(void) {
     db.close();
     return 0;
   }
-  journal.load("test_db", "added.journal");
+  journal.load("test_db", "seen.journal");
   cout << "Added journal list: " << journal.size() << " element(s):\n";
   for (i = journal.begin(); i != journal.end(); i++) {
     cout << i->line(true) << endl;
@@ -726,7 +726,7 @@ int main(void) {
     db.close();
     return 0;
   }
-  journal.load("test_db", "added.journal");
+  journal.load("test_db", "seen.journal");
   cout << "Added journal list: " << journal.size() << " element(s):\n";
   for (i = journal.begin(); i != journal.end(); i++) {
     cout << i->line(true) << endl;
@@ -782,7 +782,7 @@ int main(void) {
     db.close();
     return 0;
   }
-  journal.load("test_db", "added.journal");
+  journal.load("test_db", "seen.journal");
   cout << "Added journal list: " << journal.size() << " element(s):\n";
   for (i = journal.begin(); i != journal.end(); i++) {
     cout << i->line(true) << endl;

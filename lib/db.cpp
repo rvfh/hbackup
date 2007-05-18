@@ -302,9 +302,9 @@ int Database::open_removed() {
 int Database::move_journals() {
   int status = 0;
 
-  if (rename((_path + "/added.journal").c_str(),
-    (_path + "/added").c_str())) {
-    remove((_path + "/added.journal").c_str());
+  if (rename((_path + "/seen.journal").c_str(),
+    (_path + "/seen").c_str())) {
+    remove((_path + "/seen.journal").c_str());
     status |= 1;
   }
   if (rename((_path + "/gone.journal").c_str(),
@@ -381,7 +381,7 @@ int Database::open() {
       removed.load(_path, "gone.journal");
 
       if ((errno == 0)
-       && ! active.load(_path, "added.journal", active.size())
+       && ! active.load(_path, "seen.journal", active.size())
        && ! active.load(_path, "active")) {
         cerr << "db: open: removing " << removed.size()
           << " files from active list" << endl;
@@ -720,7 +720,7 @@ int Database::parse(
   }
 
   // Append to recovery journals
-  if (added.save_journal(_path, "added.journal")
+  if (added.save_journal(_path, "seen.journal")
    || _removed.save_journal(_path, "gone.journal", removed_size)) {
     // Unlikely
     failed = 1;
