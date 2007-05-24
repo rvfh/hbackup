@@ -140,9 +140,9 @@ int Database::write(
   } else
 
   /* Check size_source size */
-  if (size_source != db_data.data().size()) {
+  if (size_source != db_data.data()->size()) {
     cerr << "db: write: size mismatch: " << path << " (" << size_source
-      << "/" << db_data.data().size() << ")" << endl;
+      << "/" << db_data.data()->size() << ")" << endl;
     failed = 1;
   } else
 
@@ -494,20 +494,20 @@ int Database::expire_share(
 
     for (it = _removed.begin(); it != _removed.end(); it++) {
       // Prefix not reached
-      if (it->data().prefix().substr(0, prefix.size()) < prefix) {
+      if (it->data()->prefix().substr(0, prefix.size()) < prefix) {
         continue;
       } else
       // Prefix exceeded
-      if (it->data().prefix().substr(0, prefix.size()) > prefix) {
+      if (it->data()->prefix().substr(0, prefix.size()) > prefix) {
         break;
       } else
       // Prefix reached
       // Path not reached
-      if (it->data().path().substr(0, path.size()) < path) {
+      if (it->data()->path().substr(0, path.size()) < path) {
         continue;
       } else
       // Path exceeded
-      if (it->data().path().substr(0, path.size()) > path) {
+      if (it->data()->path().substr(0, path.size()) > path) {
         break;
       } else
       // Path reached
@@ -628,7 +628,7 @@ int Database::parse(
   SortedList<DbData>::iterator entry_active = _active.begin();
   // Jump irrelevant first records
   while ((entry_active != _active.end())
-   && (entry_active->data().fullPath(full_path.size()) < full_path)) {
+   && (entry_active->data()->fullPath(full_path.size()) < full_path)) {
     entry_active++;
   }
   SortedList<DbData>::iterator active_last = _active.end();
@@ -641,7 +641,7 @@ int Database::parse(
 
     // Check whether db data is (still) relevant
     if ((entry_active != _active.end()) && (active_last != entry_active)
-     && (entry_active->data().fullPath(full_path.size()) > full_path)) {
+     && (entry_active->data()->fullPath(full_path.size()) > full_path)) {
       // Irrelevant rest of list
       entry_active = _active.end();
     }
@@ -662,7 +662,7 @@ int Database::parse(
       // End of file data reached: remove element
       db_remove = true;
     } else {
-      int result = entry_active->data().path().substr(mounted_path.size() + 1).compare(entry_file_list->path());
+      int result = entry_active->data()->path().substr(mounted_path.size() + 1).compare(entry_file_list->path());
 
       if (result < 0) {
         db_remove = true;
@@ -670,19 +670,19 @@ int Database::parse(
       if (result > 0) {
         file_add = true;
       } else
-      if (entry_active->data().metadiffer(*entry_file_list)) {
+      if (entry_active->data()->metadiffer(*entry_file_list)) {
         db_remove = true;
         file_add = true;
 
         /* If it's a file and size and mtime are the same, copy checksum accross */
-        if (S_ISREG(entry_active->data().type())
-         && (entry_active->data().size() == entry_file_list->size())
-         && (entry_active->data().mtime() == entry_file_list->mtime())) {
+        if (S_ISREG(entry_active->data()->type())
+         && (entry_active->data()->size() == entry_file_list->size())
+         && (entry_active->data()->mtime() == entry_file_list->mtime())) {
           // Same file, just ownership changed or something
           same_file = true;
          }
       } else
-      if (S_ISREG(entry_active->data().type())
+      if (S_ISREG(entry_active->data()->type())
        && (entry_active->checksum().size() == 0)) {
         // Previously failed write
         db_remove = true;
@@ -740,8 +740,8 @@ int Database::parse(
       for (i = added.begin(); i != added.end(); i++) {
         /* Same data as in file_list */
         filestobackup++;
-        if (S_ISREG(i->data().type()) && i->checksum().empty()) {
-          sizetobackup += i->data().size();
+        if (S_ISREG(i->data()->type()) && i->checksum().empty()) {
+          sizetobackup += i->data()->size();
         }
       }
       printf(" --> Files to add: %u (%lld bytes)\n",
@@ -762,19 +762,19 @@ int Database::parse(
         break;
       }
       // Set checksum
-      if (S_ISREG(i->data().type()) && i->checksum().empty()) {
-        if (write(mount_path + i->data().path().substr(mounted_path.size()),
+      if (S_ISREG(i->data()->type()) && i->checksum().empty()) {
+        if (write(mount_path + i->data()->path().substr(mounted_path.size()),
          *i) != 0) {
           /* Write failed, need to go on */
           failed = 1;
           if (! terminating()) {
             /* Don't signal errors on termination */
             cerr << "\r" << strerror(errno) << ": "
-              << i->data().path() << ", ignoring" << endl;
+              << i->data()->path() << ", ignoring" << endl;
           }
         }
         if (verbosity() > 2) {
-          sizebackedup += i->data().size();
+          sizebackedup += i->data()->size();
         }
       }
       _active.add(*i);
@@ -887,10 +887,10 @@ int Database::scan(const string& checksum, bool thorough) {
         failed = 1;
         if (! terminating() && verbosity() > 2) {
           struct tm *time;
-          cout << " --> Client:      " << i->data().prefix() << endl;
-          cout << " --> File name:   " << i->data().path() << endl;
+          cout << " --> Client:      " << i->data()->prefix() << endl;
+          cout << " --> File name:   " << i->data()->path() << endl;
           if (verbosity() > 3) {
-            time_t file_mtime = i->data().mtime();
+            time_t file_mtime = i->data()->mtime();
             time = localtime(&file_mtime);
             printf(" --> Modified:    %04u-%02u-%02u %2u:%02u:%02u %s\n",
               time->tm_year + 1900, time->tm_mon + 1, time->tm_mday,

@@ -89,7 +89,7 @@ public:
     || (_data != right._data);
   }
   bool   operator==(const DbData& right) const { return ! (*this != right); }
-  File   data() const { return _data; }
+  File*  data() { return &_data; }
   string checksum() const { return _checksum; }
   time_t in() const { return _in; }
   time_t out() const { return _out; }
