@@ -1,117 +1,117 @@
 >List 27 file(s):
-test	cvs	d	0	0	1000	1000	755	
-test	cvs/CVS	d	0	0	1000	1000	755	
-test	cvs/CVS/Entries	f	141	1	1000	1000	644	
-test	cvs/dirbad	d	0	0	1000	1000	755	
-test	cvs/dirbad/fileoth	f	0	1	1000	1000	644	
-test	cvs/dirbad/fileutd	f	0	1	1000	1000	644	
-test	cvs/diroth	d	0	0	1000	1000	755	
-test	cvs/dirutd	d	0	0	1000	1000	755	
-test	cvs/dirutd/CVS	d	0	0	1000	1000	755	
-test	cvs/dirutd/CVS/Entries	f	42	1	1000	1000	644	
-test	cvs/dirutd/fileoth	f	0	1	1000	1000	644	
-test	cvs/dirutd/fileutd	f	0	1	1000	1000	644	
-test	cvs/filemod.o	f	0	1	1000	1000	644	
-test	cvs/filenew.c	f	0	1	1000	1000	644	
-test	cvs/fileoth	f	0	1	1000	1000	644	
-test	cvs/fileutd.h	f	0	1	1000	1000	644	
-test	dir space	d	0	0	1000	1000	755	
-test	dir space/file space	f	0	1	1000	1000	644	
-test	subdir	d	0	0	1000	1000	755	
-test	subdir/testfile	f	12	1	1000	1000	644	
-test	subdir/testfile1	f	0	1	1000	1000	644	
-test	subdir/testfile2	f	12	1	1000	1000	644	
-test	test space	f	0	1	1000	1000	644	
-test	testdir	d	0	0	1000	1000	755	
-test	testfile	f	13	1	1000	1000	644	
-test	testfile~	f	0	1	1000	1000	644	
-test	testlink	l	8	1	1000	1000	777	testfile
+	cvs	d	0	0	1000	1000	755	
+	cvs/CVS	d	0	0	1000	1000	755	
+	cvs/CVS/Entries	f	141	1	1000	1000	644	
+	cvs/dirbad	d	0	0	1000	1000	755	
+	cvs/dirbad/fileoth	f	0	1	1000	1000	644	
+	cvs/dirbad/fileutd	f	0	1	1000	1000	644	
+	cvs/diroth	d	0	0	1000	1000	755	
+	cvs/dirutd	d	0	0	1000	1000	755	
+	cvs/dirutd/CVS	d	0	0	1000	1000	755	
+	cvs/dirutd/CVS/Entries	f	42	1	1000	1000	644	
+	cvs/dirutd/fileoth	f	0	1	1000	1000	644	
+	cvs/dirutd/fileutd	f	0	1	1000	1000	644	
+	cvs/filemod.o	f	0	1	1000	1000	644	
+	cvs/filenew.c	f	0	1	1000	1000	644	
+	cvs/fileoth	f	0	1	1000	1000	644	
+	cvs/fileutd.h	f	0	1	1000	1000	644	
+	dir space	d	0	0	1000	1000	755	
+	dir space/file space	f	0	1	1000	1000	644	
+	subdir	d	0	0	1000	1000	755	
+	subdir/testfile	f	12	1	1000	1000	644	
+	subdir/testfile1	f	0	1	1000	1000	644	
+	subdir/testfile2	f	12	1	1000	1000	644	
+	test space	f	0	1	1000	1000	644	
+	testdir	d	0	0	1000	1000	755	
+	testfile	f	13	1	1000	1000	644	
+	testfile~	f	0	1	1000	1000	644	
+	testlink	l	8	1	1000	1000	777	testfile
 as previous with subdir in ignore list
 >List 23 file(s):
-test	cvs	d	0	0	1000	1000	755	
-test	cvs/CVS	d	0	0	1000	1000	755	
-test	cvs/CVS/Entries	f	141	1	1000	1000	644	
-test	cvs/dirbad	d	0	0	1000	1000	755	
-test	cvs/dirbad/fileoth	f	0	1	1000	1000	644	
-test	cvs/dirbad/fileutd	f	0	1	1000	1000	644	
-test	cvs/diroth	d	0	0	1000	1000	755	
-test	cvs/dirutd	d	0	0	1000	1000	755	
-test	cvs/dirutd/CVS	d	0	0	1000	1000	755	
-test	cvs/dirutd/CVS/Entries	f	42	1	1000	1000	644	
-test	cvs/dirutd/fileoth	f	0	1	1000	1000	644	
-test	cvs/dirutd/fileutd	f	0	1	1000	1000	644	
-test	cvs/filemod.o	f	0	1	1000	1000	644	
-test	cvs/filenew.c	f	0	1	1000	1000	644	
-test	cvs/fileoth	f	0	1	1000	1000	644	
-test	cvs/fileutd.h	f	0	1	1000	1000	644	
-test	dir space	d	0	0	1000	1000	755	
-test	dir space/file space	f	0	1	1000	1000	644	
-test	test space	f	0	1	1000	1000	644	
-test	testdir	d	0	0	1000	1000	755	
-test	testfile	f	13	1	1000	1000	644	
-test	testfile~	f	0	1	1000	1000	644	
-test	testlink	l	8	1	1000	1000	777	testfile
+	cvs	d	0	0	1000	1000	755	
+	cvs/CVS	d	0	0	1000	1000	755	
+	cvs/CVS/Entries	f	141	1	1000	1000	644	
+	cvs/dirbad	d	0	0	1000	1000	755	
+	cvs/dirbad/fileoth	f	0	1	1000	1000	644	
+	cvs/dirbad/fileutd	f	0	1	1000	1000	644	
+	cvs/diroth	d	0	0	1000	1000	755	
+	cvs/dirutd	d	0	0	1000	1000	755	
+	cvs/dirutd/CVS	d	0	0	1000	1000	755	
+	cvs/dirutd/CVS/Entries	f	42	1	1000	1000	644	
+	cvs/dirutd/fileoth	f	0	1	1000	1000	644	
+	cvs/dirutd/fileutd	f	0	1	1000	1000	644	
+	cvs/filemod.o	f	0	1	1000	1000	644	
+	cvs/filenew.c	f	0	1	1000	1000	644	
+	cvs/fileoth	f	0	1	1000	1000	644	
+	cvs/fileutd.h	f	0	1	1000	1000	644	
+	dir space	d	0	0	1000	1000	755	
+	dir space/file space	f	0	1	1000	1000	644	
+	test space	f	0	1	1000	1000	644	
+	testdir	d	0	0	1000	1000	755	
+	testfile	f	13	1	1000	1000	644	
+	testfile~	f	0	1	1000	1000	644	
+	testlink	l	8	1	1000	1000	777	testfile
 as previous with testlink in ignore list
 >List 22 file(s):
-test	cvs	d	0	0	1000	1000	755	
-test	cvs/CVS	d	0	0	1000	1000	755	
-test	cvs/CVS/Entries	f	141	1	1000	1000	644	
-test	cvs/dirbad	d	0	0	1000	1000	755	
-test	cvs/dirbad/fileoth	f	0	1	1000	1000	644	
-test	cvs/dirbad/fileutd	f	0	1	1000	1000	644	
-test	cvs/diroth	d	0	0	1000	1000	755	
-test	cvs/dirutd	d	0	0	1000	1000	755	
-test	cvs/dirutd/CVS	d	0	0	1000	1000	755	
-test	cvs/dirutd/CVS/Entries	f	42	1	1000	1000	644	
-test	cvs/dirutd/fileoth	f	0	1	1000	1000	644	
-test	cvs/dirutd/fileutd	f	0	1	1000	1000	644	
-test	cvs/filemod.o	f	0	1	1000	1000	644	
-test	cvs/filenew.c	f	0	1	1000	1000	644	
-test	cvs/fileoth	f	0	1	1000	1000	644	
-test	cvs/fileutd.h	f	0	1	1000	1000	644	
-test	dir space	d	0	0	1000	1000	755	
-test	dir space/file space	f	0	1	1000	1000	644	
-test	test space	f	0	1	1000	1000	644	
-test	testdir	d	0	0	1000	1000	755	
-test	testfile	f	13	1	1000	1000	644	
-test	testfile~	f	0	1	1000	1000	644	
+	cvs	d	0	0	1000	1000	755	
+	cvs/CVS	d	0	0	1000	1000	755	
+	cvs/CVS/Entries	f	141	1	1000	1000	644	
+	cvs/dirbad	d	0	0	1000	1000	755	
+	cvs/dirbad/fileoth	f	0	1	1000	1000	644	
+	cvs/dirbad/fileutd	f	0	1	1000	1000	644	
+	cvs/diroth	d	0	0	1000	1000	755	
+	cvs/dirutd	d	0	0	1000	1000	755	
+	cvs/dirutd/CVS	d	0	0	1000	1000	755	
+	cvs/dirutd/CVS/Entries	f	42	1	1000	1000	644	
+	cvs/dirutd/fileoth	f	0	1	1000	1000	644	
+	cvs/dirutd/fileutd	f	0	1	1000	1000	644	
+	cvs/filemod.o	f	0	1	1000	1000	644	
+	cvs/filenew.c	f	0	1	1000	1000	644	
+	cvs/fileoth	f	0	1	1000	1000	644	
+	cvs/fileutd.h	f	0	1	1000	1000	644	
+	dir space	d	0	0	1000	1000	755	
+	dir space/file space	f	0	1	1000	1000	644	
+	test space	f	0	1	1000	1000	644	
+	testdir	d	0	0	1000	1000	755	
+	testfile	f	13	1	1000	1000	644	
+	testfile~	f	0	1	1000	1000	644	
 as previous with CVS parser
 Directory should be under CVS control: test/cvs/dirbad
 >List 17 file(s):
-test	cvs	d	0	0	1000	1000	755	
-test	cvs/CVS	d	0	0	1000	1000	755	
-test	cvs/CVS/Entries	f	141	1	1000	1000	644	
-test	cvs/dirbad	d	0	0	1000	1000	755	
-test	cvs/dirutd	d	0	0	1000	1000	755	
-test	cvs/dirutd/CVS	d	0	0	1000	1000	755	
-test	cvs/dirutd/CVS/Entries	f	42	1	1000	1000	644	
-test	cvs/dirutd/fileutd	f	0	1	1000	1000	644	
-test	cvs/filemod.o	f	0	1	1000	1000	644	
-test	cvs/filenew.c	f	0	1	1000	1000	644	
-test	cvs/fileutd.h	f	0	1	1000	1000	644	
-test	dir space	d	0	0	1000	1000	755	
-test	dir space/file space	f	0	1	1000	1000	644	
-test	test space	f	0	1	1000	1000	644	
-test	testdir	d	0	0	1000	1000	755	
-test	testfile	f	13	1	1000	1000	644	
-test	testfile~	f	0	1	1000	1000	644	
+	cvs	d	0	0	1000	1000	755	
+	cvs/CVS	d	0	0	1000	1000	755	
+	cvs/CVS/Entries	f	141	1	1000	1000	644	
+	cvs/dirbad	d	0	0	1000	1000	755	
+	cvs/dirutd	d	0	0	1000	1000	755	
+	cvs/dirutd/CVS	d	0	0	1000	1000	755	
+	cvs/dirutd/CVS/Entries	f	42	1	1000	1000	644	
+	cvs/dirutd/fileutd	f	0	1	1000	1000	644	
+	cvs/filemod.o	f	0	1	1000	1000	644	
+	cvs/filenew.c	f	0	1	1000	1000	644	
+	cvs/fileutd.h	f	0	1	1000	1000	644	
+	dir space	d	0	0	1000	1000	755	
+	dir space/file space	f	0	1	1000	1000	644	
+	test space	f	0	1	1000	1000	644	
+	testdir	d	0	0	1000	1000	755	
+	testfile	f	13	1	1000	1000	644	
+	testfile~	f	0	1	1000	1000	644	
 as previous
 Directory should be under CVS control: test/cvs/dirbad
 >List 17 file(s):
-test	cvs	d	0	0	1000	1000	755	
-test	cvs/CVS	d	0	0	1000	1000	755	
-test	cvs/CVS/Entries	f	141	1	1000	1000	644	
-test	cvs/dirbad	d	0	0	1000	1000	755	
-test	cvs/dirutd	d	0	0	1000	1000	755	
-test	cvs/dirutd/CVS	d	0	0	1000	1000	755	
-test	cvs/dirutd/CVS/Entries	f	42	1	1000	1000	644	
-test	cvs/dirutd/fileutd	f	0	1	1000	1000	644	
-test	cvs/filemod.o	f	0	1	1000	1000	644	
-test	cvs/filenew.c	f	0	1	1000	1000	644	
-test	cvs/fileutd.h	f	0	1	1000	1000	644	
-test	dir space	d	0	0	1000	1000	755	
-test	dir space/file space	f	0	1	1000	1000	644	
-test	test space	f	0	1	1000	1000	644	
-test	testdir	d	0	0	1000	1000	755	
-test	testfile	f	13	1	1000	1000	644	
-test	testfile~	f	0	1	1000	1000	644	
+	cvs	d	0	0	1000	1000	755	
+	cvs/CVS	d	0	0	1000	1000	755	
+	cvs/CVS/Entries	f	141	1	1000	1000	644	
+	cvs/dirbad	d	0	0	1000	1000	755	
+	cvs/dirutd	d	0	0	1000	1000	755	
+	cvs/dirutd/CVS	d	0	0	1000	1000	755	
+	cvs/dirutd/CVS/Entries	f	42	1	1000	1000	644	
+	cvs/dirutd/fileutd	f	0	1	1000	1000	644	
+	cvs/filemod.o	f	0	1	1000	1000	644	
+	cvs/filenew.c	f	0	1	1000	1000	644	
+	cvs/fileutd.h	f	0	1	1000	1000	644	
+	dir space	d	0	0	1000	1000	755	
+	dir space/file space	f	0	1	1000	1000	644	
+	test space	f	0	1	1000	1000	644	
+	testdir	d	0	0	1000	1000	755	
+	testfile	f	13	1	1000	1000	644	
+	testfile~	f	0	1	1000	1000	644	
