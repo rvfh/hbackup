@@ -72,7 +72,7 @@ int DbList::load(
       SortedList<DbData>::iterator i = prev;
       i++;
       while (i != end()) {
-        if ((i->data() == prev->data())
+        if ((*i->data() == *prev->data())
          && (i->checksum() == prev->checksum())) {
           prev->setOut(i->out());
           i = erase(i);
