@@ -60,7 +60,7 @@ int main(void) {
   cout << endl << "Test: file read" << endl;
   readfile = new File(".", "test/zcopy_source");
   if (readfile->open("r")) {
-    cout << "Error opening file " << readfile->fullPath() << endl;
+    cout << "Error opening file" << endl;
   } else {
     unsigned char buffer[File::chunk];
     size_t read_size = 0;
@@ -84,7 +84,7 @@ int main(void) {
   readfile = new File(".", "test/zcopy_source");
   writefile = new File(".", "test/zcopy_dest");
   if (readfile->open("r") || writefile->open("w")) {
-    cout << "Error opening file " << readfile->fullPath() << endl;
+    cout << "Error opening file" << endl;
   } else {
     unsigned char buffer[File::chunk];
     size_t read_size = 0;
@@ -119,7 +119,7 @@ int main(void) {
   readfile = new File(".", "test/zcopy_source");
   writefile = new File(".", "test/zcopy_dest");
   if (readfile->open("r") || writefile->open("w", 5)) {
-    cout << "Error opening file " << readfile->fullPath() << endl;
+    cout << "Error opening file" << endl;
   } else {
     unsigned char buffer[File::chunk];
     size_t read_size = 0;
@@ -154,7 +154,7 @@ int main(void) {
   readfile = new File(".", "test/zcopy_dest");
   writefile = new File(".", "test/zcopy_source");
   if (readfile->open("r", 1) || writefile->open("w")) {
-    cout << "Error opening file " << readfile->fullPath() << endl;
+    cout << "Error opening file" << endl;
   } else {
     unsigned char buffer[File::chunk];
     size_t read_size = 0;
@@ -190,7 +190,7 @@ int main(void) {
   readfile = new File(".", "test/zcopy_source");
   writefile = new File(".", "test/zcopy_dest");
   if (readfile->open("r") || writefile->open("w", 5)) {
-    cout << "Error opening file " << readfile->fullPath() << endl;
+    cout << "Error opening file" << endl;
   } else {
     unsigned char buffer[File::chunk];
     size_t read_size = 0;
@@ -227,7 +227,7 @@ int main(void) {
     writefile = swap;
   }
   if (readfile->open("r", 1) || writefile->open("w", 5)) {
-    cout << "Error opening file " << readfile->fullPath() << endl;
+    cout << "Error opening file" << endl;
   } else {
     unsigned char buffer[File::chunk];
     size_t read_size = 0;

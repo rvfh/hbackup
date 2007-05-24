@@ -27,7 +27,8 @@
 namespace hbackup {
 
 class File {
-  string          _prefix;    // mount or share path or prrefix
+  string          _prefix;    // share path
+  string          _prepath;   // mount path
   string          _path;      // file path
   string          _checksum;  // file checksum
   string          _link;      // what the link points to (if a link, of course)
@@ -67,6 +68,7 @@ public:
     gid_t         gid,
     mode_t        mode) :
       _prefix(prefix),
+      _prepath(""),
       _path(path),
       _checksum(""),
       _link(link),
@@ -86,6 +88,7 @@ public:
   bool metadiffer(const File&) const;
   string name() const;
   string prefix() const { return _prefix; };
+  string prepath() const { return _prepath; };
   string path() const { return _path; };
   string checksum() const { return _checksum; }
   string fullPath(int max_size = -1) const;

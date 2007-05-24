@@ -37,12 +37,13 @@ using namespace hbackup;
 
 File::File(const string& access_path, const string& path) {
   string full_path;
+  _prefix = "";
   if (path.empty()) {
-    _prefix   = "";
+    _prepath  = "";
     _path     = access_path;
     full_path = _path;
   } else {
-    _prefix   = access_path;
+    _prepath  = access_path;
     _path     = path;
     full_path = access_path + "/" + _path;
   }
@@ -232,7 +233,7 @@ int File::open(const char* req_mode, unsigned int compression) {
 
   _dsize  = 0;
   _fempty = true;
-  _fd = fopen64(fullPath().c_str(), mode);
+  _fd = fopen64((_prepath + "/" + _path).c_str(), mode);
   if (_fd == NULL)
     return -1;
   if (feof(_fd)) {
