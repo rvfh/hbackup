@@ -32,7 +32,9 @@ int terminating(void) {
 }
 
 int main(void) {
-  string line;
+  string  line;
+  File*   readfile;
+  File*   writefile;
 
   cout << "Tools Test" << endl;
 
@@ -54,6 +56,208 @@ int main(void) {
     &check_in, &check_out, 0);
   cout << "In: " << size_in << " bytes, checksum: " << check_in << endl;
   cout << "Out: " << size_out << " bytes, checksum: " << check_out << endl;
+
+  cout << endl << "Test: file read" << endl;
+  readfile = new File(".", "test/zcopy_source");
+  if (readfile->open("r")) {
+    cout << "Error opening file " << readfile->fullPath() << endl;
+  } else {
+    unsigned char buffer[File::chunk];
+    size_t read_size = 0;
+    do {
+      size_t size = readfile->read(buffer, File::chunk);
+      if (size < 0) {
+        cout << "broken by read" << endl;
+        break;
+      }
+      read_size += size;
+    } while (! readfile->eof());
+    if (readfile->close()) cout << "Error closing file" << endl;
+    cout << "read size: " << read_size
+      << " (" << readfile->size() << " -> " <<  readfile->dsize()
+      << "), checksum: " << readfile->checksum() << endl;
+  }
+  delete readfile;
+
+  cout << endl << "Test: file copy (read + write)" << endl;
+  system("dd if=/dev/zero of=test/zcopy_source bs=1M count=10 status=noxfer 2> /dev/null");
+  readfile = new File(".", "test/zcopy_source");
+  writefile = new File(".", "test/zcopy_dest");
+  if (readfile->open("r") || writefile->open("w")) {
+    cout << "Error opening file " << readfile->fullPath() << endl;
+  } else {
+    unsigned char buffer[File::chunk];
+    size_t read_size = 0;
+    size_t write_size = 0;
+    do {
+      size_t size = readfile->read(buffer, File::chunk);
+      if (size < 0) {
+        cout << "broken by read" << endl;
+        break;
+      }
+      read_size += size;
+      size = writefile->write(buffer, size, readfile->eof());
+      if (size < 0) {
+        cout << "broken by write" << endl;
+        break;
+      }
+      write_size += size;
+    } while (! readfile->eof());
+    if (readfile->close()) cout << "Error closing read file" << endl;
+    if (writefile->close()) cout << "Error closing write file" << endl;
+    cout << "read size: " << read_size
+      << " (" << readfile->size() << " -> " <<  readfile->dsize()
+      << "), checksum: " << readfile->checksum() << endl;
+    cout << "write size: " << write_size
+      << " (" << writefile->dsize() << " -> " <<  writefile->size()
+      << "), checksum: " << writefile->checksum() << endl;
+  }
+  delete readfile;
+  delete writefile;
+
+  cout << endl << "Test: file compress (read + compress write)" << endl;
+  readfile = new File(".", "test/zcopy_source");
+  writefile = new File(".", "test/zcopy_dest");
+  if (readfile->open("r") || writefile->open("w", 5)) {
+    cout << "Error opening file " << readfile->fullPath() << endl;
+  } else {
+    unsigned char buffer[File::chunk];
+    size_t read_size = 0;
+    size_t write_size = 0;
+    do {
+      size_t size = readfile->read(buffer, File::chunk);
+      if (size < 0) {
+        cout << "broken by read" << endl;
+        break;
+      }
+      read_size += size;
+      size = writefile->write(buffer, size, readfile->eof());
+      if (size < 0) {
+        cout << "broken by write" << endl;
+        break;
+      }
+      write_size += size;
+    } while (! readfile->eof());
+    if (readfile->close()) cout << "Error closing read file" << endl;
+    if (writefile->close()) cout << "Error closing write file" << endl;
+    cout << "read size: " << read_size
+      << " (" << readfile->size() << " -> " <<  readfile->dsize()
+      << "), checksum: " << readfile->checksum() << endl;
+    cout << "write size: " << write_size
+      << " (" << writefile->dsize() << " -> " <<  writefile->size()
+      << "), checksum: " << writefile->checksum() << endl;
+  }
+  delete readfile;
+  delete writefile;
+
+  cout << endl << "Test: file uncompress (uncompress read + write)" << endl;
+  readfile = new File(".", "test/zcopy_dest");
+  writefile = new File(".", "test/zcopy_source");
+  if (readfile->open("r", 1) || writefile->open("w")) {
+    cout << "Error opening file " << readfile->fullPath() << endl;
+  } else {
+    unsigned char buffer[File::chunk];
+    size_t read_size = 0;
+    size_t write_size = 0;
+    do {
+      size_t size = readfile->read(buffer, File::chunk);
+      if (size < 0) {
+        cout << "broken by read" << endl;
+        break;
+      }
+      read_size += size;
+      size = writefile->write(buffer, size, readfile->eof());
+      if (size < 0) {
+        cout << "broken by write" << endl;
+        break;
+      }
+      write_size += size;
+    } while (! readfile->eof());
+    if (readfile->close()) cout << "Error closing read file" << endl;
+    if (writefile->close()) cout << "Error closing write file" << endl;
+    cout << "read size: " << read_size
+      << " (" << readfile->size() << " -> " <<  readfile->dsize()
+      << "), checksum: " << readfile->checksum() << endl;
+    cout << "write size: " << write_size
+      << " (" << writefile->dsize() << " -> " <<  writefile->size()
+      << "), checksum: " << writefile->checksum() << endl;
+  }
+  delete readfile;
+  delete writefile;
+
+  cout << endl << "Test: file compress (read + compress write)"
+    << endl;
+  readfile = new File(".", "test/zcopy_source");
+  writefile = new File(".", "test/zcopy_dest");
+  if (readfile->open("r") || writefile->open("w", 5)) {
+    cout << "Error opening file " << readfile->fullPath() << endl;
+  } else {
+    unsigned char buffer[File::chunk];
+    size_t read_size = 0;
+    size_t write_size = 0;
+    do {
+      size_t size = readfile->read(buffer, File::chunk);
+      if (size < 0) {
+        cout << "broken by read" << endl;
+        break;
+      }
+      read_size += size;
+      size = writefile->write(buffer, size, readfile->eof());
+      if (size < 0) {
+        cout << "broken by write" << endl;
+        break;
+      }
+      write_size += size;
+    } while (! readfile->eof());
+    if (readfile->close()) cout << "Error closing read file" << endl;
+    if (writefile->close()) cout << "Error closing write file" << endl;
+    cout << "read size: " << read_size
+      << " (" << readfile->size() << " -> " <<  readfile->dsize()
+      << "), checksum: " << readfile->checksum() << endl;
+    cout << "write size: " << write_size
+      << " (" << writefile->dsize() << " -> " <<  writefile->size()
+      << "), checksum: " << writefile->checksum() << endl;
+  }
+  cout << endl
+    << "Test: file recompress (uncompress read + compress write), no closing"
+    << endl;
+  {
+    File* swap = readfile;
+    readfile = writefile;
+    writefile = swap;
+  }
+  if (readfile->open("r", 1) || writefile->open("w", 5)) {
+    cout << "Error opening file " << readfile->fullPath() << endl;
+  } else {
+    unsigned char buffer[File::chunk];
+    size_t read_size = 0;
+    size_t write_size = 0;
+    do {
+      size_t size = readfile->read(buffer, File::chunk);
+      if (size < 0) {
+        cout << "broken by read" << endl;
+        break;
+      }
+      read_size += size;
+      size = writefile->write(buffer, size, readfile->eof());
+      if (size < 0) {
+        cout << "broken by write" << endl;
+        break;
+      }
+      write_size += size;
+    } while (! readfile->eof());
+    if (readfile->close()) cout << "Error closing read file" << endl;
+    if (writefile->close()) cout << "Error closing write file" << endl;
+    cout << "read size: " << read_size
+      << " (" << readfile->size() << " -> " <<  readfile->dsize()
+      << "), checksum: " << readfile->checksum() << endl;
+    cout << "write size: " << write_size
+      << " (" << writefile->dsize() << " -> " <<  writefile->size()
+      << "), checksum: " << writefile->checksum() << endl;
+  }
+  delete readfile;
+  delete writefile;
+
 
   cout << endl << "Test: testDir" << endl;
   cout << "Check test_db dir: "
