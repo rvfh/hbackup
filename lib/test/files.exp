@@ -6,6 +6,29 @@ Out: 10208 bytes, checksum: b7350db49d036137b2ef752a82145e91
 In: 10485760 bytes, checksum: f1c9645dbc14efddc7d8a322685f26eb
 Out: 10485760 bytes, checksum: f1c9645dbc14efddc7d8a322685f26eb
 
+Test: file read
+read size: 10485760 (10485760 -> 10485760), checksum: f1c9645dbc14efddc7d8a322685f26eb
+
+Test: file copy (read + write)
+read size: 10485760 (10485760 -> 10485760), checksum: f1c9645dbc14efddc7d8a322685f26eb
+write size: 10485760 (10485760 -> 10485760), checksum: f1c9645dbc14efddc7d8a322685f26eb
+
+Test: file compress (read + compress write)
+read size: 10485760 (10485760 -> 10485760), checksum: f1c9645dbc14efddc7d8a322685f26eb
+write size: 10208 (10485760 -> 10208), checksum: b7350db49d036137b2ef752a82145e91
+
+Test: file uncompress (uncompress read + write)
+read size: 10485760 (10208 -> 10485760), checksum: b7350db49d036137b2ef752a82145e91
+write size: 10485760 (10485760 -> 10485760), checksum: f1c9645dbc14efddc7d8a322685f26eb
+
+Test: file compress (read + compress write)
+read size: 10485760 (10485760 -> 10485760), checksum: f1c9645dbc14efddc7d8a322685f26eb
+write size: 10208 (10485760 -> 10208), checksum: b7350db49d036137b2ef752a82145e91
+
+Test: file recompress (uncompress read + compress write), no closing
+read size: 10485760 (10208 -> 10485760), checksum: b7350db49d036137b2ef752a82145e91
+write size: 10208 (10485760 -> 10208), checksum: b7350db49d036137b2ef752a82145e91
+
 Test: testDir
 Check test_db dir: 0
 Check but do not create test_db/0 1 dir: 1

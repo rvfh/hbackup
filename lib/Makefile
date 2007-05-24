@@ -25,7 +25,7 @@ cvs_parser.o: files.h parsers.h cvs_parser.h
 db.o: list.h files.h filters.h parsers.h dbdata.h dblist.h db.h
 dblist.o: list.h files.h dbdata.h dblist.h
 files.o: files.h
-filters.o: filters.h
+filters.o: filters.h files.h
 paths.o: files.h filters.h parsers.h cvs_parser.h paths.h
 
 # Rules

@@ -16,17 +16,17 @@
      Boston, MA 02111-1307, USA.
 */
 
-#include <fstream>
 #include <iostream>
 #include <vector>
 #include <string>
 #include <cctype>
+#include <cstdio>
 #include <dirent.h>
+#include <sys/types.h>
 #include <sys/stat.h>
+#include <fcntl.h>
 #include <unistd.h>
-#include <openssl/md5.h>
-#include <openssl/evp.h>
-#include <zlib.h>
+#include <errno.h>
 
 using namespace std;
 
@@ -35,15 +35,14 @@ using namespace std;
 
 using namespace hbackup;
 
-#define CHUNK 409600
-
 File::File(const string& access_path, const string& path) {
-  _prefix   = "";
   string full_path;
   if (path.empty()) {
+    _prefix   = "";
     _path     = access_path;
     full_path = _path;
   } else {
+    _prefix   = access_path;
     _path     = path;
     full_path = access_path + "/" + _path;
   }
@@ -80,6 +79,8 @@ File::File(const string& access_path, const string& path) {
       free(link);
     }
   }
+  _fd = NULL;
+  _checksum = "";
 }
 
 File::File(char* line, size_t size) {
@@ -212,6 +213,235 @@ string File::line(bool nodates) const {
   return output;
 }
 
+int File::open(const char* req_mode, unsigned int compression) {
+  char mode[2];
+
+  switch (req_mode[0]) {
+  case 'w':
+    strcpy(mode, "w");
+    _fwrite = true;
+    _size = 0;
+    break;
+  case 'r':
+    strcpy(mode, "r");
+    _fwrite = false;
+    break;
+  default:
+    return 1;
+  }
+
+  _dsize  = 0;
+  _fempty = true;
+  _fd = fopen64(fullPath().c_str(), mode);
+  if (_fd == NULL)
+    return -1;
+  if (feof(_fd)) {
+    _feof = true;
+  } else {
+    _feof = false;
+  }
+
+  /* Create openssl resources */
+  _ctx = new EVP_MD_CTX;
+  if (_ctx != NULL) {
+    EVP_DigestInit(_ctx, EVP_md5());
+  }
+
+
+  /* Create zlib resources */
+  if (compression != 0) {
+    _fbuffer        = new unsigned char[chunk];
+    _strm           = new z_stream;
+    _strm->zalloc   = Z_NULL;
+    _strm->zfree    = Z_NULL;
+    _strm->opaque   = Z_NULL;
+    _strm->avail_in = 0;
+    _strm->next_in  = Z_NULL;
+    if (_fwrite) {
+      /* Compress */
+      if (deflateInit2(_strm, compression, Z_DEFLATED, 16 + 15, 9,
+          Z_DEFAULT_STRATEGY)) {
+        fprintf(stderr, "zcopy: deflate init failed\n");
+        compression = 0;
+      }
+    } else {
+      /* De-compress */
+      if (inflateInit2(_strm, 32 + 15)) {
+        compression = 0;
+      }
+    }
+  } else {
+    _strm = NULL;
+  }
+
+  return _fd == NULL;
+}
+
+int File::close() {
+  if (_fd == NULL) return -1;
+
+  /* Compute checksum */
+  if (_ctx != NULL) {
+    unsigned char checksum[36];
+    size_t        length;
+
+    EVP_DigestFinal(_ctx, checksum, &length);
+    md5sum(_checksum, checksum, length);
+  }
+
+  /* Destroy zlib resources */
+  if (_strm != NULL) {
+    if (_fwrite) {
+      deflateEnd(_strm);
+    } else {
+      inflateEnd(_strm);
+    }
+  }
+
+  return fclose(_fd);
+}
+
+ssize_t File::read(unsigned char* buffer, size_t count) {
+  size_t length;
+
+  if ((_fd == NULL) || _fwrite) {
+    errno = EINVAL;
+    return -1;
+  }
+
+  if (count > chunk) count = chunk;
+  if (count == 0) return 0;
+
+  if (_strm == NULL) {
+    _fbuffer = buffer;
+  }
+
+  // Read new data
+  if (_fempty) {
+    // Read chunk
+    length = fread(_fbuffer, 1, count, _fd);
+
+    /* Update checksum with chunk */
+    if (_ctx != NULL) {
+      EVP_DigestUpdate(_ctx, _fbuffer, length);
+    }
+
+    /* Fill decompression input buffer with chunk or just return chunk */
+    if (_strm != NULL) {
+      _strm->avail_in = length;
+      _strm->next_in  = _fbuffer;
+      _fempty = false;
+    } else {
+      _dsize += length;
+      if (length == 0)
+        _feof = true;
+      return length;
+    }
+  }
+
+  // Continue decompression of previous data
+  _strm->avail_out = chunk;
+  _strm->next_out  = buffer;
+  switch (inflate(_strm, Z_NO_FLUSH)) {
+    case Z_NEED_DICT:
+    case Z_DATA_ERROR:
+    case Z_MEM_ERROR:
+      fprintf(stderr, "File::read: inflate failed\n");
+      break;
+    case Z_STREAM_END:
+      _feof = true;
+      break;
+    default:
+      _feof = false;
+  }
+  _fempty = (_strm->avail_out != 0);
+  length = chunk - _strm->avail_out;
+  _dsize += length;
+  return length;
+}
+
+ssize_t File::write(unsigned char* buffer, size_t count, bool eof) {
+  static bool finished = true;
+  size_t length;
+
+  if ((_fd == NULL) || ! _fwrite || (count > chunk)) {
+    errno = EINVAL;
+    return -1;
+  }
+
+  // No compression, nothing to finish
+  if (_strm == NULL) {
+    finished = true;
+  }
+
+  if (count == 0) {
+    if (finished) {
+      return 0;
+    }
+    finished = true;
+  } else {
+    finished = false;
+  }
+
+  _dsize += count;
+
+  if (_strm == NULL) {
+    // Just write
+    size_t wlength;
+
+    length = count;
+
+    /* Checksum computation */
+    if (_ctx != NULL) {
+      EVP_DigestUpdate(_ctx, buffer, length);
+    }
+
+    do {
+      wlength = fwrite(buffer, 1, length, _fd);
+      length -= wlength;
+    } while ((length != 0) && (wlength != 0));
+  } else {
+    // Compress data
+    _strm->avail_in = count;
+    _strm->next_in  = buffer;
+    count = 0;
+
+    do {
+      _strm->avail_out = chunk;
+      _strm->next_out  = _fbuffer;
+      deflate(_strm, eof ? Z_FINISH : Z_NO_FLUSH);
+      length = chunk - _strm->avail_out;
+      count += length;
+
+      /* Checksum computation */
+      if (_ctx != NULL) {
+        EVP_DigestUpdate(_ctx, _fbuffer, length);
+      }
+
+      size_t wlength;
+      do {
+        wlength = fwrite(_fbuffer, 1, length, _fd);
+        length -= wlength;
+      } while ((length != 0) && (wlength != 0));
+    } while (_strm->avail_out == 0);
+  }
+
+  _size += count;
+  return count;
+}
+
+ssize_t File::readLine(unsigned char* buffer, size_t count, char delim) {
+  return 0;
+}
+
+ssize_t File::writeLine(const unsigned char* buffer, size_t count, char delim){
+  return 0;
+}
+
+ssize_t File::readParams(vector<string>& params) {
+  return 0;
+}
+
 // Public functions
 int File::testDir(const string& path, bool create) {
   DIR  *directory;
@@ -298,8 +528,8 @@ int File::zcopy(
     int           compress) {
   FILE          *writefile;
   FILE          *readfile;
-  unsigned char buffer_in[CHUNK];
-  unsigned char buffer_out[CHUNK];
+  unsigned char buffer_in[chunk];
+  unsigned char buffer_out[chunk];
   EVP_MD_CTX    ctx_in;
   EVP_MD_CTX    ctx_out;
   size_t        length;
@@ -350,7 +580,7 @@ int File::zcopy(
 
   /* We shall copy, (de-)compress and compute the checksum in one go */
   while (! feof(readfile) && ! terminating()) {
-    size_t rlength = fread(buffer_in, 1, CHUNK, readfile);
+    size_t rlength = fread(buffer_in, 1, chunk, readfile);
     size_t wlength;
 
     /* Size read */
@@ -365,7 +595,7 @@ int File::zcopy(
       strm.next_in = buffer_in;
 
       do {
-        strm.avail_out = CHUNK;
+        strm.avail_out = chunk;
         strm.next_out = buffer_out;
         if (compress > 0) {
           deflate(&strm, feof(readfile) ? Z_FINISH : Z_NO_FLUSH);
@@ -378,7 +608,7 @@ int File::zcopy(
               break;
           }
         }
-        rlength = CHUNK - strm.avail_out;
+        rlength = chunk - strm.avail_out;
 
         /* Checksum computation */
         EVP_DigestUpdate(&ctx_out, buffer_out, rlength);
@@ -456,9 +686,9 @@ int File::getChecksum(const string& path, string& checksum) {
 
   /* Read file, updating checksum */
   while (! feof(readfile) && ! terminating()) {
-    char buffer[CHUNK];
+    char buffer[chunk];
 
-    rlength = fread(buffer, 1, CHUNK, readfile);
+    rlength = fread(buffer, 1, chunk, readfile);
     EVP_DigestUpdate(&ctx, buffer, rlength);
   }
   fclose(readfile);
