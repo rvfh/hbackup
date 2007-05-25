@@ -59,7 +59,7 @@ int main(void) {
 
   cout << endl << "Test: file read" << endl;
   readfile = new File(".", "test/zcopy_source");
-  if (readfile->open("r")) {
+  if (readfile->open(".", "r")) {
     cout << "Error opening file" << endl;
   } else {
     unsigned char buffer[File::chunk];
@@ -83,7 +83,7 @@ int main(void) {
   system("dd if=/dev/zero of=test/zcopy_source bs=1M count=10 status=noxfer 2> /dev/null");
   readfile = new File(".", "test/zcopy_source");
   writefile = new File(".", "test/zcopy_dest");
-  if (readfile->open("r") || writefile->open("w")) {
+  if (readfile->open(".", "r") || writefile->open(".", "w")) {
     cout << "Error opening file" << endl;
   } else {
     unsigned char buffer[File::chunk];
@@ -118,7 +118,7 @@ int main(void) {
   cout << endl << "Test: file compress (read + compress write)" << endl;
   readfile = new File(".", "test/zcopy_source");
   writefile = new File(".", "test/zcopy_dest");
-  if (readfile->open("r") || writefile->open("w", 5)) {
+  if (readfile->open(".", "r") || writefile->open(".", "w", 5)) {
     cout << "Error opening file" << endl;
   } else {
     unsigned char buffer[File::chunk];
@@ -153,7 +153,7 @@ int main(void) {
   cout << endl << "Test: file uncompress (uncompress read + write)" << endl;
   readfile = new File(".", "test/zcopy_dest");
   writefile = new File(".", "test/zcopy_source");
-  if (readfile->open("r", 1) || writefile->open("w")) {
+  if (readfile->open(".", "r", 1) || writefile->open(".", "w")) {
     cout << "Error opening file" << endl;
   } else {
     unsigned char buffer[File::chunk];
@@ -189,7 +189,7 @@ int main(void) {
     << endl;
   readfile = new File(".", "test/zcopy_source");
   writefile = new File(".", "test/zcopy_dest");
-  if (readfile->open("r") || writefile->open("w", 5)) {
+  if (readfile->open(".", "r") || writefile->open(".", "w", 5)) {
     cout << "Error opening file" << endl;
   } else {
     unsigned char buffer[File::chunk];
@@ -226,7 +226,7 @@ int main(void) {
     readfile = writefile;
     writefile = swap;
   }
-  if (readfile->open("r", 1) || writefile->open("w", 5)) {
+  if (readfile->open(".", "r", 1) || writefile->open(".", "w", 5)) {
     cout << "Error opening file" << endl;
   } else {
     unsigned char buffer[File::chunk];
@@ -314,7 +314,6 @@ int main(void) {
   cout << "\nline constructor" << endl;
   {
     File file_data("test/testlink");
-    file_data.setPrefix("prefix");
     cout << "Line: " << file_data.line(true) << endl;;
     char* new_line = new char[80];
     strcpy(new_line, (file_data.line(true) + "\t").c_str());

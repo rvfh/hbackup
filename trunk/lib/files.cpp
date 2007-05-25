@@ -37,13 +37,10 @@ using namespace hbackup;
 
 File::File(const string& access_path, const string& path) {
   string full_path;
-  _prefix = "";
   if (path.empty()) {
-    _prepath  = "";
     _path     = access_path;
     full_path = _path;
   } else {
-    _prepath  = access_path;
     _path     = path;
     full_path = access_path + "/" + _path;
   }
@@ -91,7 +88,10 @@ File::File(char* line, size_t size) {
   char      letter;
   int       failed = 0;
 
-  for (int field = 1; field <= 9; field++) {
+  // Dummy constructor for file reading
+  if (size == 0) return;
+
+  for (int field = 2; field <= 9; field++) {
     // Get tabulation position
     delim = strchr(start, '\t');
     if (delim == NULL) {
@@ -102,9 +102,6 @@ File::File(char* line, size_t size) {
       value[delim - start] = '\0';
       /* Extract data */
       switch (field) {
-        case 1:   /* Prefix */
-          _prefix = value;
-          break;
         case 2:   /* Path */
           _path = value;
           break;
@@ -163,18 +160,16 @@ bool File::metadiffer(const File& right) const {
 
 // Tested in db's test
 bool File::operator<(const File& right) const {
-  if ((_prefix == right._prefix) && (_path == right._path)) {
+  if (_path == right._path) {
     return (_mtime < right._mtime)  || (_size < right._size)
         || (_uid < right._uid)      || (_gid < right._gid)
         || (_mode < right._mode)    || (_link < right._link);
   }
-  return ((_prefix < right._prefix)
-       || ((_prefix == right._prefix) && (_path < right._path)));
+  return (_path < right._path);
 }
 
 bool File::operator!=(const File& right) const {
-  return (_prefix != right._prefix) || (_path != right._path)
-      || metadiffer(right);
+  return (_path != right._path) || metadiffer(right);
 }
 
 // Tested in cvs_parser's test
@@ -187,18 +182,8 @@ string File::name() const {
   }
 }
 
-// Tested in db's test
-string File::fullPath(int size_max) const {
-  // Simple and inefficient
-  string full_path = _prefix + "/" + _path;
-  if (size_max < 0) {
-    return full_path;
-  }
-  return full_path.substr(0, size_max);
-}
-
 string File::line(bool nodates) const {
-  string  output = _prefix + "\t" + _path + "\t" + typeLetter(_type);
+  string  output = _path + "\t" + typeLetter(_type);
   char*   numbers = NULL;
   time_t  mtime;
 
@@ -214,7 +199,8 @@ string File::line(bool nodates) const {
   return output;
 }
 
-int File::open(const char* req_mode, unsigned int compression) {
+int File::open(const char* prepath, const char* req_mode,
+    unsigned int compression) {
   char mode[2];
 
   switch (req_mode[0]) {
@@ -233,7 +219,7 @@ int File::open(const char* req_mode, unsigned int compression) {
 
   _dsize  = 0;
   _fempty = true;
-  _fd = fopen64((_prepath + "/" + _path).c_str(), mode);
+  _fd = fopen64((string(prepath) + "/" + _path).c_str(), mode);
   if (_fd == NULL)
     return -1;
   if (feof(_fd)) {

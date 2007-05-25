@@ -840,33 +840,39 @@ int main(void) {
   // Add second element again, different times and checksum
   i++;
   db_data = new DbData(*i->data());
+  db_data->setPrefix(i->prefix());
   db_data->setChecksum("BLAH");
   db_data->setOut();
   journal.push_back(*db_data);
   // Add third element again, different times
   i++;
   db_data = new DbData(*i->data());
+  db_data->setPrefix(i->prefix());
   db_data->setChecksum(i->checksum());
   db_data->setOut();
   journal.push_back(*db_data);
   // Add third element again, different times and checksum
   db_data = new DbData(*i->data());
+  db_data->setPrefix(i->prefix());
   db_data->setChecksum("BLIH");
   db_data->setOut();
   journal.push_back(*db_data);
   // Add third element again, different times
   db_data = new DbData(*i->data());
+  db_data->setPrefix(i->prefix());
   db_data->setChecksum(i->checksum());
   db_data->setOut();
   journal.push_back(*db_data);
   // Add fourth element again, different time out
   i++;
   db_data = new DbData(*i);
+  db_data->setPrefix(i->prefix());
   db_data->setOut();
   journal.push_back(*db_data);
   // Add fifth element again, different times
   i++;
   db_data = new DbData(*i->data());
+  db_data->setPrefix(i->prefix());
   db_data->setChecksum(i->checksum());
   db_data->setOut();
   journal.push_back(*db_data);
@@ -877,21 +883,25 @@ int main(void) {
   i++;
   i++;
   db_data = new DbData(*i->data());
+  db_data->setPrefix(i->prefix());
   db_data->setChecksum(i->checksum());
   db_data->setOut();
   journal.push_back(*db_data);
   // Add eigth element again, different times and checksum
   db_data = new DbData(*i->data());
+  db_data->setPrefix(i->prefix());
   db_data->setChecksum("BLOH");
   db_data->setOut();
   journal.push_back(*db_data);
   // Add eigth element again, different times
   db_data = new DbData(*i->data());
+  db_data->setPrefix(i->prefix());
   db_data->setChecksum(i->checksum());
   db_data->setOut();
   journal.push_back(*db_data);
   // Add eigth element again, different times
   db_data = new DbData(*i->data());
+  db_data->setPrefix(i->prefix());
   db_data->setChecksum(i->checksum());
   db_data->setOut();
   journal.push_back(*db_data);

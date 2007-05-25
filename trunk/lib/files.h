@@ -27,8 +27,6 @@
 namespace hbackup {
 
 class File {
-  string          _prefix;    // share path
-  string          _prepath;   // mount path
   string          _path;      // file path
   string          _checksum;  // file checksum
   string          _link;      // what the link points to (if a link, of course)
@@ -58,7 +56,6 @@ public:
   File(const string& access_path, const string& path = "");
   // Constructor for given file data
   File(
-    const string& prefix,
     const string& path,
     const string& link,
     mode_t        type,
@@ -67,8 +64,6 @@ public:
     uid_t         uid,
     gid_t         gid,
     mode_t        mode) :
-      _prefix(prefix),
-      _prepath(""),
       _path(path),
       _checksum(""),
       _link(link),
@@ -87,8 +82,6 @@ public:
   bool operator==(const File& right) const { return ! (*this != right); }
   bool metadiffer(const File&) const;
   string name() const;
-  string prefix() const { return _prefix; };
-  string prepath() const { return _prepath; };
   string path() const { return _path; };
   string checksum() const { return _checksum; }
   string fullPath(int max_size = -1) const;
@@ -99,11 +92,11 @@ public:
   bool eof() const { return _feof; };
   // Line containing all data (argument for debug only)
   string line(bool nodates = false) const;
-  void setPrefix(const string& prefix) { _prefix = prefix; }
   void setPath(const string& path) { _path = path; }
 
   // Open file, for read or write (no append), with or without compression
-  int open(const char* req_mode, unsigned int compression = 0);
+  int open(const char* prepath, const char* req_mode,
+    unsigned int compression = 0);
   // Close file, for read or write (no append), with or without compression
   int close();
   // Read file sets eof (check with eof()) when all data is read and ready

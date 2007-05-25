@@ -27,6 +27,7 @@ namespace hbackup {
 
 class DbData {
   File    _data;
+  string  _prefix;
   string  _checksum;
   time_t  _in;
   time_t  _out;
@@ -35,7 +36,7 @@ public:
   DbData(const File& data) :
     _data(data), _checksum(""), _out(0), _expired(false) { _in = time(NULL); }
   // line gets modified
-  DbData(char* line, size_t size) : _data(line, size), _expired(false) {
+  DbData(char* line, size_t size) : _data("", 0), _expired(false) {
     char* start  = line;
     char* value  = new char[size];
     int   failed = 0;
@@ -51,6 +52,12 @@ public:
         value[delim - start] = '\0';
         /* Extract data */
         switch (field) {
+          case 1:   /* Prefix */
+            _prefix = value;
+            break;
+          case 2:   /* File data */
+            _data = File(start, size - (start - line));
+            break;
           case 10:  /* Checksum */
             _checksum = value;
             break;
@@ -76,31 +83,44 @@ public:
     }
   }
   bool operator<(const DbData& right) const {
-    if (_data < right._data) return true;
-    if (right._data < _data) return false;
-    // Equal then...
-    return (_in < right._in)
-      || ((_in == right._in) && (_checksum < right._checksum));
+    if (_prefix == right._prefix) {
+      if (_data < right._data) return true;
+      if (right._data < _data) return false;
+      // Equal then...
+      return (_in < right._in)
+        || ((_in == right._in) && (_checksum < right._checksum));
+    }
+    return (_prefix < right._prefix);
   // Note: checking for _out would break the journal replay stuff (uses find)
   }
   // Equality and difference exclude _out
   bool operator!=(const DbData& right) const {
-    return (_in != right._in) || (_checksum != right._checksum)
-    || (_data != right._data);
+    return (_prefix != right._prefix) || (_in != right._in)
+        || (_checksum != right._checksum) || (_data != right._data);
   }
   bool   operator==(const DbData& right) const { return ! (*this != right); }
   File*  data() { return &_data; }
+  string prefix() const { return _prefix; }
   string checksum() const { return _checksum; }
   time_t in() const { return _in; }
   time_t out() const { return _out; }
   bool   expired() { return _expired; }
+  void   setPrefix(const string& prefix) { _prefix = prefix; }
   void   setChecksum(const string& checksum) { _checksum = checksum; }
   void   setOut() { _out = time(NULL); }
   void   setOut(time_t out) { _out = out; }
   void   resetExpired() { _expired = false; }
   void   setExpired() { _expired = true; }
+  string fullPath(int size_max) const {
+    // Simple and inefficient
+    string full_path = _prefix + "/" + _data.path();
+    if (size_max < 0) {
+      return full_path;
+    }
+    return full_path.substr(0, size_max);
+  }
   string line(bool nodates = false) const {
-    string  output = _data.line(nodates) + "\t" + _checksum;
+    string  output = _prefix + "\t" + _data.line(nodates) + "\t" + _checksum;
     char*   numbers = NULL;
 
     asprintf(&numbers, "%ld\t%ld", _in, _out);
