@@ -494,11 +494,11 @@ int Database::expire_share(
 
     for (it = _removed.begin(); it != _removed.end(); it++) {
       // Prefix not reached
-      if (it->data()->prefix().substr(0, prefix.size()) < prefix) {
+      if (it->prefix().substr(0, prefix.size()) < prefix) {
         continue;
       } else
       // Prefix exceeded
-      if (it->data()->prefix().substr(0, prefix.size()) > prefix) {
+      if (it->prefix().substr(0, prefix.size()) > prefix) {
         break;
       } else
       // Prefix reached
@@ -628,7 +628,7 @@ int Database::parse(
   SortedList<DbData>::iterator entry_active = _active.begin();
   // Jump irrelevant first records
   while ((entry_active != _active.end())
-   && (entry_active->data()->fullPath(full_path.size()) < full_path)) {
+   && (entry_active->fullPath(full_path.size()) < full_path)) {
     entry_active++;
   }
   SortedList<DbData>::iterator active_last = _active.end();
@@ -641,7 +641,7 @@ int Database::parse(
 
     // Check whether db data is (still) relevant
     if ((entry_active != _active.end()) && (active_last != entry_active)
-     && (entry_active->data()->fullPath(full_path.size()) > full_path)) {
+     && (entry_active->fullPath(full_path.size()) > full_path)) {
       // Irrelevant rest of list
       entry_active = _active.end();
     }
@@ -696,9 +696,9 @@ int Database::parse(
     if (file_add) {
       // Create new record
       File file_data(*entry_file_list);
-      file_data.setPrefix(prefix);
       file_data.setPath(mounted_path + "/" + entry_file_list->path());
       DbData db_data(file_data);
+      db_data.setPrefix(prefix);
       if (same_file) {
         db_data.setChecksum(entry_active->checksum());
       }
@@ -887,7 +887,7 @@ int Database::scan(const string& checksum, bool thorough) {
         failed = 1;
         if (! terminating() && verbosity() > 2) {
           struct tm *time;
-          cout << " --> Client:      " << i->data()->prefix() << endl;
+          cout << " --> Client:      " << i->prefix() << endl;
           cout << " --> File name:   " << i->data()->path() << endl;
           if (verbosity() > 3) {
             time_t file_mtime = i->data()->mtime();
