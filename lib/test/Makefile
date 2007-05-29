@@ -16,7 +16,7 @@ test:	list.done \
 
 clean:
 	@rm -f *.[oa] *~ *.out *.err *.all *.done *_test zcop*
-	@../../test_setup clean
+	@../../test/test_setup clean
 
 # Rules
 %_test.o: %_test.cpp
@@ -27,9 +27,9 @@ clean:
 	@echo "BUILD	$@"
 	@$(CXX) $(LDFLAGS) -o $@ $^
 
-%.done: %_test %.exp ../../test_setup
+%.done: %_test %.exp ../../test/test_setup
 	@echo "RUN	$<"
-	@../../test_setup
+	@../../test/test_setup
 	@./$< > `basename $@ .done`.all 2>&1
 	@diff -q `basename $@ .done`.exp `basename $@ .done`.all
 	@touch $@

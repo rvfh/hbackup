@@ -9,12 +9,12 @@ test:	hbackup.done
 
 clean:
 	@rm -f *.[oa] *~ *.out *.err *.all *.done *_test zcop*
-	@../../test_setup clean
+	@../../test/test_setup clean
 
 # Rules
-hbackup.done: ../hbackup hbackup.exp ../../test_setup
+hbackup.done: ../hbackup hbackup.exp ../../test/test_setup
 	@echo "RUN	$<"
-	@../../test_setup
+	@../../test/test_setup
 	@rm -f hbackup.all
 	@./$< -vvv -c etc/hbackup.conf >> hbackup.all 2>&1 || echo -n
 	@./$< -vvv -c etc/hbackup.conf -C myhost -C client >> hbackup.all 2>&1 \
