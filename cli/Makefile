@@ -36,13 +36,17 @@ hbackup.o: ../lib/hbackup.h version.h
 version.h:
 	@echo "CREATE	$@"
 	@echo "/* This file is auto-generated, do not edit. */" > version.h
-	@echo "\n#ifndef VERSION_H\n#define VERSION_H\n" >> version.h
+	@echo >> version.h
+	@echo "#ifndef VERSION_H" >> version.h
+	@echo "#define VERSION_H" >> version.h
+	@echo >> version.h
 	@echo "#define VERSION_MAJOR $(MAJOR)" >> version.h
 	@echo "#define VERSION_MINOR $(MINOR)" >> version.h
 	@echo "#define VERSION_BUGFIX $(BUGFIX)" >> version.h
 	@echo -n "#define BUILD " >> version.h
 	@date -u +"%s" >> version.h
-	@echo "\n#endif" >> version.h
+	@echo >> version.h
+	@echo "#endif" >> version.h
 
 %o: %cpp
 	@echo "CXX	$<"
