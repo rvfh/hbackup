@@ -17,7 +17,7 @@ hbackup.done: ../hbackup hbackup.exp ../../test_setup
 	@../../test_setup
 	@rm -f hbackup.all
 	@./$< -vvv -c etc/hbackup.conf >> hbackup.all 2>&1 || echo -n
-	@./$< -vvv -c etc/hbackup.conf -C cbers11 -C client >> hbackup.all 2>&1 \
+	@./$< -vvv -c etc/hbackup.conf -C myhost -C client >> hbackup.all 2>&1 \
 	|| echo -n
 	@./$< -vvv -c etc/hbackup.conf -s >> hbackup.all 2>&1 || echo -n
 	@./$< -vvv -c etc/hbackup.conf -t >> hbackup.all 2>&1 || echo -n

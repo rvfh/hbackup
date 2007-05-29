@@ -82,9 +82,9 @@ mkdir "$CONFIGDIR"
 cat << EOF > "$CONFIGDIR/hbackup.conf"
 db "$TESTDBDIR"
 
-client cbers11
+client myhost
 protocol file
-hostname cbers11.dpi.inpe.br
+hostname myhost.mynetwork.lan
 listfile "$CONFIGDIR/localhost.list"
 
 client client
