@@ -1,11 +1,11 @@
  -> Reading configuration file
- --> Client: cbers11
+ --> Client: myhost
  --> Client: client
  --> Client: other
  -> Opening database
  --> Database initialized
  --> Database active items part open (contents: 0 files)
-Backup client 'cbers11' using protocol 'file'
+Backup client 'myhost' using protocol 'file'
  -> Reading backup list file
  --> Path: test
  --> Path: test2
@@ -32,12 +32,12 @@ Expire path 'test'
  -> Closing database
  --> Database removed items part closed (contents: 0 files)
  -> Reading configuration file
- --> Client: cbers11
+ --> Client: myhost
  --> Client: client
  --> Client: other
  -> Opening database
  --> Database active items part open (contents: 18 files)
-Backup client 'cbers11' using protocol 'file'
+Backup client 'myhost' using protocol 'file'
  -> Reading backup list file
  --> Path: test
  --> Path: test2
@@ -61,7 +61,7 @@ Expire path 'test'
  -> Closing database
  --> Database removed items part closed (contents: 0 files)
  -> Reading configuration file
- --> Client: cbers11
+ --> Client: myhost
  --> Client: client
  --> Client: other
  -> Opening database
@@ -75,7 +75,7 @@ Expire path 'test'
  -> Closing database
  --> Database removed items part closed (contents: 0 files)
  -> Reading configuration file
- --> Client: cbers11
+ --> Client: myhost
  --> Client: client
  --> Client: other
  -> Opening database
