@@ -94,7 +94,17 @@ Client: Client4
 Options: username= password=
  --> Database initialized
  --> Database active items part open (contents: 0 files)
-Client unreachable 'myClient' using protocol 'nfs' (Connection timed out)
+Backup client 'myClient' using protocol 'nfs'
+ -> Reading backup list file
+ --> Path: /home/User/test
+Backup path '/home/User/test'
+ -> Building list of files
+Unmounted test_db/mount
+ -> Parsing list of files (1)
+ --> Files to add: 1 (0 bytes)
+ --> Done: 1/1
+ --> Files to remove: 0
+Unmounted test_db/mount
 Backup client 'myClient2' using protocol 'smb'
  -> Reading backup list file
  --> Path: C:/Test
@@ -118,12 +128,12 @@ Unmounted test_db/mount
 Backup client 'Client4' using protocol 'smb'
 List file not found test_db/mount/home/BlaH/Backup.list
 Unmounted test_db/mount
- --> Database active items part closed (contents: 1 file)
+ --> Database active items part closed (contents: 2 files)
  --> Client: testhost
 >List 1 client(s):
 Client: testhost
 -> file://localhost etc/localhost.list
- --> Database active items part open (contents: 1 file)
+ --> Database active items part open (contents: 2 files)
 Backup client 'testhost' using protocol 'file'
  -> Reading backup list file
  --> Path: test
@@ -141,12 +151,12 @@ Backup path 'test2'
  --> Files to add: 5 (928768 bytes)
  --> Done: 1/5 (0.0%) --> Done: 2/5 (15.7%) --> Done: 3/5 (43.6%) --> Done: 4/5 (100.0%) --> Done: 5/5 (100.0%)
  --> Files to remove: 0
- --> Database active items part closed (contents: 19 files)
+ --> Database active items part closed (contents: 20 files)
  --> Client: testhost
 >List 1 client(s):
 Client: testhost
 -> file://testhost etc/localhost.list
- --> Database active items part open (contents: 19 files)
+ --> Database active items part open (contents: 20 files)
 Backup client 'testhost' using protocol 'file'
  -> Reading backup list file
  --> Path: test
@@ -162,4 +172,4 @@ Backup path 'test2'
  -> Parsing list of files (5)
  --> Files to add: 0
  --> Files to remove: 0
- --> Database active items part closed (contents: 19 files)
+ --> Database active items part closed (contents: 20 files)

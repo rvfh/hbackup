@@ -8,6 +8,8 @@ TESTDIRCIFS="test_cifs"
 TESTDIRNFS="test_nfs"
 TESTDBDIR="test_db"
 
+ROOTDIRNFS="/home/User"
+
 # Clean
 if [ -d "$TESTDBDIR" ]; then
   chmod u+w "$TESTDBDIR"
@@ -88,6 +90,13 @@ cat << EOF > "$TESTDIRCIFS/Backup/Backup.LST"
 path "C:\Test" # Do not end it in \" !!!
 EOF
 
+# NFS test
+mkdir -p "$TESTDIRNFS/test"
+touch  "$TESTDIRNFS/test/File2.txt"
+cat << EOF > "$TESTDIRNFS/hbackup.list"
+path "$ROOTDIRNFS/test/"
+EOF
+
 # Config
 mkdir "$CONFIGDIR"
 cat << EOF > "$CONFIGDIR/hbackup.conf"
@@ -97,6 +106,11 @@ client myhost
 protocol file
 hostname myhost.mynetwork.lan
 listfile "$CONFIGDIR/localhost.list"
+
+client myClient
+protocol nfs
+hostname myClient
+listfile $ROOTDIRNFS/hbackup.list
 
 client client
 protocol smb
