@@ -75,14 +75,8 @@ public:
   //
   bool initialised() { return _initialised; }
   void setInitialised() { _initialised = true; }
-  int  setMountPoint(const string& mount_point, bool check = true) {
+  void setMountPoint(const string& mount_point) {
     _mount_point = mount_point;
-    /* Check that mount dir exists, if not create it */
-    if (check && (File::testDir(_mount_point, true) == 2)) {
-      cerr << "Cannot create mount point" << endl;
-      return 2;
-    }
-    return 0;
   }
   string mountPoint() { return _mount_point; }
   int  backup(Database& db, bool config_check = false);

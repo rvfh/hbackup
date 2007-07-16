@@ -1,0 +1,8 @@
+#!/bin/sh
+
+dest="$1"
+
+rm -rf "$dest"
+echo "Unmounted $dest"
+
+exit 0

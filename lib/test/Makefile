@@ -27,10 +27,13 @@ clean:
 	@echo "BUILD	$@"
 	@$(CXX) $(LDFLAGS) -o $@ $^
 
-%.done: %_test %.exp ../../test/test_setup
+%.done: %_test %.exp ../../test/.timestamp
 	@echo "RUN	$<"
 	@../../test/test_setup
-	@./$< > `basename $@ .done`.all 2>&1
+	@PATH=../../test:$(PATH) ./$< > `basename $@ .done`.all 2>&1
 	@diff -q `basename $@ .done`.exp `basename $@ .done`.all
 	@touch $@
 	@rm -f `basename $@ .done`.all
+
+../../test/.timestamp:
+	$(MAKE) -C ../../test

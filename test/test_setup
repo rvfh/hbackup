@@ -1,19 +1,23 @@
 #!/bin/bash
 
 # Dir names
-TESTDBDIR="test_db"
+CONFIGDIR="etc"
 TESTDIR="test"
 TESTDIR2="test2"
-CONFIGDIR="etc"
+TESTDIRCIFS="test_cifs"
+TESTDIRNFS="test_nfs"
+TESTDBDIR="test_db"
 
 # Clean
 if [ -d "$TESTDBDIR" ]; then
   chmod u+w "$TESTDBDIR"
 fi
+rm -rf "$CONFIGDIR"
 rm -rf "$TESTDBDIR"
 rm -rf "$TESTDIR"
 rm -rf "$TESTDIR2"
-rm -rf "$CONFIGDIR"
+rm -rf "$TESTDIRCIFS"
+rm -rf "$TESTDIRNFS"
 
 if [ "$1" == "clean" ]; then
   exit 0
@@ -76,6 +80,13 @@ dd if=/dev/zero of="$TESTDIR2/testfile~" bs=512 count=1024 2> /dev/null
 dd if=/dev/zero of="$TESTDIR2/testfile2" bs=253 count=1024 2> /dev/null
 ln -s "testfile" "$TESTDIR2/testlink"
 
+# CIFS test
+mkdir -p "$TESTDIRCIFS/Backup"
+mkdir -p "$TESTDIRCIFS/Test"
+touch  "$TESTDIRCIFS/Test/File.TXT"
+cat << EOF > "$TESTDIRCIFS/Backup/Backup.LST"
+path "C:\Test" # Do not end it in \" !!!
+EOF
 
 # Config
 mkdir "$CONFIGDIR"
@@ -100,6 +111,7 @@ protocol ssh
 hostname otherClient
 listfile /home/backup/Backup.list
 EOF
+
 cat << EOF > "$CONFIGDIR/localhost.list"
 # Share test
 path "test" # should work
