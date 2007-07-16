@@ -3,6 +3,7 @@
 # From test_setup
 TESTDIRCIFS="$PWD/test_cifs"
 TESTDIRNFS="$PWD/test_nfs"
+ROOTDIRNFS="/home/User"
 
 # Expect -t
 case "$1" in
@@ -15,15 +16,7 @@ case "$1" in
 esac
 shift
 
-# Expect type
-case "$1" in
-"cifs" )
-  src="$TESTDIRCIFS"
-  ;;
-* )
-  exit -EINVAL
-  ;;
-esac
+# Get type
 fstype=$1
 shift
 
@@ -33,7 +26,18 @@ if [ "$1" == "-o" ]; then
   shift
 fi
 
-# Skip source
+# Expect source
+case "$fstype" in
+"cifs" )
+  src="$TESTDIRCIFS"
+  ;;
+"nfs" )
+  src="$TESTDIRNFS`echo $1 | sed "s%.*$ROOTDIRNFS%%"`"
+  ;;
+* )
+  exit -EINVAL
+  ;;
+esac
 shift
 
 # Get destination
