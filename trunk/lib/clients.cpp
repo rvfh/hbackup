@@ -73,6 +73,9 @@ int Client::mountPath(
     }
   }
 
+  /* Check that mount dir exists, if not create it */
+  File::testDir(_mount_point, true);
+
   /* Build mount command */
   if (_protocol == "file") {
     return 0;
@@ -96,6 +99,7 @@ int Client::mountPath(
     cout << " ---> " << command << endl;
   }
   command += " > /dev/null 2>&1";
+
   int result = system(command.c_str());
   if (result != 0) {
     errno = ETIMEDOUT;
@@ -149,7 +153,9 @@ int Client::readListFile(const string& list_path) {
       if (File::decodeLine(buffer, params)) {
         errno = EUCLEAN;
         cerr << "Warning: in list file " << list_path << ", line " << line
-          << " missing single- or double-quote" << endl;
+          << " missing single- or double-quote," << endl;
+        cerr << "make sure double-quoted Windows paths do not end in '\\'."
+          << endl;
       }
       if (params.size() >= 1) {
         if (params[0] == "path") {
@@ -159,7 +165,7 @@ int Client::readListFile(const string& list_path) {
               << " 'path' takes exactly one argument" << endl;
             failed = 1;
           } else {
-          /* New backup path */
+            /* New backup path */
             _paths.push_back(Path(params[1]));
             if (verbosity() > 2) {
               cout << " --> Path: " << _paths.back().path() << endl;

@@ -1,0 +1,48 @@
+#!/bin/sh
+
+# From test_setup
+TESTDIRCIFS="$PWD/test_cifs"
+TESTDIRNFS="$PWD/test_nfs"
+
+# Expect -t
+case "$1" in
+"-t" )
+  echo > /dev/null
+  ;;
+* )
+  exit -EINVAL
+  ;;
+esac
+shift
+
+# Expect type
+case "$1" in
+"cifs" )
+  src="$TESTDIRCIFS"
+  ;;
+* )
+  exit -EINVAL
+  ;;
+esac
+fstype=$1
+shift
+
+# Skip options
+if [ "$1" == "-o" ]; then
+  shift
+  shift
+fi
+
+# Skip source
+shift
+
+# Get destination
+dest="$1"
+shift
+
+# Simulate mounting of share
+rm -rf "$dest"
+ln -sf "$src" "$dest"
+
+# Success
+exit 0

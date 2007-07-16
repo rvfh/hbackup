@@ -54,7 +54,7 @@ int Path::iterate_directory(const string& path, Parser* parser) {
   }
   DIR* directory = opendir(path.c_str());
   if (directory == NULL) {
-    cerr << "paths: cannot open directory: " << path << endl;
+    cerr << "paths: " << strerror(errno) << ": " << path << endl;
     return 2;
   }
   struct dirent *dir_entry;

@@ -64,7 +64,8 @@ int main(void) {
     i->show();
   }
   for (vector<Client>::iterator i = clients.begin(); i != clients.end(); i++) {
-    i->setMountPoint("test_db/mount") || i->backup(db, 0);
+    i->setMountPoint("test_db/mount");
+    i->backup(db, 0);
   }
   clients.clear();
 
@@ -140,7 +141,8 @@ int main(void) {
   }
   db.open();
   for (vector<Client>::iterator i = clients.begin(); i != clients.end(); i++) {
-    i->setMountPoint("test_db/mount") || i->backup(db, 0);
+    i->setMountPoint("test_db/mount");
+    i->backup(db, 0);
   }
   clients.clear();
   db.close();
@@ -155,7 +157,8 @@ int main(void) {
   }
   db.open();
   for (vector<Client>::iterator i = clients.begin(); i != clients.end(); i++) {
-    i->setMountPoint("test_db/mount") || i->backup(db, 0);
+    i->setMountPoint("test_db/mount");
+    i->backup(db, 0);
   }
   clients.clear();
   db.close();
@@ -169,7 +172,8 @@ int main(void) {
   }
   db.open();
   for (vector<Client>::iterator i = clients.begin(); i != clients.end(); i++) {
-    i->setMountPoint("test_db/mount") || i->backup(db, 0);
+    i->setMountPoint("test_db/mount");
+    i->backup(db, 0);
   }
   clients.clear();
   db.close();

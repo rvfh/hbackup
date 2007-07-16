@@ -366,8 +366,8 @@ int main(int argc, char **argv) {
                 continue;
               }
             }
-            if (client->setMountPoint(db_path + "/mount")
-             || client->backup(db, config_check)) {
+            client->setMountPoint(db_path + "/mount");
+            if (client->backup(db, config_check)) {
               failed = 1;
             }
           }

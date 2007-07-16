@@ -217,9 +217,16 @@ int File::open(const char* prepath, const char* req_mode,
     return 1;
   }
 
+  string path;
+  if (prepath[0] == '\0') {
+    path = _path;
+  } else {
+    path = string(prepath) + "/" + _path;
+  }
+
   _dsize  = 0;
   _fempty = true;
-  _fd = fopen64((string(prepath) + "/" + _path).c_str(), mode);
+  _fd = fopen64(path.c_str(), mode);
   if (_fd == NULL)
     return -1;
   if (feof(_fd)) {
