@@ -10,7 +10,8 @@ add_executable (hbackup hbackup.cpp)
 
 # Set compile flags
 set_target_properties(hbackup
-	PROPERTIES COMPILE_FLAGS "-Wall -O2 -ansi -DVERSION_MAJOR=${MAJOR} -DVERSION_MINOR=${MINOR} -DVERSION_BUGFIX=${BUGFIX} -DBUILD=0")
+	PROPERTIES
+		COMPILE_FLAGS "-Wall -O2 -ansi -DVERSION_MAJOR=${MAJOR} -DVERSION_MINOR=${MINOR} -DVERSION_BUGFIX=${BUGFIX} -DBUILD=0")
 
 # add openssl library
 target_link_libraries(hbackup ssl)
