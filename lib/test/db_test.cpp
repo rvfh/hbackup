@@ -64,8 +64,8 @@ int main(void) {
   int               status;
 
   /* Test internal functions */
-  File::zcopy("test/testfile", "test_db/testfile.gz", &size, &zsize, &checksum,
-    &zchecksum, 5);
+  File::zcopy("test1/testfile", "test_db/testfile.gz", &size, &zsize,
+    &checksum, &zchecksum, 5);
   cout << "Copied " << size << " -> " << zsize << " bytes: "
     << checksum << " -> " << zchecksum << endl;
 
@@ -94,7 +94,7 @@ int main(void) {
   path->addFilter("type", "file");
   path->addFilter("path_regex", "\\.o$", true);
   verbose = 3;
-  if (path->createList("test////")) {
+  if (path->createList("test1////")) {
     cout << "file list is empty" << endl;
     return 0;
   }
@@ -116,13 +116,13 @@ int main(void) {
   }
 
   /* Write check */
-  db_data = new DbData(File("test/testfile"));
-  if ((status = db.write("test/testfile", *db_data))) {
+  db_data = new DbData(File("test1/testfile"));
+  if ((status = db.write("test1/testfile", *db_data))) {
     printf("db.write error status %u\n", status);
     db.close();
     return 0;
   }
-  cout << db_data->checksum() << "  test/testfile" << endl;
+  cout << db_data->checksum() << "  test1/testfile" << endl;
 
   /* Read check */
   if ((status = db.read("test_db/blah", db_data->checksum()))) {
@@ -131,7 +131,7 @@ int main(void) {
     return 0;
   }
 
-  if ((status = db.parse("file://host", "/home/user", "test", path->list()))) {
+  if ((status = db.parse("file://host", "/home/user", "test1", path->list()))){
     printf("db.parse error status %u\n", status);
     db.close();
     return 0;
@@ -181,7 +181,7 @@ int main(void) {
     cout << i->line(true) << endl;
   }
 
-  if ((status = db.parse("file://host", "/home/user", "test", path->list()))) {
+  if ((status = db.parse("file://host", "/home/user", "test1", path->list()))){
     printf("db.parse error status %u\n", status);
     db.close();
     return 0;
@@ -376,8 +376,8 @@ int main(void) {
     cout << i->line(true) << endl;
   }
 
-  system("chmod 0775 test/testdir");
-  system("chmod 0775 test/cvs/dirutd/CVS/Entries");
+  system("chmod 0775 test1/testdir");
+  system("chmod 0775 test1/cvs/dirutd/CVS/Entries");
 
   path = new Path("");
   path->addParser("c", "cvs");
@@ -390,7 +390,7 @@ int main(void) {
   path->addFilter("type", "file");
   path->addFilter("path_regex", "\\.o$", true);
   verbose = 3;
-  if (path->createList("test////")) {
+  if (path->createList("test1////")) {
     cout << "file list is empty" << endl;
     return 0;
   }
@@ -401,7 +401,7 @@ int main(void) {
     cout << i->line(true) << endl;
   }
 
-  if ((status = db.parse("file://host", "/home/user", "test", path->list()))) {
+  if ((status = db.parse("file://host", "/home/user", "test1", path->list()))){
     printf("db.parse error status %u\n", status);
     db.close();
     return 0;
@@ -433,9 +433,9 @@ int main(void) {
     cout << i->line(true) << endl;
   }
 
-  remove("test/dir space/file space");
+  remove("test1/dir space/file space");
   verbose = 3;
-  if (path->createList("test////")) {
+  if (path->createList("test1////")) {
     cout << "file list is empty" << endl;
     return 0;
   }
@@ -446,7 +446,7 @@ int main(void) {
     cout << i->line(true) << endl;
   }
 
-  if ((status = db.parse("file://host", "/home/user", "test", path->list()))) {
+  if ((status = db.parse("file://host", "/home/user", "test1", path->list()))){
     printf("db.parse error status %u\n", status);
     db.close();
     return 0;
@@ -504,8 +504,8 @@ int main(void) {
   }
   journal.clear();
 
-  system("chmod 0777 test/testdir");
-  system("chmod 0777 test/cvs/dirutd/CVS/Entries");
+  system("chmod 0777 test1/testdir");
+  system("chmod 0777 test1/cvs/dirutd/CVS/Entries");
 
   path = new Path("");
   path->addParser("c", "cvs");
@@ -518,7 +518,7 @@ int main(void) {
   path->addFilter("type", "file");
   path->addFilter("path_regex", "\\.o$", true);
   verbose = 3;
-  if (path->createList("test////")) {
+  if (path->createList("test1////")) {
     cout << "file list is empty" << endl;
     return 0;
   }
@@ -529,7 +529,7 @@ int main(void) {
     cout << i->line(true) << endl;
   }
 
-  if ((status = db.parse("file://host", "/home/user", "test", path->list()))) {
+  if ((status = db.parse("file://host", "/home/user", "test1", path->list()))){
     printf("db.parse error status %u\n", status);
     db.close();
     return 0;
@@ -561,9 +561,9 @@ int main(void) {
     cout << i->line(true) << endl;
   }
 
-  remove("test/dir space/file space");
+  remove("test1/dir space/file space");
   verbose = 3;
-  if (path->createList("test////")) {
+  if (path->createList("test1////")) {
     cout << "file list is empty" << endl;
     return 0;
   }
@@ -574,7 +574,7 @@ int main(void) {
     cout << i->line(true) << endl;
   }
 
-  if ((status = db.parse("file://host", "/home/user", "test", path->list()))) {
+  if ((status = db.parse("file://host", "/home/user", "test1", path->list()))){
     printf("db.parse error status %u\n", status);
     db.close();
     return 0;
@@ -639,8 +639,8 @@ int main(void) {
     cout << i->line(true) << endl;
   }
 
-  remove("test/testfile");
-  remove("test/cvs/dirutd/fileutd");
+  remove("test1/testfile");
+  remove("test1/cvs/dirutd/fileutd");
 
   path = new Path("");
   path->addParser("c", "cvs");
@@ -653,7 +653,7 @@ int main(void) {
   path->addFilter("type", "file");
   path->addFilter("path_regex", "\\.o$", true);
   verbose = 3;
-  if (path->createList("test////")) {
+  if (path->createList("test1////")) {
     cout << "file list is empty" << endl;
     return 0;
   }
@@ -664,7 +664,7 @@ int main(void) {
     cout << i->line(true) << endl;
   }
 
-  if ((status = db.parse("file://host", "/home/user", "test",
+  if ((status = db.parse("file://host", "/home/user", "test1",
       path->list()))) {
     printf("db.parse error status %u\n", status);
     db.close();
@@ -709,7 +709,7 @@ int main(void) {
   path->addFilter("type", "file");
   path->addFilter("path_regex", "\\.o$", true);
   verbose = 3;
-  if (path->createList("test////")) {
+  if (path->createList("test1////")) {
     cout << "file list is empty" << endl;
     return 0;
   }
@@ -720,7 +720,7 @@ int main(void) {
     cout << i->line(true) << endl;
   }
 
-  if ((status = db.parse("file://host", "/home/user", "test",
+  if ((status = db.parse("file://host", "/home/user", "test1",
       path->list()))) {
     printf("db.parse error status %u\n", status);
     db.close();

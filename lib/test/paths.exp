@@ -76,7 +76,7 @@ testdir	d	0	0	1000	1000	755
 testfile	f	13	1	1000	1000	644	
 testfile~	f	0	1	1000	1000	644	
 as previous with CVS parser
-Directory should be under CVS control: test/cvs/dirbad
+Directory should be under CVS control: test1/cvs/dirbad
 >List 17 file(s):
 cvs	d	0	0	1000	1000	755	
 cvs/CVS	d	0	0	1000	1000	755	
@@ -96,7 +96,7 @@ testdir	d	0	0	1000	1000	755
 testfile	f	13	1	1000	1000	644	
 testfile~	f	0	1	1000	1000	644	
 as previous
-Directory should be under CVS control: test/cvs/dirbad
+Directory should be under CVS control: test1/cvs/dirbad
 >List 17 file(s):
 cvs	d	0	0	1000	1000	755	
 cvs/CVS	d	0	0	1000	1000	755	

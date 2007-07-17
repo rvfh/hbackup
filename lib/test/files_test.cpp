@@ -39,12 +39,12 @@ int main(void) {
   cout << "Tools Test" << endl;
 
   cout << endl << "Test: zcopy" << endl;
-  system("dd if=/dev/zero of=test/zcopy_source bs=1M count=10 status=noxfer 2> /dev/null");
+  system("dd if=/dev/zero of=test1/zcopy_source bs=1M count=10 status=noxfer 2> /dev/null");
   long long size_in  = 125;
   long long size_out = 250;
   string  check_in  = "bart";
   string  check_out = "ernest";
-  File::zcopy("test/zcopy_source", "test/zcopy_dest", &size_in, &size_out,
+  File::zcopy("test1/zcopy_source", "test1/zcopy_dest", &size_in, &size_out,
     &check_in, &check_out, 5);
   cout << "In: " << size_in << " bytes, checksum: " << check_in << endl;
   cout << "Out: " << size_out << " bytes, checksum: " << check_out << endl;
@@ -52,13 +52,13 @@ int main(void) {
   size_out = 250;
   check_in  = "bart";
   check_out = "ernest";
-  File::zcopy("test/zcopy_source", "test/zcopy_dest", &size_in, &size_out,
+  File::zcopy("test1/zcopy_source", "test1/zcopy_dest", &size_in, &size_out,
     &check_in, &check_out, 0);
   cout << "In: " << size_in << " bytes, checksum: " << check_in << endl;
   cout << "Out: " << size_out << " bytes, checksum: " << check_out << endl;
 
   cout << endl << "Test: file read" << endl;
-  readfile = new File(".", "test/zcopy_source");
+  readfile = new File(".", "test1/zcopy_source");
   if (readfile->open(".", "r")) {
     cout << "Error opening file" << endl;
   } else {
@@ -80,9 +80,9 @@ int main(void) {
   delete readfile;
 
   cout << endl << "Test: file copy (read + write)" << endl;
-  system("dd if=/dev/zero of=test/zcopy_source bs=1M count=10 status=noxfer 2> /dev/null");
-  readfile = new File(".", "test/zcopy_source");
-  writefile = new File(".", "test/zcopy_dest");
+  system("dd if=/dev/zero of=test1/zcopy_source bs=1M count=10 status=noxfer 2> /dev/null");
+  readfile = new File(".", "test1/zcopy_source");
+  writefile = new File(".", "test1/zcopy_dest");
   if (readfile->open(".", "r") || writefile->open(".", "w")) {
     cout << "Error opening file" << endl;
   } else {
@@ -116,8 +116,8 @@ int main(void) {
   delete writefile;
 
   cout << endl << "Test: file compress (read + compress write)" << endl;
-  readfile = new File(".", "test/zcopy_source");
-  writefile = new File(".", "test/zcopy_dest");
+  readfile = new File(".", "test1/zcopy_source");
+  writefile = new File(".", "test1/zcopy_dest");
   if (readfile->open(".", "r") || writefile->open(".", "w", 5)) {
     cout << "Error opening file" << endl;
   } else {
@@ -151,8 +151,8 @@ int main(void) {
   delete writefile;
 
   cout << endl << "Test: file uncompress (uncompress read + write)" << endl;
-  readfile = new File(".", "test/zcopy_dest");
-  writefile = new File(".", "test/zcopy_source");
+  readfile = new File(".", "test1/zcopy_dest");
+  writefile = new File(".", "test1/zcopy_source");
   if (readfile->open(".", "r", 1) || writefile->open(".", "w")) {
     cout << "Error opening file" << endl;
   } else {
@@ -187,8 +187,8 @@ int main(void) {
 
   cout << endl << "Test: file compress (read + compress write)"
     << endl;
-  readfile = new File(".", "test/zcopy_source");
-  writefile = new File(".", "test/zcopy_dest");
+  readfile = new File(".", "test1/zcopy_source");
+  writefile = new File(".", "test1/zcopy_dest");
   if (readfile->open(".", "r") || writefile->open(".", "w", 5)) {
     cout << "Error opening file" << endl;
   } else {
@@ -301,7 +301,7 @@ int main(void) {
   cout << "\nmetadata" << endl;
   {
     struct tm *time;
-    File file_data("test/testfile");
+    File file_data("test1/testfile");
     time_t file_time = file_data.mtime();
     time = localtime(&file_time);
     cout << "Line: " << file_data.line(true) << endl;;
@@ -313,7 +313,7 @@ int main(void) {
 
   cout << "\nline constructor" << endl;
   {
-    File file_data("test/testlink");
+    File file_data("test1/testlink");
     cout << "Line: " << file_data.line(true) << endl;;
     char* new_line = new char[80];
     strcpy(new_line, (file_data.line(true) + "\t").c_str());

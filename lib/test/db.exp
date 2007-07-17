@@ -2,7 +2,7 @@ Copied 13 -> 33 bytes: 59ca0efa9f5633cb0371bbc0355478d8 -> f94b4a4f91902f37f53e9
 Copied 33 -> 13 bytes: f94b4a4f91902f37f53e9e38fafbb524 -> 59ca0efa9f5633cb0371bbc0355478d8
 Copied 524288 -> ? bytes 59071590099d21dd439896592338bf95 -> ?
 Copied ? -> 543 bytes ? -> 29178ac07006174c64c06f39b745a30b
-Directory should be under CVS control: test/////cvs/dirbad
+Directory should be under CVS control: test1/////cvs/dirbad
 >List 16 file(s):
 cvs	d	0	0	1000	1000	755	
 cvs/CVS	d	0	0	1000	1000	755	
@@ -22,7 +22,7 @@ testfile	f	13	1	1000	1000	644
 testlink	l	8	1	1000	1000	777	testfile
  --> Database initialized
  --> Database active items part open (contents: 0 files)
-59ca0efa9f5633cb0371bbc0355478d8-0  test/testfile
+59ca0efa9f5633cb0371bbc0355478d8-0  test1/testfile
  --> Files to add: 16 (196 bytes)
  --> Done: 1/16 (0.0%) --> Done: 2/16 (0.0%) --> Done: 3/16 (71.9%) --> Done: 4/16 (71.9%) --> Done: 5/16 (71.9%) --> Done: 6/16 (71.9%) --> Done: 7/16 (93.4%) --> Done: 8/16 (93.4%) --> Done: 9/16 (93.4%) --> Done: 10/16 (93.4%) --> Done: 11/16 (93.4%) --> Done: 12/16 (93.4%) --> Done: 13/16 (93.4%) --> Done: 14/16 (93.4%) --> Done: 15/16 (100.0%) --> Done: 16/16 (100.0%)
  --> Files to remove: 0
@@ -214,7 +214,7 @@ file://host	/home/user/test space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998e
 file://host	/home/user/testdir	d	0	0	1000	1000	755			15	0	
 file://host	/home/user/testfile	f	13	1	1000	1000	644			16	0	
 file://host	/home/user/testlink	l	8	1	1000	1000	777	testfile		17	0	
-Directory should be under CVS control: test/////cvs/dirbad
+Directory should be under CVS control: test1/////cvs/dirbad
 Removed list: 0 element(s):
 >List 16 file(s):
 cvs	d	0	0	1000	1000	755	
@@ -273,7 +273,7 @@ Removed list: 3 element(s):
 file://host	/home/user/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	644		5252f242d27b8c2c9fdbdcbb33545d07-0	8	23	
 file://host	/home/user/testdir	d	0	0	1000	1000	755			15	25	
 file://host	/home/user/testfile	f	13	1	1000	1000	644			16	27	
-Directory should be under CVS control: test/////cvs/dirbad
+Directory should be under CVS control: test1/////cvs/dirbad
 >List 15 file(s):
 cvs	d	0	0	1000	1000	755	
 cvs/CVS	d	0	0	1000	1000	755	
@@ -360,7 +360,7 @@ file://host	/home/user/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	644		5252f242d27b
 file://host	/home/user/dir space/file space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	13	28	
 file://host	/home/user/testdir	d	0	0	1000	1000	755			15	25	
 file://host	/home/user/testfile	f	13	1	1000	1000	644			16	27	
-Directory should be under CVS control: test/////cvs/dirbad
+Directory should be under CVS control: test1/////cvs/dirbad
 >List 15 file(s):
 cvs	d	0	0	1000	1000	755	
 cvs/CVS	d	0	0	1000	1000	755	
@@ -412,7 +412,7 @@ file://host	/home/user/testlink	l	8	1	1000	1000	777	testfile		17	0
 Removed list: 2 element(s):
 file://host	/home/user/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	775		5252f242d27b8c2c9fdbdcbb33545d07-0	22	30	
 file://host	/home/user/testdir	d	0	0	1000	1000	775			24	32	
-Directory should be under CVS control: test/////cvs/dirbad
+Directory should be under CVS control: test1/////cvs/dirbad
 >List 15 file(s):
 cvs	d	0	0	1000	1000	755	
 cvs/CVS	d	0	0	1000	1000	755	
@@ -496,7 +496,7 @@ file://host	/home/user/test space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998e
 file://host	/home/user/testdir	d	0	0	1000	1000	777			31	0	
 file://host	/home/user/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371bbc0355478d8-0	26	0	
 file://host	/home/user/testlink	l	8	1	1000	1000	777	testfile		17	0	
-Directory should be under CVS control: test/////cvs/dirbad
+Directory should be under CVS control: test1/////cvs/dirbad
 Removed list: 0 element(s):
 >List 13 file(s):
 cvs	d	0	0	1000	1000	755	
@@ -541,7 +541,7 @@ file://host	/home/user/testlink	l	8	1	1000	1000	777	testfile		17	0
 Removed list: 2 element(s):
 file://host	/home/user/cvs/dirutd/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	9	33	
 file://host	/home/user/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371bbc0355478d8-0	26	34	
-Directory should be under CVS control: test/////cvs/dirbad
+Directory should be under CVS control: test1/////cvs/dirbad
 >List 13 file(s):
 cvs	d	0	0	1000	1000	755	
 cvs/CVS	d	0	0	1000	1000	755	

@@ -62,13 +62,13 @@ Socket : 0140000
 Unknown: 0000000
 
 metadata
-Line: test/testfile	f	13	1	1000	1000	644	
+Line: test1/testfile	f	13	1	1000	1000	644	
  * type: 0x00008000
  * mtime (local): 2006-10-22  0:00:00
 
 line constructor
-Line: test/testlink	l	8	1	1000	1000	777	testfile
-Line: test/testlink	l	8	1	1000	1000	777	testfile
+Line: test1/testlink	l	8	1	1000	1000	777	testfile
+Line: test1/testlink	l	8	1	1000	1000	777	testfile
 
 readline
 readline(a): 0

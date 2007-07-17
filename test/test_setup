@@ -2,7 +2,7 @@
 
 # Dir names
 CONFIGDIR="etc"
-TESTDIR="test"
+TESTDIR="test1"
 TESTDIR2="test2"
 TESTDIRCIFS="test_cifs"
 TESTDIRNFS="test_nfs"
@@ -128,7 +128,7 @@ EOF
 
 cat << EOF > "$CONFIGDIR/localhost.list"
 # Share test
-path "test" # should work
+path "test1" # should work
 expire 1
 ignore path_start subdir
 ignore type file

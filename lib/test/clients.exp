@@ -136,11 +136,11 @@ Client: testhost
  --> Database active items part open (contents: 2 files)
 Backup client 'testhost' using protocol 'file'
  -> Reading backup list file
- --> Path: test
+ --> Path: test1
  --> Path: test2
-Backup path 'test'
+Backup path 'test1'
  -> Building list of files
-Directory should be under CVS control: test/cvs/dirbad
+Directory should be under CVS control: test1/cvs/dirbad
  -> Parsing list of files (13)
  --> Files to add: 13 (0 bytes)
  --> Done: 1/13 --> Done: 2/13 --> Done: 3/13 --> Done: 4/13 --> Done: 5/13 --> Done: 6/13 --> Done: 7/13 --> Done: 8/13 --> Done: 9/13 --> Done: 10/13 --> Done: 11/13 --> Done: 12/13 --> Done: 13/13
@@ -159,11 +159,11 @@ Client: testhost
  --> Database active items part open (contents: 20 files)
 Backup client 'testhost' using protocol 'file'
  -> Reading backup list file
- --> Path: test
+ --> Path: test1
  --> Path: test2
-Backup path 'test'
+Backup path 'test1'
  -> Building list of files
-Directory should be under CVS control: test/cvs/dirbad
+Directory should be under CVS control: test1/cvs/dirbad
  -> Parsing list of files (13)
  --> Files to add: 0
  --> Files to remove: 0
