@@ -3,6 +3,11 @@
 # and to the root binary directory of the project as ${HBACKUP_BINARY_DIR}.
 project(HBACKUP)
 
+# Version numbers
+set(MAJOR 0)
+set(MINOR 2)
+set(BUGFIX 0)
+
 # Recurse into the "lib" and "cli" subdirectories.
 add_subdirectory(lib)
 add_subdirectory(cli)

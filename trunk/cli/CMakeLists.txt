@@ -1,7 +1,3 @@
-set(MAJOR 0)
-set(MINOR 1)
-set(BUGFIX 0)
-
 # Make sure the compiler can find include files from our library.
 include_directories (${HBACKUP_SOURCE_DIR}/lib)
 
@@ -23,5 +19,8 @@ target_link_libraries(hbackup ssl)
 target_link_libraries(hbackup z)
 
 # Link the executable to the Hello library.
-target_link_libraries (hbackup hbackup-static)
+target_link_libraries (hbackup hbackup-lib)
 
+# Install in $PREFIX/bin
+install(TARGETS hbackup
+	RUNTIME DESTINATION bin)
