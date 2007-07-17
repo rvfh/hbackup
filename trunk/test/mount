@@ -21,10 +21,8 @@ fstype=$1
 shift
 
 # Skip options
-if [ "$1" == "-o" ]; then
-  shift
-  shift
-fi
+shift
+shift
 
 # Expect source
 case "$fstype" in
