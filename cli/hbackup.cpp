@@ -37,7 +37,6 @@ using namespace std;
 #include "cvs_parser.h"
 #include "paths.h"
 #include "clients.h"
-#include "version.h"
 
 using namespace hbackup;
 
