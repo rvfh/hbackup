@@ -12,7 +12,7 @@ clean:
 	@../../test/test_setup clean
 
 # Rules
-hbackup.done: ../hbackup hbackup.exp ../../test/.timestamp
+hbackup.done: ../hbackup hbackup.exp
 	@echo "RUN	$<"
 	@../../test/test_setup
 	@rm -f hbackup.all
@@ -24,6 +24,3 @@ hbackup.done: ../hbackup hbackup.exp ../../test/.timestamp
 	@diff -q `basename $@ .done`.exp `basename $@ .done`.all
 	@touch $@
 	@rm -f `basename $@ .done`.all
-
-../../test/.timestamp:
-	$(MAKE) -C ../../test
