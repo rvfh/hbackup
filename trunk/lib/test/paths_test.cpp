@@ -45,7 +45,7 @@ int terminating(void) {
 int main(void) {
   Path* path = new Path("");
 
-  if (! path->createList("test")) {
+  if (! path->createList("test1")) {
     cout << ">List " << path->list()->size() << " file(s):\n";
     for (list<File>::iterator i = path->list()->begin();
      i != path->list()->end(); i++) {
@@ -58,7 +58,7 @@ int main(void) {
    || path->addFilter("path", "subdir", true)) {
     cout << "Failed to add filter" << endl;
   }
-  if (! path->createList("test")) {
+  if (! path->createList("test1")) {
     cout << ">List " << path->list()->size() << " file(s):\n";
     for (list<File>::iterator i = path->list()->begin();
      i != path->list()->end(); i++) {
@@ -71,7 +71,7 @@ int main(void) {
    || path->addFilter("path_start", "testlink", true)) {
     cout << "Failed to add filter" << endl;
   }
-  if (! path->createList("test")) {
+  if (! path->createList("test1")) {
     cout << ">List " << path->list()->size() << " file(s):\n";
     for (list<File>::iterator i = path->list()->begin();
      i != path->list()->end(); i++) {
@@ -83,7 +83,7 @@ int main(void) {
   if (path->addParser("controlled", "cvs")) {
     cout << "Failed to add parser" << endl;
   }
-  if (! path->createList("test")) {
+  if (! path->createList("test1")) {
     cout << ">List " << path->list()->size() << " file(s):\n";
     for (list<File>::iterator i = path->list()->begin();
      i != path->list()->end(); i++) {
@@ -92,7 +92,7 @@ int main(void) {
   }
 
   cout << "as previous" << endl;
-  if (! path->createList("test")) {
+  if (! path->createList("test1")) {
     cout << ">List " << path->list()->size() << " file(s):\n";
     for (list<File>::iterator i = path->list()->begin();
      i != path->list()->end(); i++) {

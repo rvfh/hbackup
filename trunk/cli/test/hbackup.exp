@@ -8,11 +8,11 @@
  --> Database active items part open (contents: 0 files)
 Backup client 'myhost' using protocol 'file'
  -> Reading backup list file
- --> Path: test
+ --> Path: test1
  --> Path: test2
-Backup path 'test'
+Backup path 'test1'
  -> Building list of files
-Directory should be under CVS control: test/cvs/dirbad
+Directory should be under CVS control: test1/cvs/dirbad
  -> Parsing list of files (13)
  --> Files to add: 13 (0 bytes)
  --> Done: 1/13 --> Done: 2/13 --> Done: 3/13 --> Done: 4/13 --> Done: 5/13 --> Done: 6/13 --> Done: 7/13 --> Done: 8/13 --> Done: 9/13 --> Done: 10/13 --> Done: 11/13 --> Done: 12/13 --> Done: 13/13
@@ -47,7 +47,7 @@ Unmounted test_db/mount
 Protocol not supported: ssh
  --> Database active items part closed (contents: 20 files)
  --> Database removed items part open (contents: 0 files)
-Expire path 'test'
+Expire path 'test1'
  -> Removing expired records
  --> Expired data: 0
  -> Closing database
@@ -61,11 +61,11 @@ Expire path 'test'
  --> Database active items part open (contents: 20 files)
 Backup client 'myhost' using protocol 'file'
  -> Reading backup list file
- --> Path: test
+ --> Path: test1
  --> Path: test2
-Backup path 'test'
+Backup path 'test1'
  -> Building list of files
-Directory should be under CVS control: test/cvs/dirbad
+Directory should be under CVS control: test1/cvs/dirbad
  -> Parsing list of files (13)
  --> Files to add: 0
  --> Files to remove: 0
@@ -85,7 +85,7 @@ Backup path 'C:/Test'
 Unmounted test_db/mount
  --> Database active items part closed (contents: 20 files)
  --> Database removed items part open (contents: 0 files)
-Expire path 'test'
+Expire path 'test1'
  -> Removing expired records
  --> Expired data: 0
  -> Closing database
