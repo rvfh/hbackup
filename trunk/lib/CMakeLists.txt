@@ -1,3 +1,6 @@
+# Include test subdir
+add_subdirectory(test)
+
 # Set source files
 set(SRC clients.cpp db.cpp dblist.cpp files.cpp filters.cpp paths.cpp
 	cvs_parser.cpp)

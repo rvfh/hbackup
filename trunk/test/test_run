@@ -1,0 +1,32 @@
+target="$1"
+expected="$target".exp
+output="$target".all
+success="$target".done
+executable="$target"_test
+
+export PATH=../../test:$PATH
+
+# Setup
+if ! test_setup; then
+	echo "Cannot setup test environment"
+	mv test test1	# RM
+	exit 1
+fi
+
+# Run
+if ! ./$executable > $output 2>&1; then
+	mv test test1	# RM
+	exit 2
+fi
+
+# Check
+if ! diff -q $expected $output; then
+	mv test test1	# RM
+	exit 3
+fi
+
+# Successs
+touch $success
+rm -f $output
+mv test test1	# RM
+exit 0
