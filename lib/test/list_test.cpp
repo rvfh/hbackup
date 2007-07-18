@@ -26,6 +26,14 @@ using namespace std;
 
 using namespace hbackup;
 
+int verbosity(void) {
+  return 0;
+}
+
+int terminating(void) {
+  return 0;
+}
+
 int main() {
   SortedList<string> sorted_list;
   list<string>::iterator i;

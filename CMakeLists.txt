@@ -3,6 +3,9 @@
 # and to the root binary directory of the project as ${HBACKUP_BINARY_DIR}.
 project(HBACKUP)
 
+# Enable testing
+enable_testing()
+
 # Version numbers
 set(MAJOR 0)
 set(MINOR 2)

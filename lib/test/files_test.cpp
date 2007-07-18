@@ -27,6 +27,10 @@ using namespace std;
 
 using namespace hbackup;
 
+int verbosity(void) {
+  return 0;
+}
+
 int terminating(void) {
   return 0;
 }
