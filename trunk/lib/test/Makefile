@@ -29,8 +29,4 @@ clean:
 
 %.done: %_test %.exp
 	@echo "RUN	$<"
-	@../../test/test_setup
-	@PATH=../../test:$(PATH) ./$< > `basename $@ .done`.all 2>&1
-	@diff -q `basename $@ .done`.exp `basename $@ .done`.all
-	@touch $@
-	@rm -f `basename $@ .done`.all
+	@../../test/test_run `basename $@ .done`
