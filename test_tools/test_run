@@ -4,7 +4,7 @@ output="$target".all
 success="$target".done
 executable="$target"_test
 
-export PATH=../../test:$PATH
+export PATH=../../test_tools:$PATH
 
 # Clean previous success and output
 rm -f $success $output
