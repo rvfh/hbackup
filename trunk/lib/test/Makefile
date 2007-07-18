@@ -16,7 +16,7 @@ test:	list.done \
 
 clean:
 	@rm -f *.[oa] *~ *.out *.err *.all *.done *_test zcop*
-	@../../test/test_setup clean
+	@../../test_tools/test_setup clean
 
 # Rules
 %_test.o: %_test.cpp
@@ -29,4 +29,4 @@ clean:
 
 %.done: %_test %.exp
 	@echo "RUN	$<"
-	@../../test/test_run `basename $@ .done`
+	@../../test_tools/test_run `basename $@ .done`

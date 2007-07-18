@@ -9,18 +9,18 @@ test:	hbackup.done
 
 clean:
 	@rm -f *.[oa] *~ *.out *.err *.all *.done *_test zcop*
-	@../../test/test_setup clean
+	@../../test_tools/test_setup clean
 
 # Rules
 hbackup.done: ../hbackup hbackup.exp
 	@echo "RUN	$<"
-	@../../test/test_setup
+	@../../test_tools/test_setup
 	@rm -f hbackup.all
-	@PATH=../../test:$(PATH) ./$< -vvv -c etc/hbackup.conf >> hbackup.all 2>&1 || echo -n
-	@PATH=../../test:$(PATH) ./$< -vvv -c etc/hbackup.conf -C myhost -C client >> hbackup.all 2>&1 \
+	@PATH=../../test_tools:$(PATH) ./$< -vvv -c etc/hbackup.conf >> hbackup.all 2>&1 || echo -n
+	@PATH=../../test_tools:$(PATH) ./$< -vvv -c etc/hbackup.conf -C myhost -C client >> hbackup.all 2>&1 \
 	|| echo -n
-	@PATH=../../test:$(PATH) ./$< -vvv -c etc/hbackup.conf -s >> hbackup.all 2>&1 || echo -n
-	@PATH=../../test:$(PATH) ./$< -vvv -c etc/hbackup.conf -t >> hbackup.all 2>&1 || echo -n
+	@PATH=../../test_tools:$(PATH) ./$< -vvv -c etc/hbackup.conf -s >> hbackup.all 2>&1 || echo -n
+	@PATH=../../test_tools:$(PATH) ./$< -vvv -c etc/hbackup.conf -t >> hbackup.all 2>&1 || echo -n
 	@diff -q `basename $@ .done`.exp `basename $@ .done`.all
 	@touch $@
 	@rm -f `basename $@ .done`.all
