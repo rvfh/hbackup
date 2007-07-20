@@ -26,6 +26,7 @@
 
 using namespace std;
 
+#include "list.h"
 #include "files.h"
 #include "filters.h"
 #include "parsers.h"
@@ -89,7 +90,7 @@ int Path::iterate_directory(const string& path, Parser* parser) {
         continue;
       }
     }
-    _list.push_back(file_data);
+    _list.add(file_data);
   }
   closedir(directory);
   if (terminating()) {
@@ -245,6 +246,5 @@ int Path::createList(const string& backup_path) {
     _list.clear();
     return 1;
   }
-  _list.sort();
   return 0;
 }
