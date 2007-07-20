@@ -19,6 +19,10 @@
 #ifndef PATHS_H
 #define PATHS_H
 
+#ifndef LIST_H
+#error You must include files.h before paths.h
+#endif
+
 #ifndef FILES_H
 #error You must include files.h before paths.h
 #endif
@@ -34,12 +38,12 @@
 namespace hbackup {
 
 class Path {
-  string      _path;
-  int         _expiration;
-  Parsers     _parsers;
-  Filters     _filters;
-  list<File>  _list;
-  int         _mount_path_length;
+  string            _path;
+  int               _expiration;
+  Parsers           _parsers;
+  Filters           _filters;
+  SortedList<File>  _list;
+  int               _mount_path_length;
   int iterate_directory(
     const string&   path,
     Parser*         parser);
