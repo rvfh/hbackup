@@ -35,6 +35,51 @@ int terminating(void) {
   return 0;
 }
 
+void showFile(const GenericFile &g) {
+  switch (g.type()) {
+  case 'f': {
+    File2 *f = new File2(g);
+    cout << "Name: " << f->name()
+      << ", type = " << f->type()
+      << ", mtime = " << f->mtime()
+      << ", size = " << f->size()
+      << ", uid = " << (int)(f->uid() != 0)
+      << ", gid = " << (int)(f->gid() != 0)
+      << ", mode = " << f->mode()
+      << endl;
+    delete f; }
+    break;
+  case 'l': {
+    Link *l = new Link(g, g.path());
+    cout << "Name: " << l->name()
+      << ", type = " << l->type()
+      << ", mtime = " << l->mtime()
+      << ", size = " << l->size()
+      << ", uid = " << (int)(l->uid() != 0)
+      << ", gid = " << (int)(l->gid() != 0)
+      << ", mode = " << l->mode()
+      << ", link = " << l->link()
+      << endl;
+    delete l; }
+    break;
+  case 'd': {
+    Directory *d = new Directory(g, g.path());
+    cout << "Name: " << d->name()
+      << ", type = " << d->type()
+      << ", mtime = " << d->mtime()
+      << ", size = " << d->size()
+      << ", uid = " << (int)(d->uid() != 0)
+      << ", gid = " << (int)(d->gid() != 0)
+      << ", mode = " << d->mode()
+      << endl;
+    d->showList();
+    delete d; }
+    break;
+  default:
+    cout << "Unknown file type: " << g.type() << endl;
+  }
+}
+
 int main(void) {
   string  line;
   File*   readfile;
@@ -457,6 +502,21 @@ int main(void) {
   }
   cout << endl;
   delete params;
+
+  // New age preparation test
+  GenericFile *g;
+  g = new GenericFile("test1/testfile");
+  showFile(*g);
+  delete g;
+  g = new GenericFile("test1/testlink");
+  showFile(*g);
+  delete g;
+  g = new GenericFile("test1/testdir");
+  showFile(*g);
+  delete g;
+  g = new GenericFile("test1/subdir");
+  showFile(*g);
+  delete g;
 
   return 0;
 }

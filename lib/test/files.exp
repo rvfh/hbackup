@@ -134,3 +134,10 @@ ef
 g\h "ij'	kl
 m\n 'op"	qr
 
+Name: testfile, type = f, mtime = 1161486000, size = 13, uid = 1, gid = 1, mode = 420
+Name: testlink, type = l, mtime = 0, size = 8, uid = 1, gid = 1, mode = 511, link = testfile
+Name: testdir, type = d, mtime = 0, size = 0, uid = 1, gid = 1, mode = 493
+Name: subdir, type = d, mtime = 0, size = 0, uid = 1, gid = 1, mode = 493
+ -> name: testfile
+ -> name: testfile1
+ -> name: testfile2
