@@ -31,6 +31,7 @@ using namespace std;
 namespace hbackup {
 
 class GenericFile {
+  char*     _path;      // file path
 protected:
   char*     _name;      // file name
   char      _type;      // file type (0 if metadata not available)
@@ -40,17 +41,30 @@ protected:
   gid_t     _gid;       // group ID of owner
   mode_t    _mode;      // permissions
 public:
+  // Default constructor
+  GenericFile(const GenericFile& g) :
+        _path(NULL),
+        _name(NULL),
+        _type(g._type),
+        _mtime(g._mtime),
+        _size(g._size),
+        _uid(g._uid),
+        _gid(g._gid),
+        _mode(g._mode) {
+    asprintf(&_name, "%s", g._name);
+  }
   // Constructor for path in the VFS
-  GenericFile(const char *path);
+  GenericFile(const char *path, const char* name = "");
   // Constructor for given file metadata
   GenericFile(
-    const char* name,
-    char        type,
-    time_t      mtime,
-    long long   size,
-    uid_t       uid,
-    gid_t       gid,
-    mode_t      mode) :
+      const char* name,
+      char        type,
+      time_t      mtime,
+      long long   size,
+      uid_t       uid,
+      gid_t       gid,
+      mode_t      mode) :
+        _path(NULL),
         _name(NULL),
         _type(type),
         _mtime(mtime),
@@ -58,25 +72,94 @@ public:
         _uid(uid),
         _gid(gid),
         _mode(mode) {
-      asprintf(&_name, "%s", name);
+    asprintf(&_name, "%s", name);
   }
-  ~GenericFile()      {
+  ~GenericFile() {
+    free(_path);
     free(_name);
   }
+  bool        isValid() const { return _type != '?'; }
   // Data read access
-  const char* name()  { return _name;  }
-  char        type()  { return _type;  }
-  time_t      mtime() { return _mtime; }
-  long long   size()  { return _size;  }
-  uid_t       uid()   { return _uid;   }
-  gid_t       gid()   { return _gid;   }
-  mode_t      mode()  { return _mode;  }
+  const char* path()    const { return _path;  }
+  const char* name()    const { return _name;  }
+  char        type()    const { return _type;  }
+  time_t      mtime()   const { return _mtime; }
+  long long   size()    const { return _size;  }
+  uid_t       uid()     const { return _uid;   }
+  gid_t       gid()     const { return _gid;   }
+  mode_t      mode()    const { return _mode;  }
+};
+
+class GenericFileListElement {
+  GenericFile*            _payload;
+  GenericFileListElement* _next;
+public:
+  GenericFileListElement(GenericFile* payload) :
+    _payload(payload),
+    _next(NULL) {}
+  ~GenericFileListElement() {
+    delete _payload;
+    delete _next;
+  }
+  void insert(GenericFileListElement** first);
+  GenericFile*            payload() { return _payload; }
+  GenericFileListElement* next()    { return _next; }
 };
 
 class File2 : public GenericFile {
+  char*     _checksum;
+public:
+  // Constructor for path in the VFS
+  File2(const GenericFile& g) :
+      GenericFile(g),
+      _checksum(NULL) {}
+  // Constructor for given file metadata
+  File2(
+    const char* name,
+    char        type,
+    time_t      mtime,
+    long long   size,
+    uid_t       uid,
+    gid_t       gid,
+    mode_t      mode,
+    const char* checksum) :
+        GenericFile(name, type, mtime, size, uid, gid, mode),
+        _checksum(NULL) {
+      asprintf(&_checksum, "%s", checksum);
+  }
+  ~File2() {
+    free(_checksum);
+  }
+  // Data read access
+  const char* checksum()  const { return _checksum;  }
 };
 
 class Directory : public GenericFile {
+  GenericFileListElement* _first_entry;
+  int entries;
+  int read(const char* path);
+public:
+  // Constructor for path in the VFS
+  Directory(const GenericFile& g, const char* path) :
+      GenericFile(g),
+      _first_entry(NULL),
+      entries(0) {
+    _size  = 0;
+    _mtime = 0;
+    // Create list of GenericFiles contained in directory
+    if (read(path)) entries = -1;
+  }
+  ~Directory() {
+    delete _first_entry;
+  }
+  // FIXME Temporary
+  void showList() {
+    GenericFileListElement* entry = _first_entry;
+    while (entry != NULL) {
+      cout << " -> name: " << entry->payload()->name() << endl;
+      entry = entry->next();
+    }
+  }
 };
 
 class CharDev : public GenericFile {
@@ -92,7 +175,22 @@ class Link : public GenericFile {
   char*     _link;
 public:
   // Constructor for path in the VFS
-  Link(const char *path);
+  Link(const GenericFile& g, const char* path) :
+      GenericFile(g),
+      _link(NULL) {
+    _mtime = 0;
+    char* link = (char*) malloc(FILENAME_MAX + 1);
+    int   size = readlink(path, link, FILENAME_MAX);
+
+    if (size < 0) {
+      _type = '?';
+      free(link);
+    } else {
+      _link = (char*) malloc(size + 1);
+      strncpy(_link, link, size);
+      _link[size] = '\0';
+    }
+  }
   // Constructor for given file metadata
   Link(
     const char* name,
@@ -111,7 +209,7 @@ public:
     free(_link);
   }
   // Data read access
-  const char* link()  { return _link;  }
+  const char* link()  const { return _link;  }
 };
 
 class Socket : public GenericFile {

@@ -35,6 +35,81 @@ using namespace std;
 
 using namespace hbackup;
 
+GenericFile::GenericFile(const char* path, const char* name) {
+  if (name[0] == '\0') {
+    const char* name = strrchr(path, '/');
+
+    _path = NULL;
+    asprintf(&_path, "%s", path);
+
+    _name = NULL;
+    if (name != NULL) {
+      asprintf(&_name, "%s", ++name);
+    } else {
+      asprintf(&_name, "%s", path);
+    }
+  } else {
+    asprintf(&_path, "%s/%s", path, name);
+    asprintf(&_name, "%s", name);
+  }
+
+  struct stat64 metadata;
+  if (lstat64(path, &metadata)) {
+    // errno set by lstat
+    _type = '?';
+  } else {
+    if (S_ISREG(metadata.st_mode))       _type =  'f';
+    else if (S_ISDIR(metadata.st_mode))  _type =  'd';
+    else if (S_ISCHR(metadata.st_mode))  _type =  'c';
+    else if (S_ISBLK(metadata.st_mode))  _type =  'b';
+    else if (S_ISFIFO(metadata.st_mode)) _type =  'p';
+    else if (S_ISLNK(metadata.st_mode))  _type =  'l';
+    else if (S_ISSOCK(metadata.st_mode)) _type =  's';
+    else                                 _type =  '?';
+    /* Fill in file information */
+    _size  = metadata.st_size;
+    _mtime = metadata.st_mtime;
+    _uid   = metadata.st_uid;
+    _gid   = metadata.st_gid;
+    _mode  = metadata.st_mode & ~S_IFMT;
+  }
+}
+
+void GenericFileListElement::insert(GenericFileListElement** first) {
+  GenericFileListElement* next     = *first;
+  GenericFileListElement* previous = NULL;
+  while ((next != NULL)
+      && (strcmp(next->_payload->name(), this->_payload->name()) < 0)) {
+    previous = next;
+    next = next->_next;
+  }
+  _next = next;
+  if (previous == NULL) {
+    *first = this;
+  } else {
+    previous->_next = this;
+  }
+}
+
+int Directory::read(const char* path) {
+  DIR* directory = opendir(path);
+  if (directory == NULL) return -1;
+
+  struct dirent *dir_entry;
+  while (((dir_entry = readdir(directory)) != NULL) && ! terminating()) {
+    /* Ignore . and .. */
+    if (!strcmp(dir_entry->d_name, ".") || !strcmp(dir_entry->d_name, "..")){
+      continue;
+    }
+    GenericFile *g = new GenericFile(path, dir_entry->d_name);
+    GenericFileListElement* e = new GenericFileListElement(g);
+    e->insert(&_first_entry);
+  }
+
+  closedir(directory);
+  return 0;
+}
+
 File::File(const string& access_path, const string& path) {
   string full_path;
   if (path.empty()) {
