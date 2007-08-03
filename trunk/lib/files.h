@@ -30,6 +30,93 @@ using namespace std;
 
 namespace hbackup {
 
+class GenericFile {
+protected:
+  char*     _name;      // file name
+  char      _type;      // file type (0 if metadata not available)
+  time_t    _mtime;     // time of last modification
+  long long _size;      // on-disk size, in bytes
+  uid_t     _uid;       // user ID of owner
+  gid_t     _gid;       // group ID of owner
+  mode_t    _mode;      // permissions
+public:
+  // Constructor for path in the VFS
+  GenericFile(const char *path);
+  // Constructor for given file metadata
+  GenericFile(
+    const char* name,
+    char        type,
+    time_t      mtime,
+    long long   size,
+    uid_t       uid,
+    gid_t       gid,
+    mode_t      mode) :
+        _name(NULL),
+        _type(type),
+        _mtime(mtime),
+        _size(size),
+        _uid(uid),
+        _gid(gid),
+        _mode(mode) {
+      asprintf(&_name, "%s", name);
+  }
+  ~GenericFile()      {
+    free(_name);
+  }
+  // Data read access
+  const char* name()  { return _name;  }
+  char        type()  { return _type;  }
+  time_t      mtime() { return _mtime; }
+  long long   size()  { return _size;  }
+  uid_t       uid()   { return _uid;   }
+  gid_t       gid()   { return _gid;   }
+  mode_t      mode()  { return _mode;  }
+};
+
+class File2 : public GenericFile {
+};
+
+class Directory : public GenericFile {
+};
+
+class CharDev : public GenericFile {
+};
+
+class BlockDev : public GenericFile {
+};
+
+class Pipe : public GenericFile {
+};
+
+class Link : public GenericFile {
+  char*     _link;
+public:
+  // Constructor for path in the VFS
+  Link(const char *path);
+  // Constructor for given file metadata
+  Link(
+    const char* name,
+    char        type,
+    time_t      mtime,
+    long long   size,
+    uid_t       uid,
+    gid_t       gid,
+    mode_t      mode,
+    const char* link) :
+        GenericFile(name, type, mtime, size, uid, gid, mode),
+        _link(NULL) {
+      asprintf(&_link, "%s", link);
+  }
+  ~Link() {
+    free(_link);
+  }
+  // Data read access
+  const char* link()  { return _link;  }
+};
+
+class Socket : public GenericFile {
+};
+
 class File {
   string          _path;      // file path
   string          _checksum;  // file checksum
