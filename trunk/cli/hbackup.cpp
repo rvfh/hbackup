@@ -230,8 +230,8 @@ int main(int argc, char **argv) {
     failed = 2;
   } else {
     /* Read configuration file */
-    vector<Client> clients;
-    vector<Client>::iterator client = clients.end();
+    list<Client> clients;
+    list<Client>::iterator client = clients.end();
     string  buffer;
     int     line    = 0;
 

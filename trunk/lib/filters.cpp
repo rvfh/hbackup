@@ -17,7 +17,6 @@
 */
 
 #include <iostream>
-#include <vector>
 #include <stdarg.h>
 #include <regex.h>
 #include <sys/stat.h>

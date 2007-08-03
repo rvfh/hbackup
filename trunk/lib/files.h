@@ -20,6 +20,10 @@
 #define FILES_H
 
 #include <fstream>
+#include <vector>
+
+using namespace std;
+
 #include <openssl/md5.h>
 #include <openssl/evp.h>
 #include <zlib.h>

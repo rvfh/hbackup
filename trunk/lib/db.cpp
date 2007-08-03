@@ -37,8 +37,6 @@
 #include <iostream>
 #include <sstream>
 #include <string>
-#include <vector>
-#include <list>
 #include <sys/stat.h>
 #include <signal.h>
 #include <time.h>
