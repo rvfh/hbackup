@@ -3,7 +3,7 @@
 target="$1"
 expected="$target".exp
 output="$target".all
-executable="$target"_test
+
 
 # Set path to access test scripts in priority
 export PATH=../../test_tools:$PATH
@@ -17,10 +17,17 @@ if ! test_setup; then
 	exit 1
 fi
 
-# Run
-if ! ./$executable > $output 2>&1; then
-	exit 2
-fi
+# Typical backup
+../hbackup -vvv -c etc/hbackup.conf >> $output 2>&1 #|| exit 1
+
+# Specify clients
+../hbackup -vvv -c etc/hbackup.conf -C myhost -C client >> $output 2>&1 #|| exit 1
+
+# Scan DB
+../hbackup -vvv -c etc/hbackup.conf -s >> $output 2>&1 #|| exit 1
+
+# Check DB
+../hbackup -vvv -c etc/hbackup.conf -t >> $output 2>&1 #|| exit 1
 
 # Check
 if ! diff -q $expected $output; then

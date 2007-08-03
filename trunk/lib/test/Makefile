@@ -29,4 +29,4 @@ clean:
 
 %.done: %_test %.exp
 	@echo "RUN	$<"
-	@../../test_tools/test_run `basename $@ .done`
+	@../../test_tools/test_run `basename $@ .done` && touch $@
