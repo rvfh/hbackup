@@ -8,7 +8,7 @@ all: test
 test:	hbackup.done
 
 clean:
-	@rm -f *.[oa] *~ *.out *.err *.all *.done *_test zcop*
+	@rm -f *.[oa] *~ *.all *.done 
 	@../../test_tools/test_setup clean
 
 # Rules
