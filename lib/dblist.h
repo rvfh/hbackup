@@ -19,13 +19,8 @@
 #ifndef DBLIST_H
 #define DBLIST_H
 
-#ifndef DBDATA_H
-#error You must include dbdata.h before db.h
-#endif
-
-#ifndef LIST_H
-#error You must include list.h before db.h
-#endif
+#include "dbdata.h"
+#include "list.h"
 
 namespace hbackup {
 

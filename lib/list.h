@@ -19,6 +19,8 @@
 #ifndef LIST_H
 #define LIST_H
 
+#include <list>
+
 namespace hbackup {
 
 template<class T>

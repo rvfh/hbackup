@@ -19,9 +19,8 @@
 #ifndef CVS_PARSER_H
 #define CVS_PARSER_H
 
-#ifndef PARSERS_H
-#error You must include parsers.h before cvs_parser.h
-#endif
+#include "files.h"
+#include "parsers.h"
 
 namespace hbackup {
 

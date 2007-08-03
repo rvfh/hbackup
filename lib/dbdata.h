@@ -19,9 +19,7 @@
 #ifndef DBDATA_H
 #define DBDATA_H
 
-#ifndef FILES_H
-#error You must include files.h before dbdata.h
-#endif
+#include "files.h"
 
 namespace hbackup {
 

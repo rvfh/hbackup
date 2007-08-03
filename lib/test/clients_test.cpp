@@ -45,14 +45,14 @@ int terminating(void) {
 }
 
 int main(void) {
-  vector<Client> clients;
-  vector<Client>::iterator client = clients.end();
+  list<Client> clients;
+  list<Client>::iterator client = clients.end();
   Database  db("test_db");
 
   remove("test_db/list");
 
   printf(">List %u client(s):\n", clients.size());
-  for (vector<Client>::iterator i = clients.begin(); i != clients.end(); i++) {
+  for (list<Client>::iterator i = clients.begin(); i != clients.end(); i++) {
     i->show();
   }
   client = clients.insert(clients.end(), Client("localhost"));
@@ -60,17 +60,17 @@ int main(void) {
   client->setHostOrIp("localhost");
   client->setListfile("etc/doesnotexist");
   printf(">List %u client(s):\n", clients.size());
-  for (vector<Client>::iterator i = clients.begin(); i != clients.end(); i++) {
+  for (list<Client>::iterator i = clients.begin(); i != clients.end(); i++) {
     i->show();
   }
-  for (vector<Client>::iterator i = clients.begin(); i != clients.end(); i++) {
+  for (list<Client>::iterator i = clients.begin(); i != clients.end(); i++) {
     i->setMountPoint("test_db/mount");
     i->backup(db, 0);
   }
   clients.clear();
 
   printf(">List %u client(s):\n", clients.size());
-  for (vector<Client>::iterator i = clients.begin(); i != clients.end(); i++) {
+  for (list<Client>::iterator i = clients.begin(); i != clients.end(); i++) {
     i->show();
   }
   client = clients.insert(clients.end(), Client("myClient"));
@@ -78,7 +78,7 @@ int main(void) {
   client->setHostOrIp("myClient");
   client->setListfile("/home/User/hbackup.list");
   printf(">List %u client(s):\n", clients.size());
-  for (vector<Client>::iterator i = clients.begin(); i != clients.end(); i++) {
+  for (list<Client>::iterator i = clients.begin(); i != clients.end(); i++) {
     i->show();
   }
   client = clients.insert(clients.end(), Client("myClient2"));
@@ -88,7 +88,7 @@ int main(void) {
   client->addOption("password", "flesyM");
   client->setListfile("C:\\Backup\\Backup.LST");
   printf(">List %u client(s):\n", clients.size());
-  for (vector<Client>::iterator i = clients.begin(); i != clients.end(); i++) {
+  for (list<Client>::iterator i = clients.begin(); i != clients.end(); i++) {
     i->show();
   }
   client = clients.insert(clients.end(), Client("otherClient"));
@@ -96,7 +96,7 @@ int main(void) {
   client->setHostOrIp("otherClient");
   client->setListfile("c:/home/backup/Backup.list");
   printf(">List %u client(s):\n", clients.size());
-  for (vector<Client>::iterator i = clients.begin(); i != clients.end(); i++) {
+  for (list<Client>::iterator i = clients.begin(); i != clients.end(); i++) {
     i->show();
   }
   client = clients.insert(clients.end(), Client("Client"));
@@ -106,7 +106,7 @@ int main(void) {
   client->addOption("iocharset", "utf8");
   client->setListfile("c:/home/BlaH/Backup.list");
   printf(">List %u client(s):\n", clients.size());
-  for (vector<Client>::iterator i = clients.begin(); i != clients.end(); i++) {
+  for (list<Client>::iterator i = clients.begin(); i != clients.end(); i++) {
     i->show();
   }
   client = clients.insert(clients.end(), Client("Client2"));
@@ -117,7 +117,7 @@ int main(void) {
   client->addOption("password", "");
   client->setListfile("c:/home/BlaH/Backup.list");
   printf(">List %u client(s):\n", clients.size());
-  for (vector<Client>::iterator i = clients.begin(); i != clients.end(); i++) {
+  for (list<Client>::iterator i = clients.begin(); i != clients.end(); i++) {
     i->show();
   }
   client = clients.insert(clients.end(), Client("Client3"));
@@ -126,7 +126,7 @@ int main(void) {
   client->addOption("username", "");
   client->setListfile("c:/home/BlaH/Backup.list");
   printf(">List %u client(s):\n", clients.size());
-  for (vector<Client>::iterator i = clients.begin(); i != clients.end(); i++) {
+  for (list<Client>::iterator i = clients.begin(); i != clients.end(); i++) {
     i->show();
   }
   client = clients.insert(clients.end(), Client("Client4"));
@@ -136,11 +136,11 @@ int main(void) {
   client->addOption("password", "");
   client->setListfile("c:/home/BlaH/Backup.list");
   printf(">List %u client(s):\n", clients.size());
-  for (vector<Client>::iterator i = clients.begin(); i != clients.end(); i++) {
+  for (list<Client>::iterator i = clients.begin(); i != clients.end(); i++) {
     i->show();
   }
   db.open();
-  for (vector<Client>::iterator i = clients.begin(); i != clients.end(); i++) {
+  for (list<Client>::iterator i = clients.begin(); i != clients.end(); i++) {
     i->setMountPoint("test_db/mount");
     i->backup(db, 0);
   }
@@ -152,11 +152,11 @@ int main(void) {
   client->setHostOrIp("localhost");
   client->setListfile("etc/localhost.list");
   printf(">List %u client(s):\n", clients.size());
-  for (vector<Client>::iterator i = clients.begin(); i != clients.end(); i++) {
+  for (list<Client>::iterator i = clients.begin(); i != clients.end(); i++) {
     i->show();
   }
   db.open();
-  for (vector<Client>::iterator i = clients.begin(); i != clients.end(); i++) {
+  for (list<Client>::iterator i = clients.begin(); i != clients.end(); i++) {
     i->setMountPoint("test_db/mount");
     i->backup(db, 0);
   }
@@ -167,11 +167,11 @@ int main(void) {
   client->setProtocol("file");
   client->setListfile("etc/localhost.list");
   printf(">List %u client(s):\n", clients.size());
-  for (vector<Client>::iterator i = clients.begin(); i != clients.end(); i++) {
+  for (list<Client>::iterator i = clients.begin(); i != clients.end(); i++) {
     i->show();
   }
   db.open();
-  for (vector<Client>::iterator i = clients.begin(); i != clients.end(); i++) {
+  for (list<Client>::iterator i = clients.begin(); i != clients.end(); i++) {
     i->setMountPoint("test_db/mount");
     i->backup(db, 0);
   }

@@ -18,7 +18,6 @@
 
 #include <iostream>
 #include <string>
-#include <vector>
 #include <list>
 #include <dirent.h>
 #include <sys/stat.h>

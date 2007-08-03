@@ -18,14 +18,10 @@
 
 #include <iostream>
 #include <string>
-#include <vector>
-#include <list>
 #include <errno.h>
 
 using namespace std;
 
-#include "list.h"
-#include "files.h"
 #include "dbdata.h"
 #include "dblist.h"
 #include "hbackup.h"
@@ -53,7 +49,7 @@ int DbList::load(
         continue;
       }
 
-      DbData  db_data(buffer, bsize);
+      DbData db_data(buffer, bsize);
       if (db_data.in() == 0) {
         failed = 1;
         cerr << "dblist: load: " << filename << ": Corrupted, line " << line
