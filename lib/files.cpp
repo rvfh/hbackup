@@ -83,11 +83,26 @@ void GenericFileListElement::insert(GenericFileListElement** first) {
     previous = next;
     next = next->_next;
   }
-  _next = next;
-  if (previous == NULL) {
-    *first = this;
-  } else {
+  _previous = previous;
+  if (previous != NULL) {
     previous->_next = this;
+  } else {
+    *first = this;
+  }
+  _next = next;
+  if (next != NULL) {
+    next->_previous = this;
+  }
+}
+
+void GenericFileListElement::remove(GenericFileListElement** first) {
+  if (_previous != NULL) {
+    _previous->_next = _next;
+  } else {
+    *first = _next;
+  }
+  if (_next != NULL) {
+    _next->_previous = _previous;
   }
 }
 
