@@ -93,14 +93,17 @@ public:
 class GenericFileListElement {
   GenericFile*            _payload;
   GenericFileListElement* _next;
+  GenericFileListElement* _previous;
 public:
   GenericFileListElement(GenericFile* payload) :
     _payload(payload),
-    _next(NULL) {}
+    _next(NULL),
+    _previous(NULL) {}
   ~GenericFileListElement() {
     delete _payload;
   }
   void insert(GenericFileListElement** first);
+  void remove(GenericFileListElement** first);
   GenericFile*            payload() { return _payload; }
   GenericFileListElement* next()    { return _next; }
 };
