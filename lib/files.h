@@ -99,7 +99,6 @@ public:
     _next(NULL) {}
   ~GenericFileListElement() {
     delete _payload;
-    delete _next;
   }
   void insert(GenericFileListElement** first);
   GenericFile*            payload() { return _payload; }
@@ -136,25 +135,27 @@ public:
 
 class Directory : public GenericFile {
   GenericFileListElement* _first_entry;
-  int entries;
-  int read(const char* path);
+  int _entries;
+  int createList(const char* path);
+  void deleteList();
 public:
   // Constructor for path in the VFS
   Directory(const GenericFile& g, const char* path) :
       GenericFile(g),
       _first_entry(NULL),
-      entries(0) {
+      _entries(0) {
     _size  = 0;
     _mtime = 0;
     // Create list of GenericFiles contained in directory
-    if (read(path)) entries = -1;
+    if (createList(path)) _entries = -1;
   }
   ~Directory() {
-    delete _first_entry;
+    deleteList();
   }
   // FIXME Temporary
   void showList() {
     GenericFileListElement* entry = _first_entry;
+    cout << "Listing " << _entries << " entries:" << endl;
     while (entry != NULL) {
       cout << " -> name: " << entry->payload()->name() << endl;
       entry = entry->next();

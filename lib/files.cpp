@@ -91,7 +91,7 @@ void GenericFileListElement::insert(GenericFileListElement** first) {
   }
 }
 
-int Directory::read(const char* path) {
+int Directory::createList(const char* path) {
   DIR* directory = opendir(path);
   if (directory == NULL) return -1;
 
@@ -104,10 +104,22 @@ int Directory::read(const char* path) {
     GenericFile *g = new GenericFile(path, dir_entry->d_name);
     GenericFileListElement* e = new GenericFileListElement(g);
     e->insert(&_first_entry);
+    _entries++;
   }
 
   closedir(directory);
   return 0;
+}
+
+void Directory::deleteList() {
+  GenericFileListElement* current = _first_entry;
+
+  while (current != NULL) {
+    GenericFileListElement* next = current->next();
+    delete current;
+    current = next;
+    _entries--;
+  }
 }
 
 File::File(const string& access_path, const string& path) {
