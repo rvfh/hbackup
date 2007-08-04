@@ -41,7 +41,7 @@ void showFile(const GenericFile &g) {
     File2 *f = new File2(g);
     cout << "Name: " << f->name()
       << ", type = " << f->type()
-      << ", mtime = " << f->mtime()
+      << ", mtime = " << (f->mtime() != 0)
       << ", size = " << f->size()
       << ", uid = " << (int)(f->uid() != 0)
       << ", gid = " << (int)(f->gid() != 0)
@@ -53,7 +53,7 @@ void showFile(const GenericFile &g) {
     Link *l = new Link(g, g.path());
     cout << "Name: " << l->name()
       << ", type = " << l->type()
-      << ", mtime = " << l->mtime()
+      << ", mtime = " << (l->mtime() != 0)
       << ", size = " << l->size()
       << ", uid = " << (int)(l->uid() != 0)
       << ", gid = " << (int)(l->gid() != 0)
@@ -66,7 +66,7 @@ void showFile(const GenericFile &g) {
     Directory *d = new Directory(g, g.path());
     cout << "Name: " << d->name()
       << ", type = " << d->type()
-      << ", mtime = " << d->mtime()
+      << ", mtime = " << (d->mtime() != 0)
       << ", size = " << d->size()
       << ", uid = " << (int)(d->uid() != 0)
       << ", gid = " << (int)(d->gid() != 0)
