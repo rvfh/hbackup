@@ -36,7 +36,82 @@ int terminating(void) {
   return 0;
 }
 
-void showFile(const Node &g) {
+void showList(const Directory* d, int level = 0);
+
+void defaultShowFile(const Node* g) {
+  cout << "Oth.: " << g->name()
+    << ", type = " << g->type()
+    << ", mtime = " << (g->mtime() != 0)
+    << ", size = " << g->size()
+    << ", uid = " << (int)(g->uid() != 0)
+    << ", gid = " << (int)(g->gid() != 0)
+    << ", mode = " << g->mode()
+    << endl;
+}
+
+void showFile(const Node* g, int level = 1) {
+  int level_no = level;
+  cout << " ";
+  while (level_no--) cout << "-";
+  cout << "> ";
+  if (g->parsed()) {
+    switch (g->type()) {
+      case 'f': {
+        const File2* f = (const File2*) g;
+        cout << "File: " << f->name()
+          << ", type = " << f->type()
+          << ", mtime = " << (f->mtime() != 0)
+          << ", size = " << f->size()
+          << ", uid = " << (int)(f->uid() != 0)
+          << ", gid = " << (int)(f->gid() != 0)
+          << ", mode = " << f->mode()
+          << endl;
+      } break;
+      case 'l': {
+        const Link* l = (const Link*) g;
+        cout << "Link: " << l->name()
+          << ", type = " << l->type()
+          << ", mtime = " << (l->mtime() != 0)
+          << ", size = " << l->size()
+          << ", uid = " << (int)(l->uid() != 0)
+          << ", gid = " << (int)(l->gid() != 0)
+          << ", mode = " << l->mode()
+          << ", link = " << l->link()
+          << endl;
+      } break;
+      case 'd': {
+        const Directory* d = (const Directory*) g;
+        cout << "Dir.: " << d->name()
+          << ", type = " << d->type()
+          << ", mtime = " << (d->mtime() != 0)
+          << ", size = " << d->size()
+          << ", uid = " << (int)(d->uid() != 0)
+          << ", gid = " << (int)(d->gid() != 0)
+          << ", mode = " << d->mode()
+          << endl;
+        if (level) {
+          showList(d, level);
+        }
+      } break;
+    }
+  } else {
+    defaultShowFile(g);
+  }
+}
+
+void showList(const Directory* d, int level) {
+  if (level == 0) {
+    showFile(d, level);
+  }
+  NodeListElement* entry = d->entries_head();
+  ++level;
+  while (entry != NULL) {
+    showFile(entry->payload(), level);
+    entry = entry->next();
+  }
+}
+
+void createNshowFile(const Node &g) {
   switch (g.type()) {
   case 'f': {
     File2 *f = new File2(g);
@@ -65,21 +140,8 @@ void showFile(const Node &g) {
     break;
   case 'd': {
     Directory *d = new Directory(g);
-    cout << "Name: " << d->name()
-      << ", type = " << d->type()
-      << ", mtime = " << (d->mtime() != 0)
-      << ", size = " << d->size()
-      << ", uid = " << (int)(d->uid() != 0)
-      << ", gid = " << (int)(d->gid() != 0)
-      << ", mode = " << d->mode()
-      << endl;
     d->createList();
-    NodeListElement* entry = d->entries_head();
-    cout << "Listing " << d->entries() << " entries:" << endl;
-    while (entry != NULL) {
-      cout << " -> name: " << entry->payload()->name() << endl;
-      entry = entry->next();
-    }
+    showList(d);
     delete d; }
     break;
   default:
@@ -485,16 +547,16 @@ int main(void) {
   // New age preparation test
   Node *g;
   g = new Node("test1/testfile");
-  showFile(*g);
+  createNshowFile(*g);
   delete g;
   g = new Node("test1/testlink");
-  showFile(*g);
+  createNshowFile(*g);
   delete g;
   g = new Node("test1/testdir");
-  showFile(*g);
+  createNshowFile(*g);
   delete g;
   g = new Node("test1/subdir");
-  showFile(*g);
+  createNshowFile(*g);
   delete g;
 
   cout << endl << "Validity tests" << endl;
@@ -550,6 +612,22 @@ int main(void) {
   cout << "Link is file? " << File2("test1/touchedlink").isValid() << endl;
   cout << "Link is dir? " << Directory("test1/touchedlink").isValid() << endl;
   cout << "Link is link? " << Link("test1/touchedlink").isValid() << endl;
+
+  cout << endl << "Parsing test" << endl;
+
+  Directory* d = new Directory("test1");
+  if (d->isValid()) {
+    if (! d->createList()) {
+      if (! d->parseList()) {
+        showList(d);
+      }
+    } else {
+      cerr << "Failed to create list: " << strerror(errno) << endl;
+    }
+  }
+  delete d;
+
+  cout << endl << "End of tests" << endl;
 
   return 0;
 }
