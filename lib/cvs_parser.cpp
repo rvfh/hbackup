@@ -47,7 +47,7 @@ Parser *CvsParser::isControlled(const string& dir_path) const {
   }
 
   // If control directory exists and contains an entries file, assume control
-  if (File::testReg(dir_path + "/" + _control_dir + "/" + _entries, false)) {
+  if (! File2((dir_path + "/" + _control_dir).c_str(), _entries).isValid()) {
     if (! _dummy) {
       cerr << "Directory should be under " << name() << " control: "
         << dir_path << endl;

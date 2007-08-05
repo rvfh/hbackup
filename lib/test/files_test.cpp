@@ -50,7 +50,7 @@ void showFile(const Node &g) {
     delete f; }
     break;
   case 'l': {
-    Link *l = new Link(g, g.path());
+    Link *l = new Link(g);
     cout << "Name: " << l->name()
       << ", type = " << l->type()
       << ", mtime = " << (l->mtime() != 0)
@@ -63,7 +63,7 @@ void showFile(const Node &g) {
     delete l; }
     break;
   case 'd': {
-    Directory *d = new Directory(g, g.path());
+    Directory *d = new Directory(g);
     cout << "Name: " << d->name()
       << ", type = " << d->type()
       << ", mtime = " << (d->mtime() != 0)
@@ -324,14 +324,6 @@ int main(void) {
   cout << "Check test_db/0 1 dir: "
     << File::testDir("test_db/0 1", false) << endl;
 
-  cout << endl << "Test: testReg" << endl;
-  cout << "Check but do not create test_db/0 1/a b file: "
-    << File::testReg("test_db/0 1/a b", false) << endl;
-  cout << "Check and create test_db/0 1/a b file: "
-    << File::testReg("test_db/0 1/a b", true) << endl;
-  cout << "Check test_db/0 1/a b file: "
-    << File::testReg("test_db/0 1/a b", 0) << endl;
-
   cout << endl << "Test: typeLetter" << endl;
   printf("File   : %c\n", File::typeLetter(S_IFREG));
   printf("Dir    : %c\n", File::typeLetter(S_IFDIR));
@@ -523,6 +515,17 @@ int main(void) {
   g = new Node("test1/subdir");
   showFile(*g);
   delete g;
+
+  cout << endl << "Validity tests" << endl;
+  cout << "File is file? " << File2("test1/testfile").isValid() << endl;
+  cout << "File is dir? " << Directory("test1/testfile").isValid() << endl;
+  cout << "File is link? " << Link("test1/testfile").isValid() << endl;
+  cout << "Dir is file? " << File2("test1/testdir").isValid() << endl;
+  cout << "Dir is dir? " << Directory("test1/testdir").isValid() << endl;
+  cout << "Dir is link? " << Link("test1/testdir").isValid() << endl;
+  cout << "Link is file? " << File2("test1/testlink").isValid() << endl;
+  cout << "Link is dir? " << Directory("test1/testlink").isValid() << endl;
+  cout << "Link is link? " << Link("test1/testlink").isValid() << endl;
 
   return 0;
 }
