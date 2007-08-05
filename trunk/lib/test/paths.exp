@@ -1,4 +1,4 @@
->List 27 file(s):
+>List 28 file(s):
 cvs	d	0	0	1000	1000	755	
 cvs/CVS	d	0	0	1000	1000	755	
 cvs/CVS/Entries	f	141	1	1000	1000	644	
@@ -26,8 +26,9 @@ testdir	d	0	0	1000	1000	755
 testfile	f	13	1	1000	1000	644	
 testfile~	f	0	1	1000	1000	644	
 testlink	l	8	1	1000	1000	777	testfile
+testpipe	p	0	1	1000	1000	644	
 as previous with subdir in ignore list
->List 23 file(s):
+>List 24 file(s):
 cvs	d	0	0	1000	1000	755	
 cvs/CVS	d	0	0	1000	1000	755	
 cvs/CVS/Entries	f	141	1	1000	1000	644	
@@ -51,8 +52,9 @@ testdir	d	0	0	1000	1000	755
 testfile	f	13	1	1000	1000	644	
 testfile~	f	0	1	1000	1000	644	
 testlink	l	8	1	1000	1000	777	testfile
+testpipe	p	0	1	1000	1000	644	
 as previous with testlink in ignore list
->List 22 file(s):
+>List 23 file(s):
 cvs	d	0	0	1000	1000	755	
 cvs/CVS	d	0	0	1000	1000	755	
 cvs/CVS/Entries	f	141	1	1000	1000	644	
@@ -75,9 +77,10 @@ test space	f	0	1	1000	1000	644
 testdir	d	0	0	1000	1000	755	
 testfile	f	13	1	1000	1000	644	
 testfile~	f	0	1	1000	1000	644	
+testpipe	p	0	1	1000	1000	644	
 as previous with CVS parser
 Directory should be under CVS control: test1/cvs/dirbad
->List 17 file(s):
+>List 18 file(s):
 cvs	d	0	0	1000	1000	755	
 cvs/CVS	d	0	0	1000	1000	755	
 cvs/CVS/Entries	f	141	1	1000	1000	644	
@@ -95,9 +98,10 @@ test space	f	0	1	1000	1000	644
 testdir	d	0	0	1000	1000	755	
 testfile	f	13	1	1000	1000	644	
 testfile~	f	0	1	1000	1000	644	
+testpipe	p	0	1	1000	1000	644	
 as previous
 Directory should be under CVS control: test1/cvs/dirbad
->List 17 file(s):
+>List 18 file(s):
 cvs	d	0	0	1000	1000	755	
 cvs/CVS	d	0	0	1000	1000	755	
 cvs/CVS/Entries	f	141	1	1000	1000	644	
@@ -115,3 +119,4 @@ test space	f	0	1	1000	1000	644
 testdir	d	0	0	1000	1000	755	
 testfile	f	13	1	1000	1000	644	
 testfile~	f	0	1	1000	1000	644	
+testpipe	p	0	1	1000	1000	644	

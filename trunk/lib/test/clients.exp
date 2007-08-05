@@ -141,9 +141,9 @@ Backup client 'testhost' using protocol 'file'
 Backup path 'test1'
  -> Building list of files
 Directory should be under CVS control: test1/cvs/dirbad
- -> Parsing list of files (13)
- --> Files to add: 13 (0 bytes)
- --> Done: 1/13 --> Done: 2/13 --> Done: 3/13 --> Done: 4/13 --> Done: 5/13 --> Done: 6/13 --> Done: 7/13 --> Done: 8/13 --> Done: 9/13 --> Done: 10/13 --> Done: 11/13 --> Done: 12/13 --> Done: 13/13
+ -> Parsing list of files (14)
+ --> Files to add: 14 (0 bytes)
+ --> Done: 1/14 --> Done: 2/14 --> Done: 3/14 --> Done: 4/14 --> Done: 5/14 --> Done: 6/14 --> Done: 7/14 --> Done: 8/14 --> Done: 9/14 --> Done: 10/14 --> Done: 11/14 --> Done: 12/14 --> Done: 13/14 --> Done: 14/14
  --> Files to remove: 0
 Backup path 'test2'
  -> Building list of files
@@ -151,12 +151,12 @@ Backup path 'test2'
  --> Files to add: 5 (928768 bytes)
  --> Done: 1/5 (0.0%) --> Done: 2/5 (15.7%) --> Done: 3/5 (43.6%) --> Done: 4/5 (100.0%) --> Done: 5/5 (100.0%)
  --> Files to remove: 0
- --> Database active items part closed (contents: 20 files)
+ --> Database active items part closed (contents: 21 files)
  --> Client: testhost
 >List 1 client(s):
 Client: testhost
 -> file://testhost etc/localhost.list
- --> Database active items part open (contents: 20 files)
+ --> Database active items part open (contents: 21 files)
 Backup client 'testhost' using protocol 'file'
  -> Reading backup list file
  --> Path: test1
@@ -164,7 +164,7 @@ Backup client 'testhost' using protocol 'file'
 Backup path 'test1'
  -> Building list of files
 Directory should be under CVS control: test1/cvs/dirbad
- -> Parsing list of files (13)
+ -> Parsing list of files (14)
  --> Files to add: 0
  --> Files to remove: 0
 Backup path 'test2'
@@ -172,4 +172,4 @@ Backup path 'test2'
  -> Parsing list of files (5)
  --> Files to add: 0
  --> Files to remove: 0
- --> Database active items part closed (contents: 20 files)
+ --> Database active items part closed (contents: 21 files)

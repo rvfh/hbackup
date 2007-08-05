@@ -286,8 +286,6 @@ class File {
   gid_t           _gid;       // group ID of owner
   mode_t          _mode;      // permissions
 public:
-  // Max buffer size for read/write
-  static const size_t chunk = 409600;
   // Constructor for existing file (if only one argument, it will be the path)
   File(const string& access_path, const string& path = "");
   // Constructor for given file data
