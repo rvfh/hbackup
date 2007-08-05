@@ -149,34 +149,31 @@ public:
 class Directory : public Node {
   NodeListElement* _entries_head;
   int _entries;
-  int createList();
-  void deleteList();
 public:
   // Constructor for existing Node
   Directory(const Node& g) :
       Node(g),
       _entries_head(NULL),
-      _entries(0) {
+      _entries(-1) {
     _size  = 0;
     _mtime = 0;
-    // Create list of Nodes contained in directory
-    if (createList()) _entries = -1;
   }
   // Constructor for path in the VFS
   Directory(const char *path, const char* name = "") :
       Node(path, name),
       _entries_head(NULL),
-      _entries(0) {
+      _entries(-1) {
     _size  = 0;
     _mtime = 0;
-    // Create list of Nodes contained in directory
-    if (createList()) _entries = -1;
   }
   ~Directory() {
     deleteList();
   }
   // Create directory
-  int create();
+  int               create();
+  // Create list of Nodes contained in directory
+  int               createList();
+  void              deleteList();
   bool              isValid() const       { return _type == 'd'; }
   int               entries() const       { return _entries; }
   NodeListElement*  entries_head() const  { return _entries_head; }
