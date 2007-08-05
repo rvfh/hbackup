@@ -350,7 +350,7 @@ int main(void) {
   db.open();
 
   File::testDir("test_db/data/59ca0efa9f5633cb0371bbc0355478d8-0", 1);
-  File::testReg("test_db/data/59ca0efa9f5633cb0371bbc0355478d8-0/data", 1);
+  Stream("test_db/data/59ca0efa9f5633cb0371bbc0355478d8-0/data").create();
   verbose = 3;
   if ((status = db.scan("", true))) {
     printf("full thorough scan error status %u\n", status);
@@ -945,12 +945,12 @@ int main(void) {
 
   cout << endl << "Test: getdir" << endl;
   cout << "Check test_db/data dir: " << File::testDir("test_db/data", true) << endl;
-  File::testReg("test_db/data/.nofiles", true);
+  Stream("test_db/data/.nofiles").create();
   File::testDir("test_db/data/fe", true);
-  File::testReg("test_db/data/fe/.nofiles", true);
-  File::testReg("test_db/data/fe/test4", true);
+  Stream("test_db/data/fe/.nofiles").create();
+  Stream("test_db/data/fe/test4").create();
   File::testDir("test_db/data/fe/dc", true);
-  File::testReg("test_db/data/fe/dc/.nofiles", true);
+  Stream("test_db/data/fe/dc/.nofiles").create();
   File::testDir("test_db/data/fe/ba", true);
   File::testDir("test_db/data/fe/ba/test1", true);
   File::testDir("test_db/data/fe/98", true);
@@ -1023,6 +1023,7 @@ int main(void) {
 
   cout << "List is gone" << endl;
   remove("test_db/active");
+  remove("test_db/active~");
   if ((status = db.open())) {
     printf("Error: %s\n", strerror(errno));
   }

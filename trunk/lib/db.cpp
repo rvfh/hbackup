@@ -57,12 +57,11 @@ using namespace hbackup;
 int Database::organise(const string& path, int number) {
   DIR           *directory;
   struct dirent *dir_entry;
-  string        nofiles;
+  Stream        nofiles(path.c_str(), ".nofiles");
   int           failed   = 0;
 
   /* Already organised? */
-  nofiles = path + "/.nofiles";
-  if (! File::testReg(nofiles, 0)) {
+  if (nofiles.isValid()) {
     return 0;
   }
   /* Find out how many entries */
@@ -107,7 +106,7 @@ int Database::organise(const string& path, int number) {
       }
     }
     if (! failed) {
-      File::testReg(nofiles, 1);
+      nofiles.create();
     }
   }
   closedir(directory);
@@ -163,15 +162,12 @@ int Database::write(
       final_path += str;
       if (! File::testDir(final_path, 1)) {
         /* Directory exists */
-        string try_path;
-
-        try_path = final_path + "/data";
-        if (File::testReg(try_path, 0) == 0) {
+        File2 try_file(final_path.c_str(), "data");
+        if (try_file.isValid()) {
           /* A file already exists, let's compare */
-          File try_md(try_path);
-          File temp_md(temp_path);
+          File2 temp_md(temp_path.c_str());
 
-          differ = (try_md.size() != temp_md.size());
+          differ = (try_file.size() != temp_md.size());
         }
       }
       if (! differ) {
@@ -278,7 +274,7 @@ int Database::getDir(
   // Two cases: either there are files, or a .nofiles file and directories
   do {
     // If we can find a .nofiles file, then go down one more directory
-    if (! File::testReg(path + "/.nofiles", false)) {
+    if (File2(path.c_str(), ".nofiles").isValid()) {
       path += "/" + checksum.substr(level, 2);
       level += 2;
       if (File::testDir(path, create) == 2) {
@@ -327,6 +323,9 @@ int Database::open() {
     return 2;
   }
 
+  Stream active(_path.c_str(), "active");
+  Stream removed(_path.c_str(), "removed");
+
   // Check that data dir exists, if not create it
   status = File::testDir(_path + "/data", true);
   if (status == 2) {
@@ -334,8 +333,8 @@ int Database::open() {
   } else
   if (status == 1) {
     // Create files
-    if ((File::testReg(_path + "/active", true) == 2)
-     || (File::testReg(_path + "/removed", true) == 2)) {
+    if ((! active.isValid() && active.create())
+     || (! removed.isValid() && removed.create())) {
       cerr << "db: open: cannot create list files" << endl;
       status = 2;
     } else if (verbosity() > 2) {
@@ -343,9 +342,10 @@ int Database::open() {
     }
   } else {
     // Check files presence
-    if (File::testReg(_path + "/active", false)) {
+    if (! active.isValid()) {
       cerr << "db: open: active files list not accessible: ";
-      if (File::testReg(_path + "/active~", false)) {
+      Stream backup(_path.c_str(), "active~");
+      if (backup.isValid()) {
         cerr << "using backup" << endl;
         rename((_path + "/active~").c_str(), (_path + "/active").c_str());
       } else {
@@ -353,9 +353,10 @@ int Database::open() {
         status = 2;
       }
     }
-    if ((status != 2) && File::testReg(_path + "/removed", false)) {
-      cerr << "db: open: active files list not accessible: ";
-      if (File::testReg(_path + "/removed~", false)) {
+    if ((status != 2) && ! removed.isValid()) {
+      cerr << "db: open: removed files list not accessible: ";
+      Stream backup(_path.c_str(), "removed~");
+      if (backup.isValid()) {
         cerr << "using backup" << endl;
         rename((_path + "/removed~").c_str(), (_path + "/removed").c_str());
       } else {
@@ -365,7 +366,7 @@ int Database::open() {
   }
 
   // Recover lists
-  if ((status != 2) && ! File::testReg(_path + "/written.journal", false)) {
+  if ((status != 2) && File2(_path.c_str(), "written.journal").isValid()) {
     cerr << "db: open: journal found, attempting crash recovery" << endl;
     DbList  active;
     DbList  removed;
@@ -922,7 +923,7 @@ int Database::scan(const string& checksum, bool thorough) {
       filefailed = true;
       cerr << "db: scan: failed to get directory for checksum " << checksum << endl;
     } else
-    if (File::testReg(path + "/data", 0)) {
+    if (! File2(path.c_str(), "data").isValid()) {
       errno = ENOENT;
       filefailed = true;
       cerr << "db: scan: file data missing for checksum " << checksum << endl;

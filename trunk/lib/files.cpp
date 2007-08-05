@@ -35,24 +35,7 @@ using namespace std;
 
 using namespace hbackup;
 
-Node::Node(const char* path, const char* name) {
-  if (name[0] == '\0') {
-    const char* name = strrchr(path, '/');
-
-    _path = NULL;
-    asprintf(&_path, "%s", path);
-
-    _name = NULL;
-    if (name != NULL) {
-      asprintf(&_name, "%s", ++name);
-    } else {
-      asprintf(&_name, "%s", path);
-    }
-  } else {
-    asprintf(&_path, "%s/%s", path, name);
-    asprintf(&_name, "%s", name);
-  }
-
+void Node::metadata(const char* path) {
   struct stat64 metadata;
   if (lstat64(path, &metadata)) {
     // errno set by lstat
@@ -73,6 +56,26 @@ Node::Node(const char* path, const char* name) {
     _gid   = metadata.st_gid;
     _mode  = metadata.st_mode & ~S_IFMT;
   }
+}
+
+Node::Node(const char* path, const char* name) {
+  if (name[0] == '\0') {
+    const char* name = strrchr(path, '/');
+
+    _path = NULL;
+    asprintf(&_path, "%s", path);
+
+    _name = NULL;
+    if (name != NULL) {
+      asprintf(&_name, "%s", ++name);
+    } else {
+      asprintf(&_name, "%s", path);
+    }
+  } else {
+    asprintf(&_path, "%s/%s", path, name);
+    asprintf(&_name, "%s", name);
+  }
+  metadata(_path);
 }
 
 void NodeListElement::insert(NodeListElement** first) {
@@ -311,7 +314,18 @@ void Stream::md5sum(char* out, const unsigned char* in, int bytes) {
   *out = '\0';
 }
 
-int Stream::open(const char* req_mode,unsigned int compression) {
+int Stream::create() {
+  FILE *readfile = fopen(_path, "w");
+
+  if (readfile == NULL) {
+    return -1;
+  }
+  fclose(readfile);
+  metadata(_path);
+  return 0;
+}
+
+int Stream::open(const char* req_mode, unsigned int compression) {
   char mode[2];
 
   switch (req_mode[0]) {
@@ -396,7 +410,9 @@ int Stream::close() {
     }
   }
 
-  return fclose(_fd);
+  int rc = fclose(_fd);
+  metadata(_path);
+  return rc;
 }
 
 ssize_t Stream::read(unsigned char* buffer, size_t count) {
@@ -540,25 +556,6 @@ int File::testDir(const string& path, bool create) {
     return 1;
   }
   closedir(directory);
-  return 0;
-}
-
-int File::testReg(const string& path, bool create) {
-  // Don't use C++ stuff: no errno set
-  FILE  *readfile;
-
-  if ((readfile = fopen(path.c_str(), "r")) == NULL) {
-    // File does not exist
-    if (create) {
-      if ((readfile = fopen(path.c_str(), "w")) == NULL) {
-        cerr << "Failed to create file: " << path << endl;
-        return 2;
-      }
-      fclose(readfile);
-    }
-    return 1;
-  }
-  fclose(readfile);
   return 0;
 }
 
