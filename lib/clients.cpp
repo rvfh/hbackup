@@ -74,7 +74,9 @@ int Client::mountPath(
   }
 
   /* Check that mount dir exists, if not create it */
-  File::testDir(_mount_point, true);
+  if (Directory(_mount_point.c_str()).create()) {
+    return 2;
+  }
 
   /* Build mount command */
   if (_protocol == "file") {

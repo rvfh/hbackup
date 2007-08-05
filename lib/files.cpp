@@ -109,8 +109,19 @@ void NodeListElement::remove(NodeListElement** first) {
   }
 }
 
-int Directory::createList(const char* path) {
-  DIR* directory = opendir(path);
+int File2::create() {
+  FILE *readfile = fopen(_path, "w");
+
+  if (readfile == NULL) {
+    return -1;
+  }
+  fclose(readfile);
+  metadata(_path);
+  return 0;
+}
+
+int Directory::createList() {
+  DIR* directory = opendir(_path);
   if (directory == NULL) return -1;
 
   struct dirent *dir_entry;
@@ -119,7 +130,7 @@ int Directory::createList(const char* path) {
     if (!strcmp(dir_entry->d_name, ".") || !strcmp(dir_entry->d_name, "..")){
       continue;
     }
-    Node *g = new Node(path, dir_entry->d_name);
+    Node *g = new Node(_path, dir_entry->d_name);
     NodeListElement* e = new NodeListElement(g);
     e->insert(&_entries_head);
     _entries++;
@@ -138,6 +149,17 @@ void Directory::deleteList() {
     current = next;
     _entries--;
   }
+}
+
+int Directory::create() {
+  if (isValid()) {
+    return 0;
+  }
+  if (mkdir(_path, 0777)) {
+    return -1;
+  }
+  metadata(_path);
+  return 0;
 }
 
 File::File(const string& access_path, const string& path) {
@@ -312,17 +334,6 @@ void Stream::md5sum(char* out, const unsigned char* in, int bytes) {
     in++;
   }
   *out = '\0';
-}
-
-int Stream::create() {
-  FILE *readfile = fopen(_path, "w");
-
-  if (readfile == NULL) {
-    return -1;
-  }
-  fclose(readfile);
-  metadata(_path);
-  return 0;
 }
 
 int Stream::open(const char* req_mode, unsigned int compression) {
@@ -545,20 +556,6 @@ ssize_t Stream::write(unsigned char* buffer, size_t count, bool eof) {
 }
 
 // Public functions
-int File::testDir(const string& path, bool create) {
-  DIR  *directory;
-
-  if ((directory = opendir(path.c_str())) == NULL) {
-    if (create && mkdir(path.c_str(), 0777)) {
-      cerr << "Failed to create directory: " << path << endl;
-      return 2;
-    }
-    return 1;
-  }
-  closedir(directory);
-  return 0;
-}
-
 char File::typeLetter(mode_t mode) {
   if (S_ISREG(mode))  return 'f';
   if (S_ISDIR(mode))  return 'd';

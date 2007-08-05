@@ -349,8 +349,8 @@ int main(void) {
 
   db.open();
 
-  File::testDir("test_db/data/59ca0efa9f5633cb0371bbc0355478d8-0", 1);
-  Stream("test_db/data/59ca0efa9f5633cb0371bbc0355478d8-0/data").create();
+  Directory("test_db/data/59ca0efa9f5633cb0371bbc0355478d8-0").create();
+  File2("test_db/data/59ca0efa9f5633cb0371bbc0355478d8-0/data").create();
   verbose = 3;
   if ((status = db.scan("", true))) {
     printf("full thorough scan error status %u\n", status);
@@ -944,17 +944,17 @@ int main(void) {
   }
 
   cout << endl << "Test: getdir" << endl;
-  cout << "Check test_db/data dir: " << File::testDir("test_db/data", true) << endl;
-  Stream("test_db/data/.nofiles").create();
-  File::testDir("test_db/data/fe", true);
-  Stream("test_db/data/fe/.nofiles").create();
-  Stream("test_db/data/fe/test4").create();
-  File::testDir("test_db/data/fe/dc", true);
-  Stream("test_db/data/fe/dc/.nofiles").create();
-  File::testDir("test_db/data/fe/ba", true);
-  File::testDir("test_db/data/fe/ba/test1", true);
-  File::testDir("test_db/data/fe/98", true);
-  File::testDir("test_db/data/fe/98/test2", true);
+  cout << "Check test_db/data dir: " << ! Directory("test_db/data").isValid() << endl;
+  File2("test_db/data/.nofiles").create();
+  Directory("test_db/data/fe").create();
+  File2("test_db/data/fe/.nofiles").create();
+  File2("test_db/data/fe/test4").create();
+  Directory("test_db/data/fe/dc").create();
+  File2("test_db/data/fe/dc/.nofiles").create();
+  Directory("test_db/data/fe/ba").create();
+  Directory("test_db/data/fe/ba/test1").create();
+  Directory("test_db/data/fe/98").create();
+  Directory("test_db/data/fe/98/test2").create();
   string  getdir_path;
   cout << "febatest1 status: " << db.getDir("febatest1", getdir_path, true)
     << ", getdir_path: " << getdir_path << endl;
@@ -966,7 +966,7 @@ int main(void) {
     << ", getdir_path: " << getdir_path << endl;
   cout << "fedc76test5 status: " << db.getDir("fedc76test5", getdir_path, true)
     << ", getdir_path: " << getdir_path << endl;
-  File::testDir("test_db/data/fe/dc/76", true);
+  Directory("test_db/data/fe/dc/76").create();
   cout << "fedc76test6 status: " << db.getDir("fedc76test6", getdir_path, true)
     << ", getdir_path: " << getdir_path << endl;
   mkdir("test_db/data/fe/dc/76/test6", 0755);

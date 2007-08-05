@@ -29,12 +29,6 @@ Test: file recompress (uncompress read + compress write), no closing
 read size: 10485760 (10208 -> 10485760), checksum: b7350db49d036137b2ef752a82145e91
 write size: 10208 (10485760 -> 10208), checksum: b7350db49d036137b2ef752a82145e91
 
-Test: testDir
-Check test_db dir: 0
-Check but do not create test_db/0 1 dir: 1
-Check and create test_db/0 1 dir: 1
-Check test_db/0 1 dir: 0
-
 Test: typeLetter
 File   : f
 Dir    : d
@@ -149,3 +143,34 @@ Dir is link? 0
 Link is file? 0
 Link is dir? 0
 Link is link? 1
+
+Creation tests
+File is file? 0
+File is dir? 0
+File is link? 0
+Dir is file? 0
+Dir is dir? 0
+Dir is link? 0
+Link is file? 0
+Link is dir? 0
+Link is link? 0
+Create
+File is file? 1
+File is dir? 0
+File is link? 0
+Dir is file? 0
+Dir is dir? 1
+Dir is link? 0
+Link is file? 0
+Link is dir? 0
+Link is link? 0
+Create again
+File is file? 1
+File is dir? 0
+File is link? 0
+Dir is file? 0
+Dir is dir? 1
+Dir is link? 0
+Link is file? 0
+Link is dir? 0
+Link is link? 0
