@@ -57,7 +57,7 @@ using namespace hbackup;
 int Database::organise(const string& path, int number) {
   DIR           *directory;
   struct dirent *dir_entry;
-  Stream        nofiles(path.c_str(), ".nofiles");
+  File2         nofiles(path.c_str(), ".nofiles");
   int           failed   = 0;
 
   /* Already organised? */
@@ -93,7 +93,7 @@ int Database::organise(const string& path, int number) {
        && (file_data.name()[2] != '-')) {
         // Create two-letter directory
         string dir_path = path + "/" + file_data.name().substr(0,2);
-        if (File::testDir(dir_path, 1) == 2) {
+        if (Directory(dir_path.c_str()).create()) {
           failed = 2;
         } else {
           // Create destination path
@@ -160,7 +160,7 @@ int Database::write(
       ss >> str;
       checksum = checksum_source + "-" + str;
       final_path += str;
-      if (! File::testDir(final_path, 1)) {
+      if (! Directory(final_path.c_str()).create()) {
         /* Directory exists */
         File2 try_file(final_path.c_str(), "data");
         if (try_file.isValid()) {
@@ -277,7 +277,7 @@ int Database::getDir(
     if (File2(path.c_str(), ".nofiles").isValid()) {
       path += "/" + checksum.substr(level, 2);
       level += 2;
-      if (File::testDir(path, create) == 2) {
+      if (create && Directory(path.c_str()).create()) {
         return 1;
       }
     } else {
@@ -286,7 +286,7 @@ int Database::getDir(
   } while (true);
   // Return path
   path += "/" + checksum.substr(level);
-  return File::testDir(path, false);
+  return ! Directory(path.c_str()).isValid();
 }
 
 int Database::open_removed() {
@@ -323,24 +323,12 @@ int Database::open() {
     return 2;
   }
 
-  Stream active(_path.c_str(), "active");
-  Stream removed(_path.c_str(), "removed");
+  File2 active(_path.c_str(), "active");
+  File2 removed(_path.c_str(), "removed");
 
   // Check that data dir exists, if not create it
-  status = File::testDir(_path + "/data", true);
-  if (status == 2) {
-    cerr << "db: open: cannot create data directory" << endl;
-  } else
-  if (status == 1) {
-    // Create files
-    if ((! active.isValid() && active.create())
-     || (! removed.isValid() && removed.create())) {
-      cerr << "db: open: cannot create list files" << endl;
-      status = 2;
-    } else if (verbosity() > 2) {
-      cout << " --> Database initialized" << endl;
-    }
-  } else {
+  if (Directory(_path.c_str(), "data").isValid()) {
+    status = 0;
     // Check files presence
     if (! active.isValid()) {
       cerr << "db: open: active files list not accessible: ";
@@ -353,6 +341,7 @@ int Database::open() {
         status = 2;
       }
     }
+
     if ((status != 2) && ! removed.isValid()) {
       cerr << "db: open: removed files list not accessible: ";
       Stream backup(_path.c_str(), "removed~");
@@ -363,6 +352,19 @@ int Database::open() {
         cerr << "no backup accessible, ignoring" << endl;
       }
     }
+  } else if (! Directory(_path.c_str(), "data").create()) {
+    status = 1;
+    // Create files
+    if ((! active.isValid() && active.create())
+     || (! removed.isValid() && removed.create())) {
+      cerr << "db: open: cannot create list files" << endl;
+      status = 2;
+    } else if (verbosity() > 2) {
+      cout << " --> Database initialized" << endl;
+    }
+  } else {
+    status = 2;
+    cerr << "db: open: cannot create data directory" << endl;
   }
 
   // Recover lists

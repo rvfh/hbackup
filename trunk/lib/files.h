@@ -139,6 +139,8 @@ public:
   ~File2() {
     free(_checksum);
   }
+  // Create empty file
+  int create();
   bool        isValid() const { return _type == 'f'; }
   // Data read access
   const char* checksum() const { return _checksum;  }
@@ -147,7 +149,7 @@ public:
 class Directory : public Node {
   NodeListElement* _entries_head;
   int _entries;
-  int createList(const char* path);
+  int createList();
   void deleteList();
 public:
   // Constructor for existing Node
@@ -158,11 +160,23 @@ public:
     _size  = 0;
     _mtime = 0;
     // Create list of Nodes contained in directory
-    if (createList(_path)) _entries = -1;
+    if (createList()) _entries = -1;
+  }
+  // Constructor for path in the VFS
+  Directory(const char *path, const char* name = "") :
+      Node(path, name),
+      _entries_head(NULL),
+      _entries(0) {
+    _size  = 0;
+    _mtime = 0;
+    // Create list of Nodes contained in directory
+    if (createList()) _entries = -1;
   }
   ~Directory() {
     deleteList();
   }
+  // Create directory
+  int create();
   bool              isValid() const       { return _type == 'd'; }
   int               entries() const       { return _entries; }
   NodeListElement*  entries_head() const  { return _entries_head; }
@@ -239,8 +253,6 @@ public:
   // Constructor for path in the VFS
   Stream(const char *path, const char* name = "") :
       File2(path, name) {}
-  // Create empty file
-  int create();
   // Open file, for read or write (no append), with or without compression
   int open(
     const char*           req_mode,
@@ -318,8 +330,6 @@ public:
   string line(bool nodates = false) const;
   void setPath(const string& path) { _path = path; }
 
-  // Test whether dir exists, create it if requested
-  static int testDir(const string& path, bool create);
   // Transform letter into mode
   static char typeLetter(mode_t mode);
   // Transform mode into letter
