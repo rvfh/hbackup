@@ -119,33 +119,41 @@ int Database::write(
     int             compress) {
   string    temp_path;
   string    dest_path;
-  string    checksum_source;
-  string    checksum_dest;
   string    checksum;
   int       index = 0;
   int       deleteit = 0;
   int       failed = 0;
-  long long size_source;
-  long long size_dest;
+
+  Stream source(path.c_str());
+  if (source.open("r")) {
+    cerr << "db: write: failed to open source file: " << path << endl;
+    return 2;
+  }
 
   /* Temporary file to write to */
   temp_path = _path + "/filedata";
-  /* Copy file locally */
-  if (File::zcopy(path, temp_path, &size_source, &size_dest, &checksum_source,
-   &checksum_dest, compress)) {
-    failed = 1;
+  Stream temp(temp_path.c_str());
+  if (temp.open("w", compress)) {
+    cerr << "db: write: failed to open dest file: " << temp_path << endl;
+    failed = 2;
   } else
 
-  /* Check size_source size */
-  if (size_source != db_data.data()->size()) {
-    cerr << "db: write: size mismatch: " << path << " (" << size_source
-      << "/" << db_data.data()->size() << ")" << endl;
+  /* Copy file locally */
+  if (temp.copy(source)) {
+    cerr << "db: write: failed to copy file: " << path << endl;
     failed = 1;
-  } else
+  }
+
+  source.close();
+  temp.close();
+
+  if (failed) {
+    return failed;
+  }
 
   /* Get file final location */
-  if (getDir(checksum_source, dest_path, true) == 2) {
-    cerr << "db: write: failed to get dir for: " << checksum_source << endl;
+  if (getDir(source.checksum(), dest_path, true) == 2) {
+    cerr << "db: write: failed to get dir for: " << source.checksum() << endl;
     failed = 1;
   } else {
     /* Make sure our checksum is unique */
@@ -158,7 +166,7 @@ int Database::write(
       string str;
       ss << index;
       ss >> str;
-      checksum = checksum_source + "-" + str;
+      checksum = string(source.checksum()) + "-" + str;
       final_path += str;
       if (! Directory(final_path.c_str()).create()) {
         /* Directory exists */
@@ -833,23 +841,39 @@ int Database::read(const string& path, const string& checksum) {
   temp_path = path + ".part";
 
   /* Copy file to temporary name (size not checked: checksum suffices) */
-  if (File::zcopy(source_path, temp_path, NULL, NULL, &temp_checksum, NULL, 0)) {
+  Stream source(source_path.c_str());
+  if (source.open("r")) {
+    cerr << "db: read: failed to open source file: " << source_path << endl;
+    return 2;
+  }
+  Stream temp(temp_path.c_str());
+  if (temp.open("w")) {
+    cerr << "db: read: failed to open dest file: " << temp_path << endl;
+    failed = 2;
+  } else
+
+  if (temp.copy(source)) {
     cerr << "db: read: failed to copy file: " << source_path << endl;
     failed = 2;
-  } else
+  }
 
-  /* Verify that checksums match before overwriting current final destination */
-  if (checksum.substr(0, temp_checksum.size()) != temp_checksum) {
-    cerr << "db: read: checksums don't match: " << source_path
-      << " " << temp_checksum << endl;
-    failed = 2;
-  } else
+  source.close();
+  temp.close();
 
-  /* All done */
-  if (rename(temp_path.c_str(), path.c_str())) {
-    cerr << "db: read: failed to rename file to " << strerror(errno)
-      << ": " << path << endl;
-    failed = 2;
+  if (! failed) {
+    /* Verify that checksums match before overwriting final destination */
+    if (strncmp(source.checksum(), temp.checksum(), strlen(temp.checksum()))) {
+      cerr << "db: read: checksums don't match: " << source_path
+        << " " << temp_checksum << endl;
+      failed = 2;
+    } else
+
+    /* All done */
+    if (rename(temp_path.c_str(), path.c_str())) {
+      cerr << "db: read: failed to rename file to " << strerror(errno)
+        << ": " << path << endl;
+      failed = 2;
+    }
   }
 
   if (failed) {

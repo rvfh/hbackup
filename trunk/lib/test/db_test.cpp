@@ -58,30 +58,9 @@ int main(void) {
   string            checksum;
   string            zchecksum;
   DbData*           db_data;
-  long long         size;
-  long long         zsize;
   DbList::iterator  i;
   DbList            journal;
   int               status;
-
-  /* Test internal functions */
-  File::zcopy("test1/testfile", "test_db/testfile.gz", &size, &zsize,
-    &checksum, &zchecksum, 5);
-  cout << "Copied " << size << " -> " << zsize << " bytes: "
-    << checksum << " -> " << zchecksum << endl;
-
-  File::zcopy("test_db/testfile.gz", "/dev/null", &size, &zsize, &checksum,
-    &zchecksum, -1);
-  cout << "Copied " << size << " -> " << zsize << " bytes: "
-    << checksum << " -> " << zchecksum << endl;
-
-  File::zcopy("test2/testfile~", "test_db/testfile.gz", &size, NULL, &checksum,
-    NULL, 5);
-  cout << "Copied " << size << " -> ? bytes " << checksum << " -> ?" << endl;
-
-  File::zcopy("test2/testfile~", "test_db/testfile.gz", NULL, &zsize, NULL,
-    &zchecksum, 9);
-  cout << "Copied ? -> " << zsize << " bytes ? -> " << zchecksum << endl;
 
   /* Use other modules */
   path = new Path("");
@@ -318,7 +297,7 @@ int main(void) {
   db.close();
 
   // Save list
-  File::zcopy("test_db/active", "test_db/active.save", NULL, NULL, NULL, NULL, 0);
+  system("cp test_db/active test_db/active.save");
 
   db.open();
 
@@ -332,7 +311,7 @@ int main(void) {
   db.close();
 
   // Restore list
-  File::zcopy("test_db/active.save", "test_db/active", NULL, NULL, NULL, NULL, 0);
+  system("cp test_db/active.save test_db/active");
 
   db.open();
 
@@ -345,7 +324,7 @@ int main(void) {
   db.close();
 
   // Restore list
-  File::zcopy("test_db/active.save", "test_db/active", NULL, NULL, NULL, NULL, 0);
+  system("cp test_db/active.save test_db/active");
 
   db.open();
 

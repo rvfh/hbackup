@@ -390,7 +390,7 @@ int Stream::open(const char* req_mode, unsigned int compression) {
       /* Compress */
       if (deflateInit2(_strm, compression, Z_DEFLATED, 16 + 15, 9,
           Z_DEFAULT_STRATEGY)) {
-        fprintf(stderr, "zcopy: deflate init failed\n");
+        fprintf(stderr, "stream: deflate init failed\n");
         compression = 0;
       }
     } else {
@@ -429,6 +429,7 @@ int Stream::close() {
   }
 
   int rc = fclose(_fd);
+  _fd = NULL;
   metadata(_path);
   return rc;
 }
@@ -585,179 +586,33 @@ int Stream::computeChecksum() {
   return 0;
 }
 
-// Public functions
-void File::md5sum(
-    string&               checksum_out,
-    const unsigned char*  checksum_in,
-    int                   bytes) {
-  char* hex   = "0123456789abcdef";
-  char* copy  = new char[2 * bytes + 1];
-  char* write = copy;
-
-  while (bytes != 0) {
-   *write++ = hex[*checksum_in >> 4];
-   *write++ = hex[*checksum_in & 0xf];
-    checksum_in++;
-    bytes--;
+int Stream::copy(Stream& source) {
+  if ((_fd == NULL) || (source._fd == NULL)) {
+    errno = EBADF;
   }
-  *write = '\0';
-  checksum_out = copy;
-  delete copy;
-}
-
-int File::zcopy(
-    const string& source_path,
-    const string& dest_path,
-    long long*    size_in,
-    long long*    size_out,
-    string*       checksum_in,
-    string*       checksum_out,
-    int           compress) {
-  FILE          *writefile;
-  FILE          *readfile;
-  unsigned char buffer_in[chunk];
-  unsigned char buffer_out[chunk];
-  EVP_MD_CTX    ctx_in;
-  EVP_MD_CTX    ctx_out;
-  size_t        length;
-  z_stream      strm;
-
-  /* Initialise */
-  if (size_in != NULL)  *size_in  = 0;
-  if (size_out != NULL) *size_out = 0;
-
-  /* Open file to read from */
-  if ((readfile = fopen64(source_path.c_str(), "r")) == NULL) {
-    return 2;
-  }
-
-  /* Open file to write to */
-  if ((writefile = fopen64(dest_path.c_str(), "w")) == NULL) {
-    fclose(readfile);
-    return 2;
-  }
-
-  /* Create zlib resources */
-  if (compress != 0) {
-    /* Create openssl resources */
-    EVP_DigestInit(&ctx_out, EVP_md5());
-
-    strm.zalloc   = Z_NULL;
-    strm.zfree    = Z_NULL;
-    strm.opaque   = Z_NULL;
-    strm.avail_in = 0;
-    strm.next_in  = Z_NULL;
-    if (compress > 0) {
-      /* Compress */
-      if (deflateInit2(&strm, compress, Z_DEFLATED, 16 + 15, 9,
-          Z_DEFAULT_STRATEGY)) {
-        fprintf(stderr, "zcopy: deflate init failed\n");
-        compress = 0;
-      }
-    } else {
-      /* De-compress */
-      if (inflateInit2(&strm, 32 + 15)) {
-        compress = 0;
-      }
+  unsigned char buffer[File::chunk];
+  size_t read_size = 0;
+  size_t write_size = 0;
+  do {
+    size_t size = source.read(buffer, File::chunk);
+    if (size < 0) {
+      break;
     }
-  }
-
-  /* Create openssl resources */
-  EVP_DigestInit(&ctx_in, EVP_md5());
-
-  /* We shall copy, (de-)compress and compute the checksum in one go */
-  while (! feof(readfile) && ! terminating()) {
-    size_t rlength = fread(buffer_in, 1, chunk, readfile);
-    size_t wlength;
-
-    /* Size read */
-    if (size_in != NULL) *size_in += rlength;
-
-    /* Checksum computation */
-    EVP_DigestUpdate(&ctx_in, buffer_in, rlength);
-
-    /* Compression */
-    if (compress != 0) {
-      strm.avail_in = rlength;
-      strm.next_in = buffer_in;
-
-      do {
-        strm.avail_out = chunk;
-        strm.next_out = buffer_out;
-        if (compress > 0) {
-          deflate(&strm, feof(readfile) ? Z_FINISH : Z_NO_FLUSH);
-        } else {
-          switch (inflate(&strm, Z_NO_FLUSH)) {
-            case Z_NEED_DICT:
-            case Z_DATA_ERROR:
-            case Z_MEM_ERROR:
-              fprintf(stderr, "zcopy: inflate failed\n");
-              break;
-          }
-        }
-        rlength = chunk - strm.avail_out;
-
-        /* Checksum computation */
-        EVP_DigestUpdate(&ctx_out, buffer_out, rlength);
-
-        /* Size to write */
-        if (size_out != NULL) *size_out += rlength;
-
-        do {
-          wlength = fwrite(buffer_out, 1, rlength, writefile);
-          rlength -= wlength;
-        } while ((rlength != 0) && (wlength != 0));
-      } while (strm.avail_out == 0);
-    } else {
-      /* Size to write */
-      if (size_out != NULL) *size_out += rlength;
-
-      do {
-        wlength = fwrite(buffer_in, 1, rlength, writefile);
-        rlength -= wlength;
-      } while ((rlength != 0) && (wlength != 0));
+    read_size += size;
+    size = write(buffer, size, source.eof());
+    if (size < 0) {
+      break;
     }
-  }
-  fclose(readfile);
-  fclose(writefile);
-
-  /* Get checksum for input file */
-  if (checksum_in != NULL) {
-    unsigned char checksum[36];
-    EVP_DigestFinal(&ctx_in, checksum, &length);
-    md5sum(*checksum_in, checksum, length);
-  }
-
-  /* Destroy zlib resources */
-  if (compress != 0) {
-    /* Get checksum for output file */
-    if (checksum_out != NULL) {
-      unsigned char checksum[36];
-      EVP_DigestFinal(&ctx_out, checksum, &length);
-      md5sum(*checksum_out, checksum, length);
-    }
-
-    if (compress > 0) {
-      deflateEnd(&strm);
-    } else
-    if (compress < 0) {
-      inflateEnd(&strm);
-    }
-  } else {
-    /* Might want the original checksum in the output */
-    if (checksum_out != NULL) {
-      if (checksum_in != NULL) {
-        *checksum_out = *checksum_in;
-      } else {
-        unsigned char checksum[36];
-        EVP_DigestFinal(&ctx_in, checksum, &length);
-        md5sum(*checksum_out, checksum, length);
-      }
-    }
+    write_size += size;
+  } while (! source.eof());
+  if (read_size != source.dsize()) {
+    errno = EAGAIN;
+    return -1;
   }
   return 0;
 }
 
+// Public functions
 int File::decodeLine(const string& line, vector<string>& params) {
   const char* read  = line.c_str();
   const char* end   = &read[line.size()];
