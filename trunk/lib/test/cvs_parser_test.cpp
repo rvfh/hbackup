@@ -47,7 +47,7 @@ int main(void) {
   parser_list = new CvsParser(parser_controlled);
 
   /* Directory */
-  file_data = new File("test1", "", S_IFDIR, 0, 0, 0, 0, 0);
+  file_data = new File("test1", "", 'd', 0, 0, 0, 0, 0);
   if ((parser = parser_list->isControlled(file_data->path())) == NULL) {
     cout << file_data->path() << " is not under CVS control" << endl;
   } else {
@@ -57,60 +57,60 @@ int main(void) {
   delete file_data;
 
   /* Directory */
-  file_data = new File("test1/cvs", "", S_IFDIR, 0, 0, 0, 0, 0);
+  file_data = new File("test1/cvs", "", 'd', 0, 0, 0, 0, 0);
   if ((parser = parser_list->isControlled(file_data->path())) == NULL) {
     cout << file_data->path() << " is not under CVS control" << endl;
   } else {
     parser->list();
     /* Files */
-    file_data = new File("test1/cvs/nofile", "", S_IFREG, 0, 0, 0, 0, 0);
+    file_data = new File("test1/cvs/nofile", "", 'f', 0, 0, 0, 0, 0);
     if (parser->ignore(*file_data)) {
       cout << file_data->path() << " is not under CVS control" << endl;
     }
     delete file_data;
-    file_data = new File("test1/cvs/filenew.c", "", S_IFREG, 0, 0, 0, 0, 0);
+    file_data = new File("test1/cvs/filenew.c", "", 'f', 0, 0, 0, 0, 0);
     if (parser->ignore(*file_data)) {
       cout << file_data->path() << " is not under CVS control" << endl;
     }
     delete file_data;
-    file_data = new File("test1/cvs/filemod.o", "", S_IFREG, 0, 0, 0, 0, 0);
+    file_data = new File("test1/cvs/filemod.o", "", 'f', 0, 0, 0, 0, 0);
     if (parser->ignore(*file_data)) {
       cout << file_data->path() << " is not under CVS control" << endl;
     }
     delete file_data;
-    file_data = new File("test1/cvs/fileutd.h", "", S_IFREG, 0, 0, 0, 0, 0);
+    file_data = new File("test1/cvs/fileutd.h", "", 'f', 0, 0, 0, 0, 0);
     if (parser->ignore(*file_data)) {
       cout << file_data->path() << " is not under CVS control" << endl;
     }
     delete file_data;
-    file_data = new File("test1/cvs/fileoth", "", S_IFREG, 0, 0, 0, 0, 0);
+    file_data = new File("test1/cvs/fileoth", "", 'f', 0, 0, 0, 0, 0);
     if (parser->ignore(*file_data)) {
       cout << file_data->path() << " is not under CVS control" << endl;
     }
     delete file_data;
-    file_data = new File("test1/cvs/dirutd", "", S_IFDIR, 0, 0, 0, 0, 0);
+    file_data = new File("test1/cvs/dirutd", "", 'd', 0, 0, 0, 0, 0);
     if (parser->ignore(*file_data)) {
       cout << file_data->path() << " is not under CVS control" << endl;
     }
     delete file_data;
-    file_data = new File("test1/cvs/diroth", "", S_IFDIR, 0, 0, 0, 0, 0);
+    file_data = new File("test1/cvs/diroth", "", 'd', 0, 0, 0, 0, 0);
     if (parser->ignore(*file_data)) {
       cout << file_data->path() << " is not under CVS control" << endl;
     }
     delete file_data;
-    file_data = new File("test1/cvs/CVS", "", S_IFDIR, 0, 0, 0, 0, 0);
+    file_data = new File("test1/cvs/CVS", "", 'd', 0, 0, 0, 0, 0);
     if (parser->ignore(*file_data)) {
       cout << file_data->path() << " is not under CVS control" << endl;
     }
     delete file_data;
-    file_data = new File("test1/cvs/CVS", "", S_IFDIR, 0, 0, 0, 0, 0);
+    file_data = new File("test1/cvs/CVS", "", 'd', 0, 0, 0, 0, 0);
     if ((parser2 = parser->isControlled(file_data->path())) == NULL) {
       cout << file_data->path() << " is not under CVS control" << endl;
     } else {
       delete parser2;
     }
     delete file_data;
-    file_data = new File("test1/cvs/diroth", "", S_IFDIR, 0, 0, 0, 0, 0);
+    file_data = new File("test1/cvs/diroth", "", 'd', 0, 0, 0, 0, 0);
     // Use parser so directory appears as child of controlled directory
     if ((parser2 = parser->isControlled(file_data->path())) == NULL) {
       cout << file_data->path() << " is not under CVS control" << endl;
@@ -122,19 +122,19 @@ int main(void) {
   }
 
   /* Directory */
-  file_data = new File("test1/cvs/dirutd", "", S_IFDIR, 0, 0, 0, 0, 0);
+  file_data = new File("test1/cvs/dirutd", "", 'd', 0, 0, 0, 0, 0);
   if ((parser = parser_list->isControlled(file_data->path())) == NULL) {
     cout << file_data->path() << " is not under CVS control" << endl;
   } else {
     parser->list();
     /* Files */
     delete file_data;
-    file_data = new File("test1/cvs/dirutd/fileutd", "", S_IFREG, 0, 0, 0, 0, 0);
+    file_data = new File("test1/cvs/dirutd/fileutd", "", 'f', 0, 0, 0, 0, 0);
     if (parser->ignore(*file_data)) {
       cout << file_data->path() << " is not under CVS control" << endl;
     }
     delete file_data;
-    file_data = new File("test1/cvs/dirutd/fileoth", "", S_IFREG, 0, 0, 0, 0, 0);
+    file_data = new File("test1/cvs/dirutd/fileoth", "", 'f', 0, 0, 0, 0, 0);
     if (parser->ignore(*file_data)) {
       cout << file_data->path() << " is not under CVS control" << endl;
     }
@@ -143,19 +143,19 @@ int main(void) {
   delete file_data;
 
   /* Directory */
-  file_data = new File("test1/cvs/dirbad", "", S_IFDIR, 0, 0, 0, 0, 0);
+  file_data = new File("test1/cvs/dirbad", "", 'd', 0, 0, 0, 0, 0);
   if ((parser = parser_list->isControlled(file_data->path())) == NULL) {
     cout << file_data->path() << " is not under CVS control" << endl;
   } else {
     parser->list();
     /* Files */
     delete file_data;
-    file_data = new File("test1/cvs/dirbad/fileutd", "", S_IFREG, 0, 0, 0, 0, 0);
+    file_data = new File("test1/cvs/dirbad/fileutd", "", 'f', 0, 0, 0, 0, 0);
     if (parser->ignore(*file_data)) {
       cout << file_data->path() << " is not under CVS control" << endl;
     }
     delete file_data;
-    file_data = new File("test1/cvs/dirbad/fileoth", "", S_IFREG, 0, 0, 0, 0, 0);
+    file_data = new File("test1/cvs/dirbad/fileoth", "", 'f', 0, 0, 0, 0, 0);
     if (parser->ignore(*file_data)) {
       cout << file_data->path() << " is not under CVS control" << endl;
     }
@@ -164,7 +164,7 @@ int main(void) {
   delete file_data;
 
   /* CVS directory */
-  file_data = new File("test1/cvs/CVS", "", S_IFDIR, 0, 0, 0, 0, 0);
+  file_data = new File("test1/cvs/CVS", "", 'd', 0, 0, 0, 0, 0);
   if ((parser = parser_list->isControlled(file_data->path())) == NULL) {
     cout << file_data->path() << " is not under CVS control" << endl;
   } else {

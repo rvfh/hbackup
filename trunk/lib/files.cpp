@@ -177,11 +177,18 @@ File::File(const string& access_path, const string& path) {
 
   if (lstat64(full_path.c_str(), &metadata)) {
     // errno set by lstat
-    _type = 0;
+    _type = '?';
   } else {
     /* Fill in file information */
-    _type  = metadata.st_mode & S_IFMT;
-    if (S_ISDIR(_type)) {
+    if (S_ISREG(metadata.st_mode))       _type =  'f';
+    else if (S_ISDIR(metadata.st_mode))  _type =  'd';
+    else if (S_ISCHR(metadata.st_mode))  _type =  'c';
+    else if (S_ISBLK(metadata.st_mode))  _type =  'b';
+    else if (S_ISFIFO(metadata.st_mode)) _type =  'p';
+    else if (S_ISLNK(metadata.st_mode))  _type =  'l';
+    else if (S_ISSOCK(metadata.st_mode)) _type =  's';
+    else                                 _type =  '?';
+    if (_type == 'd') {
       _size  = 0;
       _mtime = 0;
     } else {
@@ -192,12 +199,12 @@ File::File(const string& access_path, const string& path) {
     _gid   = metadata.st_gid;
     _mode  = metadata.st_mode & ~S_IFMT;
     // Get value pointed by link
-    if (S_ISLNK(_type)) {
+    if (_type == 'l') {
       char* link = new char[FILENAME_MAX];
       int   size = readlink(full_path.c_str(), link, FILENAME_MAX);
 
       if (size < 0) {
-        _type = 0;
+        _type = '?';
       } else {
         link[size] = '\0';
         _link = link;
@@ -212,7 +219,6 @@ File::File(char* line, size_t size) {
   char      *start = line;
   char      *delim;
   char      *value = new char[size];
-  char      letter;
   int       failed = 0;
 
   // Dummy constructor for file reading
@@ -233,10 +239,9 @@ File::File(char* line, size_t size) {
           _path = value;
           break;
         case 3:   /* Type */
-          if (sscanf(value, "%c", &letter) != 1) {
+          if (sscanf(value, "%c", &_type) != 1) {
             failed = 2;
           }
-          _type = File::typeMode(letter);
           break;
         case 4:   /* Size */
           if (sscanf(value, "%lld", &_size) != 1) {
@@ -274,7 +279,7 @@ File::File(char* line, size_t size) {
   }
   free(value);
   if (failed != 0) {
-    _type = 0;
+    _type = '?';
   }
 }
 
@@ -310,7 +315,7 @@ string File::name() const {
 }
 
 string File::line(bool nodates) const {
-  string  output = _path + "\t" + typeLetter(_type);
+  string  output = _path;
   char*   numbers = NULL;
   time_t  mtime;
 
@@ -320,7 +325,8 @@ string File::line(bool nodates) const {
     mtime = _mtime;
   }
 
-  asprintf(&numbers, "%lld\t%ld\t%u\t%u\t%o", _size, mtime, _uid, _gid, _mode);
+  asprintf(&numbers, "%c\t%lld\t%ld\t%u\t%u\t%o",
+    _type, _size, mtime, _uid, _gid, _mode);
   output += "\t" + string(numbers) + "\t" + _link;
   delete numbers;
   return output;
@@ -557,29 +563,6 @@ ssize_t Stream::write(unsigned char* buffer, size_t count, bool eof) {
 }
 
 // Public functions
-char File::typeLetter(mode_t mode) {
-  if (S_ISREG(mode))  return 'f';
-  if (S_ISDIR(mode))  return 'd';
-  if (S_ISCHR(mode))  return 'c';
-  if (S_ISBLK(mode))  return 'b';
-  if (S_ISFIFO(mode)) return 'p';
-  if (S_ISLNK(mode))  return 'l';
-  if (S_ISSOCK(mode)) return 's';
-  if (mode == 0)      return '!';
-  return '?';
-}
-
-mode_t File::typeMode(char letter) {
-  if (letter == 'f') return S_IFREG;
-  if (letter == 'd') return S_IFDIR;
-  if (letter == 'c') return S_IFCHR;
-  if (letter == 'b') return S_IFBLK;
-  if (letter == 'p') return S_IFIFO;
-  if (letter == 'l') return S_IFLNK;
-  if (letter == 's') return S_IFSOCK;
-  return 0;
-}
-
 void File::md5sum(
     string&               checksum_out,
     const unsigned char*  checksum_in,

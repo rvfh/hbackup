@@ -47,7 +47,7 @@ bool Condition::match(const File& filedata) const {
   /* Test condition */
   switch(_type) {
   case filter_type:
-    return (_file_type & filedata.type()) != 0;
+    return _file_type == filedata.type();
   case filter_name:
     return name == _string;
   case filter_name_start:

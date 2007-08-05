@@ -60,7 +60,7 @@ int main(void) {
   File      *file_data;
 
   cout << "Conditions test\n";
-  file_data = new File("this is/a path/to a file.txt", "", S_IFREG, 0, 0, 0, 0, 0);
+  file_data = new File("this is/a path/to a file.txt", "", 'f', 0, 0, 0, 0, 0);
 
   cout << "filter_name check\n";
   condition = new Condition(filter_name, "to a file.txt");
@@ -193,14 +193,14 @@ int main(void) {
 
   cout << "\nMatch function test\n";
   condition = new Condition(filter_size_below, (off_t) 5000);
-  file_data = new File("", "", S_IFREG, 0, 4000, 0, 0, 0);
+  file_data = new File("", "", 'f', 0, 4000, 0, 0, 0);
   if (! condition->match(*file_data)) {
     cout << "Not matching " << file_data->size() << "\n";
   } else {
     cout << "Matching " << file_data->size() << "\n";
   }
   delete file_data;
-  file_data = new File("", "", S_IFREG, 0, 6000, 0, 0, 0);
+  file_data = new File("", "", 'f', 0, 6000, 0, 0, 0);
   if (! condition->match(*file_data)) {
     cout << "Not matching " << file_data->size() << "\n";
   } else {
@@ -220,34 +220,34 @@ int main(void) {
   cout << ">List " << filter->size() << " rule(s):\n";
   filter_show(*filter);
 
-  file_data = new File("to a file.txt", "", S_IFREG, 0, 0, 0, 0, 0);
+  file_data = new File("to a file.txt", "", 'f', 0, 0, 0, 0, 0);
   if (! filter->match(*file_data)) {
     cout << "Not matching 1\n";
   }
   delete file_data;
-  file_data = new File("to a file.tst", "", S_IFREG, 0, 0, 0, 0, 0);
+  file_data = new File("to a file.tst", "", 'f', 0, 0, 0, 0, 0);
   if (! filter->match(*file_data)) {
     cout << "Not matching 2\n";
   }
   delete file_data;
-  file_data = new File("to a file.tsu", "", S_IFREG, 0, 0, 0, 0, 0);
+  file_data = new File("to a file.tsu", "", 'f', 0, 0, 0, 0, 0);
   if (! filter->match(*file_data)) {
     cout << "Not matching 3\n";
   }
   delete file_data;
 
   filter2 = new Filters;
-  file_data = new File("to a file.txt", "", S_IFREG, 0, 0, 0, 0, 0);
+  file_data = new File("to a file.txt", "", 'f', 0, 0, 0, 0, 0);
   if (! filter2->match(*file_data)) {
     cout << "Not matching +1\n";
   }
   delete file_data;
-  file_data = new File("to a file.tst", "", S_IFREG, 0, 0, 0, 0, 0);
+  file_data = new File("to a file.tst", "", 'f', 0, 0, 0, 0, 0);
   if (! filter2->match(*file_data)) {
     cout << "Not matching +2\n";
   }
   delete file_data;
-  file_data = new File("to a file.tsu", "", S_IFREG, 0, 0, 0, 0, 0);
+  file_data = new File("to a file.tsu", "", 'f', 0, 0, 0, 0, 0);
   if (! filter2->match(*file_data)) {
     cout << "Not matching +3\n";
   }
@@ -262,34 +262,34 @@ int main(void) {
   cout << ">List " << filter2->size() << " rule(s):\n";
   filter_show(*filter2);
 
-  file_data = new File("to a file.txt", "", S_IFREG, 0, 0, 0, 0, 0);
+  file_data = new File("to a file.txt", "", 'f', 0, 0, 0, 0, 0);
   if (! filter2->match(*file_data)) {
     cout << "Not matching +1\n";
   }
   delete file_data;
-  file_data = new File("to a file.tst", "", S_IFREG, 0, 0, 0, 0, 0);
+  file_data = new File("to a file.tst", "", 'f', 0, 0, 0, 0, 0);
   if (! filter2->match(*file_data)) {
     cout << "Not matching +2\n";
   }
   delete file_data;
-  file_data = new File("to a file.tsu", "", S_IFREG, 0, 0, 0, 0, 0);
+  file_data = new File("to a file.tsu", "", 'f', 0, 0, 0, 0, 0);
   if (! filter2->match(*file_data)) {
     cout << "Not matching +3\n";
   }
   delete file_data;
   delete filter2;
 
-  file_data = new File("to a file.txt", "", S_IFREG, 0, 0, 0, 0, 0);
+  file_data = new File("to a file.txt", "", 'f', 0, 0, 0, 0, 0);
   if (! filter->match(*file_data)) {
     cout << "Not matching 1\n";
   }
   delete file_data;
-  file_data = new File("to a file.tst", "", S_IFREG, 0, 0, 0, 0, 0);
+  file_data = new File("to a file.tst", "", 'f', 0, 0, 0, 0, 0);
   if (! filter->match(*file_data)) {
     cout << "Not matching 2\n";
   }
   delete file_data;
-  file_data = new File("to a file.tsu", "", S_IFREG, 0, 0, 0, 0, 0);
+  file_data = new File("to a file.tsu", "", 'f', 0, 0, 0, 0, 0);
   if (! filter->match(*file_data)) {
     cout << "Not matching 3\n";
   }
@@ -297,21 +297,21 @@ int main(void) {
   delete filter;
 
   filter = new Filters;
-  file_data = new File("", "", S_IFREG, 0, 0, 0, 0, 0);
+  file_data = new File("", "", 'f', 0, 0, 0, 0, 0);
   if (! filter->match(*file_data)) {
     cout << "Not matching " << file_data->size() << "\n";
   } else {
     cout << "Matching " << file_data->size() << "\n";
   }
   delete file_data;
-  file_data = new File("", "", S_IFREG, 0, 1000, 0, 0, 0);
+  file_data = new File("", "", 'f', 0, 1000, 0, 0, 0);
   if (! filter->match(*file_data)) {
     cout << "Not matching " << file_data->size() << "\n";
   } else {
     cout << "Matching " << file_data->size() << "\n";
   }
   delete file_data;
-  file_data = new File("", "", S_IFREG, 0, 1000000, 0, 0, 0);
+  file_data = new File("", "", 'f', 0, 1000000, 0, 0, 0);
   if (! filter->match(*file_data)) {
     cout << "Not matching " << file_data->size() << "\n";
   } else {
@@ -319,26 +319,26 @@ int main(void) {
   }
   delete file_data;
 
-  /* File type is always S_IFREG */
+  /* File type is always 'f' */
   filter->push_back(Filter(Condition(filter_size_below, (off_t) 500)));
   cout << ">List " << filter->size() << " rule(s):\n";
   filter_show(*filter);
 
-  file_data = new File("", "", S_IFREG, 0, 0, 0, 0, 0);
+  file_data = new File("", "", 'f', 0, 0, 0, 0, 0);
   if (! filter->match(*file_data)) {
     cout << "Not matching " << file_data->size() << "\n";
   } else {
     cout << "Matching " << file_data->size() << "\n";
   }
   delete file_data;
-  file_data = new File("", "", S_IFREG, 0, 1000, 0, 0, 0);
+  file_data = new File("", "", 'f', 0, 1000, 0, 0, 0);
   if (! filter->match(*file_data)) {
     cout << "Not matching " << file_data->size() << "\n";
   } else {
     cout << "Matching " << file_data->size() << "\n";
   }
   delete file_data;
-  file_data = new File("", "", S_IFREG, 0, 1000000, 0, 0, 0);
+  file_data = new File("", "", 'f', 0, 1000000, 0, 0, 0);
   if (! filter->match(*file_data)) {
     cout << "Not matching " << file_data->size() << "\n";
   } else {
@@ -346,26 +346,26 @@ int main(void) {
   }
   delete file_data;
 
-  /* File type is always S_IFREG */
+  /* File type is always 'f' */
   filter->push_back(Filter(Condition(filter_size_above, (off_t) 5000)));
   cout << ">List " << filter->size() << " rule(s):\n";
   filter_show(*filter);
 
-  file_data = new File("", "", S_IFREG, 0, 0, 0, 0, 0);
+  file_data = new File("", "", 'f', 0, 0, 0, 0, 0);
   if (! filter->match(*file_data)) {
     cout << "Not matching " << file_data->size() << "\n";
   } else {
     cout << "Matching " << file_data->size() << "\n";
   }
   delete file_data;
-  file_data = new File("", "", S_IFREG, 0, 1000, 0, 0, 0);
+  file_data = new File("", "", 'f', 0, 1000, 0, 0, 0);
   if (! filter->match(*file_data)) {
     cout << "Not matching " << file_data->size() << "\n";
   } else {
     cout << "Matching " << file_data->size() << "\n";
   }
   delete file_data;
-  file_data = new File("", "", S_IFREG, 0, 1000000, 0, 0, 0);
+  file_data = new File("", "", 'f', 0, 1000000, 0, 0, 0);
   if (! filter->match(*file_data)) {
     cout << "Not matching " << file_data->size() << "\n";
   } else {
@@ -393,35 +393,35 @@ int main(void) {
   cout << ">List " << filter->size() << " rule(s):\n";
   filter_show(*filter);
 
-  file_data = new File("", "", S_IFREG, 0, 600, 0, 0, 0);
+  file_data = new File("", "", 'f', 0, 600, 0, 0, 0);
   if (! filter->match(*file_data)) {
     cout << "Not matching " << file_data->size() << "\n";
   } else {
     cout << "Matching " << file_data->size() << "\n";
   }
   delete file_data;
-  file_data = new File("", "", S_IFREG, 0, 500, 0, 0, 0);
+  file_data = new File("", "", 'f', 0, 500, 0, 0, 0);
   if (! filter->match(*file_data)) {
     cout << "Not matching " << file_data->size() << "\n";
   } else {
     cout << "Matching " << file_data->size() << "\n";
   }
   delete file_data;
-  file_data = new File("", "", S_IFREG, 0, 450, 0, 0, 0);
+  file_data = new File("", "", 'f', 0, 450, 0, 0, 0);
   if (! filter->match(*file_data)) {
     cout << "Not matching " << file_data->size() << "\n";
   } else {
     cout << "Matching " << file_data->size() << "\n";
   }
   delete file_data;
-  file_data = new File("", "", S_IFREG, 0, 400, 0, 0, 0);
+  file_data = new File("", "", 'f', 0, 400, 0, 0, 0);
   if (! filter->match(*file_data)) {
     cout << "Not matching " << file_data->size() << "\n";
   } else {
     cout << "Matching " << file_data->size() << "\n";
   }
   delete file_data;
-  file_data = new File("", "", S_IFREG, 0, 300, 0, 0, 0);
+  file_data = new File("", "", 'f', 0, 300, 0, 0, 0);
   if (! filter->match(*file_data)) {
     cout << "Not matching " << file_data->size() << "\n";
   } else {

@@ -66,7 +66,7 @@ int Path::iterate_directory(const string& path, Parser* parser) {
       file_path.substr(_mount_path_length + 1));
 
     /* Remove mount path and leading slash from records */
-    if (file_data.type() == 0) {
+    if (file_data.type() == '?') {
       cerr << "paths: cannot get metadata: " << file_path << endl;
       continue;
     } else
@@ -78,7 +78,7 @@ int Path::iterate_directory(const string& path, Parser* parser) {
     if (! _filters.empty() && _filters.match(file_data)) {
       continue;
     } else
-    if (S_ISDIR(file_data.type())) {
+    if (file_data.type() == 'd') {
       if (iterate_directory(file_path, parser)) {
         if (! terminating()) {
           cerr << "paths: cannot iterate into directory: "
@@ -126,27 +126,27 @@ int Path::addFilter(
 
   /* Add specified filter */
   if (type == "type") {
-    mode_t file_type;
+    char file_type;
     if ((value == "file") || (value == "f")) {
-      file_type = S_IFREG;
+      file_type = 'f';
     } else
     if ((value == "dir") || (value == "d")) {
-      file_type = S_IFDIR;
+      file_type = 'd';
     } else
     if ((value == "char") || (value == "c")) {
-      file_type = S_IFCHR;
+      file_type = 'c';
     } else
     if ((value == "block") || (value == "b")) {
-      file_type = S_IFBLK;
+      file_type = 'b';
     } else
     if ((value == "pipe") || (value == "p")) {
-      file_type = S_IFIFO;
+      file_type = 'p';
     } else
     if ((value == "link") || (value == "l")) {
-      file_type = S_IFLNK;
+      file_type = 'l';
     } else
     if ((value == "socket") || (value == "s")) {
-      file_type = S_IFSOCK;
+      file_type = 's';
     } else {
       // Wrong value
       return 2;

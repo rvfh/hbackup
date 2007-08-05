@@ -79,10 +79,10 @@ CvsParser::CvsParser(parser_mode_t mode, const string& dir_path) {
         // entries file is a single 'D'
         continue;
       }
-      cvs_entry.type = S_IFDIR;
+      cvs_entry.type = 'd';
       buffer.erase(0,1);
     } else {
-      cvs_entry.type = S_IFREG;
+      cvs_entry.type = 'f';
     }
     if (buffer.substr(0,1) != "/") {
       continue;
@@ -107,7 +107,7 @@ bool CvsParser::ignore(const File& file_data) {
   }
 
   // Do not ignore control directory
-  if ((file_data.name() == _control_dir) && (file_data.type() == S_IFDIR)) {
+  if ((file_data.name() == _control_dir) && (file_data.type() == 'd')) {
     return false;
   }
 

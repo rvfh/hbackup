@@ -50,12 +50,12 @@ typedef enum {
 
 class Condition {
   filter_type_t _type;
-  mode_t        _file_type;
+  char          _file_type;
   off_t         _size;
   string        _string;
 public:
   // File type-based condition
-  Condition(filter_type_t type, mode_t file_type) :
+  Condition(filter_type_t type, char file_type) :
     _type(type), _file_type(file_type) {}
   // Size-based condition
   Condition(filter_type_t type, off_t size) :

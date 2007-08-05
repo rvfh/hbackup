@@ -82,11 +82,11 @@ int Database::organise(const string& path, int number) {
       }
       File file_data(path, dir_entry->d_name);
       string source_path = path + "/" + dir_entry->d_name;
-      if (file_data.type() == 0) {
+      if (file_data.type() == '?') {
         cerr << "db: organise: cannot get metadata: " << source_path << endl;
         failed = 2;
       } else
-      if (S_ISDIR(file_data.type())
+      if ((file_data.type() == 'd')
        // If we crashed, we might have some two-letter dirs already
        && (file_data.name().size() != 2)
        // If we've reached the point where the dir is ??-?, stop!
@@ -676,14 +676,14 @@ int Database::parse(
         file_add = true;
 
         /* If it's a file and size and mtime are the same, copy checksum accross */
-        if (S_ISREG(entry_active->data()->type())
+        if ((entry_active->data()->type() == 'f')
          && (entry_active->data()->size() == entry_file_list->size())
          && (entry_active->data()->mtime() == entry_file_list->mtime())) {
           // Same file, just ownership changed or something
           same_file = true;
          }
       } else
-      if (S_ISREG(entry_active->data()->type())
+      if ((entry_active->data()->type() == 'f')
        && (entry_active->checksum().size() == 0)) {
         // Previously failed write
         db_remove = true;
@@ -741,7 +741,7 @@ int Database::parse(
       for (i = added.begin(); i != added.end(); i++) {
         /* Same data as in file_list */
         filestobackup++;
-        if (S_ISREG(i->data()->type()) && i->checksum().empty()) {
+        if ((i->data()->type() == 'f') && i->checksum().empty()) {
           sizetobackup += i->data()->size();
         }
       }
@@ -763,7 +763,7 @@ int Database::parse(
         break;
       }
       // Set checksum
-      if (S_ISREG(i->data()->type()) && i->checksum().empty()) {
+      if ((i->data()->type() == 'f') && i->checksum().empty()) {
         if (write(mount_path + i->data()->path().substr(mounted_path.size()),
          *i) != 0) {
           /* Write failed, need to go on */
