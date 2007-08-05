@@ -124,6 +124,7 @@ int Directory::createList() {
   DIR* directory = opendir(_path);
   if (directory == NULL) return -1;
 
+  _entries = 0;
   struct dirent *dir_entry;
   while (((dir_entry = readdir(directory)) != NULL) && ! terminating()) {
     /* Ignore . and .. */
@@ -141,13 +142,13 @@ int Directory::createList() {
 }
 
 void Directory::deleteList() {
-  NodeListElement* current = _entries_head;
+  _entries = -1;
 
+  NodeListElement* current = _entries_head;
   while (current != NULL) {
     NodeListElement* next = current->next();
     delete current;
     current = next;
-    _entries--;
   }
 }
 

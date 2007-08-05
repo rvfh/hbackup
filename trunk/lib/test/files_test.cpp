@@ -72,6 +72,7 @@ void showFile(const Node &g) {
       << ", gid = " << (int)(d->gid() != 0)
       << ", mode = " << d->mode()
       << endl;
+    d->createList();
     NodeListElement* entry = d->entries_head();
     cout << "Listing " << d->entries() << " entries:" << endl;
     while (entry != NULL) {
