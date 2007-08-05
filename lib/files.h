@@ -30,7 +30,7 @@ using namespace std;
 
 namespace hbackup {
 
-class GenericFile {
+class Node {
   char*     _path;      // file path
 protected:
   char*     _name;      // file name
@@ -42,7 +42,7 @@ protected:
   mode_t    _mode;      // permissions
 public:
   // Default constructor
-  GenericFile(const GenericFile& g) :
+  Node(const Node& g) :
         _path(NULL),
         _name(NULL),
         _type(g._type),
@@ -54,9 +54,9 @@ public:
     asprintf(&_name, "%s", g._name);
   }
   // Constructor for path in the VFS
-  GenericFile(const char *path, const char* name = "");
+  Node(const char *path, const char* name = "");
   // Constructor for given file metadata
-  GenericFile(
+  Node(
       const char* name,
       char        type,
       time_t      mtime,
@@ -74,7 +74,7 @@ public:
         _mode(mode) {
     asprintf(&_name, "%s", name);
   }
-  ~GenericFile() {
+  ~Node() {
     free(_path);
     free(_name);
   }
@@ -90,30 +90,30 @@ public:
   mode_t      mode()    const { return _mode;  }
 };
 
-class GenericFileListElement {
-  GenericFile*            _payload;
-  GenericFileListElement* _next;
-  GenericFileListElement* _previous;
+class NodeListElement {
+  Node*            _payload;
+  NodeListElement* _next;
+  NodeListElement* _previous;
 public:
-  GenericFileListElement(GenericFile* payload) :
+  NodeListElement(Node* payload) :
     _payload(payload),
     _next(NULL),
     _previous(NULL) {}
-  ~GenericFileListElement() {
+  ~NodeListElement() {
     delete _payload;
   }
-  void insert(GenericFileListElement** first);
-  void remove(GenericFileListElement** first);
-  GenericFile*            payload() { return _payload; }
-  GenericFileListElement* next()    { return _next; }
+  void insert(NodeListElement** first);
+  void remove(NodeListElement** first);
+  Node*            payload() { return _payload; }
+  NodeListElement* next()    { return _next; }
 };
 
-class File2 : public GenericFile {
+class File2 : public Node {
   char*     _checksum;
 public:
   // Constructor for path in the VFS
-  File2(const GenericFile& g) :
-      GenericFile(g),
+  File2(const Node& g) :
+      Node(g),
       _checksum(NULL) {}
   // Constructor for given file metadata
   File2(
@@ -125,7 +125,7 @@ public:
     gid_t       gid,
     mode_t      mode,
     const char* checksum) :
-        GenericFile(name, type, mtime, size, uid, gid, mode),
+        Node(name, type, mtime, size, uid, gid, mode),
         _checksum(NULL) {
       asprintf(&_checksum, "%s", checksum);
   }
@@ -133,54 +133,47 @@ public:
     free(_checksum);
   }
   // Data read access
-  const char* checksum()  const { return _checksum;  }
+  const char* checksum() const { return _checksum;  }
 };
 
-class Directory : public GenericFile {
-  GenericFileListElement* _first_entry;
+class Directory : public Node {
+  NodeListElement* _entries_head;
   int _entries;
   int createList(const char* path);
   void deleteList();
 public:
   // Constructor for path in the VFS
-  Directory(const GenericFile& g, const char* path) :
-      GenericFile(g),
-      _first_entry(NULL),
+  Directory(const Node& g, const char* path) :
+      Node(g),
+      _entries_head(NULL),
       _entries(0) {
     _size  = 0;
     _mtime = 0;
-    // Create list of GenericFiles contained in directory
+    // Create list of Nodes contained in directory
     if (createList(path)) _entries = -1;
   }
   ~Directory() {
     deleteList();
   }
-  // FIXME Temporary
-  void showList() {
-    GenericFileListElement* entry = _first_entry;
-    cout << "Listing " << _entries << " entries:" << endl;
-    while (entry != NULL) {
-      cout << " -> name: " << entry->payload()->name() << endl;
-      entry = entry->next();
-    }
-  }
+  int entries()                   const { return _entries; }
+  NodeListElement* entries_head() const { return _entries_head; }
 };
 
-class CharDev : public GenericFile {
+class CharDev : public Node {
 };
 
-class BlockDev : public GenericFile {
+class BlockDev : public Node {
 };
 
-class Pipe : public GenericFile {
+class Pipe : public Node {
 };
 
-class Link : public GenericFile {
+class Link : public Node {
   char*     _link;
 public:
   // Constructor for path in the VFS
-  Link(const GenericFile& g, const char* path) :
-      GenericFile(g),
+  Link(const Node& g, const char* path) :
+      Node(g),
       _link(NULL) {
     _mtime = 0;
     char* link = (char*) malloc(FILENAME_MAX + 1);
@@ -205,7 +198,7 @@ public:
     gid_t       gid,
     mode_t      mode,
     const char* link) :
-        GenericFile(name, type, mtime, size, uid, gid, mode),
+        Node(name, type, mtime, size, uid, gid, mode),
         _link(NULL) {
       asprintf(&_link, "%s", link);
   }
@@ -216,7 +209,7 @@ public:
   const char* link()  const { return _link;  }
 };
 
-class Socket : public GenericFile {
+class Socket : public Node {
 };
 
 class File {

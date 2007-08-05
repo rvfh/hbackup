@@ -35,7 +35,7 @@ int terminating(void) {
   return 0;
 }
 
-void showFile(const GenericFile &g) {
+void showFile(const Node &g) {
   switch (g.type()) {
   case 'f': {
     File2 *f = new File2(g);
@@ -72,7 +72,12 @@ void showFile(const GenericFile &g) {
       << ", gid = " << (int)(d->gid() != 0)
       << ", mode = " << d->mode()
       << endl;
-    d->showList();
+    NodeListElement* entry = d->entries_head();
+    cout << "Listing " << d->entries() << " entries:" << endl;
+    while (entry != NULL) {
+      cout << " -> name: " << entry->payload()->name() << endl;
+      entry = entry->next();
+    }
     delete d; }
     break;
   default:
@@ -504,17 +509,17 @@ int main(void) {
   delete params;
 
   // New age preparation test
-  GenericFile *g;
-  g = new GenericFile("test1/testfile");
+  Node *g;
+  g = new Node("test1/testfile");
   showFile(*g);
   delete g;
-  g = new GenericFile("test1/testlink");
+  g = new Node("test1/testlink");
   showFile(*g);
   delete g;
-  g = new GenericFile("test1/testdir");
+  g = new Node("test1/testdir");
   showFile(*g);
   delete g;
-  g = new GenericFile("test1/subdir");
+  g = new Node("test1/subdir");
   showFile(*g);
   delete g;
 
