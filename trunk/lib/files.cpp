@@ -35,7 +35,7 @@ using namespace std;
 
 using namespace hbackup;
 
-GenericFile::GenericFile(const char* path, const char* name) {
+Node::Node(const char* path, const char* name) {
   if (name[0] == '\0') {
     const char* name = strrchr(path, '/');
 
@@ -75,9 +75,9 @@ GenericFile::GenericFile(const char* path, const char* name) {
   }
 }
 
-void GenericFileListElement::insert(GenericFileListElement** first) {
-  GenericFileListElement* next     = *first;
-  GenericFileListElement* previous = NULL;
+void NodeListElement::insert(NodeListElement** first) {
+  NodeListElement* next     = *first;
+  NodeListElement* previous = NULL;
   while ((next != NULL)
       && (strcmp(next->_payload->name(), this->_payload->name()) < 0)) {
     previous = next;
@@ -95,7 +95,7 @@ void GenericFileListElement::insert(GenericFileListElement** first) {
   }
 }
 
-void GenericFileListElement::remove(GenericFileListElement** first) {
+void NodeListElement::remove(NodeListElement** first) {
   if (_previous != NULL) {
     _previous->_next = _next;
   } else {
@@ -116,9 +116,9 @@ int Directory::createList(const char* path) {
     if (!strcmp(dir_entry->d_name, ".") || !strcmp(dir_entry->d_name, "..")){
       continue;
     }
-    GenericFile *g = new GenericFile(path, dir_entry->d_name);
-    GenericFileListElement* e = new GenericFileListElement(g);
-    e->insert(&_first_entry);
+    Node *g = new Node(path, dir_entry->d_name);
+    NodeListElement* e = new NodeListElement(g);
+    e->insert(&_entries_head);
     _entries++;
   }
 
@@ -127,10 +127,10 @@ int Directory::createList(const char* path) {
 }
 
 void Directory::deleteList() {
-  GenericFileListElement* current = _first_entry;
+  NodeListElement* current = _entries_head;
 
   while (current != NULL) {
-    GenericFileListElement* next = current->next();
+    NodeListElement* next = current->next();
     delete current;
     current = next;
     _entries--;
