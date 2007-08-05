@@ -87,8 +87,6 @@ void showFile(const Node &g) {
 
 int main(void) {
   string  line;
-  File*   readfile;
-  File*   writefile;
 
   cout << "Tools Test" << endl;
 
@@ -111,9 +109,12 @@ int main(void) {
   cout << "In: " << size_in << " bytes, checksum: " << check_in << endl;
   cout << "Out: " << size_out << " bytes, checksum: " << check_out << endl;
 
+  Stream* readfile;
+  Stream* writefile;
+
   cout << endl << "Test: file read" << endl;
-  readfile = new File(".", "test1/zcopy_source");
-  if (readfile->open(".", "r")) {
+  readfile = new Stream("test1/zcopy_source");
+  if (readfile->open("r")) {
     cout << "Error opening file" << endl;
   } else {
     unsigned char buffer[File::chunk];
@@ -135,9 +136,9 @@ int main(void) {
 
   cout << endl << "Test: file copy (read + write)" << endl;
   system("dd if=/dev/zero of=test1/zcopy_source bs=1M count=10 status=noxfer 2> /dev/null");
-  readfile = new File(".", "test1/zcopy_source");
-  writefile = new File(".", "test1/zcopy_dest");
-  if (readfile->open(".", "r") || writefile->open(".", "w")) {
+  readfile = new Stream("test1/zcopy_source");
+  writefile = new Stream("test1/zcopy_dest");
+  if (readfile->open("r") || writefile->open("w")) {
     cout << "Error opening file" << endl;
   } else {
     unsigned char buffer[File::chunk];
@@ -170,9 +171,9 @@ int main(void) {
   delete writefile;
 
   cout << endl << "Test: file compress (read + compress write)" << endl;
-  readfile = new File(".", "test1/zcopy_source");
-  writefile = new File(".", "test1/zcopy_dest");
-  if (readfile->open(".", "r") || writefile->open(".", "w", 5)) {
+  readfile = new Stream("test1/zcopy_source");
+  writefile = new Stream("test1/zcopy_dest");
+  if (readfile->open("r") || writefile->open("w", 5)) {
     cout << "Error opening file" << endl;
   } else {
     unsigned char buffer[File::chunk];
@@ -205,9 +206,9 @@ int main(void) {
   delete writefile;
 
   cout << endl << "Test: file uncompress (uncompress read + write)" << endl;
-  readfile = new File(".", "test1/zcopy_dest");
-  writefile = new File(".", "test1/zcopy_source");
-  if (readfile->open(".", "r", 1) || writefile->open(".", "w")) {
+  readfile = new Stream("test1/zcopy_dest");
+  writefile = new Stream("test1/zcopy_source");
+  if (readfile->open("r", 1) || writefile->open("w")) {
     cout << "Error opening file" << endl;
   } else {
     unsigned char buffer[File::chunk];
@@ -241,9 +242,9 @@ int main(void) {
 
   cout << endl << "Test: file compress (read + compress write)"
     << endl;
-  readfile = new File(".", "test1/zcopy_source");
-  writefile = new File(".", "test1/zcopy_dest");
-  if (readfile->open(".", "r") || writefile->open(".", "w", 5)) {
+  readfile = new Stream("test1/zcopy_source");
+  writefile = new Stream("test1/zcopy_dest");
+  if (readfile->open("r") || writefile->open("w", 5)) {
     cout << "Error opening file" << endl;
   } else {
     unsigned char buffer[File::chunk];
@@ -276,11 +277,11 @@ int main(void) {
     << "Test: file recompress (uncompress read + compress write), no closing"
     << endl;
   {
-    File* swap = readfile;
+    Stream* swap = readfile;
     readfile = writefile;
     writefile = swap;
   }
-  if (readfile->open(".", "r", 1) || writefile->open(".", "w", 5)) {
+  if (readfile->open("r", 1) || writefile->open("w", 5)) {
     cout << "Error opening file" << endl;
   } else {
     unsigned char buffer[File::chunk];

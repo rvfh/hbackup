@@ -179,7 +179,6 @@ File::File(const string& access_path, const string& path) {
       free(link);
     }
   }
-  _fd = NULL;
   _checksum = "";
 }
 
@@ -301,8 +300,18 @@ string File::line(bool nodates) const {
   return output;
 }
 
-int File::open(const char* prepath, const char* req_mode,
-    unsigned int compression) {
+void Stream::md5sum(char* out, const unsigned char* in, int bytes) {
+  char* hex   = "0123456789abcdef";
+
+  while (bytes-- != 0) {
+    *out++ = hex[*in >> 4];
+    *out++ = hex[*in & 0xf];
+    in++;
+  }
+  *out = '\0';
+}
+
+int Stream::open(const char* req_mode,unsigned int compression) {
   char mode[2];
 
   switch (req_mode[0]) {
@@ -319,16 +328,9 @@ int File::open(const char* prepath, const char* req_mode,
     return 1;
   }
 
-  string path;
-  if (prepath[0] == '\0') {
-    path = _path;
-  } else {
-    path = string(prepath) + "/" + _path;
-  }
-
   _dsize  = 0;
   _fempty = true;
-  _fd = fopen64(path.c_str(), mode);
+  _fd = fopen64(_path, mode);
   if (_fd == NULL)
     return -1;
   if (feof(_fd)) {
@@ -342,7 +344,6 @@ int File::open(const char* prepath, const char* req_mode,
   if (_ctx != NULL) {
     EVP_DigestInit(_ctx, EVP_md5());
   }
-
 
   /* Create zlib resources */
   if (compression != 0) {
@@ -373,7 +374,7 @@ int File::open(const char* prepath, const char* req_mode,
   return _fd == NULL;
 }
 
-int File::close() {
+int Stream::close() {
   if (_fd == NULL) return -1;
 
   /* Compute checksum */
@@ -382,6 +383,7 @@ int File::close() {
     size_t        length;
 
     EVP_DigestFinal(_ctx, checksum, &length);
+    _checksum = (char*) malloc(2 * length + 1);
     md5sum(_checksum, checksum, length);
   }
 
@@ -397,7 +399,7 @@ int File::close() {
   return fclose(_fd);
 }
 
-ssize_t File::read(unsigned char* buffer, size_t count) {
+ssize_t Stream::read(unsigned char* buffer, size_t count) {
   size_t length;
 
   if ((_fd == NULL) || _fwrite) {
@@ -456,7 +458,7 @@ ssize_t File::read(unsigned char* buffer, size_t count) {
   return length;
 }
 
-ssize_t File::write(unsigned char* buffer, size_t count, bool eof) {
+ssize_t Stream::write(unsigned char* buffer, size_t count, bool eof) {
   static bool finished = true;
   size_t length;
 
@@ -524,18 +526,6 @@ ssize_t File::write(unsigned char* buffer, size_t count, bool eof) {
 
   _size += count;
   return count;
-}
-
-ssize_t File::readLine(unsigned char* buffer, size_t count, char delim) {
-  return 0;
-}
-
-ssize_t File::writeLine(const unsigned char* buffer, size_t count, char delim){
-  return 0;
-}
-
-ssize_t File::readParams(vector<string>& params) {
-  return 0;
 }
 
 // Public functions

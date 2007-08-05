@@ -109,6 +109,7 @@ public:
 };
 
 class File2 : public Node {
+protected:
   char*     _checksum;
 public:
   // Constructor for path in the VFS
@@ -212,6 +213,42 @@ public:
 class Socket : public Node {
 };
 
+class Stream : public File2 {
+  char*           _path;      // file path
+  FILE*           _fd;        // file descriptor
+  long long       _dsize;     // uncompressed data size, in bytes
+  bool            _fwrite;    // file open for write
+  unsigned char*  _fbuffer;   // buffer for file compression during read/write
+  bool            _fempty;    // compression buffer not empty
+  bool            _feof;      // All data read AND decompressed
+  EVP_MD_CTX*     _ctx;       // openssl resources
+  z_stream*       _strm;      // zlib resources
+  // Convert MD5 to readable string
+  static void md5sum(char* out, const unsigned char* in, int bytes);
+public:
+  // Max buffer size for read/write
+  static const size_t chunk = 409600;
+  Stream(const char* path) : File2(path) { asprintf(&_path, "%s", path); }
+  // Open file, for read or write (no append), with or without compression
+  int open(
+    const char*           req_mode,
+    unsigned int          compression = 0);
+  // Close file, for read or write (no append), with or without compression
+  int close();
+  // Read file sets eof (check with eof()) when all data is read and ready
+  ssize_t read(
+    unsigned char*        buffer,
+    size_t                count);
+  // Write to file (signal end of file for compression end)
+  ssize_t write(
+    unsigned char*        buffer,
+    size_t                count,
+    bool                  eof);
+  // Data access
+  long long dsize() const { return _dsize; };
+  bool eof() const { return _feof; };
+};
+
 class File {
   string          _path;      // file path
   string          _checksum;  // file checksum
@@ -222,14 +259,6 @@ class File {
   uid_t           _uid;       // user ID of owner
   gid_t           _gid;       // group ID of owner
   mode_t          _mode;      // permissions
-  FILE*           _fd;        // file descriptor
-  long long       _dsize;     // uncompressed data size, in bytes
-  bool            _fwrite;    // file open for write
-  unsigned char*  _fbuffer;   // buffer for file compression during read/write
-  bool            _fempty;    // compression buffer not empty
-  bool            _feof;      // All data read AND decompressed
-  EVP_MD_CTX*     _ctx;       // openssl resources
-  z_stream*       _strm;      // zlib resources
   // Convert MD5 to readable string
   static void md5sum(
     string&               checksum_out,
@@ -258,8 +287,7 @@ public:
       _size(size),
       _uid(uid),
       _gid(gid),
-      _mode(mode),
-      _fd(NULL) {}
+      _mode(mode) {}
   // Constructor for given line
   File(char* line, size_t size);
   // Need '<' to sort list
@@ -274,27 +302,9 @@ public:
   mode_t type() const { return _type; }
   time_t mtime() const { return _mtime; };
   long long size() const { return _size; };
-  long long dsize() const { return _dsize; };
-  bool eof() const { return _feof; };
   // Line containing all data (argument for debug only)
   string line(bool nodates = false) const;
   void setPath(const string& path) { _path = path; }
-
-  // Open file, for read or write (no append), with or without compression
-  int open(const char* prepath, const char* req_mode,
-    unsigned int compression = 0);
-  // Close file, for read or write (no append), with or without compression
-  int close();
-  // Read file sets eof (check with eof()) when all data is read and ready
-  ssize_t read(unsigned char* buffer, size_t count);
-  // Write to file (signal end of file for compression end)
-  ssize_t write(unsigned char* buffer, size_t count, bool eof);
-  // Get a line of data
-  ssize_t readLine(unsigned char* buffer, size_t count, char delim);
-  // Add a line of data
-  ssize_t writeLine(const unsigned char* buffer, size_t count, char delim);
-  // Get parameters from one line of data
-  ssize_t readParams(vector<string>& params);
 
   // Test whether dir exists, create it if requested
   static int testDir(const string& path, bool create);
