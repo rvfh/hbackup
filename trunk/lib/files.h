@@ -322,11 +322,15 @@ public:
   bool metadiffer(const File&) const;
   string name() const;
   string path() const { return _path; };
+  string link() const { return _link; };
   string checksum() const { return _checksum; }
   string fullPath(int max_size = -1) const;
   char type() const { return _type; }
   time_t mtime() const { return _mtime; };
   long long size() const { return _size; };
+  uid_t uid() const { return _uid; };
+  gid_t gid() const { return _gid; };
+  mode_t mode() const { return _mode; };
   // Line containing all data (argument for debug only)
   string line(bool nodates = false) const;
   void setPath(const string& path) { _path = path; }

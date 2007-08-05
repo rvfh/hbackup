@@ -118,8 +118,14 @@ public:
     return full_path.substr(0, size_max);
   }
   string line(bool nodates = false) const {
-    string  output = _prefix + "\t" + _data.line(nodates) + "\t" + _checksum;
     char*   numbers = NULL;
+    string  output = _prefix + "\t" + _data.path();
+
+    asprintf(&numbers, "%c\t%lld\t%ld\t%u\t%u\t%o", _data.type(),
+      _data.size(), nodates ? (_data.mtime() != 0) : _data.mtime(),
+      _data.uid(), _data.gid(), _data.mode());
+    output += "\t" + string(numbers) + "\t" + _data.link() + "\t" + _checksum;
+    delete numbers;
 
     asprintf(&numbers, "%ld\t%ld", _in, _out);
     output += "\t" + string(numbers) + "\t";
