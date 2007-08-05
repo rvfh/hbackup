@@ -22,6 +22,7 @@ using namespace std;
 #include <vector>
 #include <string>
 #include <sys/stat.h>
+#include <errno.h>
 
 #include "files.h"
 
@@ -91,27 +92,9 @@ int main(void) {
 
   cout << "Tools Test" << endl;
 
-  cout << endl << "Test: zcopy" << endl;
-  system("dd if=/dev/zero of=test1/zcopy_source bs=1M count=10 status=noxfer 2> /dev/null");
-  long long size_in  = 125;
-  long long size_out = 250;
-  string  check_in  = "bart";
-  string  check_out = "ernest";
-  File::zcopy("test1/zcopy_source", "test1/zcopy_dest", &size_in, &size_out,
-    &check_in, &check_out, 5);
-  cout << "In: " << size_in << " bytes, checksum: " << check_in << endl;
-  cout << "Out: " << size_out << " bytes, checksum: " << check_out << endl;
-  size_in  = 125;
-  size_out = 250;
-  check_in  = "bart";
-  check_out = "ernest";
-  File::zcopy("test1/zcopy_source", "test1/zcopy_dest", &size_in, &size_out,
-    &check_in, &check_out, 0);
-  cout << "In: " << size_in << " bytes, checksum: " << check_in << endl;
-  cout << "Out: " << size_out << " bytes, checksum: " << check_out << endl;
-
   Stream* readfile;
   Stream* writefile;
+  system("dd if=/dev/zero of=test1/zcopy_source bs=1M count=10 status=noxfer 2> /dev/null");
 
   cout << endl << "Test: file read" << endl;
   readfile = new Stream("test1/zcopy_source");
@@ -322,6 +305,26 @@ int main(void) {
     cout << "Checksum: " << readfile->checksum() << endl;
   }
   delete readfile;
+
+  cout << endl << "Test: copy" << endl;
+  readfile = new Stream("test1/zcopy_source");
+  remove("test1/zcopy_dest");
+  writefile = new Stream("test1/zcopy_dest");
+  if (readfile->open("r", 1) || writefile->open("w", 0)) {
+    cout << "Error opening file" << endl;
+  } else {
+    int rc = writefile->copy(*readfile);
+    if (readfile->close()) cout << "Error closing read file" << endl;
+    if (writefile->close()) cout << "Error closing write file" << endl;
+    if (rc) {
+      cout << "Error copying file: " << strerror(errno) << endl;
+    } else {
+      cout << "checksum in: " << readfile->checksum() << endl;
+      cout << "checksum out: " << writefile->checksum() << endl;
+    }
+  }
+  delete readfile;
+  delete writefile;
 
 
   cout << "\nmetadata" << endl;

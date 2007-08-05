@@ -249,7 +249,8 @@ public:
   static const size_t chunk = 409600;
   // Constructor for path in the VFS
   Stream(const char *path, const char* name = "") :
-      File2(path, name) {}
+      File2(path, name),
+      _fd(NULL) {}
   // Open file, for read or write (no append), with or without compression
   int open(
     const char*           req_mode,
@@ -266,10 +267,12 @@ public:
     size_t                count,
     bool                  eof);
   // Compute file checksum
-  int computeChecksum();
+  int       computeChecksum();
+  // Copy file into another
+  int       copy(Stream& source);
   // Data access
-  long long dsize() const { return _dsize; };
-  bool eof() const { return _feof; };
+  long long dsize() const   { return _dsize; };
+  bool      eof() const     { return _feof; };
 };
 
 class File {
@@ -282,11 +285,6 @@ class File {
   uid_t           _uid;       // user ID of owner
   gid_t           _gid;       // group ID of owner
   mode_t          _mode;      // permissions
-  // Convert MD5 to readable string
-  static void md5sum(
-    string&               checksum_out,
-    const unsigned char*  checksum_in,
-    int                   bytes);
 public:
   // Max buffer size for read/write
   static const size_t chunk = 409600;
@@ -329,15 +327,6 @@ public:
   string line(bool nodates = false) const;
   void setPath(const string& path) { _path = path; }
 
-  // Copy, compress and compute checksum (MD5), all in once
-  static int zcopy(
-    const string& source_path,
-    const string& dest_path,
-    long long*    size_in,
-    long long*    size_out,
-    string*       checksum_in,
-    string*       checksum_out,
-    int           compress);
   // Read parameters from line
   static int decodeLine(const string& line, vector<string>& params);
 };
