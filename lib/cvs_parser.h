@@ -26,7 +26,7 @@ namespace hbackup {
 
 typedef struct {
   string  name;   /* File name */
-  mode_t  type;   /* File type */
+  char    type;   /* File type */
 } cvs_entry_t;
 
 class CvsParser : public Parser {
@@ -48,7 +48,7 @@ public:
   void list() {
     cout << "List: " << _files.size() << " file(s)" << endl;
     for (unsigned int i = 0; i < _files.size(); i++) {
-      cout << "-> " << _files[i].name << endl;
+      cout << "-> " << _files[i].name << " (" << _files[i].type << ")" << endl;
     }
   }
 };

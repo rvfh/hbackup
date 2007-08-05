@@ -315,27 +315,6 @@ int main(void) {
   delete writefile;
 
 
-  cout << endl << "Test: typeLetter" << endl;
-  printf("File   : %c\n", File::typeLetter(S_IFREG));
-  printf("Dir    : %c\n", File::typeLetter(S_IFDIR));
-  printf("Char   : %c\n", File::typeLetter(S_IFCHR));
-  printf("Block  : %c\n", File::typeLetter(S_IFBLK));
-  printf("FIFO   : %c\n", File::typeLetter(S_IFIFO));
-  printf("Link   : %c\n", File::typeLetter(S_IFLNK));
-  printf("Socket : %c\n", File::typeLetter(S_IFSOCK));
-  printf("Zero   : %c\n", File::typeLetter(0));
-  printf("Unknown: %c\n", File::typeLetter(-1));
-
-  cout << endl << "Test: typeMode" << endl;
-  printf("File   : 0%06o\n", File::typeMode('f'));
-  printf("Dir    : 0%06o\n", File::typeMode('d'));
-  printf("Char   : 0%06o\n", File::typeMode('c'));
-  printf("Block  : 0%06o\n", File::typeMode('b'));
-  printf("FIFO   : 0%06o\n", File::typeMode('p'));
-  printf("Link   : 0%06o\n", File::typeMode('l'));
-  printf("Socket : 0%06o\n", File::typeMode('s'));
-  printf("Unknown: 0%06o\n", File::typeMode('?'));
-
   cout << "\nmetadata" << endl;
   {
     struct tm *time;
@@ -343,7 +322,6 @@ int main(void) {
     time_t file_time = file_data.mtime();
     time = localtime(&file_time);
     cout << "Line: " << file_data.line(true) << endl;;
-    printf(" * type: 0x%08x\n", file_data.type());
     printf(" * mtime (local): %04u-%02u-%02u %2u:%02u:%02u\n",
       time->tm_year + 1900, time->tm_mon + 1, time->tm_mday,
       time->tm_hour, time->tm_min, time->tm_sec);

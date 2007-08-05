@@ -274,7 +274,7 @@ class File {
   string          _path;      // file path
   string          _checksum;  // file checksum
   string          _link;      // what the link points to (if a link, of course)
-  mode_t          _type;      // file type (0 if metadata not available)
+  char            _type;      // file type ('?' if metadata not available)
   time_t          _mtime;     // time of last modification
   long long       _size;      // on-disk size, in bytes
   uid_t           _uid;       // user ID of owner
@@ -294,7 +294,7 @@ public:
   File(
     const string& path,
     const string& link,
-    mode_t        type,
+    char          type,
     time_t        mtime,
     long long     size,
     uid_t         uid,
@@ -320,17 +320,13 @@ public:
   string path() const { return _path; };
   string checksum() const { return _checksum; }
   string fullPath(int max_size = -1) const;
-  mode_t type() const { return _type; }
+  char type() const { return _type; }
   time_t mtime() const { return _mtime; };
   long long size() const { return _size; };
   // Line containing all data (argument for debug only)
   string line(bool nodates = false) const;
   void setPath(const string& path) { _path = path; }
 
-  // Transform letter into mode
-  static char typeLetter(mode_t mode);
-  // Transform mode into letter
-  static mode_t typeMode(char letter);
   // Copy, compress and compute checksum (MD5), all in once
   static int zcopy(
     const string& source_path,
