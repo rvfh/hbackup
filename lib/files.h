@@ -40,6 +40,7 @@ protected:
   uid_t     _uid;       // user ID of owner
   gid_t     _gid;       // group ID of owner
   mode_t    _mode;      // permissions
+  bool      _parsed;    // more info available using proper type
   void metadata(const char* path);
 public:
   // Default constructor
@@ -51,7 +52,8 @@ public:
         _size(g._size),
         _uid(g._uid),
         _gid(g._gid),
-        _mode(g._mode) {
+        _mode(g._mode),
+        _parsed(false) {
     asprintf(&_path, "%s", g._path);
     asprintf(&_name, "%s", g._name);
   }
@@ -73,7 +75,8 @@ public:
         _size(size),
         _uid(uid),
         _gid(gid),
-        _mode(mode) {
+        _mode(mode),
+        _parsed(false) {
     asprintf(&_name, "%s", name);
   }
   virtual ~Node() {
@@ -82,14 +85,15 @@ public:
   }
   virtual bool  isValid() const { return _type != '?'; }
   // Data read access
-  const char*   path()    const { return _path;  }
-  const char*   name()    const { return _name;  }
-  char          type()    const { return _type;  }
-  time_t        mtime()   const { return _mtime; }
-  long long     size()    const { return _size;  }
-  uid_t         uid()     const { return _uid;   }
-  gid_t         gid()     const { return _gid;   }
-  mode_t        mode()    const { return _mode;  }
+  const char*   path()    const { return _path;   }
+  const char*   name()    const { return _name;   }
+  char          type()    const { return _type;   }
+  time_t        mtime()   const { return _mtime;  }
+  long long     size()    const { return _size;   }
+  uid_t         uid()     const { return _uid;    }
+  gid_t         gid()     const { return _gid;    }
+  mode_t        mode()    const { return _mode;   }
+  bool          parsed()  const { return _parsed; }
 };
 
 class NodeListElement {
@@ -106,6 +110,7 @@ public:
   }
   void insert(NodeListElement** first);
   void remove(NodeListElement** first);
+  void replacePayload(Node* payload);
   Node*            payload() { return _payload; }
   NodeListElement* next()    { return _next; }
 };
@@ -117,11 +122,15 @@ public:
   // Constructor for existing Node
   File2(const Node& g) :
       Node(g),
-      _checksum(NULL) {}
+      _checksum(NULL) {
+    _parsed = true;
+  }
   // Constructor for path in the VFS
   File2(const char *path, const char* name = "") :
       Node(path, name),
-      _checksum(NULL) {}
+      _checksum(NULL) {
+    _parsed = true;
+  }
   // Constructor for given file metadata
   File2(
     const char* name,
@@ -132,9 +141,10 @@ public:
     gid_t       gid,
     mode_t      mode,
     const char* checksum) :
-        Node(name, type, mtime, size, uid, gid, mode),
-        _checksum(NULL) {
-      asprintf(&_checksum, "%s", checksum);
+      Node(name, type, mtime, size, uid, gid, mode),
+      _checksum(NULL) {
+    _parsed = true;
+    asprintf(&_checksum, "%s", checksum);
   }
   ~File2() {
     free(_checksum);
@@ -157,6 +167,7 @@ public:
       _entries(-1) {
     _size  = 0;
     _mtime = 0;
+    _parsed = true;
   }
   // Constructor for path in the VFS
   Directory(const char *path, const char* name = "") :
@@ -165,6 +176,7 @@ public:
       _entries(-1) {
     _size  = 0;
     _mtime = 0;
+    _parsed = true;
   }
   ~Directory() {
     deleteList();
@@ -173,19 +185,11 @@ public:
   int               create();
   // Create list of Nodes contained in directory
   int               createList();
+  int               parseList();
   void              deleteList();
   bool              isValid() const       { return _type == 'd'; }
   int               entries() const       { return _entries; }
   NodeListElement*  entries_head() const  { return _entries_head; }
-};
-
-class CharDev : public Node {
-};
-
-class BlockDev : public Node {
-};
-
-class Pipe : public Node {
 };
 
 class Link : public Node {
@@ -196,6 +200,7 @@ public:
       Node(g),
       _link(NULL) {
     _mtime = 0;
+    _parsed = true;
     char* link = (char*) malloc(FILENAME_MAX + 1);
     int   size = readlink(_path, link, FILENAME_MAX);
 
@@ -220,7 +225,8 @@ public:
     const char* link) :
         Node(name, type, mtime, size, uid, gid, mode),
         _link(NULL) {
-      asprintf(&_link, "%s", link);
+    _parsed = true;
+    asprintf(&_link, "%s", link);
   }
   ~Link() {
     free(_link);

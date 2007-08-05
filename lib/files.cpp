@@ -59,6 +59,7 @@ void Node::metadata(const char* path) {
 }
 
 Node::Node(const char* path, const char* name) {
+  _parsed = false;
   if (name[0] == '\0') {
     const char* name = strrchr(path, '/');
 
@@ -109,6 +110,11 @@ void NodeListElement::remove(NodeListElement** first) {
   }
 }
 
+void NodeListElement::replacePayload(Node* payload) {
+  delete _payload;
+  _payload = payload;
+}
+
 int File2::create() {
   FILE *readfile = fopen(_path, "w");
 
@@ -138,6 +144,35 @@ int Directory::createList() {
   }
 
   closedir(directory);
+  return 0;
+}
+
+int Directory::parseList() {
+  NodeListElement* entry = _entries_head;
+  while (entry != NULL) {
+    Node* payload = entry->payload();
+    switch (payload->type()) {
+      case 'f': {
+        File2 *f = new File2(*payload);
+        entry->replacePayload(f);
+      }
+      break;
+      case 'l': {
+        Link *l = new Link(*payload);
+        entry->replacePayload(l);
+      }
+      break;
+      case 'd': {
+        Directory *d = new Directory(*payload);
+        entry->replacePayload(d);
+        if (! d->createList()) {
+          d->parseList();
+        }
+      }
+      break;
+    }
+    entry = entry->next();
+  }
   return 0;
 }
 
