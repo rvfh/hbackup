@@ -265,6 +265,8 @@ public:
     unsigned char*        buffer,
     size_t                count,
     bool                  eof);
+  // Compute file checksum
+  int computeChecksum();
   // Data access
   long long dsize() const { return _dsize; };
   bool eof() const { return _feof; };
@@ -336,8 +338,6 @@ public:
     string*       checksum_in,
     string*       checksum_out,
     int           compress);
-  // Compute file checksum (MD5)
-  static int getChecksum(const string& path, string& checksum);
   // Read parameters from line
   static int decodeLine(const string& line, vector<string>& params);
 };

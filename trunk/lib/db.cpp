@@ -931,21 +931,21 @@ int Database::scan(const string& checksum, bool thorough) {
       cerr << "db: scan: file data missing for checksum " << checksum << endl;
     } else
     if (thorough) {
-      string  check_path = path + "/data";
-      string checksum_real;
+      string check_path = path + "/data";
 
       /* Read file to compute checksum, compare with expected */
-      if (File::getChecksum(check_path, checksum_real) == 2) {
+      Stream s(check_path.c_str());
+      if (s.computeChecksum()) {
         errno = ENOENT;
         filefailed = true;
         cerr << "db: scan: file data missing for checksum " << checksum << endl;
       } else
-      if (checksum.substr(0, checksum_real.size()) != checksum_real) {
+      if (strncmp(checksum.c_str(), s.checksum(), strlen(s.checksum()))) {
         errno = EILSEQ;
         filefailed = true;
         if (! terminating()) {
           cerr << "db: scan: file data corrupted for checksum " << checksum
-            << " (found to be " << checksum_real << ")" << endl;
+            << " (found to be " << s.checksum() << ")" << endl;
         }
       }
 

@@ -562,6 +562,29 @@ ssize_t Stream::write(unsigned char* buffer, size_t count, bool eof) {
   return count;
 }
 
+int Stream::computeChecksum() {
+  if (open("r", 0)) {
+    return -1;
+  }
+  unsigned char buffer[Stream::chunk];
+  size_t read_size = 0;
+  do {
+    size_t size = read(buffer, Stream::chunk);
+    if (size < 0) {
+      break;
+    }
+    read_size += size;
+  } while (! eof());
+  if (close()) {
+    return -1;
+  }
+  if (read_size != _size) {
+    errno = EAGAIN;
+    return -1;
+  }
+  return 0;
+}
+
 // Public functions
 void File::md5sum(
     string&               checksum_out,
@@ -732,36 +755,6 @@ int File::zcopy(
       }
     }
   }
-  return 0;
-}
-
-int File::getChecksum(const string& path, string& checksum) {
-  FILE       *readfile;
-  EVP_MD_CTX ctx;
-  size_t     rlength;
-
-  /* Open file */
-  if ((readfile = fopen(path.c_str(), "r")) == NULL) {
-    return 2;
-  }
-
-  /* Initialize checksum calculation */
-  EVP_DigestInit(&ctx, EVP_md5());
-
-  /* Read file, updating checksum */
-  while (! feof(readfile) && ! terminating()) {
-    char buffer[chunk];
-
-    rlength = fread(buffer, 1, chunk, readfile);
-    EVP_DigestUpdate(&ctx, buffer, rlength);
-  }
-  fclose(readfile);
-
-  /* Get checksum */
-  unsigned char checksum_temp[36];
-  EVP_DigestFinal(&ctx, checksum_temp, &rlength);
-  md5sum(checksum, checksum_temp, rlength);
-
   return 0;
 }
 

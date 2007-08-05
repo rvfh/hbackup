@@ -314,6 +314,15 @@ int main(void) {
   delete readfile;
   delete writefile;
 
+  cout << endl << "Test: computeChecksum" << endl;
+  readfile = new Stream("test1/testfile");
+  if (readfile->computeChecksum()) {
+    cout << "Error computing checksum" << endl;
+  } else {
+    cout << "Checksum: " << readfile->checksum() << endl;
+  }
+  delete readfile;
+
 
   cout << "\nmetadata" << endl;
   {
