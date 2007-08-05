@@ -13,9 +13,9 @@ Backup client 'myhost' using protocol 'file'
 Backup path 'test1'
  -> Building list of files
 Directory should be under CVS control: test1/cvs/dirbad
- -> Parsing list of files (13)
- --> Files to add: 13 (0 bytes)
- --> Done: 1/13 --> Done: 2/13 --> Done: 3/13 --> Done: 4/13 --> Done: 5/13 --> Done: 6/13 --> Done: 7/13 --> Done: 8/13 --> Done: 9/13 --> Done: 10/13 --> Done: 11/13 --> Done: 12/13 --> Done: 13/13
+ -> Parsing list of files (14)
+ --> Files to add: 14 (0 bytes)
+ --> Done: 1/14 --> Done: 2/14 --> Done: 3/14 --> Done: 4/14 --> Done: 5/14 --> Done: 6/14 --> Done: 7/14 --> Done: 8/14 --> Done: 9/14 --> Done: 10/14 --> Done: 11/14 --> Done: 12/14 --> Done: 13/14 --> Done: 14/14
  --> Files to remove: 0
 Backup path 'test2'
  -> Building list of files
@@ -45,7 +45,7 @@ Backup path 'C:/Test'
  --> Files to remove: 0
 Unmounted test_db/mount
 Protocol not supported: ssh
- --> Database active items part closed (contents: 20 files)
+ --> Database active items part closed (contents: 21 files)
  --> Database removed items part open (contents: 0 files)
 Expire path 'test1'
  -> Removing expired records
@@ -58,7 +58,7 @@ Expire path 'test1'
  --> Client: client
  --> Client: other
  -> Opening database
- --> Database active items part open (contents: 20 files)
+ --> Database active items part open (contents: 21 files)
 Backup client 'myhost' using protocol 'file'
  -> Reading backup list file
  --> Path: test1
@@ -66,7 +66,7 @@ Backup client 'myhost' using protocol 'file'
 Backup path 'test1'
  -> Building list of files
 Directory should be under CVS control: test1/cvs/dirbad
- -> Parsing list of files (13)
+ -> Parsing list of files (14)
  --> Files to add: 0
  --> Files to remove: 0
 Backup path 'test2'
@@ -83,7 +83,7 @@ Backup path 'C:/Test'
  --> Files to add: 0
  --> Files to remove: 0
 Unmounted test_db/mount
- --> Database active items part closed (contents: 20 files)
+ --> Database active items part closed (contents: 21 files)
  --> Database removed items part open (contents: 0 files)
 Expire path 'test1'
  -> Removing expired records
@@ -96,10 +96,10 @@ Expire path 'test1'
  --> Client: client
  --> Client: other
  -> Opening database
- --> Database active items part open (contents: 20 files)
+ --> Database active items part open (contents: 21 files)
  -> Scanning database
- --> Scanning database contents: 20 files
- --> Database active items part closed (contents: 20 files)
+ --> Scanning database contents: 21 files
+ --> Database active items part closed (contents: 21 files)
  --> Database removed items part open (contents: 0 files)
  -> Removing expired records
  --> Expired data: 0
@@ -111,10 +111,10 @@ Expire path 'test1'
  --> Client: client
  --> Client: other
  -> Opening database
- --> Database active items part open (contents: 20 files)
+ --> Database active items part open (contents: 21 files)
  -> Checking database
- --> Scanning database contents thoroughly: 20 files
- --> Database active items part closed (contents: 20 files)
+ --> Scanning database contents thoroughly: 21 files
+ --> Database active items part closed (contents: 21 files)
  --> Database removed items part open (contents: 0 files)
  -> Removing expired records
  --> Expired data: 0

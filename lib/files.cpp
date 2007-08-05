@@ -590,11 +590,11 @@ int Stream::copy(Stream& source) {
   if ((_fd == NULL) || (source._fd == NULL)) {
     errno = EBADF;
   }
-  unsigned char buffer[File::chunk];
+  unsigned char buffer[Stream::chunk];
   size_t read_size = 0;
   size_t write_size = 0;
   do {
-    size_t size = source.read(buffer, File::chunk);
+    size_t size = source.read(buffer, Stream::chunk);
     if (size < 0) {
       break;
     }

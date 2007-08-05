@@ -101,10 +101,10 @@ int main(void) {
   if (readfile->open("r")) {
     cout << "Error opening file" << endl;
   } else {
-    unsigned char buffer[File::chunk];
+    unsigned char buffer[Stream::chunk];
     size_t read_size = 0;
     do {
-      size_t size = readfile->read(buffer, File::chunk);
+      size_t size = readfile->read(buffer, Stream::chunk);
       if (size < 0) {
         cout << "broken by read" << endl;
         break;
@@ -125,11 +125,11 @@ int main(void) {
   if (readfile->open("r") || writefile->open("w")) {
     cout << "Error opening file" << endl;
   } else {
-    unsigned char buffer[File::chunk];
+    unsigned char buffer[Stream::chunk];
     size_t read_size = 0;
     size_t write_size = 0;
     do {
-      size_t size = readfile->read(buffer, File::chunk);
+      size_t size = readfile->read(buffer, Stream::chunk);
       if (size < 0) {
         cout << "broken by read" << endl;
         break;
@@ -160,11 +160,11 @@ int main(void) {
   if (readfile->open("r") || writefile->open("w", 5)) {
     cout << "Error opening file" << endl;
   } else {
-    unsigned char buffer[File::chunk];
+    unsigned char buffer[Stream::chunk];
     size_t read_size = 0;
     size_t write_size = 0;
     do {
-      size_t size = readfile->read(buffer, File::chunk);
+      size_t size = readfile->read(buffer, Stream::chunk);
       if (size < 0) {
         cout << "broken by read" << endl;
         break;
@@ -195,11 +195,11 @@ int main(void) {
   if (readfile->open("r", 1) || writefile->open("w")) {
     cout << "Error opening file" << endl;
   } else {
-    unsigned char buffer[File::chunk];
+    unsigned char buffer[Stream::chunk];
     size_t read_size = 0;
     size_t write_size = 0;
     do {
-      size_t size = readfile->read(buffer, File::chunk);
+      size_t size = readfile->read(buffer, Stream::chunk);
       if (size < 0) {
         cout << "broken by read" << endl;
         break;
@@ -231,11 +231,11 @@ int main(void) {
   if (readfile->open("r") || writefile->open("w", 5)) {
     cout << "Error opening file" << endl;
   } else {
-    unsigned char buffer[File::chunk];
+    unsigned char buffer[Stream::chunk];
     size_t read_size = 0;
     size_t write_size = 0;
     do {
-      size_t size = readfile->read(buffer, File::chunk);
+      size_t size = readfile->read(buffer, Stream::chunk);
       if (size < 0) {
         cout << "broken by read" << endl;
         break;
@@ -268,11 +268,11 @@ int main(void) {
   if (readfile->open("r", 1) || writefile->open("w", 5)) {
     cout << "Error opening file" << endl;
   } else {
-    unsigned char buffer[File::chunk];
+    unsigned char buffer[Stream::chunk];
     size_t read_size = 0;
     size_t write_size = 0;
     do {
-      size_t size = readfile->read(buffer, File::chunk);
+      size_t size = readfile->read(buffer, Stream::chunk);
       if (size < 0) {
         cout << "broken by read" << endl;
         break;

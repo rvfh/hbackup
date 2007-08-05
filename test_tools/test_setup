@@ -35,6 +35,7 @@ echo "Hello world!" > "$TESTDIR/testfile"
 touch -d 20061022 "$TESTDIR/testfile"
 touch "$TESTDIR/testfile~"
 ln -s "testfile" "$TESTDIR/testlink"
+mkfifo "$TESTDIR/testpipe"
 
 # Filters test
 mkdir "$TESTDIR/subdir"
