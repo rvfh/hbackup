@@ -164,7 +164,6 @@ public:
   int   create();
   // Create list of Nodes contained in directory
   int   createList();
-  int   parseList();
   void  deleteList();
   bool  isValid() const     { return _type == 'd'; }
   list<Node*>& nodesList()  { return _nodes; }

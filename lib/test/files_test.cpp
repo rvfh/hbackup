@@ -36,6 +36,38 @@ int terminating(void) {
   return 0;
 }
 
+int parseList(Directory *d) {
+  list<Node*>::iterator i = d->nodesList().begin();
+  while (i != d->nodesList().end()) {
+    Node* payload = *i;
+    switch (payload->type()) {
+      case 'f': {
+        File2 *f = new File2(*payload);
+        delete *i;
+        *i = f;
+      }
+      break;
+      case 'l': {
+        Link *l = new Link(*payload);
+        delete *i;
+        *i = l;
+      }
+      break;
+      case 'd': {
+        Directory *di = new Directory(*payload);
+        delete *i;
+        *i = di;
+        if (! di->createList()) {
+          parseList(di);
+        }
+      }
+      break;
+    }
+    i++;
+  }
+  return 0;
+}
+
 void showList(Directory* d, int level = 0);
 
 void defaultShowFile(const Node* g) {
@@ -647,7 +679,7 @@ int main(void) {
   Directory* d = new Directory("test1");
   if (d->isValid()) {
     if (! d->createList()) {
-      if (! d->parseList()) {
+      if (! parseList(d)) {
         showList(d);
       }
     } else {
