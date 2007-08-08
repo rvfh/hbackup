@@ -91,42 +91,6 @@ Node::Node(const char* path, const char* name) {
   metadata(_path);
 }
 
-void NodeListElement::insert(NodeListElement** first) {
-  NodeListElement* next     = *first;
-  NodeListElement* previous = NULL;
-  while ((next != NULL)
-      && (strcmp(next->_payload->name(), this->_payload->name()) < 0)) {
-    previous = next;
-    next = next->_next;
-  }
-  _previous = previous;
-  if (previous != NULL) {
-    previous->_next = this;
-  } else {
-    *first = this;
-  }
-  _next = next;
-  if (next != NULL) {
-    next->_previous = this;
-  }
-}
-
-void NodeListElement::remove(NodeListElement** first) {
-  if (_previous != NULL) {
-    _previous->_next = _next;
-  } else {
-    *first = _next;
-  }
-  if (_next != NULL) {
-    _next->_previous = _previous;
-  }
-}
-
-void NodeListElement::replacePayload(Node* payload) {
-  delete _payload;
-  _payload = payload;
-}
-
 int File2::create() {
   int readfile = open(_path, O_WRONLY | O_CREAT, 0666);
 
@@ -142,7 +106,6 @@ int Directory::createList() {
   DIR* directory = opendir(_path);
   if (directory == NULL) return -1;
 
-  _entries = 0;
   struct dirent *dir_entry;
   while (((dir_entry = readdir(directory)) != NULL) && ! terminating()) {
     /* Ignore . and .. */
@@ -150,9 +113,11 @@ int Directory::createList() {
       continue;
     }
     Node *g = new Node(_path, dir_entry->d_name);
-    NodeListElement* e = new NodeListElement(g);
-    e->insert(&_entries_head);
-    _entries++;
+    list<Node*>::iterator i = _nodes.begin();
+    while ((i != _nodes.end()) && (strcmp((*i)->name(), g->name()) < 0)) {
+      i++;
+    }
+    _nodes.insert(i, g);
   }
 
   closedir(directory);
@@ -160,42 +125,42 @@ int Directory::createList() {
 }
 
 int Directory::parseList() {
-  NodeListElement* entry = _entries_head;
-  while (entry != NULL) {
-    Node* payload = entry->payload();
+  list<Node*>::iterator i = _nodes.begin();
+  while (i != _nodes.end()) {
+    Node* payload = *i;
     switch (payload->type()) {
       case 'f': {
         File2 *f = new File2(*payload);
-        entry->replacePayload(f);
+        delete *i;
+        *i = f;
       }
       break;
       case 'l': {
         Link *l = new Link(*payload);
-        entry->replacePayload(l);
+        delete *i;
+        *i = l;
       }
       break;
       case 'd': {
         Directory *d = new Directory(*payload);
-        entry->replacePayload(d);
+        delete *i;
+        *i = d;
         if (! d->createList()) {
           d->parseList();
         }
       }
       break;
     }
-    entry = entry->next();
+    i++;
   }
   return 0;
 }
 
 void Directory::deleteList() {
-  _entries = -1;
-
-  NodeListElement* current = _entries_head;
-  while (current != NULL) {
-    NodeListElement* next = current->next();
-    delete current;
-    current = next;
+  list<Node*>::iterator i = _nodes.begin();
+  while (i != _nodes.end()) {
+    delete *i;
+    i++;
   }
 }
 

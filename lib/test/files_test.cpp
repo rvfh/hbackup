@@ -36,7 +36,7 @@ int terminating(void) {
   return 0;
 }
 
-void showList(const Directory* d, int level = 0);
+void showList(Directory* d, int level = 0);
 
 void defaultShowFile(const Node* g) {
   cout << "Oth.: " << g->name()
@@ -49,7 +49,7 @@ void defaultShowFile(const Node* g) {
     << endl;
 }
 
-void showFile(const Node* g, int level = 1) {
+void showFile(Node* g, int level = 1) {
   int level_no = level;
   cout << " ";
   while (level_no--) cout << "-";
@@ -80,7 +80,7 @@ void showFile(const Node* g, int level = 1) {
           << endl;
       } break;
       case 'd': {
-        const Directory* d = (const Directory*) g;
+        Directory* d = (Directory*) g;
         cout << "Dir.: " << d->name()
           << ", type = " << d->type()
           << ", mtime = " << (d->mtime() != 0)
@@ -99,15 +99,16 @@ void showFile(const Node* g, int level = 1) {
   }
 }
 
-void showList(const Directory* d, int level) {
+void showList(Directory* d, int level) {
   if (level == 0) {
     showFile(d, level);
   }
-  NodeListElement* entry = d->entries_head();
   ++level;
-  while (entry != NULL) {
-    showFile(entry->payload(), level);
-    entry = entry->next();
+  list<Node*>::iterator i = d->nodesList().begin();
+
+  while (i != d->nodesList().end()) {
+    showFile(*i, level);
+    i++;
   }
 }
 
