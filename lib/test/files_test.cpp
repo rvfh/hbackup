@@ -154,6 +154,12 @@ int main(void) {
 
   cout << "Tools Test" << endl;
 
+  mode_t mask = umask(0077);
+  printf("Original mask = 0%03o\n", mask);
+  mask = umask(0077);
+  printf("Our mask = 0%03o\n", mask);
+
+
   Stream* readfile;
   Stream* writefile;
   system("dd if=/dev/zero of=test1/zcopy_source bs=1M count=10 status=noxfer 2> /dev/null");
@@ -161,18 +167,20 @@ int main(void) {
   cout << endl << "Test: file read" << endl;
   readfile = new Stream("test1/zcopy_source");
   if (readfile->open("r")) {
-    cout << "Error opening file" << endl;
+    cout << "Error opening source file: " << strerror(errno) << endl;
   } else {
     unsigned char buffer[Stream::chunk];
     size_t read_size = 0;
+    bool eof = false;
     do {
-      size_t size = readfile->read(buffer, Stream::chunk);
+      ssize_t size = readfile->read(buffer, Stream::chunk);
       if (size < 0) {
-        cout << "broken by read" << endl;
+        cout << "broken by read: " << strerror(errno) << endl;
         break;
       }
+      eof = (size == 0);
       read_size += size;
-    } while (! readfile->eof());
+    } while (! eof);
     if (readfile->close()) cout << "Error closing file" << endl;
     cout << "read size: " << read_size
       << " (" << readfile->size() << " -> " <<  readfile->dsize()
@@ -184,26 +192,30 @@ int main(void) {
   system("dd if=/dev/zero of=test1/zcopy_source bs=1M count=10 status=noxfer 2> /dev/null");
   readfile = new Stream("test1/zcopy_source");
   writefile = new Stream("test1/zcopy_dest");
-  if (readfile->open("r") || writefile->open("w")) {
-    cout << "Error opening file" << endl;
+  if (readfile->open("r")) {
+    cout << "Error opening source file: " << strerror(errno) << endl;
+  } else if (writefile->open("w")) {
+    cout << "Error opening dest file: " << strerror(errno) << endl;
   } else {
     unsigned char buffer[Stream::chunk];
     size_t read_size = 0;
     size_t write_size = 0;
+    bool eof = false;
     do {
-      size_t size = readfile->read(buffer, Stream::chunk);
+      ssize_t size = readfile->read(buffer, Stream::chunk);
       if (size < 0) {
-        cout << "broken by read" << endl;
+        cout << "broken by read: " << strerror(errno) << endl;
         break;
       }
+      eof = (size == 0);
       read_size += size;
-      size = writefile->write(buffer, size, readfile->eof());
+      size = writefile->write(buffer, size, eof);
       if (size < 0) {
         cout << "broken by write" << endl;
         break;
       }
       write_size += size;
-    } while (! readfile->eof());
+    } while (! eof);
     if (readfile->close()) cout << "Error closing read file" << endl;
     if (writefile->close()) cout << "Error closing write file" << endl;
     cout << "read size: " << read_size
@@ -219,26 +231,30 @@ int main(void) {
   cout << endl << "Test: file compress (read + compress write)" << endl;
   readfile = new Stream("test1/zcopy_source");
   writefile = new Stream("test1/zcopy_dest");
-  if (readfile->open("r") || writefile->open("w", 5)) {
-    cout << "Error opening file" << endl;
+  if (readfile->open("r")) {
+    cout << "Error opening source file: " << strerror(errno) << endl;
+  } else if (writefile->open("w", 5)) {
+    cout << "Error opening dest file: " << strerror(errno) << endl;
   } else {
     unsigned char buffer[Stream::chunk];
     size_t read_size = 0;
     size_t write_size = 0;
+    bool eof = false;
     do {
-      size_t size = readfile->read(buffer, Stream::chunk);
+      ssize_t size = readfile->read(buffer, Stream::chunk);
       if (size < 0) {
-        cout << "broken by read" << endl;
+        cout << "broken by read: " << strerror(errno) << endl;
         break;
       }
+      eof = (size == 0);
       read_size += size;
-      size = writefile->write(buffer, size, readfile->eof());
+      size = writefile->write(buffer, size, eof);
       if (size < 0) {
         cout << "broken by write" << endl;
         break;
       }
       write_size += size;
-    } while (! readfile->eof());
+    } while (! eof);
     if (readfile->close()) cout << "Error closing read file" << endl;
     if (writefile->close()) cout << "Error closing write file" << endl;
     cout << "read size: " << read_size
@@ -254,26 +270,30 @@ int main(void) {
   cout << endl << "Test: file uncompress (uncompress read + write)" << endl;
   readfile = new Stream("test1/zcopy_dest");
   writefile = new Stream("test1/zcopy_source");
-  if (readfile->open("r", 1) || writefile->open("w")) {
-    cout << "Error opening file" << endl;
+  if (readfile->open("r", 1)) {
+    cout << "Error opening source file: " << strerror(errno) << endl;
+  } else if (writefile->open("w")) {
+    cout << "Error opening dest file: " << strerror(errno) << endl;
   } else {
     unsigned char buffer[Stream::chunk];
     size_t read_size = 0;
     size_t write_size = 0;
+    bool eof = false;
     do {
-      size_t size = readfile->read(buffer, Stream::chunk);
+      ssize_t size = readfile->read(buffer, Stream::chunk);
       if (size < 0) {
-        cout << "broken by read" << endl;
+        cout << "broken by read: " << strerror(errno) << endl;
         break;
       }
+      eof = (size == 0);
       read_size += size;
-      size = writefile->write(buffer, size, readfile->eof());
+      size = writefile->write(buffer, size, eof);
       if (size < 0) {
         cout << "broken by write" << endl;
         break;
       }
       write_size += size;
-    } while (! readfile->eof());
+    } while (! eof);
     if (readfile->close()) cout << "Error closing read file" << endl;
     if (writefile->close()) cout << "Error closing write file" << endl;
     cout << "read size: " << read_size
@@ -290,26 +310,30 @@ int main(void) {
     << endl;
   readfile = new Stream("test1/zcopy_source");
   writefile = new Stream("test1/zcopy_dest");
-  if (readfile->open("r") || writefile->open("w", 5)) {
-    cout << "Error opening file" << endl;
+  if (readfile->open("r")) {
+    cout << "Error opening source file: " << strerror(errno) << endl;
+  } else if (writefile->open("w", 5)) {
+    cout << "Error opening dest file: " << strerror(errno) << endl;
   } else {
     unsigned char buffer[Stream::chunk];
     size_t read_size = 0;
     size_t write_size = 0;
+    bool eof = false;
     do {
-      size_t size = readfile->read(buffer, Stream::chunk);
+      ssize_t size = readfile->read(buffer, Stream::chunk);
       if (size < 0) {
-        cout << "broken by read" << endl;
+        cout << "broken by read: " << strerror(errno) << endl;
         break;
       }
+      eof = (size == 0);
       read_size += size;
-      size = writefile->write(buffer, size, readfile->eof());
+      size = writefile->write(buffer, size, eof);
       if (size < 0) {
         cout << "broken by write" << endl;
         break;
       }
       write_size += size;
-    } while (! readfile->eof());
+    } while (! eof);
     if (readfile->close()) cout << "Error closing read file" << endl;
     if (writefile->close()) cout << "Error closing write file" << endl;
     cout << "read size: " << read_size
@@ -327,26 +351,30 @@ int main(void) {
     readfile = writefile;
     writefile = swap;
   }
-  if (readfile->open("r", 1) || writefile->open("w", 5)) {
-    cout << "Error opening file" << endl;
+  if (readfile->open("r", 1)) {
+    cout << "Error opening source file: " << strerror(errno) << endl;
+  } else if (writefile->open("w", 5)) {
+    cout << "Error opening dest file: " << strerror(errno) << endl;
   } else {
     unsigned char buffer[Stream::chunk];
     size_t read_size = 0;
     size_t write_size = 0;
+    bool eof = false;
     do {
-      size_t size = readfile->read(buffer, Stream::chunk);
+      ssize_t size = readfile->read(buffer, Stream::chunk);
       if (size < 0) {
-        cout << "broken by read" << endl;
+        cout << "broken by read: " << strerror(errno) << endl;
         break;
       }
+      eof = (size == 0);
       read_size += size;
-      size = writefile->write(buffer, size, readfile->eof());
+      size = writefile->write(buffer, size, eof);
       if (size < 0) {
         cout << "broken by write" << endl;
         break;
       }
       write_size += size;
-    } while (! readfile->eof());
+    } while (! eof);
     if (readfile->close()) cout << "Error closing read file" << endl;
     if (writefile->close()) cout << "Error closing write file" << endl;
     cout << "read size: " << read_size
@@ -373,7 +401,7 @@ int main(void) {
   remove("test1/zcopy_dest");
   writefile = new Stream("test1/zcopy_dest");
   if (readfile->open("r", 1) || writefile->open("w", 0)) {
-    cout << "Error opening file" << endl;
+    cout << "Error opening file: " << strerror(errno) << endl;
   } else {
     int rc = writefile->copy(*readfile);
     if (readfile->close()) cout << "Error closing read file" << endl;
@@ -583,7 +611,7 @@ int main(void) {
 
   cout << "Create" << endl;
   if (File2("test1/touchedfile").create())
-    cout << "failed to create file" << endl;
+    cout << "failed to create file: " << strerror(errno) << endl;
   if (Directory("test1/toucheddir").create())
     cout << "failed to create dir" << endl;
 
@@ -599,7 +627,7 @@ int main(void) {
 
   cout << "Create again" << endl;
   if (File2("test1/touchedfile").create())
-    cout << "failed to create file" << endl;
+    cout << "failed to create file: " << strerror(errno) << endl;
   if (Directory("test1/toucheddir").create())
     cout << "failed to create dir" << endl;
 
