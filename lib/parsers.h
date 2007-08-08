@@ -19,6 +19,10 @@
 #ifndef PARSERS_H
 #define PARSERS_H
 
+#include <list>
+
+using namespace std;
+
 #include "files.h"
 
 namespace hbackup {
@@ -32,8 +36,11 @@ typedef enum {
 
 class Parser {
 protected:
-  parser_mode_t _mode;
-  bool          _dummy;
+  // Declare list stuff here to overcome apparent bug in GCC
+  list<File>            _files;
+  list<File>::iterator  _i;
+  parser_mode_t         _mode;
+  bool                  _dummy;
 public:
   // Constructor for parsers list
   // Note: inherited classes MUST PURELY INHERIT this constructor

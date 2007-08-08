@@ -23,8 +23,6 @@
 
 using namespace std;
 
-#include "files.h"
-#include "parsers.h"
 #include "cvs_parser.h"
 
 using namespace hbackup;
@@ -70,7 +68,8 @@ CvsParser::CvsParser(parser_mode_t mode, const string& dir_path) {
   while (! entries.eof()) {
     string  buffer;
     getline(entries, buffer);
-    cvs_entry_t cvs_entry;
+    string name;
+    char type;
 
     if (buffer.substr(0,1) == "D") {
       if (buffer.size() == 1) {
@@ -78,10 +77,10 @@ CvsParser::CvsParser(parser_mode_t mode, const string& dir_path) {
         // entries file is a single 'D'
         continue;
       }
-      cvs_entry.type = 'd';
+      type = 'd';
       buffer.erase(0,1);
     } else {
-      cvs_entry.type = 'f';
+      type = 'f';
     }
     if (buffer.substr(0,1) != "/") {
       continue;
@@ -92,8 +91,7 @@ CvsParser::CvsParser(parser_mode_t mode, const string& dir_path) {
       continue;
     }
     buffer.erase(pos);
-    cvs_entry.name = buffer;
-    _files.push_back(cvs_entry);
+    _files.push_back(File(buffer, "", type, 0, 0, 0, 0, 0));
   }
   /* Close file */
   entries.close();
@@ -112,9 +110,8 @@ bool CvsParser::ignore(const File& file_data) {
 
   // Look for match in list
   bool controlled = false;
-  vector<cvs_entry_t>::iterator i;
-  for (i = _files.begin(); i != _files.end(); i++) {
-    if ((i->name == file_data.name()) && (i->type == file_data.type())) {
+  for (_i = _files.begin(); _i != _files.end(); _i++) {
+    if ((_i->name() == file_data.name()) && (_i->type() == file_data.type())) {
       controlled = true;
       break;
     }
@@ -132,5 +129,12 @@ bool CvsParser::ignore(const File& file_data) {
       if (controlled) return true; else return false;
     default:  // parser_disabled
       return false;
+  }
+}
+
+void CvsParser::list() {
+  cout << "List: " << _files.size() << " file(s)" << endl;
+  for (_i = _files.begin(); _i != _files.end(); _i++) {
+    cout << "-> " << _i->name() << " (" << _i->type() << ")" << endl;
   }
 }
