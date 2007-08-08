@@ -124,38 +124,6 @@ int Directory::createList() {
   return 0;
 }
 
-int Directory::parseList() {
-  list<Node*>::iterator i = _nodes.begin();
-  while (i != _nodes.end()) {
-    Node* payload = *i;
-    switch (payload->type()) {
-      case 'f': {
-        File2 *f = new File2(*payload);
-        delete *i;
-        *i = f;
-      }
-      break;
-      case 'l': {
-        Link *l = new Link(*payload);
-        delete *i;
-        *i = l;
-      }
-      break;
-      case 'd': {
-        Directory *d = new Directory(*payload);
-        delete *i;
-        *i = d;
-        if (! d->createList()) {
-          d->parseList();
-        }
-      }
-      break;
-    }
-    i++;
-  }
-  return 0;
-}
-
 void Directory::deleteList() {
   list<Node*>::iterator i = _nodes.begin();
   while (i != _nodes.end()) {
