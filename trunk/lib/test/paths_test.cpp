@@ -21,7 +21,6 @@
 using namespace std;
 
 #include <iostream>
-#include <vector>
 #include <list>
 #include <string>
 
@@ -80,7 +79,7 @@ int main(void) {
   }
 
   cout << "as previous with CVS parser" << endl;
-  if (path->addParser("controlled", "cvs")) {
+  if (path->addParser("cvs", "controlled")) {
     cout << "Failed to add parser" << endl;
   }
   if (! path->createList("test1")) {

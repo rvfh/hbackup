@@ -20,7 +20,6 @@
 #define FILES_H
 
 #include <fstream>
-#include <vector>
 #include <list>
 
 using namespace std;
@@ -165,8 +164,9 @@ public:
   // Create list of Nodes contained in directory
   int   createList();
   void  deleteList();
-  bool  isValid() const     { return _type == 'd'; }
-  list<Node*>& nodesList()  { return _nodes; }
+  bool  isValid() const                     { return _type == 'd'; }
+  list<Node*>& nodesList()                  { return _nodes; }
+  const list<Node*>& nodesListConst() const { return _nodes; }
 };
 
 class Link : public Node {
@@ -311,7 +311,7 @@ public:
   void setPath(const string& path) { _path = path; }
 
   // Read parameters from line
-  static int decodeLine(const string& line, vector<string>& params);
+  static int decodeLine(const string& line, list<string>& params);
 };
 
 }

@@ -19,7 +19,6 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <vector>
 #include <list>
 #include <signal.h>
 #include <errno.h>
@@ -245,7 +244,7 @@ int main(int argc, char **argv) {
       if (pos != string::npos) {
         buffer.erase(pos);
       }
-      vector<string> params;
+      list<string> params;
 
       line++;
       if (File::decodeLine(buffer, params)) {
@@ -256,61 +255,65 @@ int main(int argc, char **argv) {
       if (params.size() == 1) {
         errno = EUCLEAN;
         cerr << "Error: in file " << config_path << ", line " << line
-          << " unexpected lonely keyword: " << params[0] << endl;
+          << " unexpected lonely keyword: " << *params.begin() << endl;
         failed = 2;
       } else if (params.size() > 1) {
-        if (params[0] == "db") {
+        list<string>::iterator current = params.begin();
+        string                 keyword = *current++;
+
+        if (keyword == "db") {
           if (params.size() > 2) {
             cerr << "Error: in file " << config_path << ", line " << line
-              << " '" << params[0] << "' takes exactly one argument" << endl;
+              << " '" << keyword << "' takes exactly one argument" << endl;
             failed = 2;
           }
-          db_path = params[1];
-        } else if (params[0] == "client") {
+          db_path = *current;
+        } else if (keyword == "client") {
           if (params.size() > 2) {
             cerr << "Error: in file " << config_path << ", line " << line
-              << " '" << params[0] << "' takes exactly one argument" << endl;
+              << " '" << keyword << "' takes exactly one argument" << endl;
             failed = 2;
           }
-          client = clients.insert(clients.end(), Client(params[1]));
+          client = clients.insert(clients.end(), Client(*current));
         } else if (client != clients.end()) {
-          if (params[0] == "hostname") {
+          if (keyword == "hostname") {
             if (params.size() > 2) {
               cerr << "Error: in file " << config_path << ", line " << line
-                << " '" << params[0] << "' takes exactly one argument" << endl;
+                << " '" << keyword << "' takes exactly one argument" << endl;
               failed = 2;
             }
-            client->setHostOrIp(params[1]);
+            client->setHostOrIp(*current);
           } else
-          if (params[0] == "protocol") {
+          if (keyword == "protocol") {
             if (params.size() > 2) {
               cerr << "Error: in file " << config_path << ", line " << line
-                << " '" << params[0] << "' takes exactly one argument" << endl;
+                << " '" << keyword << "' takes exactly one argument" << endl;
               failed = 2;
             }
-            client->setProtocol(params[1]);
+            client->setProtocol(*current);
           } else
-          if (params[0] == "option") {
+          if (keyword == "option") {
             if (params.size() > 3) {
               cerr << "Error: in file " << config_path << ", line " << line
-                << " '" << params[0] << "' takes one or two arguments" << endl;
+                << " '" << keyword << "' takes one or two arguments" << endl;
               failed = 2;
             }
             if (params.size() == 2) {
-              client->addOption(params[1]);
+              client->addOption(*current);
             } else {
-              client->addOption(params[1], params[2]);
+              string name = *current++;
+              client->addOption(name, *current);
             }
           } else
-          if (params[0] == "listfile") {
+          if (keyword == "listfile") {
             if (params.size() > 2) {
               cerr << "Error: in file " << config_path << ", line " << line
-                << " '" << params[0] << "' takes exactly one argument" << endl;
+                << " '" << keyword << "' takes exactly one argument" << endl;
               failed = 2;
             }
-            client->setListfile(params[1]);
+            client->setListfile(*current);
           } else {
-            cerr << "Unrecognised keyword '" << params[0]
+            cerr << "Unrecognised keyword '" << keyword
               << "' in configuration file, line " << line
               << endl;
             failed = 2;

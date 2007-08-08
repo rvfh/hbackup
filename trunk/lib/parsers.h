@@ -19,9 +19,7 @@
 #ifndef PARSERS_H
 #define PARSERS_H
 
-#ifndef FILES_H
-#error You must include files.h before parsers.h
-#endif
+#include "files.h"
 
 namespace hbackup {
 

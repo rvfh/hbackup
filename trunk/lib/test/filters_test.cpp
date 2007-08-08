@@ -21,7 +21,6 @@
 using namespace std;
 
 #include <iostream>
-#include <vector>
 #include <sys/stat.h>
 
 #include "files.h"
@@ -39,15 +38,13 @@ int terminating(void) {
 
 void filter_show(const Filters& filters) {
   /* Read through list of filters */
-  for (unsigned int i = 0; i < filters.size(); i++) {
-    Filter filter = filters[i];
-
-    cout << "-> List " << filter.size() << " condition(s)\n";
+  Filters::const_iterator rule;
+  for (rule = filters.begin(); rule != filters.end(); rule++) {
+    cout << "-> List " << rule->size() << " condition(s)\n";
     /* Read through list of conditions in filter */
-    for (unsigned int j = 0; j < filter.size(); j++) {
-      Condition condition = filter[j];
-
-      condition.show();
+    Filter::const_iterator condition;
+    for (condition = rule->begin(); condition != rule->end(); condition++) {
+      condition->show();
     }
   }
 }
@@ -383,7 +380,7 @@ int main(void) {
   filter_show(*filter);
 
   filter->push_back(Filter());
-  Filter *rule = &(*filter)[filter->size() - 1];
+  Filter *rule = &filter->back();
 
   rule->push_back(Condition(filter_size_below, (off_t) 500));
   cout << ">List " << filter->size() << " rule(s):\n";

@@ -20,7 +20,6 @@ using namespace std;
 
 #include <iostream>
 #include <string>
-#include <vector>
 #include <list>
 #include <sys/stat.h>
 #include <errno.h>
@@ -64,7 +63,7 @@ int main(void) {
 
   /* Use other modules */
   path = new Path("");
-  path->addParser("c", "cvs");
+  path->addParser("cvs", "c");
   path->addFilter("type", "dir");
   path->addFilter("path_start", ".svn", true);
   path->addFilter("type", "dir");
@@ -195,7 +194,7 @@ int main(void) {
   delete path;
 
   path = new Path("");
-  path->addParser("c", "cvs");
+  path->addParser("cvs", "c");
   path->addFilter("type", "dir");
   path->addFilter("path_start", ".svn", true);
   path->addFilter("type", "dir");
@@ -360,7 +359,7 @@ int main(void) {
   system("chmod 0775 test1/cvs/dirutd/CVS/Entries");
 
   path = new Path("");
-  path->addParser("c", "cvs");
+  path->addParser("cvs", "c");
   path->addFilter("type", "dir");
   path->addFilter("path_start", ".svn", true);
   path->addFilter("type", "dir");
@@ -488,7 +487,7 @@ int main(void) {
   system("chmod 0777 test1/cvs/dirutd/CVS/Entries");
 
   path = new Path("");
-  path->addParser("c", "cvs");
+  path->addParser("cvs", "c");
   path->addFilter("type", "dir");
   path->addFilter("path_start", ".svn", true);
   path->addFilter("type", "dir");
@@ -623,7 +622,7 @@ int main(void) {
   remove("test1/cvs/dirutd/fileutd");
 
   path = new Path("");
-  path->addParser("c", "cvs");
+  path->addParser("cvs", "c");
   path->addFilter("type", "dir");
   path->addFilter("path_start", ".svn", true);
   path->addFilter("type", "dir");
@@ -679,7 +678,7 @@ int main(void) {
   delete path;
 
   path = new Path("");
-  path->addParser("c", "cvs");
+  path->addParser("cvs", "c");
   path->addFilter("type", "dir");
   path->addFilter("path_start", ".svn", true);
   path->addFilter("type", "dir");
@@ -735,7 +734,7 @@ int main(void) {
   delete path;
 
   path = new Path("");
-  path->addParser("c", "cvs");
+  path->addParser("cvs", "c");
   path->addFilter("type", "dir");
   path->addFilter("path_start", ".svn", true);
   path->addFilter("type", "dir");
