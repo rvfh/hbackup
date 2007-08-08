@@ -21,6 +21,7 @@
 
 #include <fstream>
 #include <vector>
+#include <list>
 
 using namespace std;
 
@@ -96,25 +97,6 @@ public:
   bool          parsed()  const { return _parsed; }
 };
 
-class NodeListElement {
-  Node*            _payload;
-  NodeListElement* _next;
-  NodeListElement* _previous;
-public:
-  NodeListElement(Node* payload) :
-    _payload(payload),
-    _next(NULL),
-    _previous(NULL) {}
-  ~NodeListElement() {
-    delete _payload;
-  }
-  void insert(NodeListElement** first);
-  void remove(NodeListElement** first);
-  void replacePayload(Node* payload);
-  Node*            payload() { return _payload; }
-  NodeListElement* next()    { return _next; }
-};
-
 class File2 : public Node {
 protected:
   char*     _checksum;
@@ -157,39 +139,35 @@ public:
 };
 
 class Directory : public Node {
-  NodeListElement* _entries_head;
-  int _entries;
+  list<Node*> _nodes;
 public:
   // Constructor for existing Node
   Directory(const Node& g) :
-      Node(g),
-      _entries_head(NULL),
-      _entries(-1) {
+      Node(g) {
     _size  = 0;
     _mtime = 0;
     _parsed = true;
+    _nodes.clear();
   }
   // Constructor for path in the VFS
   Directory(const char *path, const char* name = "") :
-      Node(path, name),
-      _entries_head(NULL),
-      _entries(-1) {
+      Node(path, name) {
     _size  = 0;
     _mtime = 0;
     _parsed = true;
+    _nodes.clear();
   }
   ~Directory() {
     deleteList();
   }
   // Create directory
-  int               create();
+  int   create();
   // Create list of Nodes contained in directory
-  int               createList();
-  int               parseList();
-  void              deleteList();
-  bool              isValid() const       { return _type == 'd'; }
-  int               entries() const       { return _entries; }
-  NodeListElement*  entries_head() const  { return _entries_head; }
+  int   createList();
+  int   parseList();
+  void  deleteList();
+  bool  isValid() const     { return _type == 'd'; }
+  list<Node*>& nodesList()  { return _nodes; }
 };
 
 class Link : public Node {
