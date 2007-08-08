@@ -19,9 +19,9 @@
 #ifndef FILTERS_H
 #define FILTERS_H
 
-#ifndef FILES_H
-#error You must include files.h before filters.h
-#endif
+#include <list>
+
+#include "files.h"
 
 namespace hbackup {
 
@@ -68,7 +68,7 @@ public:
   void show() const;
 };
 
-class Filter: public vector<Condition> {
+class Filter: public list<Condition> {
 public:
   Filter() {}
   Filter(Condition condition) {
@@ -76,7 +76,7 @@ public:
   }
 };
 
-class Filters: public vector<Filter> {
+class Filters: public list<Filter> {
 public:
   bool match(const File& file_data) const;
 };

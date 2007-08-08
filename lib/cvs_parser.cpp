@@ -18,7 +18,6 @@
 
 #include <fstream>
 #include <iostream>
-#include <list>
 #include <string>
 #include <sys/stat.h>
 
@@ -113,9 +112,9 @@ bool CvsParser::ignore(const File& file_data) {
 
   // Look for match in list
   bool controlled = false;
-  for (unsigned int i = 0; i < _files.size(); i++) {
-    if ((_files[i].name == file_data.name())
-     && (_files[i].type == file_data.type())) {
+  vector<cvs_entry_t>::iterator i;
+  for (i = _files.begin(); i != _files.end(); i++) {
+    if ((i->name == file_data.name()) && (i->type == file_data.type())) {
       controlled = true;
       break;
     }

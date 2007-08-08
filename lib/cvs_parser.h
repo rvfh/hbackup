@@ -19,19 +19,24 @@
 #ifndef CVS_PARSER_H
 #define CVS_PARSER_H
 
+// List does not work
+#include <vector>
+
+using namespace std;
+
 #include "files.h"
 #include "parsers.h"
 
 namespace hbackup {
 
-typedef struct {
-  string  name;   /* File name */
-  char    type;   /* File type */
-} cvs_entry_t;
-
 class CvsParser : public Parser {
-  static char*        _control_dir;
-  static char*        _entries;
+  struct cvs_entry_t {
+    string  name;   /* File name */
+    char    type;   /* File type */
+  };
+
+  static char*      _control_dir;
+  static char*      _entries;
   vector<cvs_entry_t> _files;
 public:
   // Constructor for parsers list
@@ -47,8 +52,9 @@ public:
   // For debug purposes
   void list() {
     cout << "List: " << _files.size() << " file(s)" << endl;
-    for (unsigned int i = 0; i < _files.size(); i++) {
-      cout << "-> " << _files[i].name << " (" << _files[i].type << ")" << endl;
+    vector<cvs_entry_t>::iterator i;
+    for (i = _files.begin(); i != _files.end(); i++) {
+      cout << "-> " << i->name << " (" << i->type << ")" << endl;
     }
   }
 };

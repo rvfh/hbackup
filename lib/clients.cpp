@@ -18,7 +18,6 @@
 
 #include <fstream>
 #include <iostream>
-#include <vector>
 #include <list>
 #include <string>
 #include <errno.h>
@@ -149,7 +148,7 @@ int Client::readListFile(const string& list_path) {
       if (pos != string::npos) {
         buffer.erase(pos);
       }
-      vector<string> params;
+      list<string> params;
 
       line++;
       if (File::decodeLine(buffer, params)) {
@@ -159,8 +158,11 @@ int Client::readListFile(const string& list_path) {
         cerr << "make sure double-quoted Windows paths do not end in '\\'."
           << endl;
       }
-      if (params.size() >= 1) {
-        if (params[0] == "path") {
+      if (params.size() > 0) {
+        list<string>::iterator current = params.begin();
+        string                 keyword = *current++;
+
+        if (keyword == "path") {
           // Expect exactly two parameters
           if (params.size() != 2) {
             cerr << "Error: in list file " << list_path << ", line " << line
@@ -168,56 +170,86 @@ int Client::readListFile(const string& list_path) {
             failed = 1;
           } else {
             /* New backup path */
-            _paths.push_back(Path(params[1]));
+            _paths.push_back(Path(*current));
             if (verbosity() > 2) {
               cout << " --> Path: " << _paths.back().path() << endl;
             }
           }
         } else if (_paths.size() != 0) {
+          string type;
+          int rc;
+
+          if (params.size() > 1) {
+            type = *current++;
+          }
           // Path attributes
-          if ((params[0] == "ignore") || (params[0] == "ignand")) {
+          if ((keyword == "ignore") || (keyword == "ignand")) {
             // Expect exactly three parameters
             if (params.size() != 3) {
               cerr << "Error: in list file " << list_path << ", line " << line
                 << " 'filter' takes exactly two arguments" << endl;
               failed = 1;
             } else
-            if (_paths.back().addFilter(params[1], params[2], params[0]
-             == "ignand")) {
-              cerr << "Error: in list file " << list_path << ", line " << line
-                << " unsupported filter: " << params[1] << endl;
-              failed = 1;
+            if ((rc = _paths.back().addFilter(type, *current, keyword
+             == "ignand"))) {
+              switch (rc) {
+                case 1:
+                  cerr << "Error: in list file " << list_path << ", line "
+                   << line << " unsupported filter type: " << type << endl;
+                  failed = 1;
+                  break;
+                case 2:
+                  cerr << "Error: in list file " << list_path << ", line "
+                   << line << " unsupported value: '" << *current
+                   << "' for filter type " << type << endl;
+                  failed = 1;
+                  break;
+                case 3:
+                  cerr << "Error: in list file " << list_path << ", line "
+                   << line << " cannot append to nothing" << endl;
+                  failed = 1;
+                  break;
+              }
             }
           } else
-          if (params[0] == "parser") {
+          if (keyword == "parser") {
             // Expect exactly three parameters
             if (params.size() != 3) {
               cerr << "Error: in list file " << list_path << ", line " << line
                 << " 'parser' takes exactly two arguments" << endl;
               failed = 1;
             } else
-            if (_paths.back().addParser(params[1], params[2])) {
-              cerr << "Error: in list file " << list_path << ", line " << line
-                << " unsupported parser: " << params[2] << endl;
-              failed = 1;
+            if ((rc = _paths.back().addParser(type, *current))) {
+              switch (rc) {
+                case 1:
+                  cerr << "Error: in list file " << list_path << ", line "
+                   << line << " unsupported parser type: " << type << endl;
+                  failed = 1;
+                  break;
+                case 2:
+                  cerr << "Error: in list file " << list_path << ", line "
+                   << line << " unsupported parser mode: " << *current << endl;
+                  failed = 1;
+                  break;
+              }
             }
           } else
-          if (params[0] == "expire") {
+          if (keyword == "expire") {
             int time_out;
-            if ((sscanf(params[1].c_str(), "%d", &time_out) != 0)
+            if ((sscanf(type.c_str(), "%d", &time_out) != 0)
              && (time_out != 0)) {
               _paths.back().setExpiration(time_out * 3600 * 24);
             }
           } else {
             // What was that?
             cerr << "Error: in list file " << list_path << ", line " << line
-              << " unknown keyword: " << params[0] << endl;
+              << " unknown keyword: " << keyword << endl;
             failed = 1;
           }
         } else {
           // What?
           cerr << "Error: in list file " << list_path << ", line " << line
-            << " unexpected keyword at this level: " << params[0] << endl;
+            << " unexpected keyword at this level: " << keyword << endl;
           failed = 1;
         }
       }

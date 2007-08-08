@@ -120,7 +120,10 @@ greater than or equal to 5000.
 
 3. PARSERS
 
-Syntax: parser [<mode>] "<parser name>"
+Syntax: parser "<parser name>" <mode>
+
+Only one parser is implemented at the moment:
+* cvs: this parser does not check for file modification
 
 There are four modes (only the first letter matters):
 * m: backup files under control, that were modified locally (m for modified)
@@ -128,8 +131,5 @@ There are four modes (only the first letter matters):
 * l: backup files in the two cases above (l for local)
 * c: backup all files under control (c for controlled)
 
-Only one parser is implemented at the moment:
-* cvs: this parser does not check for file modification
-
-Note: parsers that do not check for file modification backup all controlled
-files if 'modified' was chosen or all files if 'local' was chosen.
+Note: parsers that do not check for file modification shall backup all
+controlled files if 'modified' was chosen, or all files if 'local' was chosen.

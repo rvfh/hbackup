@@ -19,7 +19,6 @@
 using namespace std;
 
 #include <iostream>
-#include <vector>
 #include <string>
 #include <sys/stat.h>
 #include <errno.h>
@@ -68,7 +67,7 @@ int parseList(Directory *d) {
   return 0;
 }
 
-void showList(Directory* d, int level = 0);
+void showList(const Directory* d, int level = 0);
 
 void defaultShowFile(const Node* g) {
   cout << "Oth.: " << g->name()
@@ -81,7 +80,7 @@ void defaultShowFile(const Node* g) {
     << endl;
 }
 
-void showFile(Node* g, int level = 1) {
+void showFile(const Node* g, int level = 1) {
   int level_no = level;
   cout << " ";
   while (level_no--) cout << "-";
@@ -131,16 +130,15 @@ void showFile(Node* g, int level = 1) {
   }
 }
 
-void showList(Directory* d, int level) {
+void showList(const Directory* d, int level) {
   if (level == 0) {
     showFile(d, level);
   }
   ++level;
-  list<Node*>::iterator i = d->nodesList().begin();
+  list<Node*>::const_iterator i;
 
-  while (i != d->nodesList().end()) {
+  for (i = d->nodesListConst().begin(); i != d->nodesListConst().end(); i++) {
     showFile(*i, level);
-    i++;
   }
 }
 
@@ -473,134 +471,135 @@ int main(void) {
   }
 
   cout << "\nreadline" << endl;
-  vector<string> *params;
+  list<string> *params;
+  list<string>::iterator i;
 
   // Start simple: one argument
   line = "a";
-  params = new vector<string>;
+  params = new list<string>;
   cout << "readline(" << line << "): " << File::decodeLine(line, *params) << endl;
-  for (unsigned int i = 0; i < params->size(); i++) {
-    cout << (*params)[i] << endl;
+  for (i = params->begin(); i != params->end(); i++) {
+    cout << *i << endl;
   }
   cout << endl;
   delete params;
 
   // Two arguments, test blanks
   line = " \ta \tb";
-  params = new vector<string>;
+  params = new list<string>;
   cout << "readline(" << line << "): " << File::decodeLine(line, *params) << endl;
-  for (unsigned int i = 0; i < params->size(); i++) {
-    cout << (*params)[i] << endl;
+  for (i = params->begin(); i != params->end(); i++) {
+    cout << *i << endl;
   }
   cout << endl;
   delete params;
 
   // Not single character argument
   line = "\t ab";
-  params = new vector<string>;
+  params = new list<string>;
   cout << "readline(" << line << "): " << File::decodeLine(line, *params)
     << endl;
-  for (unsigned int i = 0; i < params->size(); i++) {
-    cout << (*params)[i] << endl;
+  for (i = params->begin(); i != params->end(); i++) {
+    cout << *i << endl;
   }
   cout << endl;
   delete params;
 
   // Two of them
   line = "\t ab cd";
-  params = new vector<string>;
+  params = new list<string>;
   cout << "readline(" << line << "): " << File::decodeLine(line, *params)
     << endl;
-  for (unsigned int i = 0; i < params->size(); i++) {
-    cout << (*params)[i] << endl;
+  for (i = params->begin(); i != params->end(); i++) {
+    cout << *i << endl;
   }
   cout << endl;
   delete params;
 
   // Three, with comment
   line = "\t ab cd\tef # blah";
-  params = new vector<string>;
+  params = new list<string>;
   cout << "readline(" << line << "): " << File::decodeLine(line, *params)
     << endl;
-  for (unsigned int i = 0; i < params->size(); i++) {
-    cout << (*params)[i] << endl;
+  for (i = params->begin(); i != params->end(); i++) {
+    cout << *i << endl;
   }
   cout << endl;
   delete params;
 
   // Single quotes
   line = "\t 'ab' 'cd'\t'ef' # blah";
-  params = new vector<string>;
+  params = new list<string>;
   cout << "readline(" << line << "): " << File::decodeLine(line, *params)
     << endl;
-  for (unsigned int i = 0; i < params->size(); i++) {
-    cout << (*params)[i] << endl;
+  for (i = params->begin(); i != params->end(); i++) {
+    cout << *i << endl;
   }
   cout << endl;
   delete params;
 
   // And double quotes
   line = "\t \"ab\" 'cd'\t\"ef\" # blah";
-  params = new vector<string>;
+  params = new list<string>;
   cout << "readline(" << line << "): " << File::decodeLine(line, *params)
     << endl;
-  for (unsigned int i = 0; i < params->size(); i++) {
-    cout << (*params)[i] << endl;
+  for (i = params->begin(); i != params->end(); i++) {
+    cout << *i << endl;
   }
   cout << endl;
   delete params;
 
   // With blanks in quotes
   line = "\t ab cd\tef 'gh ij\tkl' \"mn op\tqr\" \t# blah";
-  params = new vector<string>;
+  params = new list<string>;
   cout << "readline(" << line << "): " << File::decodeLine(line, *params)
     << endl;
-  for (unsigned int i = 0; i < params->size(); i++) {
-    cout << (*params)[i] << endl;
+  for (i = params->begin(); i != params->end(); i++) {
+    cout << *i << endl;
   }
   cout << endl;
   delete params;
 
   // With quotes in quotes
   line = "\t ab cd\tef 'gh \"ij\\\'\tkl' \"mn 'op\\\"\tqr\" \t# blah";
-  params = new vector<string>;
+  params = new list<string>;
   cout << "readline(" << line << "): " << File::decodeLine(line, *params)
     << endl;
-  for (unsigned int i = 0; i < params->size(); i++) {
-    cout << (*params)[i] << endl;
+  for (i = params->begin(); i != params->end(); i++) {
+    cout << *i << endl;
   }
   cout << endl;
   delete params;
 
   // With escape characters
   line = "\t a\\b cd\tef 'g\\h \"ij\\\'\tkl' \"m\\n 'op\\\"\tqr\" \t# blah";
-  params = new vector<string>;
+  params = new list<string>;
   cout << "readline(" << line << "): " << File::decodeLine(line, *params)
     << endl;
-  for (unsigned int i = 0; i < params->size(); i++) {
-    cout << (*params)[i] << endl;
+  for (i = params->begin(); i != params->end(); i++) {
+    cout << *i << endl;
   }
   cout << endl;
   delete params;
 
   // Missing ending single quote
   line = "\t a\\b cd\tef 'g\\h \"ij\\\'\tkl";
-  params = new vector<string>;
+  params = new list<string>;
   cout << "readline(" << line << "): " << File::decodeLine(line, *params)
     << endl;
-  for (unsigned int i = 0; i < params->size(); i++) {
-    cout << (*params)[i] << endl;
+  for (i = params->begin(); i != params->end(); i++) {
+    cout << *i << endl;
   }
   cout << endl;
   delete params;
 
   // Missing ending double quote
   line = "\t a\\b cd\tef 'g\\h \"ij\\\'\tkl' \"m\\n 'op\\\"\tqr";
-  params = new vector<string>;
+  params = new list<string>;
   cout << "readline(" << line << "): " << File::decodeLine(line, *params)
     << endl;
-  for (unsigned int i = 0; i < params->size(); i++) {
-    cout << (*params)[i] << endl;
+  for (i = params->begin(); i != params->end(); i++) {
+    cout << *i << endl;
   }
   cout << endl;
   delete params;

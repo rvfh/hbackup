@@ -190,7 +190,7 @@ int Path::addFilter(
   }
 
   if (append) {
-    _filters[_filters.size() - 1].push_back(*condition);
+    _filters.back().push_back(*condition);
   } else {
     _filters.push_back(Filter(*condition));
   }
@@ -204,7 +204,7 @@ int Path::addParser(
   parser_mode_t mode;
 
   /* Determine mode */
-  switch (type[0]) {
+  switch (string[0]) {
     case 'c':
       // All controlled files
       mode = parser_controlled;
@@ -227,11 +227,11 @@ int Path::addParser(
   }
 
   /* Add specified parser */
-  if (string == "cvs") {
+  if (type == "cvs") {
     _parsers.push_back(new CvsParser(mode));
   } else {
     cerr << "Unsupported parser " << string << endl;
-    return 1;
+    return 2;
   }
   return 0;
 }

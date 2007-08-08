@@ -136,7 +136,7 @@ ignore type file
 ignand path_end ~
 ignore path_end ".o"
 ignore size_above 10
-parser controlled cvs
+parser cvs controlled
 
 path test2//
 EOF
