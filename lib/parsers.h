@@ -37,8 +37,8 @@ typedef enum {
 class Parser {
 protected:
   // Declare list stuff here to overcome apparent bug in GCC
-  list<File>            _files;
-  list<File>::iterator  _i;
+  list<Node>            _files;
+  list<Node>::iterator  _i;
   parser_mode_t         _mode;
   bool                  _dummy;
 public:

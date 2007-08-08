@@ -91,7 +91,7 @@ CvsParser::CvsParser(parser_mode_t mode, const string& dir_path) {
       continue;
     }
     buffer.erase(pos);
-    _files.push_back(File(buffer, "", type, 0, 0, 0, 0, 0));
+    _files.push_back(Node(buffer.c_str(), type, 0, 0, 0, 0, 0));
   }
   /* Close file */
   entries.close();
