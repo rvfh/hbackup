@@ -240,12 +240,11 @@ class Socket : public Node {
 };
 
 class Stream : public File2 {
-  FILE*           _fd;        // file descriptor
+  int             _fd;        // file descriptor
+  mode_t          _fmode;     // file open mode
   long long       _dsize;     // uncompressed data size, in bytes
-  bool            _fwrite;    // file open for write
   unsigned char*  _fbuffer;   // buffer for file compression during read/write
   bool            _fempty;    // compression buffer not empty
-  bool            _feof;      // All data read AND decompressed
   EVP_MD_CTX*     _ctx;       // openssl resources
   z_stream*       _strm;      // zlib resources
   // Convert MD5 to readable string
@@ -256,7 +255,7 @@ public:
   // Constructor for path in the VFS
   Stream(const char *path, const char* name = "") :
       File2(path, name),
-      _fd(NULL) {}
+      _fd(-1) {}
   // Open file, for read or write (no append), with or without compression
   int open(
     const char*           req_mode,
@@ -267,7 +266,7 @@ public:
   ssize_t read(
     unsigned char*        buffer,
     size_t                count);
-  // Write to file (signal end of file for compression end)
+  // Write to file (signal end of file for compression to end properly)
   ssize_t write(
     unsigned char*        buffer,
     size_t                count,
@@ -278,7 +277,6 @@ public:
   int       copy(Stream& source);
   // Data access
   long long dsize() const   { return _dsize; };
-  bool      eof() const     { return _feof; };
 };
 
 class File {

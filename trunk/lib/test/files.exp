@@ -1,4 +1,6 @@
 Tools Test
+Original mask = 0022
+Our mask = 0077
 
 Test: file read
 read size: 10485760 (10485760 -> 10485760), checksum: f1c9645dbc14efddc7d8a322685f26eb
@@ -182,9 +184,9 @@ Parsing test
  -> File: testfile~, type = f, mtime = 1, size = 0, uid = 1, gid = 1, mode = 420
  -> Link: testlink, type = l, mtime = 0, size = 8, uid = 1, gid = 1, mode = 511, link = testfile
  -> Oth.: testpipe, type = p, mtime = 1, size = 0, uid = 1, gid = 1, mode = 420
- -> Dir.: toucheddir, type = d, mtime = 0, size = 0, uid = 1, gid = 1, mode = 493
- -> File: touchedfile, type = f, mtime = 1, size = 0, uid = 1, gid = 1, mode = 420
- -> File: zcopy_dest, type = f, mtime = 1, size = 10485760, uid = 1, gid = 1, mode = 420
- -> File: zcopy_source, type = f, mtime = 1, size = 10208, uid = 1, gid = 1, mode = 420
+ -> Dir.: toucheddir, type = d, mtime = 0, size = 0, uid = 1, gid = 1, mode = 448
+ -> File: touchedfile, type = f, mtime = 1, size = 0, uid = 1, gid = 1, mode = 384
+ -> File: zcopy_dest, type = f, mtime = 1, size = 10485760, uid = 1, gid = 1, mode = 384
+ -> File: zcopy_source, type = f, mtime = 1, size = 10208, uid = 1, gid = 1, mode = 384
 
 End of tests

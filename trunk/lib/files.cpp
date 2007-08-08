@@ -28,6 +28,18 @@
 #include <unistd.h>
 #include <errno.h>
 
+/* I want to use the C file functions */
+#undef open
+#undef close
+#undef read
+#undef write
+namespace std {
+  using ::open;
+  using ::close;
+  using ::read;
+  using ::write;
+}
+
 using namespace std;
 
 #include "files.h"
@@ -116,12 +128,12 @@ void NodeListElement::replacePayload(Node* payload) {
 }
 
 int File2::create() {
-  FILE *readfile = fopen(_path, "w");
+  int readfile = open(_path, O_WRONLY | O_CREAT, 0666);
 
-  if (readfile == NULL) {
+  if (readfile < 0) {
     return -1;
   }
-  fclose(readfile);
+  close(readfile);
   metadata(_path);
   return 0;
 }
@@ -379,31 +391,26 @@ void Stream::md5sum(char* out, const unsigned char* in, int bytes) {
 }
 
 int Stream::open(const char* req_mode, unsigned int compression) {
-  char mode[2];
+  _fmode = O_NOATIME | O_LARGEFILE;
 
   switch (req_mode[0]) {
   case 'w':
-    strcpy(mode, "w");
-    _fwrite = true;
+    _fmode |= O_WRONLY | O_CREAT | O_TRUNC;
     _size = 0;
     break;
   case 'r':
-    strcpy(mode, "r");
-    _fwrite = false;
+    _fmode |= O_RDONLY;
     break;
   default:
-    return 1;
+    errno = EACCES;
+    return -1;
   }
 
   _dsize  = 0;
   _fempty = true;
-  _fd = fopen64(_path, mode);
-  if (_fd == NULL)
+  _fd = std::open(_path, _fmode, 0666);
+  if (_fd < 0) {
     return -1;
-  if (feof(_fd)) {
-    _feof = true;
-  } else {
-    _feof = false;
   }
 
   /* Create openssl resources */
@@ -421,7 +428,7 @@ int Stream::open(const char* req_mode, unsigned int compression) {
     _strm->opaque   = Z_NULL;
     _strm->avail_in = 0;
     _strm->next_in  = Z_NULL;
-    if (_fwrite) {
+    if (_fmode & O_WRONLY) {
       /* Compress */
       if (deflateInit2(_strm, compression, Z_DEFLATED, 16 + 15, 9,
           Z_DEFAULT_STRATEGY)) {
@@ -438,11 +445,11 @@ int Stream::open(const char* req_mode, unsigned int compression) {
     _strm = NULL;
   }
 
-  return _fd == NULL;
+  return _fd == -1;
 }
 
 int Stream::close() {
-  if (_fd == NULL) return -1;
+  if (_fd == -1) return -1;
 
   /* Compute checksum */
   if (_ctx != NULL) {
@@ -456,23 +463,23 @@ int Stream::close() {
 
   /* Destroy zlib resources */
   if (_strm != NULL) {
-    if (_fwrite) {
+    if (_fmode & O_WRONLY) {
       deflateEnd(_strm);
     } else {
       inflateEnd(_strm);
     }
   }
 
-  int rc = fclose(_fd);
-  _fd = NULL;
+  int rc = std::close(_fd);
+  _fd = -1;
   metadata(_path);
   return rc;
 }
 
 ssize_t Stream::read(unsigned char* buffer, size_t count) {
-  size_t length;
+  ssize_t length;
 
-  if ((_fd == NULL) || _fwrite) {
+  if ((_fd == -1) || (_fmode & O_WRONLY)) {
     errno = EINVAL;
     return -1;
   }
@@ -487,7 +494,10 @@ ssize_t Stream::read(unsigned char* buffer, size_t count) {
   // Read new data
   if (_fempty) {
     // Read chunk
-    length = fread(_fbuffer, 1, count, _fd);
+    length = std::read(_fd, _fbuffer, count);
+    if (length < 0) {
+      return -1;
+    }
 
     /* Update checksum with chunk */
     if (_ctx != NULL) {
@@ -501,8 +511,6 @@ ssize_t Stream::read(unsigned char* buffer, size_t count) {
       _fempty = false;
     } else {
       _dsize += length;
-      if (length == 0)
-        _feof = true;
       return length;
     }
   }
@@ -515,12 +523,6 @@ ssize_t Stream::read(unsigned char* buffer, size_t count) {
     case Z_DATA_ERROR:
     case Z_MEM_ERROR:
       fprintf(stderr, "File::read: inflate failed\n");
-      break;
-    case Z_STREAM_END:
-      _feof = true;
-      break;
-    default:
-      _feof = false;
   }
   _fempty = (_strm->avail_out != 0);
   length = chunk - _strm->avail_out;
@@ -530,9 +532,9 @@ ssize_t Stream::read(unsigned char* buffer, size_t count) {
 
 ssize_t Stream::write(unsigned char* buffer, size_t count, bool eof) {
   static bool finished = true;
-  size_t length;
+  ssize_t length;
 
-  if ((_fd == NULL) || ! _fwrite || (count > chunk)) {
+  if ((_fd == -1) || ! (_fmode & O_WRONLY) || (count > chunk)) {
     errno = EINVAL;
     return -1;
   }
@@ -555,7 +557,7 @@ ssize_t Stream::write(unsigned char* buffer, size_t count, bool eof) {
 
   if (_strm == NULL) {
     // Just write
-    size_t wlength;
+    ssize_t wlength;
 
     length = count;
 
@@ -565,7 +567,7 @@ ssize_t Stream::write(unsigned char* buffer, size_t count, bool eof) {
     }
 
     do {
-      wlength = fwrite(buffer, 1, length, _fd);
+      wlength = std::write(_fd, buffer, length);
       length -= wlength;
     } while ((length != 0) && (wlength != 0));
   } else {
@@ -586,9 +588,9 @@ ssize_t Stream::write(unsigned char* buffer, size_t count, bool eof) {
         EVP_DigestUpdate(_ctx, _fbuffer, length);
       }
 
-      size_t wlength;
+      ssize_t wlength;
       do {
-        wlength = fwrite(_fbuffer, 1, length, _fd);
+        wlength = std::write(_fd, _fbuffer, length);
         length -= wlength;
       } while ((length != 0) && (wlength != 0));
     } while (_strm->avail_out == 0);
@@ -604,13 +606,14 @@ int Stream::computeChecksum() {
   }
   unsigned char buffer[Stream::chunk];
   size_t read_size = 0;
+  ssize_t size;
   do {
-    size_t size = read(buffer, Stream::chunk);
+    size = read(buffer, Stream::chunk);
     if (size < 0) {
       break;
     }
     read_size += size;
-  } while (! eof());
+  } while (size != 0);
   if (close()) {
     return -1;
   }
@@ -622,24 +625,26 @@ int Stream::computeChecksum() {
 }
 
 int Stream::copy(Stream& source) {
-  if ((_fd == NULL) || (source._fd == NULL)) {
+  if ((_fd == -1) || (source._fd == -1)) {
     errno = EBADF;
   }
   unsigned char buffer[Stream::chunk];
   size_t read_size = 0;
   size_t write_size = 0;
+  bool eof = false;
   do {
-    size_t size = source.read(buffer, Stream::chunk);
+    ssize_t size = source.read(buffer, Stream::chunk);
     if (size < 0) {
       break;
     }
+    eof = (size == 0);
     read_size += size;
-    size = write(buffer, size, source.eof());
+    size = write(buffer, size, eof);
     if (size < 0) {
       break;
     }
     write_size += size;
-  } while (! source.eof());
+  } while (! eof);
   if (read_size != source.dsize()) {
     errno = EAGAIN;
     return -1;
