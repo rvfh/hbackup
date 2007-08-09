@@ -83,8 +83,11 @@ public:
     free(_path);
     free(_name);
   }
-  virtual bool  isValid() const { return _type != '?'; }
+  // Operators
+  virtual bool  operator<(const Node&)  const;
+  virtual bool  operator!=(const Node&) const;
   // Data read access
+  virtual bool  isValid() const { return _type != '?'; }
   const char*   path()    const { return _path;   }
   const char*   name()    const { return _name;   }
   char          type()    const { return _type;   }
