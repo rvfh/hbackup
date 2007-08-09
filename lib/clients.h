@@ -19,10 +19,6 @@
 #ifndef CLIENT_H
 #define CLIENT_H
 
-#ifndef PATHS_H
-#error You must include paths.h before clients.h
-#endif
-
 #ifndef HBACKUP_H
 #error You must include hbackup.h before clients.h
 #endif
@@ -46,6 +42,8 @@ public:
 };
 
 class Client {
+  struct        Private;
+  Private*      _d;
   string        _name;
   string        _host_or_ip;
   string        _listfilename;
@@ -54,7 +52,6 @@ class Client {
   list<Option>  _options;
   //
   bool          _initialised;
-  list<Path>    _paths;
   string        _mount_point;
   string        _mounted;
   int mountPath(string  backup_path, string  *path);
@@ -62,6 +59,7 @@ class Client {
   int readListFile(const string& list_path);
 public:
   Client(string name);
+  ~Client();
   string name() { return _name; }
   void addOption(const string& value) {
     _options.push_back(Option("", value));

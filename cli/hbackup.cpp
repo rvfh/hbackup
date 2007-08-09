@@ -26,15 +26,7 @@
 using namespace std;
 
 #include "hbackup.h"
-#include "list.h"
-#include "files.h"
-#include "dbdata.h"
-#include "dblist.h"
 #include "db.h"
-#include "filters.h"
-#include "parsers.h"
-#include "cvs_parser.h"
-#include "paths.h"
 #include "clients.h"
 
 using namespace hbackup;
@@ -229,8 +221,7 @@ int main(int argc, char **argv) {
     failed = 2;
   } else {
     /* Read configuration file */
-    list<Client> clients;
-    list<Client>::iterator client = clients.end();
+    list<Client*> clients;
     string  buffer;
     int     line    = 0;
 
@@ -238,6 +229,7 @@ int main(int argc, char **argv) {
       cout << " -> Reading configuration file" << endl;
     }
 
+    Client* client = NULL;
     while (! config_file.eof() && ! failed) {
       getline(config_file, buffer);
       unsigned int pos = buffer.find("\r");
@@ -274,8 +266,9 @@ int main(int argc, char **argv) {
               << " '" << keyword << "' takes exactly one argument" << endl;
             failed = 2;
           }
-          client = clients.insert(clients.end(), Client(*current));
-        } else if (client != clients.end()) {
+          client = new Client(*current);
+          clients.push_back(client);
+        } else if (client != NULL) {
           if (keyword == "hostname") {
             if (params.size() > 2) {
               cerr << "Error: in file " << config_path << ", line " << line
@@ -320,7 +313,7 @@ int main(int argc, char **argv) {
           }
         } else {
           cerr << "Error: in file " << config_path << ", line " << line
-            << " unknown keyword" << endl;
+            << " keyword before client" << endl;
           failed = 2;
         }
       }
@@ -350,7 +343,8 @@ int main(int argc, char **argv) {
           db.scan();
         } else {
           /* Backup */
-          for (client = clients.begin(); client != clients.end(); client++) {
+          for (list<Client*>::iterator client = clients.begin();
+              client != clients.end(); client++) {
             if (terminating()) {
               break;
             }
@@ -359,7 +353,7 @@ int main(int argc, char **argv) {
               bool found = false;
               for (list<string>::iterator i = requested_clients.begin();
                i != requested_clients.end(); i++) {
-                if (*i == client->name()) {
+                if (*i == (*client)->name()) {
                   found = true;
                   break;
                 }
@@ -368,8 +362,8 @@ int main(int argc, char **argv) {
                 continue;
               }
             }
-            client->setMountPoint(db_path + "/mount");
-            if (client->backup(db, config_check)) {
+            (*client)->setMountPoint(db_path + "/mount");
+            if ((*client)->backup(db, config_check)) {
               failed = 1;
             }
           }
@@ -381,7 +375,8 @@ int main(int argc, char **argv) {
           case 0:
             db.close_active();
             db.open_removed();
-            for (client = clients.begin(); client != clients.end(); client++) {
+            for (list<Client*>::iterator client = clients.begin();
+                client != clients.end(); client++) {
               if (terminating()) {
                 break;
               }
@@ -390,7 +385,7 @@ int main(int argc, char **argv) {
                 bool found = false;
                 for (list<string>::iterator i = requested_clients.begin();
                 i != requested_clients.end(); i++) {
-                  if (*i == client->name()) {
+                  if (*i == (*client)->name()) {
                     found = true;
                     break;
                   }
@@ -399,7 +394,7 @@ int main(int argc, char **argv) {
                   continue;
                 }
               }
-              if (client->expire(db)) {
+              if ((*client)->expire(db)) {
                 failed = 1;
               }
             }
@@ -412,6 +407,11 @@ int main(int argc, char **argv) {
       } else {
         return 2;
       }
+    }
+    // Delete clients
+    for (list<Client*>::iterator client = clients.begin();
+        client != clients.end(); client++){
+      delete *client;
     }
   }
   return failed;

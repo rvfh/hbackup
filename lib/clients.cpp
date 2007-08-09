@@ -38,6 +38,10 @@ using namespace std;
 
 using namespace hbackup;
 
+struct Client::Private {
+  list<Path>  paths;
+};
+
 int Client::mountPath(
     string        backup_path,
     string        *path) {
@@ -170,12 +174,12 @@ int Client::readListFile(const string& list_path) {
             failed = 1;
           } else {
             /* New backup path */
-            _paths.push_back(Path(*current));
+            _d->paths.push_back(Path(*current));
             if (verbosity() > 2) {
-              cout << " --> Path: " << _paths.back().path() << endl;
+              cout << " --> Path: " << _d->paths.back().path() << endl;
             }
           }
-        } else if (_paths.size() != 0) {
+        } else if (_d->paths.size() != 0) {
           string type;
           int rc;
 
@@ -190,7 +194,7 @@ int Client::readListFile(const string& list_path) {
                 << " 'filter' takes exactly two arguments" << endl;
               failed = 1;
             } else
-            if ((rc = _paths.back().addFilter(type, *current, keyword
+            if ((rc = _d->paths.back().addFilter(type, *current, keyword
              == "ignand"))) {
               switch (rc) {
                 case 1:
@@ -219,7 +223,7 @@ int Client::readListFile(const string& list_path) {
                 << " 'parser' takes exactly two arguments" << endl;
               failed = 1;
             } else
-            if ((rc = _paths.back().addParser(type, *current))) {
+            if ((rc = _d->paths.back().addParser(type, *current))) {
               switch (rc) {
                 case 1:
                   cerr << "Error: in list file " << list_path << ", line "
@@ -238,7 +242,7 @@ int Client::readListFile(const string& list_path) {
             int time_out;
             if ((sscanf(type.c_str(), "%d", &time_out) != 0)
              && (time_out != 0)) {
-              _paths.back().setExpiration(time_out * 3600 * 24);
+              _d->paths.back().setExpiration(time_out * 3600 * 24);
             }
           } else {
             // What was that?
@@ -261,6 +265,7 @@ int Client::readListFile(const string& list_path) {
 }
 
 Client::Client(string value) {
+  _d            = new Private;
   _name         = value;
   _host_or_ip   = _name;
   _listfilename = "";
@@ -273,6 +278,10 @@ Client::Client(string value) {
   if (verbosity() > 2) {
     cout << " --> Client: " << _name << endl;
   }
+}
+
+Client::~Client() {
+  delete _d;
 }
 
 void Client::setHostOrIp(string value) {
@@ -328,10 +337,10 @@ int Client::backup(
   if (! readListFile(list_path)) {
     setInitialised();
     /* Backup */
-    if (_paths.empty()) {
+    if (_d->paths.empty()) {
       failed = 1;
     } else if (! config_check) {
-      for (list<Path>::iterator i = _paths.begin(); i != _paths.end(); i++) {
+      for (list<Path>::iterator i = _d->paths.begin(); i != _d->paths.end(); i++) {
         if (terminating() || clientfailed) {
           break;
         }
@@ -385,7 +394,7 @@ int Client::backup(
 
 int Client::expire(Database& db) {
   if (initialised()) {
-    for (list<Path>::iterator i = _paths.begin(); i != _paths.end(); i++) {
+    for (list<Path>::iterator i = _d->paths.begin(); i != _d->paths.end(); i++) {
       if (terminating()) {
         break;
       }
@@ -412,9 +421,9 @@ void Client::show() {
     }
     cout << endl;
   }
-  if (_paths.size() > 0) {
+  if (_d->paths.size() > 0) {
     cout << "Paths:" << endl;
-    for (list<Path>::iterator i = _paths.begin(); i != _paths.end(); i++) {
+    for (list<Path>::iterator i = _d->paths.begin(); i != _d->paths.end(); i++) {
       cout << " -> " << i->path() << endl;
     }
   }

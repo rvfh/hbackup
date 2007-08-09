@@ -45,14 +45,17 @@
 
 using namespace std;
 
-#include "list.h"
 #include "files.h"
-#include "dbdata.h"
 #include "dblist.h"
 #include "db.h"
 #include "hbackup.h"
 
 using namespace hbackup;
+
+struct Database::Private {
+  DbList  active;
+  DbList  removed;
+};
 
 int Database::organise(const string& path, int number) {
   DIR           *directory;
@@ -298,7 +301,7 @@ int Database::getDir(
 }
 
 int Database::open_removed() {
-  return _removed.open(_path, "removed");
+  return _d->removed.open(_path, "removed");
 }
 
 int Database::move_journals() {
@@ -319,6 +322,16 @@ int Database::move_journals() {
   }
 
   return status;
+}
+
+Database::Database(const string& path) {
+  _path          = path;
+  _expire_inited = false;
+  _d             = new Private;
+}
+
+Database::~Database() {
+  delete _d;
 }
 
 int Database::open() {
@@ -419,12 +432,12 @@ int Database::open() {
   }
 
   // Make sure we start clean
-  _active.clear();
-  _removed.clear();
+  _d->active.clear();
+  _d->removed.clear();
 
   // Read database active items list
   if (status != 2) {
-    if (_active.open(_path, "active") == 2) {
+    if (_d->active.open(_path, "active") == 2) {
       status = 2;
     }
   }
@@ -437,28 +450,28 @@ int Database::open() {
 }
 
 int Database::close_active() {
-  return _active.close(_path, "active");
+  return _d->active.close(_path, "active");
 }
 
 int Database::close() {
   int status = 0;
 
   // Save active list
-  if (_active.isOpen()) {
-    if (_active.close(_path, "active") != 0) {
+  if (_d->active.isOpen()) {
+    if (_d->active.close(_path, "active") != 0) {
       return 2;
     }
   }
 
   // Save removed list
-  if (_removed.size() != 0) {
+  if (_d->removed.size() != 0) {
     // Load previously removed items into removed list
-    if (! _removed.isOpen()) {
-      status = _removed.open(_path, "removed");
+    if (! _d->removed.isOpen()) {
+      status = _d->removed.open(_path, "removed");
     }
   }
-  if (_removed.isOpen() && (status != 2)) {
-    status = _removed.close(_path, "removed");
+  if (_d->removed.isOpen() && (status != 2)) {
+    status = _d->removed.close(_path, "removed");
   }
 
   // Delete journals
@@ -470,13 +483,13 @@ int Database::close() {
 }
 
 int Database::expire_init() {
-  if (! _active.isOpen()) {
+  if (! _d->active.isOpen()) {
     cerr << "db: cannot initialise expiration module unless active items lists"
     " is open" << endl;
     return 2;
   }
   SortedList<DbData>::iterator it;
-  for (it = _active.begin(); it != _active.end(); it++) {
+  for (it = _d->active.begin(); it != _d->active.end(); it++) {
     if (it->checksum().size() != 0) {
       _active_checksums.push_back(it->checksum());
     }
@@ -493,15 +506,15 @@ int Database::expire_share(
     cerr << "db: expiration module not initialised" << endl;
     return 2;
   }
-  if (! _removed.isOpen()) {
+  if (! _d->removed.isOpen()) {
     cerr << "db: cannot expire unless removed items lists is open" << endl;
     return 2;
   }
-  if (_removed.size() != 0) {
+  if (_d->removed.size() != 0) {
     SortedList<DbData>::iterator  it;
     time_t                        now = time(NULL);
 
-    for (it = _removed.begin(); it != _removed.end(); it++) {
+    for (it = _d->removed.begin(); it != _d->removed.end(); it++) {
       // Prefix not reached
       if (it->prefix().substr(0, prefix.size()) < prefix) {
         continue;
@@ -537,7 +550,7 @@ int Database::expire_finalise() {
     cerr << "db: expiration module not initialised" << endl;
     return 2;
   }
-  if (! _removed.isOpen()) {
+  if (! _d->removed.isOpen()) {
     cerr << "db: cannot expire unless removed items lists is open" << endl;
     return 2;
   }
@@ -547,7 +560,7 @@ int Database::expire_finalise() {
   // Complete list of active records, create list of expired
   list<string> expired_checksums;
   SortedList<DbData>::iterator it;
-  for (it = _removed.begin(); it != _removed.end();) {
+  for (it = _d->removed.begin(); it != _d->removed.end();) {
     if (it->checksum().size() != 0) {
       if (it->expired()) {
         expired_checksums.push_back(it->checksum());
@@ -556,7 +569,7 @@ int Database::expire_finalise() {
       }
     }
     if (it->expired()) {
-      it = _removed.erase(it);
+      it = _d->removed.erase(it);
     } else {
       it++;
     }
@@ -630,17 +643,17 @@ int Database::parse(
     const string& mount_path,
     list<File>*   file_list) {
   int     failed        = 0;
-  int     removed_size  = _removed.size();
+  int     removed_size  = _d->removed.size();
   DbList  added;
 
   string full_path = prefix + "/" + mounted_path + "/";
-  SortedList<DbData>::iterator entry_active = _active.begin();
+  SortedList<DbData>::iterator entry_active = _d->active.begin();
   // Jump irrelevant first records
-  while ((entry_active != _active.end())
+  while ((entry_active != _d->active.end())
    && (entry_active->fullPath(full_path.size()) < full_path)) {
     entry_active++;
   }
-  SortedList<DbData>::iterator active_last = _active.end();
+  SortedList<DbData>::iterator active_last = _d->active.end();
 
   list<File>::iterator          entry_file_list = file_list->begin();
   while (! terminating()) {
@@ -649,21 +662,21 @@ int Database::parse(
     bool same_file = false;
 
     // Check whether db data is (still) relevant
-    if ((entry_active != _active.end()) && (active_last != entry_active)
+    if ((entry_active != _d->active.end()) && (active_last != entry_active)
      && (entry_active->fullPath(full_path.size()) > full_path)) {
       // Irrelevant rest of list
-      entry_active = _active.end();
+      entry_active = _d->active.end();
     }
     active_last = entry_active;
 
     // Check whether we have more work to do
-    if ((entry_active == _active.end())
+    if ((entry_active == _d->active.end())
      && (entry_file_list == file_list->end())) {
       break;
     }
 
     // Deal with each case
-    if (entry_active == _active.end()) {
+    if (entry_active == _d->active.end()) {
       // End of db relevant data reached: add element
       file_add = true;
     } else
@@ -722,15 +735,15 @@ int Database::parse(
       // Mark removed
       entry_active->setOut();
       // Append to removed list
-      _removed.push_back(*entry_active);
+      _d->removed.push_back(*entry_active);
       // Remove from active list / Go on to next
-      entry_active = _active.erase(entry_active);
+      entry_active = _d->active.erase(entry_active);
     }
   }
 
   // Append to recovery journals
   if (added.save_journal(_path, "seen.journal")
-   || _removed.save_journal(_path, "gone.journal", removed_size)) {
+   || _d->removed.save_journal(_path, "gone.journal", removed_size)) {
     // Unlikely
     failed = 1;
   }
@@ -786,7 +799,7 @@ int Database::parse(
           sizebackedup += i->data()->size();
         }
       }
-      _active.add(*i);
+      _d->active.add(*i);
       if (journal_ok) {
         // Update journal
         fprintf(writefile, "%s\n", i->line().c_str());
@@ -815,7 +828,7 @@ int Database::parse(
 
   // Deal with removed/modified data
   if (verbosity() > 2) {
-    cout << " --> Files to remove: " << _removed.size() - removed_size << endl;
+    cout << " --> Files to remove: " << _d->removed.size() - removed_size << endl;
   }
 
   // Report errors
@@ -887,22 +900,22 @@ int Database::scan(const string& checksum, bool thorough) {
   int failed = 0;
 
   if (checksum == "") {
-    int files = _active.size();
+    int files = _d->active.size();
 
     if (verbosity() > 2) {
       cout << " --> Scanning database contents";
       if (thorough) {
         cout << " thoroughly";
       }
-      cout << ": " << _active.size() << " file";
-      if (_active.size() != 1) {
+      cout << ": " << _d->active.size() << " file";
+      if (_d->active.size() != 1) {
         cout << "s";
       }
       cout << endl;
     }
 
     SortedList<DbData>::iterator i;
-    for (i = _active.begin(); i != _active.end(); i++) {
+    for (i = _d->active.begin(); i != _d->active.end(); i++) {
       if ((verbosity() > 2) && ((files & 0xFF) == 0)) {
         printf(" --> Files left to go: %u\n", files);
       }
@@ -983,4 +996,13 @@ int Database::scan(const string& checksum, bool thorough) {
     }
   }
   return failed;
+}
+
+// For debug only
+void* Database::active() {
+  return &_d->active;
+}
+
+void* Database::removed() {
+  return &_d->removed;
 }
