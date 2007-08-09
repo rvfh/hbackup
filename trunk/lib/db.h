@@ -21,20 +21,20 @@
 
 #include "files.h"
 #include "dbdata.h"
-#include "dblist.h"
 
 namespace hbackup {
 
 class Database {
+  struct        Private;
+  Private*      _d;
   string        _path;
-  DbList        _active;
-  DbList        _removed;
   list<string>  _active_checksums;
   bool          _expire_inited;
   int  lock();
   void unlock();
 public:
-  Database(const string& path) : _path(path), _expire_inited(false) {}
+  Database(const string& path);
+  ~Database();
   /* Open database */
   int  open();
   /* Open removed part of database */
@@ -84,8 +84,8 @@ public:
     DbData&         db_data,
     int             compress = 0);
 // For debug only
-  DbList* active() { return &_active; }
-  DbList* removed() { return &_removed; }
+  void* active();
+  void* removed();
 };
 
 }

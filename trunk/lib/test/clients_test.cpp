@@ -44,71 +44,80 @@ int terminating(void) {
 }
 
 int main(void) {
-  list<Client> clients;
-  list<Client>::iterator client = clients.end();
+  Client*                           client;
+  list<Client*>                     clients;
   Database  db("test_db");
 
   remove("test_db/list");
 
   printf(">List %u client(s):\n", clients.size());
-  for (list<Client>::iterator i = clients.begin(); i != clients.end(); i++) {
-    i->show();
+  for (list<Client*>::iterator i = clients.begin(); i != clients.end(); i++) {
+    (*i)->show();
   }
-  client = clients.insert(clients.end(), Client("localhost"));
+  client = new Client("localhost");
+  clients.push_back(client);
   client->setProtocol("file");
   client->setHostOrIp("localhost");
   client->setListfile("etc/doesnotexist");
   printf(">List %u client(s):\n", clients.size());
-  for (list<Client>::iterator i = clients.begin(); i != clients.end(); i++) {
-    i->show();
+  for (list<Client*>::iterator i = clients.begin(); i != clients.end(); i++) {
+    (*i)->show();
   }
-  for (list<Client>::iterator i = clients.begin(); i != clients.end(); i++) {
-    i->setMountPoint("test_db/mount");
-    i->backup(db, 0);
+  for (list<Client*>::iterator i = clients.begin(); i != clients.end(); i++) {
+    (*i)->setMountPoint("test_db/mount");
+    (*i)->backup(db, 0);
+  }
+  for (list<Client*>::iterator i = clients.begin(); i != clients.end(); i++) {
+    delete *i;
   }
   clients.clear();
 
   printf(">List %u client(s):\n", clients.size());
-  for (list<Client>::iterator i = clients.begin(); i != clients.end(); i++) {
-    i->show();
+  for (list<Client*>::iterator i = clients.begin(); i != clients.end(); i++) {
+    (*i)->show();
   }
-  client = clients.insert(clients.end(), Client("myClient"));
+  client = new Client("myClient");
+  clients.push_back(client);
   client->setProtocol("nfs");
   client->setHostOrIp("myClient");
   client->setListfile("/home/User/hbackup.list");
   printf(">List %u client(s):\n", clients.size());
-  for (list<Client>::iterator i = clients.begin(); i != clients.end(); i++) {
-    i->show();
+  for (list<Client*>::iterator i = clients.begin(); i != clients.end(); i++) {
+    (*i)->show();
   }
-  client = clients.insert(clients.end(), Client("myClient2"));
+  client = new Client("myClient2");
+  clients.push_back(client);
   client->setProtocol("smb");
   client->setHostOrIp("myClient");
   client->addOption("username", "Myself");
   client->addOption("password", "flesyM");
   client->setListfile("C:\\Backup\\Backup.LST");
   printf(">List %u client(s):\n", clients.size());
-  for (list<Client>::iterator i = clients.begin(); i != clients.end(); i++) {
-    i->show();
+  for (list<Client*>::iterator i = clients.begin(); i != clients.end(); i++) {
+    (*i)->show();
   }
-  client = clients.insert(clients.end(), Client("otherClient"));
+  client = new Client("otherClient");
+  clients.push_back(client);
   client->setProtocol("ssh");
   client->setHostOrIp("otherClient");
   client->setListfile("c:/home/backup/Backup.list");
   printf(">List %u client(s):\n", clients.size());
-  for (list<Client>::iterator i = clients.begin(); i != clients.end(); i++) {
-    i->show();
+  for (list<Client*>::iterator i = clients.begin(); i != clients.end(); i++) {
+    (*i)->show();
   }
-  client = clients.insert(clients.end(), Client("Client"));
+  client = new Client("Client");
+  clients.push_back(client);
   client->setProtocol("smb");
   client->setHostOrIp("Client");
   client->addOption("username", "user");
   client->addOption("iocharset", "utf8");
   client->setListfile("c:/home/BlaH/Backup.list");
   printf(">List %u client(s):\n", clients.size());
-  for (list<Client>::iterator i = clients.begin(); i != clients.end(); i++) {
-    i->show();
+  for (list<Client*>::iterator i = clients.begin(); i != clients.end(); i++) {
+    (*i)->show();
   }
-  client = clients.insert(clients.end(), Client("Client2"));
+  client = new Client("Client2");
+  clients.push_back(client);
   client->setProtocol("smb");
   client->setHostOrIp("Client");
   client->addOption("nocase");
@@ -116,63 +125,76 @@ int main(void) {
   client->addOption("password", "");
   client->setListfile("c:/home/BlaH/Backup.list");
   printf(">List %u client(s):\n", clients.size());
-  for (list<Client>::iterator i = clients.begin(); i != clients.end(); i++) {
-    i->show();
+  for (list<Client*>::iterator i = clients.begin(); i != clients.end(); i++) {
+    (*i)->show();
   }
-  client = clients.insert(clients.end(), Client("Client3"));
+  client = new Client("Client3");
+  clients.push_back(client);
   client->setProtocol("smb");
   client->setHostOrIp("Client");
   client->addOption("username", "");
   client->setListfile("c:/home/BlaH/Backup.list");
   printf(">List %u client(s):\n", clients.size());
-  for (list<Client>::iterator i = clients.begin(); i != clients.end(); i++) {
-    i->show();
+  for (list<Client*>::iterator i = clients.begin(); i != clients.end(); i++) {
+    (*i)->show();
   }
-  client = clients.insert(clients.end(), Client("Client4"));
+  client = new Client("Client4");
+  clients.push_back(client);
   client->setProtocol("smb");
   client->setHostOrIp("Client");
   client->addOption("username", "");
   client->addOption("password", "");
   client->setListfile("c:/home/BlaH/Backup.list");
   printf(">List %u client(s):\n", clients.size());
-  for (list<Client>::iterator i = clients.begin(); i != clients.end(); i++) {
-    i->show();
+  for (list<Client*>::iterator i = clients.begin(); i != clients.end(); i++) {
+    (*i)->show();
   }
   db.open();
-  for (list<Client>::iterator i = clients.begin(); i != clients.end(); i++) {
-    i->setMountPoint("test_db/mount");
-    i->backup(db, 0);
+  for (list<Client*>::iterator i = clients.begin(); i != clients.end(); i++) {
+    (*i)->setMountPoint("test_db/mount");
+    (*i)->backup(db, 0);
+  }
+  for (list<Client*>::iterator i = clients.begin(); i != clients.end(); i++) {
+    delete *i;
   }
   clients.clear();
   db.close();
 
-  client = clients.insert(clients.end(), Client("testhost"));
+  client = new Client("testhost");
+  clients.push_back(client);
   client->setProtocol("file");
   client->setHostOrIp("localhost");
   client->setListfile("etc/localhost.list");
   printf(">List %u client(s):\n", clients.size());
-  for (list<Client>::iterator i = clients.begin(); i != clients.end(); i++) {
-    i->show();
+  for (list<Client*>::iterator i = clients.begin(); i != clients.end(); i++) {
+    (*i)->show();
   }
   db.open();
-  for (list<Client>::iterator i = clients.begin(); i != clients.end(); i++) {
-    i->setMountPoint("test_db/mount");
-    i->backup(db, 0);
+  for (list<Client*>::iterator i = clients.begin(); i != clients.end(); i++) {
+    (*i)->setMountPoint("test_db/mount");
+    (*i)->backup(db, 0);
+  }
+  for (list<Client*>::iterator i = clients.begin(); i != clients.end(); i++) {
+    delete *i;
   }
   clients.clear();
   db.close();
 
-  client = clients.insert(clients.end(), Client("testhost"));
+  client = new Client("testhost");
+  clients.push_back(client);
   client->setProtocol("file");
   client->setListfile("etc/localhost.list");
   printf(">List %u client(s):\n", clients.size());
-  for (list<Client>::iterator i = clients.begin(); i != clients.end(); i++) {
-    i->show();
+  for (list<Client*>::iterator i = clients.begin(); i != clients.end(); i++) {
+    (*i)->show();
   }
   db.open();
-  for (list<Client>::iterator i = clients.begin(); i != clients.end(); i++) {
-    i->setMountPoint("test_db/mount");
-    i->backup(db, 0);
+  for (list<Client*>::iterator i = clients.begin(); i != clients.end(); i++) {
+    (*i)->setMountPoint("test_db/mount");
+    (*i)->backup(db, 0);
+  }
+  for (list<Client*>::iterator i = clients.begin(); i != clients.end(); i++) {
+    delete *i;
   }
   clients.clear();
   db.close();
