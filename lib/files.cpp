@@ -90,6 +90,24 @@ Node::Node(const char* path, const char* name) {
   metadata(_path);
 }
 
+// TODO Only compare names?
+bool Node::operator<(const Node& right) const {
+  int cmp = strcmp(_name, right._name);
+  if (cmp == 0) {
+    return (_type < right._type)  || (_mtime < right._mtime)
+        || (_size < right._size)  || (_uid < right._uid)
+        || (_gid < right._gid)    || (_mode < right._mode);
+  }
+  return cmp < 0;
+}
+
+bool Node::operator!=(const Node& right) const {
+  return (_type != right._type)   || (_mtime != right._mtime)
+      || (_size != right._size)   || (_uid != right._uid)
+      || (_gid != right._gid)     || (_mode != right._mode)
+      || (strcmp(_name, right._name) != 0);
+}
+
 int File2::create() {
   int readfile = open(_path, O_WRONLY | O_CREAT, 0666);
 
@@ -113,7 +131,7 @@ int Directory::createList() {
     }
     Node *g = new Node(_path, dir_entry->d_name);
     list<Node*>::iterator i = _nodes.begin();
-    while ((i != _nodes.end()) && (strcmp((*i)->name(), g->name()) < 0)) {
+    while ((i != _nodes.end()) && (*(*i) < *g)) {
       i++;
     }
     _nodes.insert(i, g);
