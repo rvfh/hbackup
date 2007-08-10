@@ -81,15 +81,17 @@ public:
     }
   }
   bool operator<(const DbData& right) const {
-    if (_prefix == right._prefix) {
-      if (_data < right._data) return true;
-      if (right._data < _data) return false;
-      // Equal then...
-      return (_in < right._in)
-        || ((_in == right._in) && (_checksum < right._checksum));
-    }
-    return (_prefix < right._prefix);
-  // Note: checking for _out would break the journal replay stuff (uses find)
+    int cmp = strcmp(_prefix.c_str(), right._prefix.c_str());
+    if (cmp < 0)return true;
+    else if (cmp > 0) return false;
+
+    if (_data < right._data) return true;
+    else if (right._data < _data) return false;
+
+    // Equal then...
+    return (_in < right._in)
+      || ((_in == right._in) && (_checksum < right._checksum));
+    // Note: checking for _out would break the journal replay stuff (uses find)
   }
   // Equality and difference exclude _out
   bool operator!=(const DbData& right) const {

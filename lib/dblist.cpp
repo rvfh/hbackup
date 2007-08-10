@@ -125,7 +125,7 @@ int DbList::save(
   return failed;
 }
 
-int DbList::save_new(
+int DbList::save_v1(
     const string& path,
     const string& filename,
     bool          backup) {
@@ -135,6 +135,7 @@ int DbList::save_new(
   string dest_path = path + "/" + filename;
   string temp_path = dest_path + ".part";
   if ((writefile = fopen(temp_path.c_str(), "w")) != NULL) {
+    fprintf(writefile, "# version 1\n");
     char*  last_prefix = NULL;
     char*  last_path   = NULL;
     time_t last_out    = 0;
