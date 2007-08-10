@@ -32,59 +32,86 @@ int DbList::load(
     const string& path,
     const string& filename,
     unsigned int  offset) {
-  string  source_path;
-  FILE    *readfile;
-  int     failed = 0;
+  string source_path = path + "/" + filename;
+  int    failed      = 0;
 
-  errno = 0;
-  source_path = path + "/" + filename;
-  if ((readfile = fopen(source_path.c_str(), "r")) != NULL) {
+  FILE* readfile = fopen(source_path.c_str(), "r");
+  if (readfile == NULL) {
+    // errno set by fopen
+    failed = -1;
+  } else {
     /* Read the file into memory */
-    char          *buffer = NULL;
-    size_t        bsize   = 0;
-    unsigned int  line    = 0;
+    char    *buffer = NULL;
+    size_t  bsize   = 0;
 
-    while ((getline(&buffer, &bsize, readfile) >= 0) && ! failed) {
-      if (++line <= offset) {
-        continue;
-      }
-
-      DbData db_data(buffer, bsize);
-      if (db_data.in() == 0) {
-        failed = 1;
-        cerr << "dblist: load: " << filename << ": Corrupted, line " << line
-          << endl;
-        errno = EUCLEAN;
+    // errno set by load_v*
+    if (getline(&buffer, &bsize, readfile) >= 0) {
+      if (buffer[0] != '#') {
+        rewind(readfile);
+        failed = load_v0(readfile);
       } else {
-        add(db_data);
+        // Only v1 for now
+        failed = load_v1(readfile);
       }
     }
     free(buffer);
     fclose(readfile);
+  }
 
-    // Unclutter
-    if (size() > 0) {
-      SortedList<DbData>::iterator prev = begin();
-      SortedList<DbData>::iterator i = prev;
-      i++;
-      while (i != end()) {
-        if ((*i->data() == *prev->data())
-         && (i->checksum() == prev->checksum())) {
-          prev->setOut(i->out());
-          i = erase(i);
-        } else {
-          i++;
-          prev++;
-        }
+  if (failed != 0) {
+    cerr << "dblist: load: " << filename << ": " << strerror(errno) << endl;
+  }
+  return failed;
+}
+
+int DbList::load_v0(FILE* readfile, unsigned int offset) {
+  int     failed = 0;
+
+  errno = 0;
+  /* Read the file into memory */
+  char          *buffer = NULL;
+  size_t        bsize   = 0;
+  unsigned int  line    = 0;
+
+  while ((getline(&buffer, &bsize, readfile) >= 0) && ! failed) {
+    if (++line <= offset) {
+      continue;
+    }
+
+    DbData db_data(buffer, bsize);
+    if (db_data.in() == 0) {
+      failed = -1;
+      cerr << "dblist: load: file corrupted, line " << line << endl;
+      errno = EUCLEAN;
+    } else {
+      add(db_data);
+    }
+  }
+  free(buffer);
+
+  // Unclutter
+  if (size() > 0) {
+    SortedList<DbData>::iterator prev = begin();
+    SortedList<DbData>::iterator i = prev;
+    i++;
+    while (i != end()) {
+      if ((*i->data() == *prev->data())
+        && (i->checksum() == prev->checksum())) {
+        prev->setOut(i->out());
+        i = erase(i);
+      } else {
+        i++;
+        prev++;
       }
     }
-  } else {
-    // errno set by fopen
-    failed = 1;
-    cerr << "dblist: load: " << filename << ": " << strerror(errno) << endl;
   }
 
   return failed;
+}
+
+int DbList::load_v1(FILE* readfile, unsigned int offset) {
+  errno = ECANCELED;
+  return -1;
 }
 
 int DbList::save(
