@@ -345,11 +345,11 @@ int Stream::open(const char* req_mode, unsigned int compression) {
 
   switch (req_mode[0]) {
   case 'w':
-    _fmode |= O_WRONLY | O_CREAT | O_TRUNC;
+    _fmode = O_WRONLY | O_CREAT | O_TRUNC;
     _size = 0;
     break;
   case 'r':
-    _fmode |= O_RDONLY;
+    _fmode = O_RDONLY;
     break;
   default:
     errno = EACCES;
