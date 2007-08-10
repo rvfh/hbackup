@@ -416,8 +416,6 @@ int Database::open() {
           }
         }
         active.save(_path, "active");
-        // New style
-        active.save_v1(_path, "active_1");
 
         cerr << "db: open: new active list size: " << active.size() << endl;
       }
@@ -425,8 +423,6 @@ int Database::open() {
 
       if ((removed.size() != 0) && ! removed.load(_path, "removed")) {
         removed.save(_path, "removed");
-        // New style
-        removed.save_v1(_path, "removed_1");
         cerr << "db: open: new removed list size: " << removed.size() << endl;
       }
       removed.clear();

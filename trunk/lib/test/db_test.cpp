@@ -890,13 +890,16 @@ int main(void) {
 
   cout << "List is garbaged" << endl;
   system("chmod u+r test_db/active");
+  system("head test_db/active > blah && mv blah test_db/active");
   system("echo blah >> test_db/active");
   if ((status = db.open())) {
     printf("Error: %s\n", strerror(errno));
+  } else {
+    db.close();
   }
 
   cout << "List is gone" << endl;
-  remove("test_db/active");
+  rename("test_db/active", "test_db/active.save");
   remove("test_db/active~");
   if ((status = db.open())) {
     printf("Error: %s\n", strerror(errno));

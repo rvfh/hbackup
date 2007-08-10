@@ -717,7 +717,7 @@ dblist: load: active: Permission denied
 dblist: failed to load active items list
 Error: Permission denied
 List is garbaged
-dblist: load: file corrupted, line 19
+dblist: load: file end not found
 dblist: load: active: Structure needs cleaning
 dblist: failed to load active items list
 Error: Structure needs cleaning

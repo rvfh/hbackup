@@ -31,8 +31,14 @@ class DbData {
   time_t  _out;
   bool    _expired;
 public:
-  DbData(const File& data) :
-    _data(data), _checksum(""), _out(0), _expired(false) { _in = time(NULL); }
+  DbData(const File& data, time_t in = 0) :
+      _data(data), _checksum(""), _out(0), _expired(false) {
+    if (in == 0) {
+      _in = time(NULL);
+    } else {
+      _in = in;
+    }
+  }
   // line gets modified
   DbData(char* line, size_t size) : _data("", 0), _expired(false) {
     char* start  = line;
@@ -107,7 +113,6 @@ public:
   bool   expired() { return _expired; }
   void   setPrefix(const string& prefix) { _prefix = prefix; }
   void   setChecksum(const string& checksum) { _checksum = checksum; }
-  void   setIn(time_t in) { _in = in; }
   void   setOut() { _out = time(NULL); }
   void   setOut(time_t out) { _out = out; }
   void   resetExpired() { _expired = false; }
