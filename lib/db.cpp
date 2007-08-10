@@ -129,22 +129,24 @@ int Database::write(
 
   Stream source(path.c_str());
   if (source.open("r")) {
-    cerr << "db: write: failed to open source file: " << path << endl;
-    return 2;
+    cerr << path << ": " << strerror(errno) << endl;
+    return -1;
   }
 
   /* Temporary file to write to */
   temp_path = _path + "/filedata";
   Stream temp(temp_path.c_str());
   if (temp.open("w", compress)) {
-    cerr << "db: write: failed to open dest file: " << temp_path << endl;
-    failed = 2;
+    cerr << "db: write: dest file: " << temp_path << ": " << strerror(errno)
+      << endl;
+    failed = -1;
   } else
 
   /* Copy file locally */
   if (temp.copy(source)) {
-    cerr << "db: write: failed to copy file: " << path << endl;
-    failed = 1;
+    cerr << "db: write: copy file: " << path << ": " << strerror(errno)
+      << endl;
+    failed = -1;
   }
 
   source.close();
@@ -157,7 +159,7 @@ int Database::write(
   /* Get file final location */
   if (getDir(source.checksum(), dest_path, true) == 2) {
     cerr << "db: write: failed to get dir for: " << source.checksum() << endl;
-    failed = 1;
+    failed = -1;
   } else {
     /* Make sure our checksum is unique */
     do {
@@ -192,7 +194,7 @@ int Database::write(
     if (rename(temp_path.c_str(), (dest_path + "/data").c_str())) {
       cerr << "db: write: failed to move file " << temp_path
         << " to " << dest_path << ": " << strerror(errno);
-      failed = 1;
+      failed = -1;
     }
   }
 
@@ -416,12 +418,17 @@ int Database::open() {
           }
         }
         active.save(_path, "active");
+        // New style
+        active.save_v1(_path, "active_1");
+
         cerr << "db: open: new active list size: " << active.size() << endl;
       }
       active.clear();
 
       if ((removed.size() != 0) && ! removed.load(_path, "removed")) {
         removed.save(_path, "removed");
+        // New style
+        removed.save_v1(_path, "removed_1");
         cerr << "db: open: new removed list size: " << removed.size() << endl;
       }
       removed.clear();
@@ -476,12 +483,6 @@ int Database::close() {
 
   // Delete journals
   move_journals();
-
-  // New style
-  if (! _d->active.load(_path, "active")
-   && ! _d->active.load(_path, "removed")) {
-    _d->active.save_v1(_path, "list");
-  }
 
   // Release lock
   unlock();
@@ -795,11 +796,6 @@ int Database::parse(
          *i) != 0) {
           /* Write failed, need to go on */
           failed = 1;
-          if (! terminating()) {
-            /* Don't signal errors on termination */
-            cerr << "\r" << strerror(errno) << ": "
-              << i->data()->path() << ", ignoring" << endl;
-          }
         }
         if (verbosity() > 2) {
           sizebackedup += i->data()->size();
@@ -820,6 +816,7 @@ int Database::parse(
         } else {
           printf(" --> Done: %d/%d\r", filesbackedup, filestobackup);
         }
+        fflush(stdout);
       }
     }
     if (journal_ok) {

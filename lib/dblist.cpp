@@ -281,6 +281,7 @@ int DbList::close(
     cerr << "dblist: failed to save " << filename << " items list" << endl;
     return 2;
   }
+  save_v1(path, filename + "_1", false);
   int list_size = size();
   clear();
   _open = false;
