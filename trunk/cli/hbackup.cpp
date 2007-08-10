@@ -217,7 +217,7 @@ int main(int argc, char **argv) {
   ifstream config_file(config_path.c_str());
 
   if (! config_file.is_open()) {
-    cerr << "Configuration file not found " << config_path << endl;
+    cerr << strerror(errno) << " " << config_path << endl;
     failed = 2;
   } else {
     /* Read configuration file */
