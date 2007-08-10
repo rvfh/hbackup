@@ -65,14 +65,13 @@ int DbList::load(
 }
 
 int DbList::load_v0(FILE* readfile, unsigned int offset) {
-  int     failed = 0;
-
-  errno = 0;
   /* Read the file into memory */
   char          *buffer = NULL;
   size_t        bsize   = 0;
   unsigned int  line    = 0;
+  int           failed  = 0;
 
+  errno = 0;
   while ((getline(&buffer, &bsize, readfile) >= 0) && ! failed) {
     if (++line <= offset) {
       continue;
@@ -110,8 +109,128 @@ int DbList::load_v0(FILE* readfile, unsigned int offset) {
 }
 
 int DbList::load_v1(FILE* readfile, unsigned int offset) {
-  errno = ECANCELED;
-  return -1;
+  /* Read the file into memory */
+  char          *buffer = NULL;
+  size_t        bsize   = 0;
+  unsigned int  line    = 0;
+  ssize_t       size    = 0;
+  int           failed  = 0;
+
+  char*         prefix = NULL;
+  char*         path   = NULL;
+  time_t        in     = 0;     // DB time in
+
+  errno = 0;
+  while (((size = getline(&buffer, &bsize, readfile)) >= 0) && ! failed) {
+    if (++line <= offset) {
+      continue;
+    }
+    if (buffer[0] != '\t') {
+      free(prefix);
+      asprintf(&prefix, buffer);
+    } else
+    if (buffer[1] != '\t') {
+      free(path);
+      asprintf(&path, &buffer[1]);
+      in = 0;
+    } else {
+      char* start  = &buffer[2];
+      char* value  = (char *) malloc(size + 1);
+      int   failed = 0;
+      int   fields = 7;
+      // Fields
+      time_t    out;            // DB time out
+      char      type;           // file type ('?' if metadata not available)
+      time_t    mtime;          // time of last modification
+      long long size;           // on-disk size, in bytes
+      uid_t     uid;            // user ID of owner
+      gid_t     gid;            // group ID of owner
+      mode_t    mode;           // permissions
+      string    checksum;       // file checksum
+      string    link;           // what the link points to
+
+      for (int field = 1; field <= fields; field++) {
+        // Get tabulation position
+        char* delim = strchr(start, '\t');
+        if (delim == NULL) {
+          failed = 1;
+        } else {
+          // Get string portion
+          strncpy(value, start, delim - start);
+          value[delim - start] = '\0';
+          /* Extract data */
+          switch (field) {
+            case 1:   /* DB timestamp */
+              if (sscanf(value, "%ld", &out) != 1) {
+                failed = -1;
+              } else if (in != 0) {
+                // TODO What if file is still active?
+                File file_data(path, link, type, mtime, size, uid, gid, mode);
+                DbData db_data(file_data);
+                db_data.setChecksum(checksum);
+                db_data.setIn(in);
+                db_data.setOut(out);
+                in = out;
+                if (failed == 0) {
+                  add(db_data);
+                }
+              }
+              break;
+            case 2:   /* Type */
+              if (sscanf(value, "%c", &type) != 1) {
+                failed = 2;
+              } else if (type == 'r') {
+                fields = 2;
+              } else if ((type == 'f') || (type == 'l')) {
+                fields++;
+              }
+              break;
+            case 3:   /* Size */
+              if (sscanf(value, "%lld", &size) != 1) {
+                failed = 2;
+              }
+              break;
+            case 4:   /* Modification time */
+              if (sscanf(value, "%ld", &mtime) != 1) {
+                failed = 2;
+              }
+              break;
+            case 5:   /* User */
+              if (sscanf(value, "%u", &uid) != 1) {
+                failed = 2;
+              }
+              break;
+            case 6:   /* Group */
+              if (sscanf(value, "%u", &gid) != 1) {
+                failed = 2;
+              }
+              break;
+            case 7:   /* Permissions */
+              if (sscanf(value, "%o", &mode) != 1) {
+                failed = 2;
+              }
+              break;
+            case 8:  /* Checksum or Link */
+                if (type == 'f') {
+                  checksum = value;;
+                } else if (type == 'l') {
+                  link = value;;
+                }
+              break;
+          }
+          start = delim + 1;
+        }
+        if (failed) {
+          cerr << "dblist: load: file corrupted, line " << line << endl;
+          errno = EUCLEAN;
+          break;
+        }
+      }
+      free(value);
+    }
+  }
+  free(buffer);
+  return failed;
 }
 
 int DbList::save(
@@ -177,7 +296,7 @@ int DbList::save_v1(
       }
       if ((last_path == NULL) || strcmp(last_path, i->data()->path().c_str())){
         if (last_out != 0) {
-          fprintf(writefile, "\t\t%ld\t\n", last_out);
+          fprintf(writefile, "\t\t%ld\tr\t\n", last_out);
           last_out = 0;
         }
         fprintf(writefile, "\t%s\n", i->data()->path().c_str());
@@ -186,7 +305,7 @@ int DbList::save_v1(
         asprintf(&last_path, i->data()->path().c_str());
       } else {
         if (last_out != i->in()) {
-          fprintf(writefile, "\t\t%ld\t\n", last_out);
+          fprintf(writefile, "\t\t%ld\tr\t\n", last_out);
           last_out = 0;
         }
       }
@@ -206,7 +325,7 @@ int DbList::save_v1(
     }
     // Last one...
     if (last_out != 0) {
-      fprintf(writefile, "\t\t%ld\t\n", last_out);
+      fprintf(writefile, "\t\t%ld\tr\t\n", last_out);
     }
     fclose(writefile);
 

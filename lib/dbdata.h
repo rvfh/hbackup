@@ -107,6 +107,7 @@ public:
   bool   expired() { return _expired; }
   void   setPrefix(const string& prefix) { _prefix = prefix; }
   void   setChecksum(const string& checksum) { _checksum = checksum; }
+  void   setIn(time_t in) { _in = in; }
   void   setOut() { _out = time(NULL); }
   void   setOut(time_t out) { _out = out; }
   void   resetExpired() { _expired = false; }

@@ -29,9 +29,6 @@ class DbList : public SortedList<DbData> {
   int  load_v0(
     FILE* readfile,
     unsigned int offset = 0);
-  int  load_v1(
-    FILE* readfile,
-    unsigned int offset = 0);
 public:
   DbList() : _open(false) {}
   bool isOpen() { return _open; }
@@ -45,7 +42,10 @@ public:
     const string& path,
     const string& filename,
     bool          backup = false);
-  // Experimental
+  // Experimental: version 1 of DB list files
+  int  load_v1(
+    FILE* readfile,
+    unsigned int offset = 0);
   int  save_v1(
     const string& path,
     const string& filename,
