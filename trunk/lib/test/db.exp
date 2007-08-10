@@ -477,13 +477,15 @@ Removed list: 2 element(s):
 file://host	/home/user/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	775		5252f242d27b8c2c9fdbdcbb33545d07-0	23	31	
 file://host	/home/user/testdir	d	0	0	1000	1000	775			25	33	
 Recovery test
-dblist: load: written.journal: Corrupted, line 3
+dblist: load: file corrupted, line 3
+dblist: load: written.journal: Structure needs cleaning
 Really added journal list: 2 element(s):
 file://host	/home/user/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	777		5252f242d27b8c2c9fdbdcbb33545d07-0	30	0	
 file://host	/home/user/testdir	d	0	0	1000	1000	777			32	0	
 db: lock: lock reset
 db: open: journal found, attempting crash recovery
-dblist: load: written.journal: Corrupted, line 3
+dblist: load: file corrupted, line 3
+dblist: load: written.journal: Structure needs cleaning
 db: open: adding 2 valid files to active list
 db: open: removing 2 files from active list
 db: open: new active list size: 20
@@ -762,7 +764,8 @@ dblist: load: active: Permission denied
 dblist: failed to load active items list
 Error: Permission denied
 List is garbaged
-dblist: load: active: Corrupted, line 19
+dblist: load: file corrupted, line 19
+dblist: load: active: Structure needs cleaning
 dblist: failed to load active items list
 Error: Structure needs cleaning
 List is gone
