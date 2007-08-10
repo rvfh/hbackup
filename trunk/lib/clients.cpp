@@ -51,15 +51,15 @@ int Client::mountPath(
   /* Determine share and path */
   if (_protocol == "file") {
     share = "";
-    *path  = backup_path;
+    *path = backup_path;
   } else
   if (_protocol == "nfs") {
     share = _host_or_ip + ":" + backup_path;
-    *path  = _mount_point;
+    *path = _mount_point;
   } else
   if (_protocol == "smb") {
     share = "//" + _host_or_ip + "/" + backup_path.substr(0,1) + "$";
-    *path  = _mount_point + "/" +  backup_path.substr(3);
+    *path = _mount_point + "/" +  backup_path.substr(3);
   } else {
     errno = EPROTONOSUPPORT;
     return 2;
@@ -300,7 +300,7 @@ void Client::setListfile(string value) {
     _listfilename = path.path().substr(pos + 1);
     _listfiledir  = path.path().substr(0, pos);
   } else {
-    _listfilename = "";
+    _listfilename = path.path();
     _listfiledir  = "";
   }
 }
@@ -327,7 +327,10 @@ int Client::backup(
         return 0;
     }
   }
-  list_path += "/" + _listfilename;
+  if (list_path.size() != 0) {
+    list_path += "/";
+  }
+  list_path += _listfilename;
 
   if (verbosity() > 0) {
     cout << "Backup client '" << _name
