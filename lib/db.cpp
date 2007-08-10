@@ -129,7 +129,7 @@ int Database::write(
 
   Stream source(path.c_str());
   if (source.open("r")) {
-    cerr << path << ": " << strerror(errno) << endl;
+    cerr << strerror(errno) << ": " << path << endl;
     return -1;
   }
 
@@ -137,15 +137,13 @@ int Database::write(
   temp_path = _path + "/filedata";
   Stream temp(temp_path.c_str());
   if (temp.open("w", compress)) {
-    cerr << "db: write: dest file: " << temp_path << ": " << strerror(errno)
-      << endl;
+    cerr << strerror(errno) << ": " << temp_path << endl;
     failed = -1;
   } else
 
   /* Copy file locally */
   if (temp.copy(source)) {
-    cerr << "db: write: copy file: " << path << ": " << strerror(errno)
-      << endl;
+    cerr << strerror(errno) << ": " << path << endl;
     failed = -1;
   }
 

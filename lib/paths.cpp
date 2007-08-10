@@ -49,7 +49,7 @@ int Path::iterate_directory(const string& path, Parser* parser) {
   }
   DIR* directory = opendir(path.c_str());
   if (directory == NULL) {
-    cerr << "paths: " << strerror(errno) << ": " << path << endl;
+    cerr << strerror(errno) << ": " << path << endl;
     return 2;
   }
   struct dirent *dir_entry;
@@ -80,10 +80,6 @@ int Path::iterate_directory(const string& path, Parser* parser) {
         cout << " ---> Dir: " << file_path.substr(_mount_path_length) << endl;
       }
       if (iterate_directory(file_path, parser)) {
-        if (! terminating()) {
-          cerr << "paths: cannot iterate into directory: "
-            << dir_entry->d_name << endl;
-        }
         continue;
       }
     }
