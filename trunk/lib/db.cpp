@@ -478,11 +478,9 @@ int Database::close() {
   move_journals();
 
   // New style
-  if (verbosity() > 3) {
-    if (! _d->active.load(_path, "active")
-     || ! _d->active.load(_path, "removed")) {
-      _d->active.save_new(_path, "list");
-    }
+  if (! _d->active.load(_path, "active")
+   && ! _d->active.load(_path, "removed")) {
+    _d->active.save_v1(_path, "list");
   }
 
   // Release lock

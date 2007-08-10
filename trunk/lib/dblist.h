@@ -39,7 +39,7 @@ public:
     const string& path,
     const string& filename,
     bool          backup = false);
-  int  save_new(
+  int  save_v1(
     const string& path,
     const string& filename,
     bool          backup = false);
