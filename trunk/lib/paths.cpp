@@ -36,9 +36,6 @@ using namespace std;
 using namespace hbackup;
 
 int Path::iterate_directory(const string& path, Parser* parser) {
-  if (verbosity() > 3) {
-    cout << " ---> Dir: " << path.substr(_mount_path_length) << endl;
-  }
   /* Check whether directory is under SCM control */
   if (! _parsers.empty()) {
     // We have a parser, check this directory with it
@@ -79,6 +76,9 @@ int Path::iterate_directory(const string& path, Parser* parser) {
       continue;
     } else
     if (file_data.type() == 'd') {
+      if (verbosity() > 3) {
+        cout << " ---> Dir: " << file_path.substr(_mount_path_length) << endl;
+      }
       if (iterate_directory(file_path, parser)) {
         if (! terminating()) {
           cerr << "paths: cannot iterate into directory: "
