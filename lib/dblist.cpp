@@ -173,15 +173,22 @@ int DbList::save_v1(
         last_prefix = NULL;
         free(last_path);
         last_path = NULL;
-        last_out = 0;
         asprintf(&last_prefix, i->prefix().c_str());
       }
       if ((last_path == NULL) || strcmp(last_path, i->data()->path().c_str())){
+        if (last_out != 0) {
+          fprintf(writefile, "\t\t%ld\t\n", last_out);
+          last_out = 0;
+        }
         fprintf(writefile, "\t%s\n", i->data()->path().c_str());
         free(last_path);
         last_path = NULL;
-        last_out = 0;
         asprintf(&last_path, i->data()->path().c_str());
+      } else {
+        if (last_out != i->in()) {
+          fprintf(writefile, "\t\t%ld\t\n", last_out);
+          last_out = 0;
+        }
       }
       fprintf(writefile, "\t\t%ld\t%c\t%lld\t%ld\t%u\t%u\t%o\t",
         i->in(), i->data()->type(), i->data()->size(), i->data()->mtime(),
@@ -194,8 +201,12 @@ int DbList::save_v1(
       }
       fprintf(writefile, "\n");
       if (i->out() != 0) {
-        fprintf(writefile, "\t\t%ld\t\n", i->out());
+        last_out = i->out();
       }
+    }
+    // Last one...
+    if (last_out != 0) {
+      fprintf(writefile, "\t\t%ld\t\n", last_out);
     }
     fclose(writefile);
 
