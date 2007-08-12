@@ -73,6 +73,41 @@ public:
   }
 };
 
+class Path2 {
+  char*         _path;
+  Directory*    _dir;
+  int           _expiration;
+  Parsers       _parsers;
+  Filters       _filters;
+  int           _mount_path_length;
+  int recurse(
+    Directory*  dir,
+    Parser*     parser);
+public:
+  Path2(const char* path);
+  ~Path2() {
+    free(_path);
+    delete _dir;
+  }
+  string path() const          { return _dir->path(); }
+  const Directory* dir() const { return _dir; }
+  int expiration() const       { return _expiration; }
+  void setExpiration(int expiration) { _expiration = expiration; }
+  // Set append to true to add as condition to last added filter
+  int addFilter(
+    const string& type,
+    const string& string,
+    bool          append = false);
+  int addParser(
+    const string& type,
+    const string& string);
+  int parse(const char* backup_path);
+  // Information
+  void showParsers() {
+    _parsers.list();
+  }
+};
+
 }
 
 #endif

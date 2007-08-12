@@ -28,6 +28,8 @@ using namespace std;
 
 using namespace hbackup;
 
+#warning need to test match for Nodes
+
 bool Condition::match(const File& filedata) const {
   string name;
 
@@ -90,6 +92,56 @@ bool Condition::match(const File& filedata) const {
   return false;
 }
 
+bool Condition::match(const Node& node) const {
+  string name = node.name();
+  string path = node.path();
+
+  /* Test condition */
+  switch(_type) {
+  case filter_type:
+    return _file_type == node.type();
+  case filter_name:
+    return name == _string;
+  case filter_name_start:
+    return name.substr(0, _string.size()) == _string;
+  case filter_name_end: {
+    signed int diff = name.size() - _string.size();
+    if (diff < 0) {
+      return false;
+    }
+    return _string == name.substr(diff); }
+  case filter_name_regex: {
+    regex_t regex;
+    if (! regcomp(&regex, _string.c_str(), REG_EXTENDED)) {
+      return ! regexec(&regex, name.c_str(), 0, NULL, 0);
+    }
+    cerr << "filters: regex: incorrect expression" << endl; }
+  case filter_path:
+    return path == _string;
+  case filter_path_start:
+    return path.substr(0, _string.size()) == _string;
+  case filter_path_end: {
+    signed int diff = path.size() - _string.size();
+    if (diff < 0) {
+      return false;
+    }
+    return _string == path.substr(diff); }
+  case filter_path_regex: {
+    regex_t regex;
+    if (! regcomp(&regex, _string.c_str(), REG_EXTENDED)) {
+      return ! regexec(&regex, node.path(), 0, NULL, 0);
+    }
+    cerr << "filters: regex: incorrect expression" << endl; }
+  case filter_size_above:
+    return node.size() >= _size;
+  case filter_size_below:
+    return node.size() <= _size;
+  default:
+    cerr << "filters: match: unknown condition type" << endl;
+  }
+  return false;
+}
+
 void Condition::show() const {
   switch (_type) {
     case filter_name:
@@ -122,6 +174,30 @@ bool Filters::match(const File& filedata) const {
     for (condition = rule->begin(); condition != rule->end(); condition++) {
       /* All filters must match for rule to match */
       if (! condition->match(filedata)) {
+        match = false;
+        break;
+      }
+    }
+    /* If all conditions matched, or the rule is empty, we have a rule match */
+    if (match) {
+      return true;
+    }
+  }
+  /* No match */
+  return false;
+}
+
+bool Filters::match(const Node& node) const {
+  /* Read through list of rules */
+  const_iterator rule;
+  for (rule = this->begin(); rule != this->end(); rule++) {
+    bool    match = true;
+
+    /* Read through list of conditions in rule */
+    Filter::const_iterator condition;
+    for (condition = rule->begin(); condition != rule->end(); condition++) {
+      /* All filters must match for rule to match */
+      if (! condition->match(node)) {
         match = false;
         break;
       }

@@ -41,6 +41,24 @@ int terminating(void) {
   return 0;
 }
 
+void showList(const Directory* d);
+
+void showFile(const Node* g) {
+  printf("%s\t%c\t%lld\t%d\t%d\t%d\t%o\n", g->path(), g->type(), g->size(),
+    (g->mtime() != 0), g->uid(), g->gid(), g->mode());
+  if (g->type() == 'd') {
+    Directory* d = (Directory*) g;
+    showList(d);
+  }
+}
+
+void showList(const Directory* d) {
+  list<Node*>::const_iterator i;
+  for (i = d->nodesListConst().begin(); i != d->nodesListConst().end(); i++) {
+    showFile(*i);
+  }
+}
+
 int main(void) {
   Path* path = new Path("");
 
@@ -100,5 +118,49 @@ int main(void) {
   }
 
   delete path;
+return 0;
+#warning remaining tests skipped
+
+  // New classes
+  cout << endl << "New classes test" << endl;
+  Path2* path2 = new Path2("");
+
+  if (! path2->parse("test1")) {
+    showFile(path2->dir());
+  }
+
+  cout << "as previous with subdir in ignore list" << endl;
+  if (path2->addFilter("type", "dir")
+   || path2->addFilter("path", "subdir", true)) {
+    cout << "Failed to add filter" << endl;
+  }
+  if (! path2->parse("test1")) {
+    showFile(path2->dir());
+  }
+
+  cout << "as previous with testlink in ignore list" << endl;
+  if (path2->addFilter("type", "link")
+   || path2->addFilter("path_start", "testlink", true)) {
+    cout << "Failed to add filter" << endl;
+  }
+  if (! path2->parse("test1")) {
+    showFile(path2->dir());
+  }
+
+  cout << "as previous with CVS parser" << endl;
+  if (path2->addParser("cvs", "controlled")) {
+    cout << "Failed to add parser" << endl;
+  }
+  if (! path2->parse("test1")) {
+    showFile(path2->dir());
+  }
+
+  cout << "as previous" << endl;
+  if (! path2->parse("test1")) {
+    showFile(path2->dir());
+  }
+
+  delete path2;
+
   return 0;
 }
