@@ -241,3 +241,229 @@ int Path::createList(const string& backup_path) {
   }
   return 0;
 }
+
+int Path2::recurse(Directory* dir, Parser* parser) {
+  if (terminating()) {
+    errno = EINTR;
+    return -1;
+  }
+  /* Check whether directory is under SCM control */
+  if (! _parsers.empty()) {
+    // We have a parser, check this directory with it
+    if (parser != NULL) {
+      parser = parser->isControlled(dir->path());
+    }
+    // We don't have a parser [anymore], check this directory
+    if (parser == NULL) {
+      parser = _parsers.isControlled(dir->path());
+    }
+  }
+  if (dir->isValid() && ! dir->createList()) {
+    for (list<Node*>::iterator i = dir->nodesList().begin();
+        i != dir->nodesList().end(); i++) {
+      Node* node = *i;
+
+      // Ignore inaccessible files
+      if (node->type() == '?') {
+        continue;
+      }
+
+      /* Let the parser analyse the file data to know whether to back it up */
+//       if ((parser != NULL) && (parser->ignore(node))) {
+//         continue;
+//       }
+
+      /* Now pass it through the filters */
+//       if (! _filters.empty() && _filters.match(node)) {
+//         continue;
+//       }
+
+      switch (node->type()) {
+        case 'f': {
+          File2 *f = new File2(*node);
+          delete *i;
+          *i = f;
+        }
+        break;
+        case 'l': {
+          Link *l = new Link(*node);
+          delete *i;
+          *i = l;
+        }
+        break;
+        case 'd': {
+          Directory *d = new Directory(*node);
+          delete *i;
+          *i = d;
+          if (verbosity() > 3) {
+            cout << " ---> Dir: " << node->path(_mount_path_length) << endl;
+          }
+          recurse(d, parser);
+        }
+        break;
+      }
+    }
+  }
+  return 0;
+}
+
+Path2::Path2(const char* path) {
+  _path              = NULL;
+  _expiration        = 0;
+  _mount_path_length = 0;
+  char* current;
+
+  // Copy path accross
+  asprintf(&_path, "%s", path);
+
+  // Change '\' into '/'
+  current = _path;
+  while (current < &_path[strlen(_path)]) {
+    if (*current == '\\') {
+      *current = '/';
+    }
+    current++;
+  }
+
+  // Remove trailing '/'s
+  while ((--current >= _path) && (*current == '/')) {
+    *current = '\0';
+  }
+
+  delete _path;
+}
+
+int Path2::addFilter(
+    const string& type,
+    const string& value,
+    bool          append) {
+  Condition *condition;
+
+  if (append && _filters.empty()) {
+    // Can't append to nothing
+    return 3;
+  }
+
+  /* Add specified filter */
+  if (type == "type") {
+    char file_type;
+    if ((value == "file") || (value == "f")) {
+      file_type = 'f';
+    } else
+    if ((value == "dir") || (value == "d")) {
+      file_type = 'd';
+    } else
+    if ((value == "char") || (value == "c")) {
+      file_type = 'c';
+    } else
+    if ((value == "block") || (value == "b")) {
+      file_type = 'b';
+    } else
+    if ((value == "pipe") || (value == "p")) {
+      file_type = 'p';
+    } else
+    if ((value == "link") || (value == "l")) {
+      file_type = 'l';
+    } else
+    if ((value == "socket") || (value == "s")) {
+      file_type = 's';
+    } else {
+      // Wrong value
+      return 2;
+    }
+    condition = new Condition(filter_type, file_type);
+  } else
+  if (type == "name") {
+    condition = new Condition(filter_name, value);
+  } else
+  if (type == "name_start") {
+    condition = new Condition(filter_name_start, value);
+  } else
+  if (type == "name_end") {
+    condition = new Condition(filter_name_end, value);
+  } else
+  if (type == "name_regex") {
+    condition = new Condition(filter_name_regex, value);
+  } else
+  if (type == "path") {
+    condition = new Condition(filter_path, value);
+  } else
+  if (type == "path_start") {
+    condition = new Condition(filter_path_start, value);
+  } else
+  if (type == "path_end") {
+    condition = new Condition(filter_path_end, value);
+  } else
+  if (type == "path_regex") {
+    condition = new Condition(filter_path_regex, value);
+  } else
+  if (type == "size_below") {
+    off_t size = strtoul(value.c_str(), NULL, 10);
+    condition = new Condition(filter_size_below, size);
+  } else
+  if (type == "size_above") {
+    off_t size = strtoul(value.c_str(), NULL, 10);
+    condition = new Condition(filter_size_above, size);
+  } else {
+    // Wrong type
+    return 1;
+  }
+
+  if (append) {
+    _filters.back().push_back(*condition);
+  } else {
+    _filters.push_back(Filter(*condition));
+  }
+  delete condition;
+  return 0;
+}
+
+int Path2::addParser(
+    const string& type,
+    const string& string) {
+  parser_mode_t mode;
+
+  /* Determine mode */
+  switch (string[0]) {
+    case 'c':
+      // All controlled files
+      mode = parser_controlled;
+      break;
+    case 'l':
+      // Local files
+      mode = parser_modifiedandothers;
+      break;
+    case 'm':
+      // Modified controlled files
+      mode = parser_modified;
+      break;
+    case 'o':
+      // Non controlled files
+      mode = parser_others;
+      break;
+    default:
+      cerr << "Undefined mode " << type << " for parser " << string << endl;
+      return 1;
+  }
+
+  /* Add specified parser */
+  if (type == "cvs") {
+    _parsers.push_back(new CvsParser(mode));
+  } else {
+    cerr << "Unsupported parser " << string << endl;
+    return 2;
+  }
+  return 0;
+}
+
+int Path2::parse(const char* backup_path) {
+#warning need to have full path and pointer to relative path in Nodes
+  _mount_path_length = strlen(backup_path);
+  _dir = new Directory(backup_path);
+  if (recurse(_dir, NULL)) {
+    delete _dir;
+    _dir = NULL;
+    return -1;
+  }
+  return 0;
+}
