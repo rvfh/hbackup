@@ -64,7 +64,7 @@ public:
   Condition(filter_type_t type, const string& str) :
     _type(type), _string(str) {}
   bool match(const File& file_data) const;
-  bool match(const Node& node) const;
+  bool match(const char* path, const Node& node) const;
   /* Debug only */
   void show() const;
 };
@@ -80,7 +80,7 @@ public:
 class Filters: public list<Filter> {
 public:
   bool match(const File& file_data) const;
-  bool match(const Node& node) const;
+  bool match(const char* path, const Node& node) const;
 };
 
 }

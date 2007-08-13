@@ -41,21 +41,24 @@ int terminating(void) {
   return 0;
 }
 
-void showList(const Directory* d);
+void showList(const Directory* d, const char* path = "");
 
-void showFile(const Node* g) {
-  printf("%s\t%c\t%lld\t%d\t%d\t%d\t%o\n", g->path(), g->type(), g->size(),
-    (g->mtime() != 0), g->uid(), g->gid(), g->mode());
+void showFile(const Node* g, const char* path = "") {
+  printf("%s%s\t%c\t%lld\t%d\t%d\t%d\t%o\n", path, g->name(), g->type(),
+    g->size(), (g->mtime() != 0), g->uid(), g->gid(), g->mode());
   if (g->type() == 'd') {
+    char* dir_path = NULL;
+    asprintf(&dir_path, "%s%s/", path, g->name());
     Directory* d = (Directory*) g;
-    showList(d);
+    showList(d, dir_path);
+    free(dir_path);
   }
 }
 
-void showList(const Directory* d) {
+void showList(const Directory* d, const char* path) {
   list<Node*>::const_iterator i;
   for (i = d->nodesListConst().begin(); i != d->nodesListConst().end(); i++) {
-    showFile(*i);
+    showFile(*i, path);
   }
 }
 
@@ -118,15 +121,13 @@ int main(void) {
   }
 
   delete path;
-return 0;
-#warning remaining tests skipped
 
   // New classes
   cout << endl << "New classes test" << endl;
   Path2* path2 = new Path2("");
 
   if (! path2->parse("test1")) {
-    showFile(path2->dir());
+    showList(path2->dir());
   }
 
   cout << "as previous with subdir in ignore list" << endl;
@@ -135,7 +136,7 @@ return 0;
     cout << "Failed to add filter" << endl;
   }
   if (! path2->parse("test1")) {
-    showFile(path2->dir());
+    showList(path2->dir());
   }
 
   cout << "as previous with testlink in ignore list" << endl;
@@ -144,7 +145,7 @@ return 0;
     cout << "Failed to add filter" << endl;
   }
   if (! path2->parse("test1")) {
-    showFile(path2->dir());
+    showList(path2->dir());
   }
 
   cout << "as previous with CVS parser" << endl;
@@ -152,12 +153,12 @@ return 0;
     cout << "Failed to add parser" << endl;
   }
   if (! path2->parse("test1")) {
-    showFile(path2->dir());
+    showList(path2->dir());
   }
 
   cout << "as previous" << endl;
   if (! path2->parse("test1")) {
-    showFile(path2->dir());
+    showList(path2->dir());
   }
 
   delete path2;

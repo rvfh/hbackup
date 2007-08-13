@@ -75,12 +75,14 @@ public:
 
 class Path2 {
   char*         _path;
+  char*         _backup_path;
   Directory*    _dir;
   int           _expiration;
   Parsers       _parsers;
   Filters       _filters;
   int           _mount_path_length;
   int recurse(
+    const char* path,
     Directory*  dir,
     Parser*     parser);
 public:
@@ -89,7 +91,7 @@ public:
     free(_path);
     delete _dir;
   }
-  string path() const          { return _dir->path(); }
+  const char* path() const     { return _path; }
   const Directory* dir() const { return _dir; }
   int expiration() const       { return _expiration; }
   void setExpiration(int expiration) { _expiration = expiration; }
