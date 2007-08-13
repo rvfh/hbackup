@@ -242,7 +242,7 @@ int Path::createList(const string& backup_path) {
   return 0;
 }
 
-int Path2::recurse(Directory* dir, Parser* parser) {
+int Path2::recurse(const char* path, Directory* dir, Parser* parser) {
   if (terminating()) {
     errno = EINTR;
     return -1;
@@ -259,24 +259,27 @@ int Path2::recurse(Directory* dir, Parser* parser) {
     }
   }
   if (dir->isValid() && ! dir->createList()) {
-    for (list<Node*>::iterator i = dir->nodesList().begin();
-        i != dir->nodesList().end(); i++) {
+    list<Node*>::iterator i = dir->nodesList().begin();
+    while (i != dir->nodesList().end()) {
       Node* node = *i;
 
       // Ignore inaccessible files
       if (node->type() == '?') {
+        i = dir->nodesList().erase(i);
         continue;
       }
 
       /* Let the parser analyse the file data to know whether to back it up */
-//       if ((parser != NULL) && (parser->ignore(node))) {
-//         continue;
-//       }
+      if ((parser != NULL) && (parser->ignore(*node))) {
+        i = dir->nodesList().erase(i);
+        continue;
+      }
 
       /* Now pass it through the filters */
-//       if (! _filters.empty() && _filters.match(node)) {
-//         continue;
-//       }
+      if (! _filters.empty() && _filters.match(path, *node)) {
+        i = dir->nodesList().erase(i);
+        continue;
+      }
 
       switch (node->type()) {
         case 'f': {
@@ -295,13 +298,17 @@ int Path2::recurse(Directory* dir, Parser* parser) {
           Directory *d = new Directory(*node);
           delete *i;
           *i = d;
+          char* dir_path = NULL;
+          asprintf(&dir_path, "%s%s/", path, node->name());
           if (verbosity() > 3) {
-            cout << " ---> Dir: " << node->path(_mount_path_length) << endl;
+            cout << " ---> Dir: " << dir_path << endl;
           }
-          recurse(d, parser);
+          recurse(dir_path, d, parser);
+          free(dir_path);
         }
         break;
       }
+      i++;
     }
   }
   return 0;
@@ -309,6 +316,7 @@ int Path2::recurse(Directory* dir, Parser* parser) {
 
 Path2::Path2(const char* path) {
   _path              = NULL;
+  _backup_path       = NULL;
   _expiration        = 0;
   _mount_path_length = 0;
   char* current;
@@ -329,8 +337,6 @@ Path2::Path2(const char* path) {
   while ((--current >= _path) && (*current == '/')) {
     *current = '\0';
   }
-
-  delete _path;
 }
 
 int Path2::addFilter(
@@ -457,13 +463,15 @@ int Path2::addParser(
 }
 
 int Path2::parse(const char* backup_path) {
-#warning need to have full path and pointer to relative path in Nodes
-  _mount_path_length = strlen(backup_path);
+  int rc = 0;
+  asprintf(&_backup_path, "%s/", backup_path);
   _dir = new Directory(backup_path);
-  if (recurse(_dir, NULL)) {
+  if (recurse("", _dir, NULL)) {
     delete _dir;
     _dir = NULL;
-    return -1;
+    rc = -1;
   }
-  return 0;
+  free(_backup_path);
+  _backup_path = NULL;
+  return rc;
 }

@@ -90,9 +90,10 @@ bool Condition::match(const File& filedata) const {
   return false;
 }
 
-bool Condition::match(const Node& node) const {
+bool Condition::match(const char* npath, const Node& node) const {
+  // TODO Use char arrays
   string name = node.name();
-  string path = node.path();
+  string path = npath + name;
 
   switch(_type) {
   case filter_type:
@@ -184,17 +185,17 @@ bool Filters::match(const File& filedata) const {
   return false;
 }
 
-bool Filters::match(const Node& node) const {
+bool Filters::match(const char* path, const Node& node) const {
   /* Read through list of rules */
   const_iterator rule;
   for (rule = this->begin(); rule != this->end(); rule++) {
-    bool    match = true;
+    bool match = true;
 
     /* Read through list of conditions in rule */
     Filter::const_iterator condition;
     for (condition = rule->begin(); condition != rule->end(); condition++) {
       /* All filters must match for rule to match */
-      if (! condition->match(node)) {
+      if (! condition->match(path, node)) {
         match = false;
         break;
       }
