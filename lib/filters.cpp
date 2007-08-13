@@ -28,8 +28,6 @@ using namespace std;
 
 using namespace hbackup;
 
-#warning need to test match for Nodes
-
 bool Condition::match(const File& filedata) const {
   string name;
 
@@ -96,7 +94,6 @@ bool Condition::match(const Node& node) const {
   string name = node.name();
   string path = node.path();
 
-  /* Test condition */
   switch(_type) {
   case filter_type:
     return _file_type == node.type();
