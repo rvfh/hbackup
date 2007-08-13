@@ -61,7 +61,7 @@ public:
   Node(const char *path, const char* name = "");
   // Constructor for given file metadata
   Node(
-      const char* name,
+      const char* path,
       char        type,
       time_t      mtime,
       long long   size,
@@ -77,7 +77,13 @@ public:
         _gid(gid),
         _mode(mode),
         _parsed(false) {
-    asprintf(&_name, "%s", name);
+    asprintf(&_path, "%s", path);
+    const char* name = strrchr(path, '/');
+    if (name != NULL) {
+      asprintf(&_name, "%s", ++name);
+    } else {
+      asprintf(&_name, "%s", path);
+    }
   }
   virtual ~Node() {
     free(_path);
