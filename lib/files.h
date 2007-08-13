@@ -41,7 +41,16 @@ protected:
   gid_t     _gid;       // group ID of owner
   mode_t    _mode;      // permissions
   bool      _parsed;    // more info available using proper type
-  void metadata(const char* path);
+  void  metadata(const char* path);
+  char* basename(char* path) {
+    char* name = strrchr(path, '/');
+    if (name != NULL) {
+      name++;
+    } else {
+      name = path;
+    }
+    return name;
+  }
 public:
   // Default constructor
   Node(const Node& g) :
@@ -55,7 +64,7 @@ public:
         _mode(g._mode),
         _parsed(false) {
     asprintf(&_path, "%s", g._path);
-    asprintf(&_name, "%s", g._name);
+    _name = basename(_path);
   }
   // Constructor for path in the VFS
   Node(const char *path, const char* name = "");
@@ -78,16 +87,10 @@ public:
         _mode(mode),
         _parsed(false) {
     asprintf(&_path, "%s", path);
-    const char* name = strrchr(path, '/');
-    if (name != NULL) {
-      asprintf(&_name, "%s", ++name);
-    } else {
-      asprintf(&_name, "%s", path);
-    }
+    _name = basename(_path);
   }
   virtual ~Node() {
     free(_path);
-    free(_name);
   }
   // Operators
   virtual bool  operator<(const Node&)  const;

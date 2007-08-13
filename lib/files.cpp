@@ -70,23 +70,14 @@ void Node::metadata(const char* path) {
 }
 
 Node::Node(const char* path, const char* name) {
+  _path = NULL;
   _parsed = false;
   if (name[0] == '\0') {
-    const char* name = strrchr(path, '/');
-
-    _path = NULL;
     asprintf(&_path, "%s", path);
-
-    _name = NULL;
-    if (name != NULL) {
-      asprintf(&_name, "%s", ++name);
-    } else {
-      asprintf(&_name, "%s", path);
-    }
   } else {
     asprintf(&_path, "%s/%s", path, name);
-    asprintf(&_name, "%s", name);
   }
+  _name = basename(_path);
   metadata(_path);
 }
 
