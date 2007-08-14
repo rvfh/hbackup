@@ -100,6 +100,14 @@ file://host	/home/user/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371bbc035
 file://host	/home/user/testlink	l	8	1	1000	1000	777	testfile		17	0	
 file://host	/home/user/testpipe	p	0	1	1000	1000	644			18	0	
 Removed list: 0 element(s):
+List select test
+Got 0 elements
+Got 5 elements
+Name: CVS
+Name: dirbad
+Name: dirutd
+Name: filenew.c
+Name: fileutd.h
  --> Files to add: 0
  --> Files to remove: 0
 dblist: load: written.journal: No such file or directory

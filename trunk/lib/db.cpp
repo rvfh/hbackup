@@ -638,6 +638,60 @@ int Database::expire_finalise() {
   return 0;
 }
 
+void Database::getList(
+    const char*  prefix,
+    const char*  base_path,
+    const char*  rel_path,
+    list<Node*>& list) {
+  char* full_path = NULL;
+  int length = asprintf(&full_path, "%s/%s/%s/", prefix, base_path, rel_path);
+
+  // Look for beginning
+  SortedList<DbData>::iterator entry = _d->active.begin();
+  // Jump irrelevant first records
+  while ((entry != _d->active.end())
+      && (strncmp(entry->fullPath().c_str(), full_path, length) < 0)) {
+    entry++;
+  }
+  // Copy relevant records
+  char* last_dir     = NULL;
+  int   last_dir_len = 0;
+  while ((entry != _d->active.end())
+      && (strncmp(entry->fullPath().c_str(), full_path, length) == 0)) {
+    if ((last_dir == NULL)
+     || strncmp(last_dir, entry->fullPath().c_str(), last_dir_len)) {
+      Node* node;
+      switch (entry->data()->type()) {
+        case 'f':
+          node = new File2(entry->data()->name().c_str(), entry->data()->type(),
+            entry->data()->mtime(), entry->data()->size(),
+            entry->data()->uid(), entry->data()->gid(), entry->data()->mode(),
+            entry->data()->checksum().c_str());
+          break;
+        case 'l':
+          node = new Link(entry->data()->name().c_str(), entry->data()->type(),
+            entry->data()->mtime(), entry->data()->size(),
+            entry->data()->uid(), entry->data()->gid(), entry->data()->mode(),
+            entry->data()->link().c_str());
+          break;
+        default:
+          node = new Node(entry->data()->name().c_str(), entry->data()->type(),
+            entry->data()->mtime(), entry->data()->size(),
+            entry->data()->uid(), entry->data()->gid(), entry->data()->mode());
+      }
+      if (node->type() == 'd') {
+        free(last_dir);
+        last_dir = NULL;
+        last_dir_len = asprintf(&last_dir, "%s%s/", full_path, node->name());
+      }
+      list.push_back(node);
+    }
+    entry++;
+  }
+  free(last_dir);
+  free(full_path);
+}
+
 int Database::parse(
     const string& prefix,
     const string& mounted_path,

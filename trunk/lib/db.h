@@ -47,6 +47,12 @@ public:
   int  move_journals();
   /* Close database */
   int  close();
+  // Prepare list for parser
+  void getList(
+    const char*  prefix,
+    const char*  base_path,
+    const char*  rel_path,
+    list<Node*>& list);
   /* Check what needs to be done for given host & path */
   int  parse(
     const string& prefix,

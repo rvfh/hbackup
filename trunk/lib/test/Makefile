@@ -10,8 +10,8 @@ test:	list.done \
 	filters.done \
 	parsers.done \
 	cvs_parser.done \
-	paths.done \
 	db.done \
+	paths.done \
 	clients.done
 
 clean:
