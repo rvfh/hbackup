@@ -195,126 +195,126 @@ int main(void) {
 
   cout << "filter_name check\n";
   condition = new Condition(filter_name, "to a file.txt");
-  if (condition->match("this is/a path/", *node)) {
+  if (condition->match("this is/a path", *node)) {
     cout << "match 2.1\n";
   }
   delete condition;
   condition = new Condition(filter_name, "to a file.tx");
-  if (condition->match("this is/a path/", *node)) {
+  if (condition->match("this is/a path", *node)) {
     cout << "match 2.2\n";
   }
   delete condition;
   condition = new Condition(filter_name, "o a file.txt");
-  if (condition->match("this is/a path/", *node)) {
+  if (condition->match("this is/a path", *node)) {
     cout << "match 2.3\n";
   }
   delete condition;
 
   cout << "filter_name_start check\n";
   condition = new Condition(filter_name_start, "to a file.txt");
-  if (condition->match("this is/a path/", *node)) {
+  if (condition->match("this is/a path", *node)) {
     cout << "match 3.1\n";
   }
   delete condition;
   condition = new Condition(filter_name_start, "to a file");
-  if (condition->match("this is/a path/", *node)) {
+  if (condition->match("this is/a path", *node)) {
     cout << "match 3.2\n";
   }
   delete condition;
   condition = new Condition(filter_name_start, "o a file");
-  if (condition->match("this is/a path/", *node)) {
+  if (condition->match("this is/a path", *node)) {
     cout << "match 3.3\n";
   }
   delete condition;
 
   cout << "filter_name_end check\n";
   condition = new Condition(filter_name_end, ".txt");
-  if (condition->match("this is/a path/", *node)) {
+  if (condition->match("this is/a path", *node)) {
     cout << "match 4.1\n";
   }
   delete condition;
   condition = new Condition(filter_name_end, ".tst");
-  if (condition->match("this is/a path/", *node)) {
+  if (condition->match("this is/a path", *node)) {
     cout << "match 4.2\n";
   }
   delete condition;
   condition = new Condition(filter_name_end, "and to a file.txt");
-  if (condition->match("this is/a path/", *node)) {
+  if (condition->match("this is/a path", *node)) {
     cout << "match 4.3\n";
   }
   delete condition;
 
   cout << "filter_name_regex check\n";
   condition = new Condition(filter_name_regex, "^.*\\.txt");
-  if (condition->match("this is/a path/", *node)) {
+  if (condition->match("this is/a path", *node)) {
     cout << "match 5.1\n";
   }
   delete condition;
   condition = new Condition(filter_name_regex, "^a.*\\.txt");
-  if (condition->match("this is/a path/", *node)) {
+  if (condition->match("this is/a path", *node)) {
     cout << "match 5.2\n";
   }
   delete condition;
 
   cout << "filter_path check\n";
   condition = new Condition(filter_path, "this is/a path/to a file.txt");
-  if (condition->match("this is/a path/", *node)) {
+  if (condition->match("this is/a path", *node)) {
     cout << "match 6.1\n";
   }
   delete condition;
   condition = new Condition(filter_path, "his is/a path/to a file.txt");
-  if (condition->match("this is/a path/", *node)) {
+  if (condition->match("this is/a path", *node)) {
     cout << "match 6.2\n";
   }
   delete condition;
   condition = new Condition(filter_path, "this is/a path/to a file.tx");
-  if (condition->match("this is/a path/", *node)) {
+  if (condition->match("this is/a path", *node)) {
     cout << "match 6.3\n";
   }
   delete condition;
 
   cout << "filter_path_start check\n";
   condition = new Condition(filter_path_start, "this is/a");
-  if (condition->match("this is/a path/", *node)) {
+  if (condition->match("this is/a path", *node)) {
     cout << "match 7.1\n";
   }
   delete condition;
   condition = new Condition(filter_path_start, "this was/a");
-  if (condition->match("this is/a path/", *node)) {
+  if (condition->match("this is/a path", *node)) {
     cout << "match 7.2\n";
   }
   delete condition;
   condition = new Condition(filter_path_start, "his is/a");
-  if (condition->match("this is/a path/", *node)) {
+  if (condition->match("this is/a path", *node)) {
     cout << "match 7.3\n";
   }
   delete condition;
 
   cout << "filter_path_end check\n";
   condition = new Condition(filter_path_end, ".txt");
-  if (condition->match("this is/a path/", *node)) {
+  if (condition->match("this is/a path", *node)) {
     cout << "match 8.1\n";
   }
   delete condition;
   condition = new Condition(filter_path_end, ".tst");
-  if (condition->match("this is/a path/", *node)) {
+  if (condition->match("this is/a path", *node)) {
     cout << "match 8.2\n";
   }
   delete condition;
   condition = new Condition(filter_path_end, "and this is/a path/to a file.txt");
-  if (condition->match("this is/a path/", *node)) {
+  if (condition->match("this is/a path", *node)) {
     cout << "match 8.3\n";
   }
   delete condition;
 
   cout << "filter_path_regex check\n";
   condition = new Condition(filter_path_regex, "^this.*path/.*\\.txt");
-  if (condition->match("this is/a path/", *node)) {
+  if (condition->match("this is/a path", *node)) {
     cout << "match 9.1\n";
   }
   delete condition;
   condition = new Condition(filter_path_regex, "^this.*path/a.*\\.txt");
-  if (condition->match("this is/a path/", *node)) {
+  if (condition->match("this is/a path", *node)) {
     cout << "match 9.2\n";
   }
   delete condition;
@@ -352,7 +352,7 @@ int main(void) {
   }
   delete node;
   node = new Node("", 'f', 0, 6000, 0, 0, 0);
-  if (! condition->match("this is/a path/", *node)) {
+  if (! condition->match("this is/a path", *node)) {
     cout << "Not matching " << node->size() << "\n";
   } else {
     cout << "Matching " << node->size() << "\n";

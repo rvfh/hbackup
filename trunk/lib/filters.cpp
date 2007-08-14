@@ -93,7 +93,12 @@ bool Condition::match(const File& filedata) const {
 bool Condition::match(const char* npath, const Node& node) const {
   // TODO Use char arrays
   string name = node.name();
-  string path = npath + name;
+  string path;
+  if (npath[0] != '\0') {
+    path = string(npath) + '/' + name;
+  } else {
+    path = name;
+  }
 
   switch(_type) {
   case filter_type:

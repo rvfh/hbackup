@@ -127,6 +127,7 @@ int main(void) {
   Path2* path2 = new Path2("");
 
   if (! path2->parse("test1")) {
+    cout << ">List " << path2->nodes() << " file(s):\n";
     showList(path2->dir());
   }
 
@@ -136,6 +137,7 @@ int main(void) {
     cout << "Failed to add filter" << endl;
   }
   if (! path2->parse("test1")) {
+    cout << ">List " << path2->nodes() << " file(s):\n";
     showList(path2->dir());
   }
 
@@ -145,6 +147,7 @@ int main(void) {
     cout << "Failed to add filter" << endl;
   }
   if (! path2->parse("test1")) {
+    cout << ">List " << path2->nodes() << " file(s):\n";
     showList(path2->dir());
   }
 
@@ -153,11 +156,13 @@ int main(void) {
     cout << "Failed to add parser" << endl;
   }
   if (! path2->parse("test1")) {
+    cout << ">List " << path2->nodes() << " file(s):\n";
     showList(path2->dir());
   }
 
   cout << "as previous" << endl;
   if (! path2->parse("test1")) {
+    cout << ">List " << path2->nodes() << " file(s):\n";
     showList(path2->dir());
   }
 

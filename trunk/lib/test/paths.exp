@@ -122,6 +122,7 @@ testfile~	f	0	1	1000	1000	644
 testpipe	p	0	1	1000	1000	644	
 
 New classes test
+>List 28 file(s):
 cvs	d	0	0	1000	1000	755
 cvs/CVS	d	0	0	1000	1000	755
 cvs/CVS/Entries	f	141	1	1000	1000	644
@@ -151,6 +152,7 @@ testfile~	f	0	1	1000	1000	644
 testlink	l	8	0	1000	1000	777
 testpipe	p	0	1	1000	1000	644
 as previous with subdir in ignore list
+>List 24 file(s):
 cvs	d	0	0	1000	1000	755
 cvs/CVS	d	0	0	1000	1000	755
 cvs/CVS/Entries	f	141	1	1000	1000	644
@@ -176,6 +178,7 @@ testfile~	f	0	1	1000	1000	644
 testlink	l	8	0	1000	1000	777
 testpipe	p	0	1	1000	1000	644
 as previous with testlink in ignore list
+>List 23 file(s):
 cvs	d	0	0	1000	1000	755
 cvs/CVS	d	0	0	1000	1000	755
 cvs/CVS/Entries	f	141	1	1000	1000	644
@@ -201,6 +204,7 @@ testfile~	f	0	1	1000	1000	644
 testpipe	p	0	1	1000	1000	644
 as previous with CVS parser
 Directory should be under CVS control: test1/cvs/dirbad
+>List 18 file(s):
 cvs	d	0	0	1000	1000	755
 cvs/CVS	d	0	0	1000	1000	755
 cvs/CVS/Entries	f	141	1	1000	1000	644
@@ -221,6 +225,7 @@ testfile~	f	0	1	1000	1000	644
 testpipe	p	0	1	1000	1000	644
 as previous
 Directory should be under CVS control: test1/cvs/dirbad
+>List 18 file(s):
 cvs	d	0	0	1000	1000	755
 cvs/CVS	d	0	0	1000	1000	755
 cvs/CVS/Entries	f	141	1	1000	1000	644
