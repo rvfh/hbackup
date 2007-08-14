@@ -166,6 +166,16 @@ int main(void) {
     showList(path2->dir());
   }
 
+  cout << "as previous with cvs/dirutd in ignore list" << endl;
+  if (path2->addFilter("type", "dir")
+   || path2->addFilter("path", "cvs/dirutd", true)) {
+    cout << "Failed to add filter" << endl;
+  }
+  if (! path2->parse("test1")) {
+    cout << ">List " << path2->nodes() << " file(s):\n";
+    showList(path2->dir());
+  }
+
   delete path2;
 
   return 0;

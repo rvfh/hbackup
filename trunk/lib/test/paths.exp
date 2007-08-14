@@ -244,3 +244,20 @@ testdir	d	0	0	1000	1000	755
 testfile	f	13	1	1000	1000	644
 testfile~	f	0	1	1000	1000	644
 testpipe	p	0	1	1000	1000	644
+as previous with cvs/dirutd in ignore list
+Directory should be under CVS control: test1/cvs/dirbad
+>List 14 file(s):
+cvs	d	0	0	1000	1000	755
+cvs/CVS	d	0	0	1000	1000	755
+cvs/CVS/Entries	f	141	1	1000	1000	644
+cvs/dirbad	d	0	0	1000	1000	755
+cvs/filemod.o	f	0	1	1000	1000	644
+cvs/filenew.c	f	0	1	1000	1000	644
+cvs/fileutd.h	f	0	1	1000	1000	644
+dir space	d	0	0	1000	1000	755
+dir space/file space	f	0	1	1000	1000	644
+test space	f	0	1	1000	1000	644
+testdir	d	0	0	1000	1000	755
+testfile	f	13	1	1000	1000	644
+testfile~	f	0	1	1000	1000	644
+testpipe	p	0	1	1000	1000	644
