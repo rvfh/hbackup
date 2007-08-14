@@ -36,7 +36,7 @@ using namespace std;
 using namespace hbackup;
 
 int Path::iterate_directory(const string& path, Parser* parser) {
-  /* Check whether directory is under SCM control */
+  // Check whether directory is under SCM control
   if (! _parsers.empty()) {
     // We have a parser, check this directory with it
     if (parser != NULL) {
@@ -54,7 +54,7 @@ int Path::iterate_directory(const string& path, Parser* parser) {
   }
   struct dirent *dir_entry;
   while (((dir_entry = readdir(directory)) != NULL) && ! terminating()) {
-    /* Ignore . and .. */
+    // Ignore . and ..
     if (! strcmp(dir_entry->d_name, ".") || ! strcmp(dir_entry->d_name, "..")){
       continue;
     }
@@ -62,16 +62,16 @@ int Path::iterate_directory(const string& path, Parser* parser) {
     File   file_data(file_path.substr(0, _mount_path_length),
       file_path.substr(_mount_path_length + 1));
 
-    /* Remove mount path and leading slash from records */
+    // Remove mount path and leading slash from records
     if (file_data.type() == '?') {
       cerr << "paths: cannot get metadata: " << file_path << endl;
       continue;
     } else
-    /* Let the parser analyse the file data to know whether to back it up */
+    // Let the parser analyse the file data to know whether to back it up
     if ((parser != NULL) && (parser->ignore(file_data))) {
       continue;
     } else
-    /* Now pass it through the filters */
+    // Now pass it through the filters
     if (! _filters.empty() && _filters.match(file_data)) {
       continue;
     } else
@@ -247,7 +247,16 @@ int Path2::recurse(const char* path, Directory* dir, Parser* parser) {
     errno = EINTR;
     return -1;
   }
-  /* Check whether directory is under SCM control */
+
+  // Get relative path
+  const char* rel_path;
+  if (path[_backup_path_length] == '\0') {
+    rel_path = &path[_backup_path_length];
+  } else {
+    rel_path = &path[_backup_path_length + 1];
+  }
+
+  // Check whether directory is under SCM control
   if (! _parsers.empty()) {
     // We have a parser, check this directory with it
     if (parser != NULL) {
@@ -269,17 +278,20 @@ int Path2::recurse(const char* path, Directory* dir, Parser* parser) {
         continue;
       }
 
-      /* Let the parser analyse the file data to know whether to back it up */
+      // Let the parser analyse the file data to know whether to back it up
       if ((parser != NULL) && (parser->ignore(*node))) {
         i = dir->nodesList().erase(i);
         continue;
       }
 
-      /* Now pass it through the filters */
-      if (! _filters.empty() && _filters.match(path, *node)) {
+      // Now pass it through the filters
+      if (! _filters.empty() && _filters.match(rel_path, *node)) {
         i = dir->nodesList().erase(i);
         continue;
       }
+
+      // Count the nodes considered, for info
+      _nodes++;
 
       switch (node->type()) {
         case 'f': {
@@ -299,7 +311,7 @@ int Path2::recurse(const char* path, Directory* dir, Parser* parser) {
           delete *i;
           *i = d;
           char* dir_path = NULL;
-          asprintf(&dir_path, "%s%s/", path, node->name());
+          asprintf(&dir_path, "%s/%s", path, node->name());
           if (verbosity() > 3) {
             cout << " ---> Dir: " << dir_path << endl;
           }
@@ -316,9 +328,8 @@ int Path2::recurse(const char* path, Directory* dir, Parser* parser) {
 
 Path2::Path2(const char* path) {
   _path              = NULL;
-  _backup_path       = NULL;
   _expiration        = 0;
-  _mount_path_length = 0;
+  _backup_path_length = 0;
   char* current;
 
   // Copy path accross
@@ -464,14 +475,13 @@ int Path2::addParser(
 
 int Path2::parse(const char* backup_path) {
   int rc = 0;
-  asprintf(&_backup_path, "%s/", backup_path);
+  _backup_path_length = strlen(backup_path);
+  _nodes = 0;
   _dir = new Directory(backup_path);
-  if (recurse("", _dir, NULL)) {
+  if (recurse(backup_path, _dir, NULL)) {
     delete _dir;
     _dir = NULL;
     rc = -1;
   }
-  free(_backup_path);
-  _backup_path = NULL;
   return rc;
 }

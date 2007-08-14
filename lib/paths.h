@@ -75,12 +75,12 @@ public:
 
 class Path2 {
   char*         _path;
-  char*         _backup_path;
+  int           _backup_path_length;
   Directory*    _dir;
-  int           _expiration;
   Parsers       _parsers;
   Filters       _filters;
-  int           _mount_path_length;
+  int           _expiration;
+  int           _nodes;
   int recurse(
     const char* path,
     Directory*  dir,
@@ -91,9 +91,10 @@ public:
     free(_path);
     delete _dir;
   }
-  const char* path() const     { return _path; }
-  const Directory* dir() const { return _dir; }
+  const char* path() const     { return _path;       }
+  const Directory* dir() const { return _dir;        }
   int expiration() const       { return _expiration; }
+  int nodes() const            { return _nodes;      }
   void setExpiration(int expiration) { _expiration = expiration; }
   // Set append to true to add as condition to last added filter
   int addFilter(
