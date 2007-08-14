@@ -29,10 +29,10 @@ using namespace std;
 #include "filters.h"
 #include "parsers.h"
 #include "cvs_parser.h"
-#include "paths.h"
 #include "dbdata.h"
 #include "dblist.h"
 #include "db.h"
+#include "paths.h"
 #include "hbackup.h"
 #include "clients.h"
 

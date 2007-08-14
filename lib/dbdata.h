@@ -117,10 +117,10 @@ public:
   void   setOut(time_t out) { _out = out; }
   void   resetExpired() { _expired = false; }
   void   setExpired() { _expired = true; }
-  string fullPath(int size_max) const {
+  string fullPath(int size_max = 0) const {
     // Simple and inefficient
     string full_path = _prefix + "/" + _data.path();
-    if (size_max < 0) {
+    if (size_max <= 0) {
       return full_path;
     }
     return full_path.substr(0, size_max);

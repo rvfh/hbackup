@@ -160,6 +160,27 @@ int main(void) {
     cout << i->line(true) << endl;
   }
 
+  cout << "List select test" << endl;
+  list<Node*> select_list;
+  db.getList("prefix", "base_path", "rel_path", select_list);
+  cout << "Got " << select_list.size() << " elements" << endl;
+  if (select_list.size() != 0) {
+    for (list<Node*>::iterator i = select_list.begin(); i != select_list.end();
+        i++) {
+      cout << "Name: " << (*i)->name() << endl;
+      delete *i;
+    }
+  }
+  db.getList("file://host", "/home/user", "cvs", select_list);
+  cout << "Got " << select_list.size() << " elements" << endl;
+  if (select_list.size() != 0) {
+    for (list<Node*>::iterator i = select_list.begin(); i != select_list.end();
+        i++) {
+      cout << "Name: " << (*i)->name() << endl;
+      delete *i;
+    }
+  }
+
   if ((status = db.parse("file://host", "/home/user", "test1", path->list()))){
     printf("db.parse error status %u\n", status);
     db.close();
