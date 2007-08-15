@@ -35,6 +35,10 @@
 #error You must include parsers.h before paths.h
 #endif
 
+#ifndef DB_H
+#error You must include db.h before paths.h
+#endif
+
 namespace hbackup {
 
 class Path {
@@ -82,6 +86,8 @@ class Path2 {
   int           _expiration;
   int           _nodes;
   int recurse(
+    Database&   db,
+    const char* prefix,
     const char* path,
     Directory*  dir,
     Parser*     parser);
@@ -104,7 +110,11 @@ public:
   int addParser(
     const string& type,
     const string& string);
-  int parse(const char* backup_path);
+  // Need prefix to tell database
+  int parse(
+    Database&   db,
+    const char* prefix,
+    const char* backup_path);
   // Information
   void showParsers() {
     _parsers.list();

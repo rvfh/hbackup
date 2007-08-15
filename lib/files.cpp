@@ -81,17 +81,6 @@ Node::Node(const char* dir_path, const char* name) {
   free(full_path);
 }
 
-// TODO Only compare names?
-bool Node::operator<(const Node& right) const {
-  int cmp = strcmp(_name, right._name);
-  if (cmp == 0) {
-    return (_type < right._type)  || (_mtime < right._mtime)
-        || (_size < right._size)  || (_uid < right._uid)
-        || (_gid < right._gid)    || (_mode < right._mode);
-  }
-  return cmp < 0;
-}
-
 bool Node::operator!=(const Node& right) const {
   return (_type != right._type)   || (_mtime != right._mtime)
       || (_size != right._size)   || (_uid != right._uid)
@@ -168,6 +157,13 @@ int Directory::create(const char* dir_path) {
   }
   free(full_path);
   return 0;
+}
+
+bool Link::operator!=(const Link& right) const {
+  if (Node(*this) != Node(right)) {
+    return true;
+  }
+  return strcmp(_link, right._link) != 0;
 }
 
 File::File(const string& access_path, const string& path) {

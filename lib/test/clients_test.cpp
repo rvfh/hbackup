@@ -27,10 +27,10 @@ using namespace std;
 #include "list.h"
 #include "filters.h"
 #include "parsers.h"
-#include "paths.h"
 #include "dbdata.h"
 #include "dblist.h"
 #include "db.h"
+#include "paths.h"
 #include "clients.h"
 
 using namespace hbackup;
@@ -47,8 +47,6 @@ int main(void) {
   Client*                           client;
   list<Client*>                     clients;
   Database  db("test_db");
-
-  remove("test_db/list");
 
   printf(">List %u client(s):\n", clients.size());
   for (list<Client*>::iterator i = clients.begin(); i != clients.end(); i++) {

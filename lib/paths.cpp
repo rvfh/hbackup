@@ -30,6 +30,9 @@ using namespace std;
 #include "filters.h"
 #include "parsers.h"
 #include "cvs_parser.h"
+#include "dbdata.h"
+#include "dblist.h"
+#include "db.h"
 #include "paths.h"
 #include "hbackup.h"
 
@@ -242,7 +245,12 @@ int Path::createList(const string& backup_path) {
   return 0;
 }
 
-int Path2::recurse(const char* cur_path, Directory* dir, Parser* parser) {
+int Path2::recurse(
+    Database&   db,
+    const char* prefix,
+    const char* cur_path,
+    Directory*  dir,
+    Parser*     parser) {
   if (terminating()) {
     errno = EINTR;
     return -1;
@@ -268,7 +276,12 @@ int Path2::recurse(const char* cur_path, Directory* dir, Parser* parser) {
     }
   }
   if (dir->isValid() && ! dir->createList(cur_path)) {
+    list<Node*> db_list;
+    // Get database info for this directory
+    db.getList(prefix, cur_path, rel_path, db_list);
+
     list<Node*>::iterator i = dir->nodesList().begin();
+    list<Node*>::iterator j = db_list.begin();
     while (i != dir->nodesList().end()) {
       Node* node = *i;
 
@@ -288,6 +301,24 @@ int Path2::recurse(const char* cur_path, Directory* dir, Parser* parser) {
       if (! _filters.empty() && _filters.match(rel_path, *node)) {
         i = dir->nodesList().erase(i);
         continue;
+      }
+
+      // Synchronize with db records
+      int cmp = -1;
+      while ((j != db_list.end())
+          && ((cmp = strcmp((*j)->name(), (*i)->name())) < 0)) {
+        if (verbosity() > 3) {
+          cout << " ----> Removed: " << (*j)->name() << endl;
+        }
+      }
+      if ((j == db_list.end()) || (cmp > 0)) {
+        if (verbosity() > 3) {
+          cout << " ----> New: " << (*i)->name() << endl;
+        }
+      } else if ((cmp == 0) && (*i != *j)) {
+        if (verbosity() > 3) {
+          cout << " ----> Modified: " << (*i)->name() << endl;
+        }
       }
 
       // Count the nodes considered, for info
@@ -312,9 +343,9 @@ int Path2::recurse(const char* cur_path, Directory* dir, Parser* parser) {
           *i = d;
           char* dir_path = Node::path(cur_path, d->name());
           if (verbosity() > 3) {
-            cout << " ---> Dir: " << dir_path << endl;
+            cout << " ---> Dir: " << &dir_path[_backup_path_length + 1] <<endl;
           }
-          recurse(dir_path, d, parser);
+          recurse(db, prefix, dir_path, d, parser);
           free(dir_path);
         }
         break;
@@ -472,12 +503,18 @@ int Path2::addParser(
   return 0;
 }
 
-int Path2::parse(const char* backup_path) {
+int Path2::parse(
+    Database&   db,
+    const char* prefix,
+    const char* backup_path) {
   int rc = 0;
   _backup_path_length = strlen(backup_path);
   _nodes = 0;
   _dir = new Directory(backup_path);
-  if (recurse(backup_path, _dir, NULL)) {
+  if (verbosity() > 3) {
+    cout << " ---> Top dir" <<endl;
+  }
+  if (recurse(db, prefix, backup_path, _dir, NULL)) {
     delete _dir;
     _dir = NULL;
     rc = -1;
