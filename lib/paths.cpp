@@ -260,11 +260,11 @@ int Path2::recurse(const char* path, Directory* dir, Parser* parser) {
   if (! _parsers.empty()) {
     // We have a parser, check this directory with it
     if (parser != NULL) {
-      parser = parser->isControlled(dir->path());
+      parser = parser->isControlled(path);
     }
     // We don't have a parser [anymore], check this directory
     if (parser == NULL) {
-      parser = _parsers.isControlled(dir->path());
+      parser = _parsers.isControlled(path);
     }
   }
   if (dir->isValid() && ! dir->createList()) {

@@ -97,7 +97,6 @@ public:
   virtual bool  operator!=(const Node&) const;
   // Data read access
   virtual bool  isValid() const { return _type != '?'; }
-  const char*   path()    const { return _path;   }
   const char*   name()    const { return _name;   }
   char          type()    const { return _type;   }
   time_t        mtime()   const { return _mtime;  }
