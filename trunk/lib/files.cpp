@@ -69,16 +69,16 @@ void Node::metadata(const char* path) {
   }
 }
 
-Node::Node(const char* path, const char* name) {
-  _path = NULL;
+Node::Node(const char* dir_path, const char* name) {
   _parsed = false;
-  if (name[0] == '\0') {
-    asprintf(&_path, "%s", path);
+  char* full_path = path(dir_path, name);
+  asprintf(&_name, "%s", basename(full_path));
+  if (_name[0] == '\0') {
+    _type = '?';
   } else {
-    asprintf(&_path, "%s/%s", path, name);
+    metadata(full_path);
   }
-  _name = basename(_path);
-  metadata(_path);
+  free(full_path);
 }
 
 // TODO Only compare names?
@@ -99,19 +99,32 @@ bool Node::operator!=(const Node& right) const {
       || (strcmp(_name, right._name) != 0);
 }
 
-int File2::create() {
-  int readfile = open(_path, O_WRONLY | O_CREAT, 0666);
-
-  if (readfile < 0) {
-    return -1;
+int File2::create(const char* dir_path) {
+  errno = 0;
+  char* full_path = path(dir_path, _name);
+  if (_name[0] == '\0') {
+    metadata(full_path);
   }
-  close(readfile);
-  metadata(_path);
+  if (! isValid()) {
+    int readfile = open(full_path, O_WRONLY | O_CREAT, 0666);
+    if (readfile < 0) {
+      return -1;
+    }
+    close(readfile);
+    metadata(full_path);
+  }
+  free(full_path);
   return 0;
 }
 
-int Directory::createList() {
-  DIR* directory = opendir(_path);
+int Directory::createList(const char* dir_path, bool is_path) {
+  char* full_path;
+  if (is_path) {
+    full_path = path(dir_path, "");
+  } else {
+    full_path = path(dir_path, _name);
+  }
+  DIR* directory = opendir(full_path);
   if (directory == NULL) return -1;
 
   struct dirent *dir_entry;
@@ -120,13 +133,14 @@ int Directory::createList() {
     if (!strcmp(dir_entry->d_name, ".") || !strcmp(dir_entry->d_name, "..")){
       continue;
     }
-    Node *g = new Node(_path, dir_entry->d_name);
+    Node *g = new Node(full_path, dir_entry->d_name);
     list<Node*>::iterator i = _nodes.begin();
     while ((i != _nodes.end()) && (*(*i) < *g)) {
       i++;
     }
     _nodes.insert(i, g);
   }
+  free(full_path);
 
   closedir(directory);
   return 0;
@@ -140,14 +154,19 @@ void Directory::deleteList() {
   }
 }
 
-int Directory::create() {
-  if (isValid()) {
-    return 0;
+int Directory::create(const char* dir_path) {
+  errno = 0;
+  char* full_path = path(dir_path, _name);
+  if (_name[0] == '\0') {
+    metadata(full_path);
   }
-  if (mkdir(_path, 0777)) {
-    return -1;
+  if (! isValid()) {
+    if (mkdir(full_path, 0777)) {
+      return -1;
+    }
+    metadata(full_path);
   }
-  metadata(_path);
+  free(full_path);
   return 0;
 }
 

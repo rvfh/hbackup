@@ -104,7 +104,7 @@ bool Condition::match(const char* npath, const Node& node) const {
   case filter_type:
     return _file_type == node.type();
   case filter_name:
-    return name == _string;
+    return strcmp(node.name(), _string.c_str()) == 0;
   case filter_name_start:
     return name.substr(0, _string.size()) == _string;
   case filter_name_end: {
