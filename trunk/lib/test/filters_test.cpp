@@ -597,34 +597,34 @@ int main(void) {
   filter_show(*filter);
 
   node = new Node("to a file.txt", 'f', 0, 0, 0, 0, 0);
-  if (! filter->match("this is/a path/", *node)) {
+  if (! filter->match("", *node)) {
     cout << "Not matching 1\n";
   }
   delete node;
   node = new Node("to a file.tst", 'f', 0, 0, 0, 0, 0);
-  if (! filter->match("this is/a path/", *node)) {
+  if (! filter->match("", *node)) {
     cout << "Not matching 2\n";
   }
   delete node;
   node = new Node("to a file.tsu", 'f', 0, 0, 0, 0, 0);
-  if (! filter->match("this is/a path/", *node)) {
+  if (! filter->match("", *node)) {
     cout << "Not matching 3\n";
   }
   delete node;
 
   filter2 = new Filters;
   node = new Node("to a file.txt", 'f', 0, 0, 0, 0, 0);
-  if (! filter2->match("this is/a path/", *node)) {
+  if (! filter2->match("this is/a path", *node)) {
     cout << "Not matching +1\n";
   }
   delete node;
   node = new Node("to a file.tst", 'f', 0, 0, 0, 0, 0);
-  if (! filter2->match("this is/a path/", *node)) {
+  if (! filter2->match("this is/a path", *node)) {
     cout << "Not matching +2\n";
   }
   delete node;
   node = new Node("to a file.tsu", 'f', 0, 0, 0, 0, 0);
-  if (! filter2->match("this is/a path/", *node)) {
+  if (! filter2->match("this is/a path", *node)) {
     cout << "Not matching +3\n";
   }
   delete node;
@@ -639,34 +639,34 @@ int main(void) {
   filter_show(*filter2);
 
   node = new Node("to a file.txt", 'f', 0, 0, 0, 0, 0);
-  if (! filter2->match("this is/a path/", *node)) {
+  if (! filter2->match("", *node)) {
     cout << "Not matching +1\n";
   }
   delete node;
   node = new Node("to a file.tst", 'f', 0, 0, 0, 0, 0);
-  if (! filter2->match("this is/a path/", *node)) {
+  if (! filter2->match("", *node)) {
     cout << "Not matching +2\n";
   }
   delete node;
   node = new Node("to a file.tsu", 'f', 0, 0, 0, 0, 0);
-  if (! filter2->match("this is/a path/", *node)) {
+  if (! filter2->match("", *node)) {
     cout << "Not matching +3\n";
   }
   delete node;
   delete filter2;
 
   node = new Node("to a file.txt", 'f', 0, 0, 0, 0, 0);
-  if (! filter->match("this is/a path/", *node)) {
+  if (! filter->match("", *node)) {
     cout << "Not matching 1\n";
   }
   delete node;
   node = new Node("to a file.tst", 'f', 0, 0, 0, 0, 0);
-  if (! filter->match("this is/a path/", *node)) {
+  if (! filter->match("", *node)) {
     cout << "Not matching 2\n";
   }
   delete node;
   node = new Node("to a file.tsu", 'f', 0, 0, 0, 0, 0);
-  if (! filter->match("this is/a path/", *node)) {
+  if (! filter->match("", *node)) {
     cout << "Not matching 3\n";
   }
   delete node;
@@ -674,21 +674,21 @@ int main(void) {
 
   filter = new Filters;
   node = new Node("", 'f', 0, 0, 0, 0, 0);
-  if (! filter->match("this is/a path/", *node)) {
+  if (! filter->match("", *node)) {
     cout << "Not matching " << node->size() << "\n";
   } else {
     cout << "Matching " << node->size() << "\n";
   }
   delete node;
   node = new Node("", 'f', 0, 1000, 0, 0, 0);
-  if (! filter->match("this is/a path/", *node)) {
+  if (! filter->match("", *node)) {
     cout << "Not matching " << node->size() << "\n";
   } else {
     cout << "Matching " << node->size() << "\n";
   }
   delete node;
   node = new Node("", 'f', 0, 1000000, 0, 0, 0);
-  if (! filter->match("this is/a path/", *node)) {
+  if (! filter->match("", *node)) {
     cout << "Not matching " << node->size() << "\n";
   } else {
     cout << "Matching " << node->size() << "\n";
@@ -701,21 +701,21 @@ int main(void) {
   filter_show(*filter);
 
   node = new Node("", 'f', 0, 0, 0, 0, 0);
-  if (! filter->match("this is/a path/", *node)) {
+  if (! filter->match("", *node)) {
     cout << "Not matching " << node->size() << "\n";
   } else {
     cout << "Matching " << node->size() << "\n";
   }
   delete node;
   node = new Node("", 'f', 0, 1000, 0, 0, 0);
-  if (! filter->match("this is/a path/", *node)) {
+  if (! filter->match("", *node)) {
     cout << "Not matching " << node->size() << "\n";
   } else {
     cout << "Matching " << node->size() << "\n";
   }
   delete node;
   node = new Node("", 'f', 0, 1000000, 0, 0, 0);
-  if (! filter->match("this is/a path/", *node)) {
+  if (! filter->match("", *node)) {
     cout << "Not matching " << node->size() << "\n";
   } else {
     cout << "Matching " << node->size() << "\n";
@@ -728,21 +728,21 @@ int main(void) {
   filter_show(*filter);
 
   node = new Node("", 'f', 0, 0, 0, 0, 0);
-  if (! filter->match("this is/a path/", *node)) {
+  if (! filter->match("", *node)) {
     cout << "Not matching " << node->size() << "\n";
   } else {
     cout << "Matching " << node->size() << "\n";
   }
   delete node;
   node = new Node("", 'f', 0, 1000, 0, 0, 0);
-  if (! filter->match("this is/a path/", *node)) {
+  if (! filter->match("", *node)) {
     cout << "Not matching " << node->size() << "\n";
   } else {
     cout << "Matching " << node->size() << "\n";
   }
   delete node;
   node = new Node("", 'f', 0, 1000000, 0, 0, 0);
-  if (! filter->match("this is/a path/", *node)) {
+  if (! filter->match("", *node)) {
     cout << "Not matching " << node->size() << "\n";
   } else {
     cout << "Matching " << node->size() << "\n";
@@ -770,35 +770,35 @@ int main(void) {
   filter_show(*filter);
 
   node = new Node("", 'f', 0, 600, 0, 0, 0);
-  if (! filter->match("this is/a path/", *node)) {
+  if (! filter->match("", *node)) {
     cout << "Not matching " << node->size() << "\n";
   } else {
     cout << "Matching " << node->size() << "\n";
   }
   delete node;
   node = new Node("", 'f', 0, 500, 0, 0, 0);
-  if (! filter->match("this is/a path/", *node)) {
+  if (! filter->match("", *node)) {
     cout << "Not matching " << node->size() << "\n";
   } else {
     cout << "Matching " << node->size() << "\n";
   }
   delete node;
   node = new Node("", 'f', 0, 450, 0, 0, 0);
-  if (! filter->match("this is/a path/", *node)) {
+  if (! filter->match("", *node)) {
     cout << "Not matching " << node->size() << "\n";
   } else {
     cout << "Matching " << node->size() << "\n";
   }
   delete node;
   node = new Node("", 'f', 0, 400, 0, 0, 0);
-  if (! filter->match("this is/a path/", *node)) {
+  if (! filter->match("", *node)) {
     cout << "Not matching " << node->size() << "\n";
   } else {
     cout << "Matching " << node->size() << "\n";
   }
   delete node;
   node = new Node("", 'f', 0, 300, 0, 0, 0);
-  if (! filter->match("this is/a path/", *node)) {
+  if (! filter->match("", *node)) {
     cout << "Not matching " << node->size() << "\n";
   } else {
     cout << "Matching " << node->size() << "\n";

@@ -132,7 +132,7 @@ bool Condition::match(const char* npath, const Node& node) const {
   case filter_path_regex: {
     regex_t regex;
     if (! regcomp(&regex, _string.c_str(), REG_EXTENDED)) {
-      return ! regexec(&regex, node.path(), 0, NULL, 0);
+      return ! regexec(&regex, path.c_str(), 0, NULL, 0);
     }
     cerr << "filters: regex: incorrect expression" << endl; }
   case filter_size_above:

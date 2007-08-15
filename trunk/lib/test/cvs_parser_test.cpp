@@ -179,131 +179,118 @@ int main(void) {
   parser_list = new CvsParser(parser_controlled);
 
   /* Directory */
-  node = new Node("test1", 'd', 0, 0, 0, 0, 0);
-  if ((parser = parser_list->isControlled(node->path())) == NULL) {
-    cout << node->path() << " is not under CVS control" << endl;
+  if ((parser = parser_list->isControlled("test1")) == NULL) {
+    cout << "test1" << " is not under CVS control" << endl;
   } else {
     parser->list();
     delete parser;
   }
-  delete node;
 
   /* Directory */
-  node = new Node("test1/cvs", 'd', 0, 0, 0, 0, 0);
-  if ((parser = parser_list->isControlled(node->path())) == NULL) {
-    cout << node->path() << " is not under CVS control" << endl;
+  if ((parser = parser_list->isControlled("test1/cvs")) == NULL) {
+    cout << "test1/cvs" << " is not under CVS control" << endl;
   } else {
     parser->list();
     /* Nodes */
     node = new Node("test1/cvs/nofile", 'f', 0, 0, 0, 0, 0);
     if (parser->ignore(*node)) {
-      cout << node->path() << " is not under CVS control" << endl;
+      cout << "test1/cvs/nofile" << " is not under CVS control" << endl;
     }
     delete node;
     node = new Node("test1/cvs/filenew.c", 'f', 0, 0, 0, 0, 0);
     if (parser->ignore(*node)) {
-      cout << node->path() << " is not under CVS control" << endl;
+      cout << "test1/cvs/filenew.c" << " is not under CVS control" << endl;
     }
     delete node;
     node = new Node("test1/cvs/filemod.o", 'f', 0, 0, 0, 0, 0);
     if (parser->ignore(*node)) {
-      cout << node->path() << " is not under CVS control" << endl;
+      cout << "test1/cvs/filemod.o" << " is not under CVS control" << endl;
     }
     delete node;
     node = new Node("test1/cvs/fileutd.h", 'f', 0, 0, 0, 0, 0);
     if (parser->ignore(*node)) {
-      cout << node->path() << " is not under CVS control" << endl;
+      cout << "test1/cvs/fileutd.h" << " is not under CVS control" << endl;
     }
     delete node;
     node = new Node("test1/cvs/fileoth", 'f', 0, 0, 0, 0, 0);
     if (parser->ignore(*node)) {
-      cout << node->path() << " is not under CVS control" << endl;
+      cout << "test1/cvs/fileoth" << " is not under CVS control" << endl;
     }
     delete node;
     node = new Node("test1/cvs/dirutd", 'd', 0, 0, 0, 0, 0);
     if (parser->ignore(*node)) {
-      cout << node->path() << " is not under CVS control" << endl;
+      cout << "test1/cvs/dirutd" << " is not under CVS control" << endl;
     }
     delete node;
     node = new Node("test1/cvs/diroth", 'd', 0, 0, 0, 0, 0);
     if (parser->ignore(*node)) {
-      cout << node->path() << " is not under CVS control" << endl;
+      cout << "test1/cvs/diroth" << " is not under CVS control" << endl;
     }
     delete node;
     node = new Node("test1/cvs/CVS", 'd', 0, 0, 0, 0, 0);
     if (parser->ignore(*node)) {
-      cout << node->path() << " is not under CVS control" << endl;
+      cout << "test1/cvs/CVS" << " is not under CVS control" << endl;
     }
     delete node;
-    node = new Node("test1/cvs/CVS", 'd', 0, 0, 0, 0, 0);
-    if ((parser2 = parser->isControlled(node->path())) == NULL) {
-      cout << node->path() << " is not under CVS control" << endl;
+    if ((parser2 = parser->isControlled("test1/cvs/CVS")) == NULL) {
+      cout << "test1/cvs/CVS" << " is not under CVS control" << endl;
     } else {
       delete parser2;
     }
-    delete node;
-    node = new Node("test1/cvs/diroth", 'd', 0, 0, 0, 0, 0);
     // Use parser so directory appears as child of controlled directory
-    if ((parser2 = parser->isControlled(node->path())) == NULL) {
-      cout << node->path() << " is not under CVS control" << endl;
+    if ((parser2 = parser->isControlled("test1/cvs/diroth")) == NULL) {
+      cout << "test1/cvs/diroth" << " is not under CVS control" << endl;
     } else {
       delete parser2;
     }
-    delete node;
     delete parser;
   }
 
   /* Directory */
-  node = new Node("test1/cvs/dirutd", 'd', 0, 0, 0, 0, 0);
-  if ((parser = parser_list->isControlled(node->path())) == NULL) {
-    cout << node->path() << " is not under CVS control" << endl;
+  if ((parser = parser_list->isControlled("test1/cvs/dirutd")) == NULL) {
+    cout << "test1/cvs/dirutd" << " is not under CVS control" << endl;
   } else {
     parser->list();
     /* Nodes */
-    delete node;
     node = new Node("test1/cvs/dirutd/fileutd", 'f', 0, 0, 0, 0, 0);
     if (parser->ignore(*node)) {
-      cout << node->path() << " is not under CVS control" << endl;
+      cout << "test1/cvs/dirutd/fileutd" << " is not under CVS control" << endl;
     }
     delete node;
     node = new Node("test1/cvs/dirutd/fileoth", 'f', 0, 0, 0, 0, 0);
     if (parser->ignore(*node)) {
-      cout << node->path() << " is not under CVS control" << endl;
+      cout << "test1/cvs/dirutd/fileoth" << " is not under CVS control" << endl;
     }
     delete parser;
+    delete node;
   }
-  delete node;
 
   /* Directory */
-  node = new Node("test1/cvs/dirbad", 'd', 0, 0, 0, 0, 0);
-  if ((parser = parser_list->isControlled(node->path())) == NULL) {
-    cout << node->path() << " is not under CVS control" << endl;
+  if ((parser = parser_list->isControlled("test1/cvs/dirbad")) == NULL) {
+    cout << "test1/cvs/dirbad" << " is not under CVS control" << endl;
   } else {
     parser->list();
     /* Nodes */
-    delete node;
     node = new Node("test1/cvs/dirbad/fileutd", 'f', 0, 0, 0, 0, 0);
     if (parser->ignore(*node)) {
-      cout << node->path() << " is not under CVS control" << endl;
+      cout << "test1/cvs/dirbad/fileutd" << " is not under CVS control" << endl;
     }
     delete node;
     node = new Node("test1/cvs/dirbad/fileoth", 'f', 0, 0, 0, 0, 0);
     if (parser->ignore(*node)) {
-      cout << node->path() << " is not under CVS control" << endl;
+      cout << "test1/cvs/dirbad/fileoth" << " is not under CVS control" << endl;
     }
+    delete node;
     delete parser;
   }
-  delete node;
 
   /* CVS directory */
-  node = new Node("test1/cvs/CVS", 'd', 0, 0, 0, 0, 0);
-  if ((parser = parser_list->isControlled(node->path())) == NULL) {
-    cout << node->path() << " is not under CVS control" << endl;
+  if ((parser = parser_list->isControlled("test1/cvs/CVS")) == NULL) {
+    cout << "test1/cvs/CVS" << " is not under CVS control" << endl;
   } else {
     parser->list();
     delete parser;
   }
-  delete node;
 
   return 0;
 }
