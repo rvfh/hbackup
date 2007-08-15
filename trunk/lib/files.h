@@ -88,8 +88,11 @@ public:
     free(_name);
   }
   // Operators
-  virtual bool  operator<(const Node&)  const;
-  virtual bool  operator!=(const Node&) const;
+  bool operator<(const Node& right) const {
+    // Only compare names
+    return strcmp(_name, right._name) < 0;
+  }
+  virtual bool operator!=(const Node&) const;
   // Data read access
   virtual bool  isValid() const { return _type != '?'; }
   const char*   name()    const { return _name;   }
@@ -247,12 +250,11 @@ public:
   ~Link() {
     free(_link);
   }
-  bool        isValid() const { return _type == 'l'; }
+  // Operators
+  bool operator!=(const Link&) const;
+  bool isValid() const { return _type == 'l'; }
   // Data read access
   const char* link()    const { return _link;  }
-};
-
-class Socket : public Node {
 };
 
 class Stream : public File2 {

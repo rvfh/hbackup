@@ -29,12 +29,17 @@ using namespace std;
 #include "parsers.h"
 #include "cvs_parser.h"
 #include "list.h"
+#include "dbdata.h"
+#include "dblist.h"
+#include "db.h"
 #include "paths.h"
 
 using namespace hbackup;
 
+static int verbose = 3;
+
 int verbosity(void) {
-  return 3;
+  return verbose;
 }
 
 int terminating(void) {
@@ -64,6 +69,7 @@ void showList(const Directory* d, const char* path) {
 
 int main(void) {
   Path* path = new Path("");
+  Database  db("test_db");
 
   if (! path->createList("test1")) {
     cout << ">List " << path->list()->size() << " file(s):\n";
@@ -123,10 +129,13 @@ int main(void) {
   delete path;
 
   // New classes
+  verbose = 99;
+  db.open();
+
   cout << endl << "New classes test" << endl;
   Path2* path2 = new Path2("");
 
-  if (! path2->parse("test1")) {
+  if (! path2->parse(db, "file://localhost", "test1")) {
     cout << ">List " << path2->nodes() << " file(s):\n";
     showList(path2->dir());
   }
@@ -136,7 +145,7 @@ int main(void) {
    || path2->addFilter("path", "subdir", true)) {
     cout << "Failed to add filter" << endl;
   }
-  if (! path2->parse("test1")) {
+  if (! path2->parse(db, "file://localhost", "test1")) {
     cout << ">List " << path2->nodes() << " file(s):\n";
     showList(path2->dir());
   }
@@ -146,7 +155,7 @@ int main(void) {
    || path2->addFilter("path_start", "testlink", true)) {
     cout << "Failed to add filter" << endl;
   }
-  if (! path2->parse("test1")) {
+  if (! path2->parse(db, "file://localhost", "test1")) {
     cout << ">List " << path2->nodes() << " file(s):\n";
     showList(path2->dir());
   }
@@ -155,13 +164,13 @@ int main(void) {
   if (path2->addParser("cvs", "controlled")) {
     cout << "Failed to add parser" << endl;
   }
-  if (! path2->parse("test1")) {
+  if (! path2->parse(db, "file://localhost", "test1")) {
     cout << ">List " << path2->nodes() << " file(s):\n";
     showList(path2->dir());
   }
 
   cout << "as previous" << endl;
-  if (! path2->parse("test1")) {
+  if (! path2->parse(db, "file://localhost", "test1")) {
     cout << ">List " << path2->nodes() << " file(s):\n";
     showList(path2->dir());
   }
@@ -171,12 +180,13 @@ int main(void) {
    || path2->addFilter("path", "cvs/dirutd", true)) {
     cout << "Failed to add filter" << endl;
   }
-  if (! path2->parse("test1")) {
+  if (! path2->parse(db, "file://localhost", "test1")) {
     cout << ">List " << path2->nodes() << " file(s):\n";
     showList(path2->dir());
   }
 
   delete path2;
+  db.close();
 
   return 0;
 }

@@ -692,6 +692,8 @@ int main(void) {
   }
   delete d;
 
+#warning difference test missing
+
   cout << endl << "End of tests" << endl;
 
   return 0;

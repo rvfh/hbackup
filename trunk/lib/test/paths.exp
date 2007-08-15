@@ -120,8 +120,48 @@ testdir	d	0	0	1000	1000	755
 testfile	f	13	1	1000	1000	644	
 testfile~	f	0	1	1000	1000	644	
 testpipe	p	0	1	1000	1000	644	
+ --> Database initialized
+ --> Database active items part open (contents: 0 files)
 
 New classes test
+ ---> Top dir
+ ----> New: cvs
+ ---> Dir: cvs
+ ----> New: CVS
+ ---> Dir: cvs/CVS
+ ----> New: Entries
+ ----> New: dirbad
+ ---> Dir: cvs/dirbad
+ ----> New: fileoth
+ ----> New: fileutd
+ ----> New: diroth
+ ---> Dir: cvs/diroth
+ ----> New: dirutd
+ ---> Dir: cvs/dirutd
+ ----> New: CVS
+ ---> Dir: cvs/dirutd/CVS
+ ----> New: Entries
+ ----> New: fileoth
+ ----> New: fileutd
+ ----> New: filemod.o
+ ----> New: filenew.c
+ ----> New: fileoth
+ ----> New: fileutd.h
+ ----> New: dir space
+ ---> Dir: dir space
+ ----> New: file space
+ ----> New: subdir
+ ---> Dir: subdir
+ ----> New: testfile
+ ----> New: testfile1
+ ----> New: testfile2
+ ----> New: test space
+ ----> New: testdir
+ ---> Dir: testdir
+ ----> New: testfile
+ ----> New: testfile~
+ ----> New: testlink
+ ----> New: testpipe
 >List 28 file(s):
 cvs	d	0	0	1000	1000	755
 cvs/CVS	d	0	0	1000	1000	755
@@ -152,6 +192,39 @@ testfile~	f	0	1	1000	1000	644
 testlink	l	8	0	1000	1000	777
 testpipe	p	0	1	1000	1000	644
 as previous with subdir in ignore list
+ ---> Top dir
+ ----> New: cvs
+ ---> Dir: cvs
+ ----> New: CVS
+ ---> Dir: cvs/CVS
+ ----> New: Entries
+ ----> New: dirbad
+ ---> Dir: cvs/dirbad
+ ----> New: fileoth
+ ----> New: fileutd
+ ----> New: diroth
+ ---> Dir: cvs/diroth
+ ----> New: dirutd
+ ---> Dir: cvs/dirutd
+ ----> New: CVS
+ ---> Dir: cvs/dirutd/CVS
+ ----> New: Entries
+ ----> New: fileoth
+ ----> New: fileutd
+ ----> New: filemod.o
+ ----> New: filenew.c
+ ----> New: fileoth
+ ----> New: fileutd.h
+ ----> New: dir space
+ ---> Dir: dir space
+ ----> New: file space
+ ----> New: test space
+ ----> New: testdir
+ ---> Dir: testdir
+ ----> New: testfile
+ ----> New: testfile~
+ ----> New: testlink
+ ----> New: testpipe
 >List 24 file(s):
 cvs	d	0	0	1000	1000	755
 cvs/CVS	d	0	0	1000	1000	755
@@ -178,6 +251,38 @@ testfile~	f	0	1	1000	1000	644
 testlink	l	8	0	1000	1000	777
 testpipe	p	0	1	1000	1000	644
 as previous with testlink in ignore list
+ ---> Top dir
+ ----> New: cvs
+ ---> Dir: cvs
+ ----> New: CVS
+ ---> Dir: cvs/CVS
+ ----> New: Entries
+ ----> New: dirbad
+ ---> Dir: cvs/dirbad
+ ----> New: fileoth
+ ----> New: fileutd
+ ----> New: diroth
+ ---> Dir: cvs/diroth
+ ----> New: dirutd
+ ---> Dir: cvs/dirutd
+ ----> New: CVS
+ ---> Dir: cvs/dirutd/CVS
+ ----> New: Entries
+ ----> New: fileoth
+ ----> New: fileutd
+ ----> New: filemod.o
+ ----> New: filenew.c
+ ----> New: fileoth
+ ----> New: fileutd.h
+ ----> New: dir space
+ ---> Dir: dir space
+ ----> New: file space
+ ----> New: test space
+ ----> New: testdir
+ ---> Dir: testdir
+ ----> New: testfile
+ ----> New: testfile~
+ ----> New: testpipe
 >List 23 file(s):
 cvs	d	0	0	1000	1000	755
 cvs/CVS	d	0	0	1000	1000	755
@@ -203,7 +308,33 @@ testfile	f	13	1	1000	1000	644
 testfile~	f	0	1	1000	1000	644
 testpipe	p	0	1	1000	1000	644
 as previous with CVS parser
+ ---> Top dir
+ ----> New: cvs
+ ---> Dir: cvs
+ ----> New: CVS
+ ---> Dir: cvs/CVS
+ ----> New: Entries
+ ----> New: dirbad
+ ---> Dir: cvs/dirbad
 Directory should be under CVS control: test1/cvs/dirbad
+ ----> New: dirutd
+ ---> Dir: cvs/dirutd
+ ----> New: CVS
+ ---> Dir: cvs/dirutd/CVS
+ ----> New: Entries
+ ----> New: fileutd
+ ----> New: filemod.o
+ ----> New: filenew.c
+ ----> New: fileutd.h
+ ----> New: dir space
+ ---> Dir: dir space
+ ----> New: file space
+ ----> New: test space
+ ----> New: testdir
+ ---> Dir: testdir
+ ----> New: testfile
+ ----> New: testfile~
+ ----> New: testpipe
 >List 18 file(s):
 cvs	d	0	0	1000	1000	755
 cvs/CVS	d	0	0	1000	1000	755
@@ -224,7 +355,33 @@ testfile	f	13	1	1000	1000	644
 testfile~	f	0	1	1000	1000	644
 testpipe	p	0	1	1000	1000	644
 as previous
+ ---> Top dir
+ ----> New: cvs
+ ---> Dir: cvs
+ ----> New: CVS
+ ---> Dir: cvs/CVS
+ ----> New: Entries
+ ----> New: dirbad
+ ---> Dir: cvs/dirbad
 Directory should be under CVS control: test1/cvs/dirbad
+ ----> New: dirutd
+ ---> Dir: cvs/dirutd
+ ----> New: CVS
+ ---> Dir: cvs/dirutd/CVS
+ ----> New: Entries
+ ----> New: fileutd
+ ----> New: filemod.o
+ ----> New: filenew.c
+ ----> New: fileutd.h
+ ----> New: dir space
+ ---> Dir: dir space
+ ----> New: file space
+ ----> New: test space
+ ----> New: testdir
+ ---> Dir: testdir
+ ----> New: testfile
+ ----> New: testfile~
+ ----> New: testpipe
 >List 18 file(s):
 cvs	d	0	0	1000	1000	755
 cvs/CVS	d	0	0	1000	1000	755
@@ -245,7 +402,27 @@ testfile	f	13	1	1000	1000	644
 testfile~	f	0	1	1000	1000	644
 testpipe	p	0	1	1000	1000	644
 as previous with cvs/dirutd in ignore list
+ ---> Top dir
+ ----> New: cvs
+ ---> Dir: cvs
+ ----> New: CVS
+ ---> Dir: cvs/CVS
+ ----> New: Entries
+ ----> New: dirbad
+ ---> Dir: cvs/dirbad
 Directory should be under CVS control: test1/cvs/dirbad
+ ----> New: filemod.o
+ ----> New: filenew.c
+ ----> New: fileutd.h
+ ----> New: dir space
+ ---> Dir: dir space
+ ----> New: file space
+ ----> New: test space
+ ----> New: testdir
+ ---> Dir: testdir
+ ----> New: testfile
+ ----> New: testfile~
+ ----> New: testpipe
 >List 14 file(s):
 cvs	d	0	0	1000	1000	755
 cvs/CVS	d	0	0	1000	1000	755
@@ -261,3 +438,4 @@ testdir	d	0	0	1000	1000	755
 testfile	f	13	1	1000	1000	644
 testfile~	f	0	1	1000	1000	644
 testpipe	p	0	1	1000	1000	644
+ --> Database active items part closed (contents: 0 files)
