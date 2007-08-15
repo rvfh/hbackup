@@ -242,7 +242,7 @@ int Path::createList(const string& backup_path) {
   return 0;
 }
 
-int Path2::recurse(const char* path, Directory* dir, Parser* parser) {
+int Path2::recurse(const char* cur_path, Directory* dir, Parser* parser) {
   if (terminating()) {
     errno = EINTR;
     return -1;
@@ -250,24 +250,24 @@ int Path2::recurse(const char* path, Directory* dir, Parser* parser) {
 
   // Get relative path
   const char* rel_path;
-  if (path[_backup_path_length] == '\0') {
-    rel_path = &path[_backup_path_length];
+  if (cur_path[_backup_path_length] == '\0') {
+    rel_path = &cur_path[_backup_path_length];
   } else {
-    rel_path = &path[_backup_path_length + 1];
+    rel_path = &cur_path[_backup_path_length + 1];
   }
 
   // Check whether directory is under SCM control
   if (! _parsers.empty()) {
     // We have a parser, check this directory with it
     if (parser != NULL) {
-      parser = parser->isControlled(path);
+      parser = parser->isControlled(cur_path);
     }
     // We don't have a parser [anymore], check this directory
     if (parser == NULL) {
-      parser = _parsers.isControlled(path);
+      parser = _parsers.isControlled(cur_path);
     }
   }
-  if (dir->isValid() && ! dir->createList()) {
+  if (dir->isValid() && ! dir->createList(cur_path)) {
     list<Node*>::iterator i = dir->nodesList().begin();
     while (i != dir->nodesList().end()) {
       Node* node = *i;
@@ -301,7 +301,7 @@ int Path2::recurse(const char* path, Directory* dir, Parser* parser) {
         }
         break;
         case 'l': {
-          Link *l = new Link(*node);
+          Link *l = new Link(*node, cur_path);
           delete *i;
           *i = l;
         }
@@ -310,8 +310,7 @@ int Path2::recurse(const char* path, Directory* dir, Parser* parser) {
           Directory *d = new Directory(*node);
           delete *i;
           *i = d;
-          char* dir_path = NULL;
-          asprintf(&dir_path, "%s/%s", path, node->name());
+          char* dir_path = Node::path(cur_path, d->name());
           if (verbosity() > 3) {
             cout << " ---> Dir: " << dir_path << endl;
           }

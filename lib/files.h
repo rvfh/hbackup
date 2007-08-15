@@ -32,7 +32,6 @@ namespace hbackup {
 
 class Node {
 protected:
-  char*     _path;      // file path
   char*     _name;      // file name
   char      _type;      // file type (0 if metadata not available)
   time_t    _mtime;     // time of last modification
@@ -42,8 +41,8 @@ protected:
   mode_t    _mode;      // permissions
   bool      _parsed;    // more info available using proper type
   void  metadata(const char* path);
-  char* basename(char* path) {
-    char* name = strrchr(path, '/');
+  const char* basename(const char* path) {
+    const char* name = strrchr(path, '/');
     if (name != NULL) {
       name++;
     } else {
@@ -54,7 +53,6 @@ protected:
 public:
   // Default constructor
   Node(const Node& g) :
-        _path(NULL),
         _name(NULL),
         _type(g._type),
         _mtime(g._mtime),
@@ -63,21 +61,19 @@ public:
         _gid(g._gid),
         _mode(g._mode),
         _parsed(false) {
-    asprintf(&_path, "%s", g._path);
-    _name = basename(_path);
+    asprintf(&_name, "%s", g._name);
   }
   // Constructor for path in the VFS
   Node(const char *path, const char* name = "");
   // Constructor for given file metadata
   Node(
-      const char* path,
+      const char* name,
       char        type,
       time_t      mtime,
       long long   size,
       uid_t       uid,
       gid_t       gid,
       mode_t      mode) :
-        _path(NULL),
         _name(NULL),
         _type(type),
         _mtime(mtime),
@@ -86,11 +82,10 @@ public:
         _gid(gid),
         _mode(mode),
         _parsed(false) {
-    asprintf(&_path, "%s", path);
-    _name = basename(_path);
+    asprintf(&_name, "%s", basename(name));
   }
   virtual ~Node() {
-    free(_path);
+    free(_name);
   }
   // Operators
   virtual bool  operator<(const Node&)  const;
@@ -105,6 +100,17 @@ public:
   gid_t         gid()     const { return _gid;    }
   mode_t        mode()    const { return _mode;   }
   bool          parsed()  const { return _parsed; }
+  static char* path(const char* dir_path, const char* name) {
+    char* full_path = NULL;
+    if (dir_path[0] == '\0') {
+      asprintf(&full_path, "%s", name);
+    } else if (name[0] == '\0') {
+      asprintf(&full_path, "%s", dir_path);
+    } else {
+      asprintf(&full_path, "%s/%s", dir_path, name);
+    }
+    return full_path;
+  }
 };
 
 class File2 : public Node {
@@ -142,8 +148,8 @@ public:
     free(_checksum);
   }
   // Create empty file
-  int create();
-  bool        isValid() const { return _type == 'f'; }
+  int create(const char* dir_path);
+  bool isValid() const { return _type == 'f'; }
   // Data read access
   const char* checksum() const { return _checksum;  }
 };
@@ -171,9 +177,9 @@ public:
     deleteList();
   }
   // Create directory
-  int   create();
+  int   create(const char* dir_path);
   // Create list of Nodes contained in directory
-  int   createList();
+  int   createList(const char* dir_path, bool is_path = true);
   void  deleteList();
   bool  isValid() const                     { return _type == 'd'; }
   list<Node*>& nodesList()                  { return _nodes; }
@@ -184,13 +190,35 @@ class Link : public Node {
   char*     _link;
 public:
   // Constructor for existing Node
-  Link(const Node& g) :
+  Link(const Node& g, const char* dir_path) :
       Node(g),
       _link(NULL) {
+    char* full_path = path(dir_path, _name);
     _mtime = 0;
     _parsed = true;
     char* link = (char*) malloc(FILENAME_MAX + 1);
-    int   size = readlink(_path, link, FILENAME_MAX);
+    int   size = readlink(full_path, link, FILENAME_MAX);
+    free(full_path);
+
+    if (size < 0) {
+      _type = '?';
+      free(link);
+    } else {
+      _link = (char*) malloc(size + 1);
+      strncpy(_link, link, size);
+      _link[size] = '\0';
+    }
+  }
+  // Constructor for path in the VFS
+  Link(const char *dir_path, const char* name = "") :
+      Node(dir_path, name),
+      _link(NULL) {
+    char* full_path = path(dir_path, name);
+    _mtime = 0;
+    _parsed = true;
+    char* link = (char*) malloc(FILENAME_MAX + 1);
+    int   size = readlink(full_path, link, FILENAME_MAX);
+    free(full_path);
 
     if (size < 0) {
       _type = '?';
@@ -228,6 +256,7 @@ class Socket : public Node {
 };
 
 class Stream : public File2 {
+  char*           _path;      // file path
   int             _fd;        // file descriptor
   mode_t          _fmode;     // file open mode
   long long       _dsize;     // uncompressed data size, in bytes
@@ -240,10 +269,17 @@ class Stream : public File2 {
 public:
   // Max buffer size for read/write
   static const size_t chunk = 409600;
+//   // Constructor for existing File
+//   Stream(const File2& g, const char* dir_path) {}
   // Constructor for path in the VFS
-  Stream(const char *path, const char* name = "") :
-      File2(path, name),
-      _fd(-1) {}
+  Stream(const char *dir_path, const char* name = "") :
+      File2(dir_path, name),
+      _fd(-1) {
+    _path = path(dir_path, name);
+  }
+  ~Stream() {
+    free(_path);
+  }
   // Open file, for read or write (no append), with or without compression
   int open(
     const char*           req_mode,

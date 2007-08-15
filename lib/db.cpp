@@ -96,7 +96,7 @@ int Database::organise(const string& path, int number) {
        && (file_data.name()[2] != '-')) {
         // Create two-letter directory
         string dir_path = path + "/" + file_data.name().substr(0,2);
-        if (Directory(dir_path.c_str()).create()) {
+        if (Directory("").create(dir_path.c_str())) {
           failed = 2;
         } else {
           // Create destination path
@@ -109,7 +109,7 @@ int Database::organise(const string& path, int number) {
       }
     }
     if (! failed) {
-      nofiles.create();
+      nofiles.create(path.c_str());
     }
   }
   closedir(directory);
@@ -171,7 +171,7 @@ int Database::write(
       ss >> str;
       checksum = string(source.checksum()) + "-" + str;
       final_path += str;
-      if (! Directory(final_path.c_str()).create()) {
+      if (! Directory("").create(final_path.c_str())) {
         /* Directory exists */
         File2 try_file(final_path.c_str(), "data");
         if (try_file.isValid()) {
@@ -288,7 +288,7 @@ int Database::getDir(
     if (File2(path.c_str(), ".nofiles").isValid()) {
       path += "/" + checksum.substr(level, 2);
       level += 2;
-      if (create && Directory(path.c_str()).create()) {
+      if (create && Directory("").create(path.c_str())) {
         return 1;
       }
     } else {
@@ -373,11 +373,11 @@ int Database::open() {
         cerr << "no backup accessible, ignoring" << endl;
       }
     }
-  } else if (! Directory(_path.c_str(), "data").create()) {
+  } else if (! Directory(_path.c_str(), "data").create(_path.c_str())) {
     status = 1;
     // Create files
-    if ((! active.isValid() && active.create())
-     || (! removed.isValid() && removed.create())) {
+    if ((! active.isValid() && active.create(_path.c_str()))
+     || (! removed.isValid() && removed.create(_path.c_str()))) {
       cerr << "db: open: cannot create list files" << endl;
       status = 2;
     } else if (verbosity() > 2) {
