@@ -62,11 +62,13 @@ static void show_help(void) {
   show_version();
   cout << "Options are:" << endl;
   cout << " -h or --help     to print this help and exit" << endl;
-  cout << " -v or --version  to print version and exit" << endl;
+  cout << " -V or --version  to print version and exit" << endl;
   cout << " -c or --config   to specify a configuration file other than \
-/etc/hbackup.conf" << endl;
+/etc/hbackup/hbackup.conf" << endl;
   cout << " -s or --scan     to scan the database for missing data" << endl;
   cout << " -t or --check    to check the database for corrupted data" << endl;
+  cout << " -u or --update   to only update the database format" << endl;
+  cout << " -v or --verbose  to be more verbose (also -vv and -vvv)" << endl;
   cout << " -C or --client   specify client to backup (more than one allowed)"
     << endl;
 }
@@ -97,6 +99,7 @@ int main(int argc, char **argv) {
   bool              scan              = false;
   bool              check             = false;
   bool              config_check      = false;
+  bool              update            = false;
   bool              expect_configpath = false;
   bool              expect_client     = false;
   struct sigaction  action;
@@ -142,6 +145,8 @@ int main(int argc, char **argv) {
         } else if (! strcmp(&argv[argn][2], "check")) {
           letter = 't';
         } else if (! strcmp(&argv[argn][2], "configcheck")) {
+          letter = 'p';
+        } else if (! strcmp(&argv[argn][2], "update")) {
           letter = 'u';
         } else if (! strcmp(&argv[argn][2], "verbose")) {
           letter = 'v';
@@ -185,8 +190,11 @@ int main(int argc, char **argv) {
         case 't':
           check = true;
           break;
-        case 'u':
+        case 'p':
           config_check = true;
+          break;
+        case 'u':
+          update = true;
           break;
         case 'v':
           verbose++;
@@ -330,6 +338,13 @@ int main(int argc, char **argv) {
         cout << " -> Opening database" << endl;
       }
       if (! db.open()) {
+        if (update) {
+          if (verbosity() > 1) {
+            cout << " -> Updating database format" << endl;
+          }
+          db.close_active();
+          db.open_removed();
+        } else
         if (check) {
           if (verbosity() > 1) {
             cout << " -> Checking database" << endl;
@@ -367,38 +382,39 @@ int main(int argc, char **argv) {
               failed = 1;
             }
           }
-        }
-        switch (db.expire_init()) {
-          case 2:
-            failed = 1;
-            break;
-          case 0:
-            db.close_active();
-            db.open_removed();
-            for (list<Client*>::iterator client = clients.begin();
-                client != clients.end(); client++) {
-              if (terminating()) {
-                break;
-              }
-              // Skip unrequested clients
-              if (requested_clients.size() != 0) {
-                bool found = false;
-                for (list<string>::iterator i = requested_clients.begin();
-                i != requested_clients.end(); i++) {
-                  if (*i == (*client)->name()) {
-                    found = true;
-                    break;
+
+          switch (db.expire_init()) {
+            case 2:
+              failed = 1;
+              break;
+            case 0:
+              db.close_active();
+              db.open_removed();
+              for (list<Client*>::iterator client = clients.begin();
+                  client != clients.end(); client++) {
+                if (terminating()) {
+                  break;
+                }
+                // Skip unrequested clients
+                if (requested_clients.size() != 0) {
+                  bool found = false;
+                  for (list<string>::iterator i = requested_clients.begin();
+                  i != requested_clients.end(); i++) {
+                    if (*i == (*client)->name()) {
+                      found = true;
+                      break;
+                    }
+                  }
+                  if (! found) {
+                    continue;
                   }
                 }
-                if (! found) {
-                  continue;
+                if ((*client)->expire(db)) {
+                  failed = 1;
                 }
               }
-              if ((*client)->expire(db)) {
-                failed = 1;
-              }
-            }
-            db.expire_finalise();
+              db.expire_finalise();
+          }
         }
         if (verbosity() > 1) {
           cout << " -> Closing database" << endl;
