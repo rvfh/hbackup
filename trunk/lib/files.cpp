@@ -160,7 +160,7 @@ int Directory::create(const char* dir_path) {
 }
 
 bool Link::operator!=(const Link& right) const {
-  if (Node(*this) != Node(right)) {
+  if (*((Node*)this) != (Node)right) {
     return true;
   }
   return strcmp(_link, right._link) != 0;

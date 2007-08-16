@@ -318,40 +318,82 @@ int Path2::recurse(
         *i = d;
       }
 
-      // Synchronize with db records
+      // Synchronize with DB records
       int cmp = -1;
       while ((j != db_list.end())
           && ((cmp = strcmp((*j)->name(), (*i)->name())) < 0)) {
-        db.remove(prefix, _path, rel_path, *j);
         if (verbosity() > 3) {
-          cout << " ---> Removed: ";
+          cout << " ---> R ";
           if (rel_path[0] != '\0') {
             cout << rel_path << "/";
           }
           cout << (*j)->name() << endl;
         }
+        db.remove(prefix, _path, rel_path, *j);
         delete *j;
         j = db_list.erase(j);
       }
+
+      // Deal with data
       if ((j == db_list.end()) || (cmp > 0)) {
-        db.add(prefix, _path, rel_path, *i);
+        // Not found in DB => new
         if (verbosity() > 3) {
-          cout << " ---> New: ";
+          cout << " ---> A ";
           if (rel_path[0] != '\0') {
             cout << rel_path << "/";
           }
           cout << (*i)->name() << endl;
         }
-      } else if (**i != **j) {
-        db.modify(prefix, _path, rel_path, *i);
-        if (verbosity() > 3) {
-          cout << " ---> Modified: ";
-          if (rel_path[0] != '\0') {
-            cout << rel_path << "/";
-          }
-          cout << (*i)->name() << endl;
-        }
+        db.add(prefix, _path, rel_path, cur_path, *i);
       } else {
+        // Found in DB
+        if (**i != **j) {
+          // Metadata differ
+          if (((*i)->type() == 'f')
+           && ((*j)->type() == 'f')
+           && ((*i)->size() == (*j)->size())
+           && ((*i)->mtime() == (*j)->mtime())) {
+            // If the file data is there, just add new metadata
+            db.modify(prefix, _path, rel_path, cur_path, *i, true);
+            cout << " ---> ~ ";
+          } else {
+            // Do it all
+            db.modify(prefix, _path, rel_path, cur_path, *i);
+            cout << " ---> M ";
+          }
+          if (verbosity() > 3) {
+            if (rel_path[0] != '\0') {
+              cout << rel_path << "/";
+            }
+            cout << (*i)->name() << endl;
+          }
+        } else {
+          // i and j have same metadata, hence same type...
+          // Compare linked data
+          if (((*i)->type() == 'l')
+           && (strcmp(((Link*)(*i))->link(), ((Link*)(*j))->link()) != 0)) {
+            db.modify(prefix, _path, rel_path, cur_path, *i);
+            if (verbosity() > 3) {
+              cout << " ---> L ";
+              if (rel_path[0] != '\0') {
+                cout << rel_path << "/";
+              }
+              cout << (*i)->name() << endl;
+            }
+          }
+          // Check that file data is present
+          if (((*i)->type() == 'f')
+           && (((File2*)(*j))->checksum()[0] == '\0')) {
+            db.modify(prefix, _path, rel_path, cur_path, *i, true);
+            if (verbosity() > 3) {
+              cout << " ---> ! ";
+              if (rel_path[0] != '\0') {
+                cout << rel_path << "/";
+              }
+              cout << (*i)->name() << endl;
+            }
+          }
+        }
         delete *j;
         j = db_list.erase(j);
       }
@@ -365,10 +407,12 @@ int Path2::recurse(
       delete *i;
       i = dir->nodesList().erase(i);
     }
+
+    // Deal with remaining DB records
     while (j != db_list.end()) {
       db.remove(prefix, _path, rel_path, *j);
       if (verbosity() > 3) {
-        cout << " ---> Removed: ";
+        cout << " ---> R ";
         if (rel_path[0] != '\0') {
           cout << rel_path << "/";
         }

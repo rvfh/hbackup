@@ -89,18 +89,21 @@ public:
     int           number);
   int  write(
     const string&   path,
-    DbData&         db_data,
+    char**          checksum,
     int             compress = 0);
   int add(
     const char* prefix,
     const char* base_path,
     const char* rel_path,
+    const char* dir_path,
     const Node* node);
   int modify(
-    const char* prefix,
-    const char* base_path,
-    const char* rel_path,
-    const Node* node);
+    const char* prefix,           // Client
+    const char* base_path,        // Path being backed up
+    const char* rel_path,         // Dir (from base_path)
+    const char* dir_path,         // Local dir below file
+    const Node* node,             // File
+    bool        no_data = false); // File data unchanged or failed write
   int remove(
     const char* prefix,
     const char* base_path,

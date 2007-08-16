@@ -118,7 +118,7 @@ int Database::organise(const string& path, int number) {
 
 int Database::write(
     const string&   path,
-    DbData&         db_data,
+    char**          dchecksum,
     int             compress) {
   string    temp_path;
   string    dest_path;
@@ -202,8 +202,9 @@ int Database::write(
   }
 
   // Report checksum
+  *dchecksum = NULL;
   if (! failed) {
-    db_data.setChecksum(checksum);
+    asprintf(dchecksum, "%s", checksum.c_str());
   }
 
   // TODO Need to store compression data
@@ -669,7 +670,7 @@ void Database::getList(
           node = new File2(entry->data()->name().c_str(), entry->data()->type(),
             entry->data()->mtime(), entry->data()->size(),
             entry->data()->uid(), entry->data()->gid(), entry->data()->mode(),
-            entry->data()->checksum().c_str());
+            entry->checksum().c_str());
           break;
         case 'l':
           node = new Link(entry->data()->name().c_str(), entry->data()->type(),
@@ -843,10 +844,15 @@ int Database::parse(
       }
       // Set checksum
       if ((i->data()->type() == 'f') && i->checksum().empty()) {
+        char* checksum = NULL;
         if (write(mount_path + i->data()->path().substr(mounted_path.size()),
-         *i) != 0) {
+         &checksum) != 0) {
           /* Write failed, need to go on */
+          i->setChecksum("");
           failed = 1;
+        } else {
+          i->setChecksum(checksum);
+          free(checksum);
         }
         if (verbosity() > 2) {
           sizebackedup += i->data()->size();
@@ -1056,23 +1062,42 @@ int Database::add(
     const char* prefix,
     const char* base_path,
     const char* rel_path,
+    const char* dir_path,
     const Node* node) {
   // Add new record to active list
   if ((node->type() == 'l') && ! node->parsed()) {
     cerr << "Bug in db add: link is not parsed!" << endl;
     return -1;
   }
+
+  // Determine path
   string full_path = base_path;
   if (rel_path[0] != '\0') {
     full_path += string("/") + rel_path;
   }
   full_path += string("/") + node->name();
+
+  // Create data
   DbData data(
     File(
       full_path, (node->type() == 'l') ? ((Link*)node)->link() : "",
       node->type(), node->mtime(), node->size(),
       node->uid(), node->gid(), node->mode()));
   data.setPrefix(prefix);
+
+  // Copy data
+  if (node->type() == 'f') {
+    char* local_path = NULL;
+    char* checksum   = NULL;
+    asprintf(&local_path, "%s/%s", dir_path, node->name());
+    if (! write(string(local_path), &checksum)) {
+      data.setChecksum(checksum);
+      free(checksum);
+    }
+    free(local_path);
+  }
+
+  // Insert entry
   _d->active.add(data);
   return 0;
 }
@@ -1081,7 +1106,10 @@ int Database::modify(
     const char* prefix,
     const char* base_path,
     const char* rel_path,
-    const Node* node) {
+    const char* dir_path,
+    const Node* node,
+    bool        no_data) {
+#warning modify not implemented
   return 0;
 }
 
