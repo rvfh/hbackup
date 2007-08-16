@@ -36,10 +36,8 @@ using namespace std;
 
 using namespace hbackup;
 
-static int verbose = 3;
-
 int verbosity(void) {
-  return verbose;
+  return 3;
 }
 
 int terminating(void) {
@@ -52,68 +50,9 @@ time_t time(time_t *t) {
 }
 
 int main(void) {
-  Path* path = new Path("/home/User");
+  Path2* path2 = new Path2("/home/User");
   Database  db("test_db");
 
-  if (! path->createList("test1")) {
-    cout << ">List " << path->list()->size() << " file(s):\n";
-    for (list<File>::iterator i = path->list()->begin();
-     i != path->list()->end(); i++) {
-      cout << i->line(true) << endl;
-    }
-  }
-
-  cout << "as previous with subdir in ignore list" << endl;
-  if (path->addFilter("type", "dir")
-   || path->addFilter("path", "subdir", true)) {
-    cout << "Failed to add filter" << endl;
-  }
-  if (! path->createList("test1")) {
-    cout << ">List " << path->list()->size() << " file(s):\n";
-    for (list<File>::iterator i = path->list()->begin();
-     i != path->list()->end(); i++) {
-      cout << i->line(true) << endl;
-    }
-  }
-
-  cout << "as previous with testlink in ignore list" << endl;
-  if (path->addFilter("type", "link")
-   || path->addFilter("path_start", "testlink", true)) {
-    cout << "Failed to add filter" << endl;
-  }
-  if (! path->createList("test1")) {
-    cout << ">List " << path->list()->size() << " file(s):\n";
-    for (list<File>::iterator i = path->list()->begin();
-     i != path->list()->end(); i++) {
-      cout << i->line(true) << endl;
-    }
-  }
-
-  cout << "as previous with CVS parser" << endl;
-  if (path->addParser("cvs", "controlled")) {
-    cout << "Failed to add parser" << endl;
-  }
-  if (! path->createList("test1")) {
-    cout << ">List " << path->list()->size() << " file(s):\n";
-    for (list<File>::iterator i = path->list()->begin();
-     i != path->list()->end(); i++) {
-      cout << i->line(true) << endl;
-    }
-  }
-
-  cout << "as previous" << endl;
-  if (! path->createList("test1")) {
-    cout << ">List " << path->list()->size() << " file(s):\n";
-    for (list<File>::iterator i = path->list()->begin();
-     i != path->list()->end(); i++) {
-      cout << i->line(true) << endl;
-    }
-  }
-
-  delete path;
-
-  // New classes
-  verbose = 99;
   db.open();
 
   // Display DB contents
@@ -130,8 +69,6 @@ int main(void) {
     cout << i->line(true) << endl;
   }
 
-  cout << endl << "New classes test" << endl;
-  Path2* path2 = new Path2("/home/User");
   system("touch test1/subdirfile");
 
   if (! path2->parse(db, "file://localhost", "test1")) {

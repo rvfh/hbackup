@@ -97,41 +97,6 @@ CvsParser::CvsParser(parser_mode_t mode, const string& dir_path) {
   entries.close();
 }
 
-bool CvsParser::ignore(const File& file_data) {
-  // No need to check more
-  if (_mode == parser_modifiedandothers) {
-    return false;
-  }
-
-  // Do not ignore control directory
-  if ((file_data.name() == _control_dir) && (file_data.type() == 'd')) {
-    return false;
-  }
-
-  // Look for match in list
-  bool controlled = false;
-  for (_i = _files.begin(); _i != _files.end(); _i++) {
-    if ((_i->name() == file_data.name()) && (_i->type() == file_data.type())) {
-      controlled = true;
-      break;
-    }
-  }
-
-  // Deal with result
-  switch (_mode) {
-    // We don't know whether controlled files are modified or not
-    case parser_controlled:
-    case parser_modified:
-      if (controlled) return false; else return true;
-    case parser_modifiedandothers:
-      return false;
-    case parser_others:
-      if (controlled) return true; else return false;
-    default:  // parser_disabled
-      return false;
-  }
-}
-
 bool CvsParser::ignore(const Node& node) {
   // No need to check more
   if (_mode == parser_modifiedandothers) {
