@@ -1117,32 +1117,49 @@ int Database::remove(
     const char* prefix,
     const char* base_path,
     const char* rel_path,
-    const Node* node) {
+    const Node* node,
+    bool        descend) {
   // Find record in active list, move it to removed list
   char* full_path = NULL;
   int length;
   if (rel_path[0] != '\0') {
-    length = asprintf(&full_path, "%s/%s/%s/%s", prefix, base_path, rel_path,
+    length = asprintf(&full_path, "%s/%s/%s/%s/", prefix, base_path, rel_path,
       node->name());
   } else {
-    length = asprintf(&full_path, "%s/%s/%s", prefix, base_path, node->name());
+    length = asprintf(&full_path, "%s/%s/%s/", prefix, base_path,
+      node->name());
   }
+  // Do not use trailing '/' for now
+  full_path[length - 1] = '\0';
 
   SortedList<DbData>::iterator entry = _d->active.begin();
   // Jump irrelevant first records
   int cmp = -1;
   while ((entry != _d->active.end())
-      && ((cmp = strncmp(entry->fullPath().c_str(), full_path, length)) < 0)) {
+      && ((cmp = strcmp(entry->fullPath().c_str(), full_path)) < 0)) {
     entry++;
   }
-  while ((entry != _d->active.end())
-      && (strncmp(entry->fullPath().c_str(), full_path, length) == 0)) {
+  if ((entry != _d->active.end()) && (cmp == 0)) {
     // Mark removed
     entry->setOut();
     // Append to removed list
     _d->removed.push_back(*entry);
     // Remove from active list / Go on to next
     entry = _d->active.erase(entry);
+
+    if (descend && (node->type() == 'd')) {
+      // Now we need the trailing '/'
+      full_path[length - 1] = '/';
+      while ((entry != _d->active.end())
+          && (strncmp(entry->fullPath().c_str(), full_path, length) == 0)) {
+        // Mark removed
+        entry->setOut();
+        // Append to removed list
+        _d->removed.push_back(*entry);
+        // Remove from active list / Go on to next
+        entry = _d->active.erase(entry);
+      }
+    }
   }
   free(full_path);
   return 0;
