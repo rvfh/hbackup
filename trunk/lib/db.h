@@ -92,24 +92,26 @@ public:
     char**          checksum,
     int             compress = 0);
   int add(
-    const char* prefix,
-    const char* base_path,
-    const char* rel_path,
-    const char* dir_path,
-    const Node* node);
-  int modify(
     const char* prefix,           // Client
     const char* base_path,        // Path being backed up
     const char* rel_path,         // Dir (from base_path)
     const char* dir_path,         // Local dir below file
     const Node* node,             // File
+    const char* checksum = NULL); // Do not copy file data, use given checksum
+  int modify(
+    const char* prefix,           // Client
+    const char* base_path,        // Path being backed up
+    const char* rel_path,         // Dir (from base_path)
+    const char* dir_path,         // Local dir below file
+    const Node* old_node,         // Old file
+    const Node* node,             // File
     bool        no_data = false); // File data unchanged or failed write
-  int remove(
-    const char* prefix,
-    const char* base_path,
-    const char* rel_path,
-    const Node* node,
-    bool        descend = true);
+  void remove(                    // Should not fail
+    const char* prefix,           // Client
+    const char* base_path,        // Path being backed up
+    const char* rel_path,         // Dir (from base_path)
+    const Node* node,             // File
+    bool        descend = true);  // Also remove files within directory
 // For debug only
   void* active();
   void* removed();

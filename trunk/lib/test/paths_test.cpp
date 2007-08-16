@@ -175,6 +175,30 @@ int main(void) {
     cout << i->line(true) << endl;
   }
 
+  cout << "as previous with testlink modified" << endl;
+  system("sleep 1 && ln -sf testnull test1/testlink");
+  if (path2->addFilter("type", "dir")
+   || path2->addFilter("path", "subdir", true)) {
+    cout << "Failed to add filter" << endl;
+  }
+  if (! path2->parse(db, "file://localhost", "test1")) {
+//     cout << ">List " << path2->nodes() << " file(s):\n";
+  }
+
+  // Display DB contents
+  cout << "Active list:  " << ((DbList*)db.active())->size()
+    << " element(s):\n";
+  for (DbList::iterator i = ((DbList*)db.active())->begin();
+       i != ((DbList*)db.active())->end(); i++) {
+    cout << i->line(true) << endl;
+  }
+  cout << "Removed list: " << ((DbList*)db.removed())->size()
+    << " element(s):\n";
+  for (DbList::iterator i = ((DbList*)db.removed())->begin();
+       i != ((DbList*)db.removed())->end(); i++) {
+    cout << i->line(true) << endl;
+  }
+
   cout << "as previous with testlink in ignore list" << endl;
   if (path2->addFilter("type", "link")
    || path2->addFilter("path_start", "testlink", true)) {

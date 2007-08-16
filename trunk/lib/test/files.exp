@@ -105,7 +105,7 @@ g\h "ij'	kl
 m\n 'op"	qr
 
 Name: testfile, type = f, mtime = 1, size = 13, uid = 1, gid = 1, mode = 420
-Name: testlink, type = l, mtime = 0, size = 8, uid = 1, gid = 1, mode = 511, link = testfile
+Name: testlink, type = l, mtime = 1, size = 8, uid = 1, gid = 1, mode = 511, link = testfile
  > Dir.: testdir, type = d, mtime = 0, size = 0, uid = 1, gid = 1, mode = 493
  > Dir.: subdir, type = d, mtime = 0, size = 0, uid = 1, gid = 1, mode = 493
  -> Oth.: testfile, type = f, mtime = 1, size = 12, uid = 1, gid = 1, mode = 420
@@ -182,7 +182,7 @@ Parsing test
  -> Dir.: testdir, type = d, mtime = 0, size = 0, uid = 1, gid = 1, mode = 493
  -> File: testfile, type = f, mtime = 1, size = 13, uid = 1, gid = 1, mode = 420
  -> File: testfile~, type = f, mtime = 1, size = 0, uid = 1, gid = 1, mode = 420
- -> Link: testlink, type = l, mtime = 0, size = 8, uid = 1, gid = 1, mode = 511, link = testfile
+ -> Link: testlink, type = l, mtime = 1, size = 8, uid = 1, gid = 1, mode = 511, link = testfile
  -> Oth.: testpipe, type = p, mtime = 1, size = 0, uid = 1, gid = 1, mode = 420
  -> Dir.: toucheddir, type = d, mtime = 0, size = 0, uid = 1, gid = 1, mode = 448
  -> File: touchedfile, type = f, mtime = 1, size = 0, uid = 1, gid = 1, mode = 384

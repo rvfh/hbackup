@@ -354,11 +354,11 @@ int Path2::recurse(
            && ((*i)->size() == (*j)->size())
            && ((*i)->mtime() == (*j)->mtime())) {
             // If the file data is there, just add new metadata
-            db.modify(prefix, _path, rel_path, cur_path, *i, true);
+            db.modify(prefix, _path, rel_path, cur_path, *j, *i, true);
             cout << " ---> ~ ";
           } else {
             // Do it all
-            db.modify(prefix, _path, rel_path, cur_path, *i);
+            db.modify(prefix, _path, rel_path, cur_path, *j, *i);
             cout << " ---> M ";
           }
           if (verbosity() > 3) {
@@ -372,7 +372,7 @@ int Path2::recurse(
           // Compare linked data
           if (((*i)->type() == 'l')
            && (strcmp(((Link*)(*i))->link(), ((Link*)(*j))->link()) != 0)) {
-            db.modify(prefix, _path, rel_path, cur_path, *i);
+            db.modify(prefix, _path, rel_path, cur_path, *j, *i);
             if (verbosity() > 3) {
               cout << " ---> L ";
               if (rel_path[0] != '\0') {
@@ -384,7 +384,7 @@ int Path2::recurse(
           // Check that file data is present
           if (((*i)->type() == 'f')
            && (((File2*)(*j))->checksum()[0] == '\0')) {
-            db.modify(prefix, _path, rel_path, cur_path, *i, true);
+            db.modify(prefix, _path, rel_path, cur_path, *j, *i, true);
             if (verbosity() > 3) {
               cout << " ---> ! ";
               if (rel_path[0] != '\0') {
