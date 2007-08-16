@@ -261,6 +261,66 @@ int main(void) {
     cout << i->line(true) << endl;
   }
 
+  cout << "as previous with testpipe gone" << endl;
+  remove("test1/testpipe");
+  if (! path2->parse(db, "file://localhost", "test1")) {
+//     cout << ">List " << path2->nodes() << " file(s):\n";
+  }
+
+  // Display DB contents
+  cout << "Active list:  " << ((DbList*)db.active())->size()
+    << " element(s):\n";
+  for (DbList::iterator i = ((DbList*)db.active())->begin();
+       i != ((DbList*)db.active())->end(); i++) {
+    cout << i->line(true) << endl;
+  }
+  cout << "Removed list: " << ((DbList*)db.removed())->size()
+    << " element(s):\n";
+  for (DbList::iterator i = ((DbList*)db.removed())->begin();
+       i != ((DbList*)db.removed())->end(); i++) {
+    cout << i->line(true) << endl;
+  }
+
+  cout << "as previous with testfile mode changed" << endl;
+  system("chmod 660 test1/testfile");
+  if (! path2->parse(db, "file://localhost", "test1")) {
+//     cout << ">List " << path2->nodes() << " file(s):\n";
+  }
+
+  // Display DB contents
+  cout << "Active list:  " << ((DbList*)db.active())->size()
+    << " element(s):\n";
+  for (DbList::iterator i = ((DbList*)db.active())->begin();
+       i != ((DbList*)db.active())->end(); i++) {
+    cout << i->line(true) << endl;
+  }
+  cout << "Removed list: " << ((DbList*)db.removed())->size()
+    << " element(s):\n";
+  for (DbList::iterator i = ((DbList*)db.removed())->begin();
+       i != ((DbList*)db.removed())->end(); i++) {
+    cout << i->line(true) << endl;
+  }
+
+  cout << "as previous with cvs/filenew.c touched" << endl;
+  system("echo blah > test1/cvs/filenew.c");
+  if (! path2->parse(db, "file://localhost", "test1")) {
+//     cout << ">List " << path2->nodes() << " file(s):\n";
+  }
+
+  // Display DB contents
+  cout << "Active list:  " << ((DbList*)db.active())->size()
+    << " element(s):\n";
+  for (DbList::iterator i = ((DbList*)db.active())->begin();
+       i != ((DbList*)db.active())->end(); i++) {
+    cout << i->line(true) << endl;
+  }
+  cout << "Removed list: " << ((DbList*)db.removed())->size()
+    << " element(s):\n";
+  for (DbList::iterator i = ((DbList*)db.removed())->begin();
+       i != ((DbList*)db.removed())->end(); i++) {
+    cout << i->line(true) << endl;
+  }
+
   delete path2;
   db.close();
 

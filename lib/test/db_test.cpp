@@ -96,15 +96,21 @@ int main(void) {
 
   /* Write check */
   db_data = new DbData(File("test1/testfile"));
-  if ((status = db.write("test1/testfile", *db_data))) {
+  char* chksm = NULL;
+  if ((status = db.write("test1/testfile", &chksm))) {
     printf("db.write error status %u\n", status);
     db.close();
     return 0;
   }
-  cout << db_data->checksum() << "  test1/testfile" << endl;
+  if (chksm == NULL) {
+    printf("db.write returned unexpected null checksum\n");
+    db.close();
+    return 0;
+  }
+  cout << chksm << "  test1/testfile" << endl;
 
   /* Read check */
-  if ((status = db.read("test_db/blah", db_data->checksum()))) {
+  if ((status = db.read("test_db/blah", chksm))) {
     printf("db.read error status %u\n", status);
     db.close();
     return 0;

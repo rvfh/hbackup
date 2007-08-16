@@ -199,18 +199,10 @@ public:
     char* full_path = path(dir_path, _name);
     _mtime = 0;
     _parsed = true;
-    char* link = (char*) malloc(FILENAME_MAX + 1);
-    int   size = readlink(full_path, link, FILENAME_MAX);
+    _link = (char*) malloc(_size + 1);
+    readlink(full_path, _link, _size);
     free(full_path);
-
-    if (size < 0) {
-      _type = '?';
-      free(link);
-    } else {
-      _link = (char*) malloc(size + 1);
-      strncpy(_link, link, size);
-      _link[size] = '\0';
-    }
+    _link[_size] = '\0';
   }
   // Constructor for path in the VFS
   Link(const char *dir_path, const char* name = "") :
@@ -219,18 +211,10 @@ public:
     char* full_path = path(dir_path, name);
     _mtime = 0;
     _parsed = true;
-    char* link = (char*) malloc(FILENAME_MAX + 1);
-    int   size = readlink(full_path, link, FILENAME_MAX);
+    _link = (char*) malloc(_size + 1);
+    readlink(full_path, _link, _size);
     free(full_path);
-
-    if (size < 0) {
-      _type = '?';
-      free(link);
-    } else {
-      _link = (char*) malloc(size + 1);
-      strncpy(_link, link, size);
-      _link[size] = '\0';
-    }
+    _link[_size] = '\0';
   }
   // Constructor for given file metadata
   Link(
