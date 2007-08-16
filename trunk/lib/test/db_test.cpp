@@ -37,6 +37,8 @@ using namespace std;
 
 using namespace hbackup;
 
+#warning most tests gone in r259, were based on old path behaviour...
+
 static int verbose = 4;
 
 int verbosity(void) {
@@ -53,36 +55,12 @@ time_t time(time_t *t) {
 }
 
 int main(void) {
-  Path*             path;
   string            checksum;
   string            zchecksum;
   DbData*           db_data;
   DbList::iterator  i;
   DbList            journal;
   int               status;
-
-  /* Use other modules */
-  path = new Path("");
-  path->addParser("cvs", "c");
-  path->addFilter("type", "dir");
-  path->addFilter("path_start", ".svn", true);
-  path->addFilter("type", "dir");
-  path->addFilter("path_start", "subdir", true);
-  path->addFilter("type", "file");
-  path->addFilter("path_end", "~", true);
-  path->addFilter("type", "file");
-  path->addFilter("path_regex", "\\.o$", true);
-  verbose = 3;
-  if (path->createList("test1////")) {
-    cout << "file list is empty" << endl;
-    return 0;
-  }
-  verbose = 4;
-  cout << ">List " << path->list()->size() << " file(s):" << endl;
-  for (list<File>::iterator i = path->list()->begin();
-    i != path->list()->end(); i++) {
-    cout << i->line(true) << endl;
-  }
 
   Database db("test_db");
 
@@ -116,11 +94,6 @@ int main(void) {
     return 0;
   }
 
-  if ((status = db.parse("file://host", "/home/user", "test1", path->list()))){
-    printf("db.parse error status %u\n", status);
-    db.close();
-    return 0;
-  }
   journal.load("test_db", "seen.journal");
   cout << "Added journal list: " << journal.size() << " element(s):\n";
   for (i = journal.begin(); i != journal.end(); i++) {
@@ -187,11 +160,6 @@ int main(void) {
     }
   }
 
-  if ((status = db.parse("file://host", "/home/user", "test1", path->list()))){
-    printf("db.parse error status %u\n", status);
-    db.close();
-    return 0;
-  }
   journal.load("test_db", "seen.journal");
   cout << "Added journal list: " << journal.size() << " element(s):\n";
   for (i = journal.begin(); i != journal.end(); i++) {
@@ -218,36 +186,7 @@ int main(void) {
   for (i = ((DbList*)db.removed())->begin(); i != ((DbList*)db.removed())->end(); i++) {
     cout << i->line(true) << endl;
   }
-  delete path;
 
-  path = new Path("");
-  path->addParser("cvs", "c");
-  path->addFilter("type", "dir");
-  path->addFilter("path_start", ".svn", true);
-  path->addFilter("type", "dir");
-  path->addFilter("path_start", "subdir", true);
-  path->addFilter("type", "file");
-  path->addFilter("path_end", "~", true);
-  path->addFilter("type", "file");
-  path->addFilter("path_regex", "\\.o$", true);
-  verbose = 3;
-  if (path->createList("test2")) {
-    cout << "file list is empty" << endl;
-    return 0;
-  }
-  verbose = 4;
-  cout << ">List " << path->list()->size() << " file(s):" << endl;
-  for (list<File>::iterator i = path->list()->begin();
-    i != path->list()->end(); i++) {
-    cout << i->line(true) << endl;
-  }
-
-  if ((status = db.parse("file://client", "/home/user2", "test2",
-      path->list()))) {
-    printf("db.parse error status %u\n", status);
-    db.close();
-    return 0;
-  }
   journal.load("test_db", "seen.journal");
   cout << "Added journal list: " << journal.size() << " element(s):\n";
   for (i = journal.begin(); i != journal.end(); i++) {
@@ -274,7 +213,6 @@ int main(void) {
   for (i = ((DbList*)db.removed())->begin(); i != ((DbList*)db.removed())->end(); i++) {
     cout << i->line(true) << endl;
   }
-  delete path;
 
   verbose = 3;
   if ((status = db.scan("59ca0efa9f5633cb0371bbc0355478d8-0"))) {
@@ -385,33 +323,6 @@ int main(void) {
   system("chmod 0775 test1/testdir");
   system("chmod 0775 test1/cvs/dirutd/CVS/Entries");
 
-  path = new Path("");
-  path->addParser("cvs", "c");
-  path->addFilter("type", "dir");
-  path->addFilter("path_start", ".svn", true);
-  path->addFilter("type", "dir");
-  path->addFilter("path_start", "subdir", true);
-  path->addFilter("type", "file");
-  path->addFilter("path_end", "~", true);
-  path->addFilter("type", "file");
-  path->addFilter("path_regex", "\\.o$", true);
-  verbose = 3;
-  if (path->createList("test1////")) {
-    cout << "file list is empty" << endl;
-    return 0;
-  }
-  verbose = 4;
-  cout << ">List " << path->list()->size() << " file(s):" << endl;
-  for (list<File>::iterator i = path->list()->begin();
-    i != path->list()->end(); i++) {
-    cout << i->line(true) << endl;
-  }
-
-  if ((status = db.parse("file://host", "/home/user", "test1", path->list()))){
-    printf("db.parse error status %u\n", status);
-    db.close();
-    return 0;
-  }
   journal.load("test_db", "seen.journal");
   cout << "Added journal list: " << journal.size() << " element(s):\n";
   for (i = journal.begin(); i != journal.end(); i++) {
@@ -441,22 +352,7 @@ int main(void) {
 
   remove("test1/dir space/file space");
   verbose = 3;
-  if (path->createList("test1////")) {
-    cout << "file list is empty" << endl;
-    return 0;
-  }
-  verbose = 4;
-  cout << ">List " << path->list()->size() << " file(s):" << endl;
-  for (list<File>::iterator i = path->list()->begin();
-    i != path->list()->end(); i++) {
-    cout << i->line(true) << endl;
-  }
 
-  if ((status = db.parse("file://host", "/home/user", "test1", path->list()))){
-    printf("db.parse error status %u\n", status);
-    db.close();
-    return 0;
-  }
   journal.load("test_db", "seen.journal");
   cout << "Added journal list: " << journal.size() << " element(s):\n";
   for (i = journal.begin(); i != journal.end(); i++) {
@@ -513,33 +409,6 @@ int main(void) {
   system("chmod 0777 test1/testdir");
   system("chmod 0777 test1/cvs/dirutd/CVS/Entries");
 
-  path = new Path("");
-  path->addParser("cvs", "c");
-  path->addFilter("type", "dir");
-  path->addFilter("path_start", ".svn", true);
-  path->addFilter("type", "dir");
-  path->addFilter("path_start", "subdir", true);
-  path->addFilter("type", "file");
-  path->addFilter("path_end", "~", true);
-  path->addFilter("type", "file");
-  path->addFilter("path_regex", "\\.o$", true);
-  verbose = 3;
-  if (path->createList("test1////")) {
-    cout << "file list is empty" << endl;
-    return 0;
-  }
-  verbose = 4;
-  cout << ">List " << path->list()->size() << " file(s):" << endl;
-  for (list<File>::iterator i = path->list()->begin();
-    i != path->list()->end(); i++) {
-    cout << i->line(true) << endl;
-  }
-
-  if ((status = db.parse("file://host", "/home/user", "test1", path->list()))){
-    printf("db.parse error status %u\n", status);
-    db.close();
-    return 0;
-  }
   journal.load("test_db", "seen.journal");
   cout << "Added journal list: " << journal.size() << " element(s):\n";
   for (i = journal.begin(); i != journal.end(); i++) {
@@ -569,22 +438,7 @@ int main(void) {
 
   remove("test1/dir space/file space");
   verbose = 3;
-  if (path->createList("test1////")) {
-    cout << "file list is empty" << endl;
-    return 0;
-  }
-  verbose = 4;
-  cout << ">List " << path->list()->size() << " file(s):" << endl;
-  for (list<File>::iterator i = path->list()->begin();
-    i != path->list()->end(); i++) {
-    cout << i->line(true) << endl;
-  }
 
-  if ((status = db.parse("file://host", "/home/user", "test1", path->list()))){
-    printf("db.parse error status %u\n", status);
-    db.close();
-    return 0;
-  }
   journal.load("test_db", "seen.journal");
   cout << "Added journal list: " << journal.size() << " element(s):\n";
   for (i = journal.begin(); i != journal.end(); i++) {
@@ -648,34 +502,6 @@ int main(void) {
   remove("test1/testfile");
   remove("test1/cvs/dirutd/fileutd");
 
-  path = new Path("");
-  path->addParser("cvs", "c");
-  path->addFilter("type", "dir");
-  path->addFilter("path_start", ".svn", true);
-  path->addFilter("type", "dir");
-  path->addFilter("path_start", "subdir", true);
-  path->addFilter("type", "file");
-  path->addFilter("path_end", "~", true);
-  path->addFilter("type", "file");
-  path->addFilter("path_regex", "\\.o$", true);
-  verbose = 3;
-  if (path->createList("test1////")) {
-    cout << "file list is empty" << endl;
-    return 0;
-  }
-  verbose = 4;
-  cout << ">List " << path->list()->size() << " file(s):" << endl;
-  for (list<File>::iterator i = path->list()->begin();
-    i != path->list()->end(); i++) {
-    cout << i->line(true) << endl;
-  }
-
-  if ((status = db.parse("file://host", "/home/user", "test1",
-      path->list()))) {
-    printf("db.parse error status %u\n", status);
-    db.close();
-    return 0;
-  }
   journal.load("test_db", "seen.journal");
   cout << "Added journal list: " << journal.size() << " element(s):\n";
   for (i = journal.begin(); i != journal.end(); i++) {
@@ -702,36 +528,7 @@ int main(void) {
   for (i = ((DbList*)db.removed())->begin(); i != ((DbList*)db.removed())->end(); i++) {
     cout << i->line(true) << endl;
   }
-  delete path;
 
-  path = new Path("");
-  path->addParser("cvs", "c");
-  path->addFilter("type", "dir");
-  path->addFilter("path_start", ".svn", true);
-  path->addFilter("type", "dir");
-  path->addFilter("path_start", "subdir", true);
-  path->addFilter("type", "file");
-  path->addFilter("path_end", "~", true);
-  path->addFilter("type", "file");
-  path->addFilter("path_regex", "\\.o$", true);
-  verbose = 3;
-  if (path->createList("test1////")) {
-    cout << "file list is empty" << endl;
-    return 0;
-  }
-  verbose = 4;
-  cout << ">List " << path->list()->size() << " file(s):" << endl;
-  for (list<File>::iterator i = path->list()->begin();
-    i != path->list()->end(); i++) {
-    cout << i->line(true) << endl;
-  }
-
-  if ((status = db.parse("file://host", "/home/user", "test1",
-      path->list()))) {
-    printf("db.parse error status %u\n", status);
-    db.close();
-    return 0;
-  }
   journal.load("test_db", "seen.journal");
   cout << "Added journal list: " << journal.size() << " element(s):\n";
   for (i = journal.begin(); i != journal.end(); i++) {
@@ -758,36 +555,7 @@ int main(void) {
   for (i = ((DbList*)db.removed())->begin(); i != ((DbList*)db.removed())->end(); i++) {
     cout << i->line(true) << endl;
   }
-  delete path;
 
-  path = new Path("");
-  path->addParser("cvs", "c");
-  path->addFilter("type", "dir");
-  path->addFilter("path_start", ".svn", true);
-  path->addFilter("type", "dir");
-  path->addFilter("path_start", "subdir", true);
-  path->addFilter("type", "file");
-  path->addFilter("path_end", "~", true);
-  path->addFilter("type", "file");
-  path->addFilter("path_regex", "\\.o$", true);
-  verbose = 3;
-  if (path->createList("test2")) {
-    cout << "file list is empty" << endl;
-    return 0;
-  }
-  verbose = 4;
-  cout << ">List " << path->list()->size() << " file(s):" << endl;
-  for (list<File>::iterator i = path->list()->begin();
-    i != path->list()->end(); i++) {
-    cout << i->line(true) << endl;
-  }
-
-  if ((status = db.parse("file://client", "/home/user2", "test2",
-      path->list()))) {
-    printf("db.parse error status %u\n", status);
-    db.close();
-    return 0;
-  }
   journal.load("test_db", "seen.journal");
   cout << "Added journal list: " << journal.size() << " element(s):\n";
   for (i = journal.begin(); i != journal.end(); i++) {
@@ -814,7 +582,6 @@ int main(void) {
   for (i = ((DbList*)db.removed())->begin(); i != ((DbList*)db.removed())->end(); i++) {
     cout << i->line(true) << endl;
   }
-  delete path;
 
   db.organise("test_db/data", 2);
 

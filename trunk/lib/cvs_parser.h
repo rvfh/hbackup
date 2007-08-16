@@ -36,7 +36,6 @@ public:
   // This will create an appropriate parser for the directory if relevant
   Parser* isControlled(const string& dir_path) const;
   // That tells use whether to ignore the file, i.e. not back it up
-  bool ignore(const File& file_data);
   bool ignore(const Node& node);
   // For debug purposes
   void list();

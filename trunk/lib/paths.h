@@ -41,42 +41,6 @@
 
 namespace hbackup {
 
-class Path {
-  string            _path;
-  int               _expiration;
-  Parsers           _parsers;
-  Filters           _filters;
-  SortedList<File>  _list;
-  int               _mount_path_length;
-  int iterate_directory(
-    const string&   path,
-    Parser*         parser);
-public:
-  Path(const string& path);
-  string path() { return _path; }
-  int expiration() { return _expiration; }
-  void setExpiration(int expiration) { _expiration = expiration; }
-  list<File>* list() {
-    return &_list;
-  }
-  // Set append to true to add as condition to last added filter
-  int addFilter(
-    const string& type,
-    const string& string,
-    bool          append = false);
-  int addParser(
-    const string& type,
-    const string& string);
-  int createList(const string& backup_path);
-  void clearList() {
-    _list.clear();
-  }
-  // Information
-  void showParsers() {
-    _parsers.list();
-  }
-};
-
 class Path2 {
   char*         _path;
   int           _backup_path_length;

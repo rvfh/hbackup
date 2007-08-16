@@ -1,683 +1,135 @@
-Directory should be under CVS control: test1/////cvs/dirbad
->List 17 file(s):
-cvs	d	0	0	1000	1000	755	
-cvs/CVS	d	0	0	1000	1000	755	
-cvs/CVS/Entries	f	141	1	1000	1000	644	
-cvs/dirbad	d	0	0	1000	1000	755	
-cvs/dirutd	d	0	0	1000	1000	755	
-cvs/dirutd/CVS	d	0	0	1000	1000	755	
-cvs/dirutd/CVS/Entries	f	42	1	1000	1000	644	
-cvs/dirutd/fileutd	f	0	1	1000	1000	644	
-cvs/filenew.c	f	0	1	1000	1000	644	
-cvs/fileutd.h	f	0	1	1000	1000	644	
-dir space	d	0	0	1000	1000	755	
-dir space/file space	f	0	1	1000	1000	644	
-test space	f	0	1	1000	1000	644	
-testdir	d	0	0	1000	1000	755	
-testfile	f	13	1	1000	1000	644	
-testlink	l	8	1	1000	1000	777	testfile
-testpipe	p	0	1	1000	1000	644	
  --> Database initialized
  --> Database active items part open (contents: 0 files)
 59ca0efa9f5633cb0371bbc0355478d8-0  test1/testfile
- --> Files to add: 17 (196 bytes)
- --> Done: 1/17 (0.0%) --> Done: 2/17 (0.0%) --> Done: 3/17 (71.9%) --> Done: 4/17 (71.9%) --> Done: 5/17 (71.9%) --> Done: 6/17 (71.9%) --> Done: 7/17 (93.4%) --> Done: 8/17 (93.4%) --> Done: 9/17 (93.4%) --> Done: 10/17 (93.4%) --> Done: 11/17 (93.4%) --> Done: 12/17 (93.4%) --> Done: 13/17 (93.4%) --> Done: 14/17 (93.4%) --> Done: 15/17 (100.0%) --> Done: 16/17 (100.0%) --> Done: 17/17 (100.0%)
- --> Files to remove: 0
-Added journal list: 17 element(s):
-file://host	/home/user/cvs	d	0	0	1000	1000	755			2	0	
-file://host	/home/user/cvs/CVS	d	0	0	1000	1000	755			3	0	
-file://host	/home/user/cvs/CVS/Entries	f	141	1	1000	1000	644			4	0	
-file://host	/home/user/cvs/dirbad	d	0	0	1000	1000	755			5	0	
-file://host	/home/user/cvs/dirutd	d	0	0	1000	1000	755			6	0	
-file://host	/home/user/cvs/dirutd/CVS	d	0	0	1000	1000	755			7	0	
-file://host	/home/user/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	644			8	0	
-file://host	/home/user/cvs/dirutd/fileutd	f	0	1	1000	1000	644			9	0	
-file://host	/home/user/cvs/filenew.c	f	0	1	1000	1000	644			10	0	
-file://host	/home/user/cvs/fileutd.h	f	0	1	1000	1000	644			11	0	
-file://host	/home/user/dir space	d	0	0	1000	1000	755			12	0	
-file://host	/home/user/dir space/file space	f	0	1	1000	1000	644			13	0	
-file://host	/home/user/test space	f	0	1	1000	1000	644			14	0	
-file://host	/home/user/testdir	d	0	0	1000	1000	755			15	0	
-file://host	/home/user/testfile	f	13	1	1000	1000	644			16	0	
-file://host	/home/user/testlink	l	8	1	1000	1000	777	testfile		17	0	
-file://host	/home/user/testpipe	p	0	1	1000	1000	644			18	0	
+dblist: load: seen.journal: No such file or directory
+dblist: load: gone.journal: No such file or directory
+dblist: load: written.journal: No such file or directory
+Added journal list: 0 element(s):
 Removed journal list: 0 element(s):
-Really added journal list: 17 element(s):
-file://host	/home/user/cvs	d	0	0	1000	1000	755			2	0	
-file://host	/home/user/cvs/CVS	d	0	0	1000	1000	755			3	0	
-file://host	/home/user/cvs/CVS/Entries	f	141	1	1000	1000	644		63b52e85e7a255c09df5cca819b74a88-0	4	0	
-file://host	/home/user/cvs/dirbad	d	0	0	1000	1000	755			5	0	
-file://host	/home/user/cvs/dirutd	d	0	0	1000	1000	755			6	0	
-file://host	/home/user/cvs/dirutd/CVS	d	0	0	1000	1000	755			7	0	
-file://host	/home/user/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	644		5252f242d27b8c2c9fdbdcbb33545d07-0	8	0	
-file://host	/home/user/cvs/dirutd/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	9	0	
-file://host	/home/user/cvs/filenew.c	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	10	0	
-file://host	/home/user/cvs/fileutd.h	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	11	0	
-file://host	/home/user/dir space	d	0	0	1000	1000	755			12	0	
-file://host	/home/user/dir space/file space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	13	0	
-file://host	/home/user/test space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	14	0	
-file://host	/home/user/testdir	d	0	0	1000	1000	755			15	0	
-file://host	/home/user/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371bbc0355478d8-0	16	0	
-file://host	/home/user/testlink	l	8	1	1000	1000	777	testfile		17	0	
-file://host	/home/user/testpipe	p	0	1	1000	1000	644			18	0	
-Active list: 17 element(s):
-file://host	/home/user/cvs	d	0	0	1000	1000	755			2	0	
-file://host	/home/user/cvs/CVS	d	0	0	1000	1000	755			3	0	
-file://host	/home/user/cvs/CVS/Entries	f	141	1	1000	1000	644		63b52e85e7a255c09df5cca819b74a88-0	4	0	
-file://host	/home/user/cvs/dirbad	d	0	0	1000	1000	755			5	0	
-file://host	/home/user/cvs/dirutd	d	0	0	1000	1000	755			6	0	
-file://host	/home/user/cvs/dirutd/CVS	d	0	0	1000	1000	755			7	0	
-file://host	/home/user/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	644		5252f242d27b8c2c9fdbdcbb33545d07-0	8	0	
-file://host	/home/user/cvs/dirutd/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	9	0	
-file://host	/home/user/cvs/filenew.c	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	10	0	
-file://host	/home/user/cvs/fileutd.h	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	11	0	
-file://host	/home/user/dir space	d	0	0	1000	1000	755			12	0	
-file://host	/home/user/dir space/file space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	13	0	
-file://host	/home/user/test space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	14	0	
-file://host	/home/user/testdir	d	0	0	1000	1000	755			15	0	
-file://host	/home/user/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371bbc0355478d8-0	16	0	
-file://host	/home/user/testlink	l	8	1	1000	1000	777	testfile		17	0	
-file://host	/home/user/testpipe	p	0	1	1000	1000	644			18	0	
+Really added journal list: 0 element(s):
+Active list: 0 element(s):
 Removed list: 0 element(s):
- --> Database active items part closed (contents: 17 files)
- --> Database active items part open (contents: 17 files)
-Active list: 17 element(s):
-file://host	/home/user/cvs	d	0	0	1000	1000	755			2	0	
-file://host	/home/user/cvs/CVS	d	0	0	1000	1000	755			3	0	
-file://host	/home/user/cvs/CVS/Entries	f	141	1	1000	1000	644		63b52e85e7a255c09df5cca819b74a88-0	4	0	
-file://host	/home/user/cvs/dirbad	d	0	0	1000	1000	755			5	0	
-file://host	/home/user/cvs/dirutd	d	0	0	1000	1000	755			6	0	
-file://host	/home/user/cvs/dirutd/CVS	d	0	0	1000	1000	755			7	0	
-file://host	/home/user/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	644		5252f242d27b8c2c9fdbdcbb33545d07-0	8	0	
-file://host	/home/user/cvs/dirutd/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	9	0	
-file://host	/home/user/cvs/filenew.c	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	10	0	
-file://host	/home/user/cvs/fileutd.h	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	11	0	
-file://host	/home/user/dir space	d	0	0	1000	1000	755			12	0	
-file://host	/home/user/dir space/file space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	13	0	
-file://host	/home/user/test space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	14	0	
-file://host	/home/user/testdir	d	0	0	1000	1000	755			15	0	
-file://host	/home/user/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371bbc0355478d8-0	16	0	
-file://host	/home/user/testlink	l	8	1	1000	1000	777	testfile		17	0	
-file://host	/home/user/testpipe	p	0	1	1000	1000	644			18	0	
+ --> Database active items part closed (contents: 0 files)
+ --> Database active items part open (contents: 0 files)
+Active list: 0 element(s):
 Removed list: 0 element(s):
 List select test
 Got 0 elements
-Got 5 elements
-Name: CVS
-Name: dirbad
-Name: dirutd
-Name: filenew.c
-Name: fileutd.h
- --> Files to add: 0
- --> Files to remove: 0
+Got 0 elements
+dblist: load: seen.journal: No such file or directory
+dblist: load: gone.journal: No such file or directory
+dblist: load: written.journal: No such file or directory
+dblist: load: seen.journal: No such file or directory
+dblist: load: gone.journal: No such file or directory
 dblist: load: written.journal: No such file or directory
 Added journal list: 0 element(s):
 Removed journal list: 0 element(s):
 Really added journal list: 0 element(s):
-Active list: 17 element(s):
-file://host	/home/user/cvs	d	0	0	1000	1000	755			2	0	
-file://host	/home/user/cvs/CVS	d	0	0	1000	1000	755			3	0	
-file://host	/home/user/cvs/CVS/Entries	f	141	1	1000	1000	644		63b52e85e7a255c09df5cca819b74a88-0	4	0	
-file://host	/home/user/cvs/dirbad	d	0	0	1000	1000	755			5	0	
-file://host	/home/user/cvs/dirutd	d	0	0	1000	1000	755			6	0	
-file://host	/home/user/cvs/dirutd/CVS	d	0	0	1000	1000	755			7	0	
-file://host	/home/user/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	644		5252f242d27b8c2c9fdbdcbb33545d07-0	8	0	
-file://host	/home/user/cvs/dirutd/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	9	0	
-file://host	/home/user/cvs/filenew.c	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	10	0	
-file://host	/home/user/cvs/fileutd.h	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	11	0	
-file://host	/home/user/dir space	d	0	0	1000	1000	755			12	0	
-file://host	/home/user/dir space/file space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	13	0	
-file://host	/home/user/test space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	14	0	
-file://host	/home/user/testdir	d	0	0	1000	1000	755			15	0	
-file://host	/home/user/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371bbc0355478d8-0	16	0	
-file://host	/home/user/testlink	l	8	1	1000	1000	777	testfile		17	0	
-file://host	/home/user/testpipe	p	0	1	1000	1000	644			18	0	
+Active list: 0 element(s):
 Removed list: 0 element(s):
->List 4 file(s):
-testdir	d	0	0	1000	1000	755	
-testfile	f	145408	1	1000	1000	644	
-testfile2	f	259072	1	1000	1000	644	
-testlink	l	8	1	1000	1000	777	testfile
- --> Files to add: 4 (404480 bytes)
- --> Done: 1/4 (0.0%) --> Done: 2/4 (35.9%) --> Done: 3/4 (100.0%) --> Done: 4/4 (100.0%)
- --> Files to remove: 0
-Added journal list: 4 element(s):
-file://client	/home/user2/testdir	d	0	0	1000	1000	755			19	0	
-file://client	/home/user2/testfile	f	145408	1	1000	1000	644			20	0	
-file://client	/home/user2/testfile2	f	259072	1	1000	1000	644			21	0	
-file://client	/home/user2/testlink	l	8	1	1000	1000	777	testfile		22	0	
+Added journal list: 0 element(s):
 Removed journal list: 0 element(s):
-Really added journal list: 4 element(s):
-file://client	/home/user2/testdir	d	0	0	1000	1000	755			19	0	
-file://client	/home/user2/testfile	f	145408	1	1000	1000	644		3d546a1ce46c6ae10ad34ab8a81c542e-0	20	0	
-file://client	/home/user2/testfile2	f	259072	1	1000	1000	644		fb00cd74a5f35e89a7fbdd3c1d05375a-0	21	0	
-file://client	/home/user2/testlink	l	8	1	1000	1000	777	testfile		22	0	
-Active list: 21 element(s):
-file://client	/home/user2/testdir	d	0	0	1000	1000	755			19	0	
-file://client	/home/user2/testfile	f	145408	1	1000	1000	644		3d546a1ce46c6ae10ad34ab8a81c542e-0	20	0	
-file://client	/home/user2/testfile2	f	259072	1	1000	1000	644		fb00cd74a5f35e89a7fbdd3c1d05375a-0	21	0	
-file://client	/home/user2/testlink	l	8	1	1000	1000	777	testfile		22	0	
-file://host	/home/user/cvs	d	0	0	1000	1000	755			2	0	
-file://host	/home/user/cvs/CVS	d	0	0	1000	1000	755			3	0	
-file://host	/home/user/cvs/CVS/Entries	f	141	1	1000	1000	644		63b52e85e7a255c09df5cca819b74a88-0	4	0	
-file://host	/home/user/cvs/dirbad	d	0	0	1000	1000	755			5	0	
-file://host	/home/user/cvs/dirutd	d	0	0	1000	1000	755			6	0	
-file://host	/home/user/cvs/dirutd/CVS	d	0	0	1000	1000	755			7	0	
-file://host	/home/user/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	644		5252f242d27b8c2c9fdbdcbb33545d07-0	8	0	
-file://host	/home/user/cvs/dirutd/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	9	0	
-file://host	/home/user/cvs/filenew.c	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	10	0	
-file://host	/home/user/cvs/fileutd.h	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	11	0	
-file://host	/home/user/dir space	d	0	0	1000	1000	755			12	0	
-file://host	/home/user/dir space/file space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	13	0	
-file://host	/home/user/test space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	14	0	
-file://host	/home/user/testdir	d	0	0	1000	1000	755			15	0	
-file://host	/home/user/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371bbc0355478d8-0	16	0	
-file://host	/home/user/testlink	l	8	1	1000	1000	777	testfile		17	0	
-file://host	/home/user/testpipe	p	0	1	1000	1000	644			18	0	
+Really added journal list: 0 element(s):
+Active list: 0 element(s):
 Removed list: 0 element(s):
- --> Database active items part closed (contents: 21 files)
- --> Database active items part open (contents: 21 files)
- --> Scanning database contents: 21 files
- --> Database active items part closed (contents: 21 files)
- --> Database active items part open (contents: 21 files)
- --> Scanning database contents thoroughly: 21 files
- --> Database active items part closed (contents: 21 files)
- --> Database active items part open (contents: 21 files)
- --> Scanning database contents: 21 files
-db: scan: file data missing for checksum 59ca0efa9f5633cb0371bbc0355478d8-0
- --> Client:      file://host
- --> File name:   /home/user/testfile
-full scan error status 1
- --> Database active items part closed (contents: 21 files)
- --> Database active items part open (contents: 21 files)
- --> Scanning database contents thoroughly: 21 files
-db: scan: file data missing for checksum 59ca0efa9f5633cb0371bbc0355478d8-0
- --> Client:      file://host
- --> File name:   /home/user/testfile
-full thorough scan error status 1
- --> Database active items part closed (contents: 21 files)
- --> Database active items part open (contents: 21 files)
- --> Scanning database contents thoroughly: 21 files
-db: scan: file data corrupted for checksum 59ca0efa9f5633cb0371bbc0355478d8-0 (found to be d41d8cd98f00b204e9800998ecf8427e)
- --> Client:      file://host
- --> File name:   /home/user/testfile
-full thorough scan error status 1
- --> Database active items part closed (contents: 21 files)
- --> Database active items part open (contents: 21 files)
-Active list: 21 element(s):
-file://client	/home/user2/testdir	d	0	0	1000	1000	755			19	0	
-file://client	/home/user2/testfile	f	145408	1	1000	1000	644		3d546a1ce46c6ae10ad34ab8a81c542e-0	20	0	
-file://client	/home/user2/testfile2	f	259072	1	1000	1000	644		fb00cd74a5f35e89a7fbdd3c1d05375a-0	21	0	
-file://client	/home/user2/testlink	l	8	1	1000	1000	777	testfile		22	0	
-file://host	/home/user/cvs	d	0	0	1000	1000	755			2	0	
-file://host	/home/user/cvs/CVS	d	0	0	1000	1000	755			3	0	
-file://host	/home/user/cvs/CVS/Entries	f	141	1	1000	1000	644		63b52e85e7a255c09df5cca819b74a88-0	4	0	
-file://host	/home/user/cvs/dirbad	d	0	0	1000	1000	755			5	0	
-file://host	/home/user/cvs/dirutd	d	0	0	1000	1000	755			6	0	
-file://host	/home/user/cvs/dirutd/CVS	d	0	0	1000	1000	755			7	0	
-file://host	/home/user/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	644		5252f242d27b8c2c9fdbdcbb33545d07-0	8	0	
-file://host	/home/user/cvs/dirutd/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	9	0	
-file://host	/home/user/cvs/filenew.c	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	10	0	
-file://host	/home/user/cvs/fileutd.h	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	11	0	
-file://host	/home/user/dir space	d	0	0	1000	1000	755			12	0	
-file://host	/home/user/dir space/file space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	13	0	
-file://host	/home/user/test space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	14	0	
-file://host	/home/user/testdir	d	0	0	1000	1000	755			15	0	
-file://host	/home/user/testfile	f	13	1	1000	1000	644			16	0	
-file://host	/home/user/testlink	l	8	1	1000	1000	777	testfile		17	0	
-file://host	/home/user/testpipe	p	0	1	1000	1000	644			18	0	
-Directory should be under CVS control: test1/////cvs/dirbad
+ --> Database active items part closed (contents: 0 files)
+ --> Database active items part open (contents: 0 files)
+ --> Scanning database contents: 0 files
+ --> Database active items part closed (contents: 0 files)
+ --> Database active items part open (contents: 0 files)
+ --> Scanning database contents thoroughly: 0 files
+ --> Database active items part closed (contents: 0 files)
+ --> Database active items part open (contents: 0 files)
+ --> Scanning database contents: 0 files
+ --> Database active items part closed (contents: 0 files)
+ --> Database active items part open (contents: 0 files)
+ --> Scanning database contents thoroughly: 0 files
+ --> Database active items part closed (contents: 0 files)
+ --> Database active items part open (contents: 0 files)
+ --> Scanning database contents thoroughly: 0 files
+ --> Database active items part closed (contents: 0 files)
+ --> Database active items part open (contents: 0 files)
+dblist: load: seen.journal: No such file or directory
+dblist: load: gone.journal: No such file or directory
+dblist: load: written.journal: No such file or directory
+dblist: load: seen.journal: No such file or directory
+dblist: load: gone.journal: No such file or directory
+dblist: load: written.journal: No such file or directory
+Active list: 0 element(s):
 Removed list: 0 element(s):
->List 17 file(s):
-cvs	d	0	0	1000	1000	755	
-cvs/CVS	d	0	0	1000	1000	755	
-cvs/CVS/Entries	f	141	1	1000	1000	644	
-cvs/dirbad	d	0	0	1000	1000	755	
-cvs/dirutd	d	0	0	1000	1000	755	
-cvs/dirutd/CVS	d	0	0	1000	1000	755	
-cvs/dirutd/CVS/Entries	f	42	1	1000	1000	775	
-cvs/dirutd/fileutd	f	0	1	1000	1000	644	
-cvs/filenew.c	f	0	1	1000	1000	644	
-cvs/fileutd.h	f	0	1	1000	1000	644	
-dir space	d	0	0	1000	1000	755	
-dir space/file space	f	0	1	1000	1000	644	
-test space	f	0	1	1000	1000	644	
-testdir	d	0	0	1000	1000	775	
-testfile	f	13	1	1000	1000	644	
-testlink	l	8	1	1000	1000	777	testfile
-testpipe	p	0	1	1000	1000	644	
- --> Files to add: 3 (13 bytes)
- --> Done: 1/3 (0.0%) --> Done: 2/3 (0.0%) --> Done: 3/3 (100.0%)
- --> Files to remove: 3
-Added journal list: 3 element(s):
-file://host	/home/user/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	775		5252f242d27b8c2c9fdbdcbb33545d07-0	23	0	
-file://host	/home/user/testdir	d	0	0	1000	1000	775			25	0	
-file://host	/home/user/testfile	f	13	1	1000	1000	644			27	0	
-Removed journal list: 3 element(s):
-file://host	/home/user/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	644		5252f242d27b8c2c9fdbdcbb33545d07-0	8	24	
-file://host	/home/user/testdir	d	0	0	1000	1000	755			15	26	
-file://host	/home/user/testfile	f	13	1	1000	1000	644			16	28	
-Really added journal list: 3 element(s):
-file://host	/home/user/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	775		5252f242d27b8c2c9fdbdcbb33545d07-0	23	0	
-file://host	/home/user/testdir	d	0	0	1000	1000	775			25	0	
-file://host	/home/user/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371bbc0355478d8-0	27	0	
-Active list: 21 element(s):
-file://client	/home/user2/testdir	d	0	0	1000	1000	755			19	0	
-file://client	/home/user2/testfile	f	145408	1	1000	1000	644		3d546a1ce46c6ae10ad34ab8a81c542e-0	20	0	
-file://client	/home/user2/testfile2	f	259072	1	1000	1000	644		fb00cd74a5f35e89a7fbdd3c1d05375a-0	21	0	
-file://client	/home/user2/testlink	l	8	1	1000	1000	777	testfile		22	0	
-file://host	/home/user/cvs	d	0	0	1000	1000	755			2	0	
-file://host	/home/user/cvs/CVS	d	0	0	1000	1000	755			3	0	
-file://host	/home/user/cvs/CVS/Entries	f	141	1	1000	1000	644		63b52e85e7a255c09df5cca819b74a88-0	4	0	
-file://host	/home/user/cvs/dirbad	d	0	0	1000	1000	755			5	0	
-file://host	/home/user/cvs/dirutd	d	0	0	1000	1000	755			6	0	
-file://host	/home/user/cvs/dirutd/CVS	d	0	0	1000	1000	755			7	0	
-file://host	/home/user/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	775		5252f242d27b8c2c9fdbdcbb33545d07-0	23	0	
-file://host	/home/user/cvs/dirutd/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	9	0	
-file://host	/home/user/cvs/filenew.c	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	10	0	
-file://host	/home/user/cvs/fileutd.h	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	11	0	
-file://host	/home/user/dir space	d	0	0	1000	1000	755			12	0	
-file://host	/home/user/dir space/file space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	13	0	
-file://host	/home/user/test space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	14	0	
-file://host	/home/user/testdir	d	0	0	1000	1000	775			25	0	
-file://host	/home/user/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371bbc0355478d8-0	27	0	
-file://host	/home/user/testlink	l	8	1	1000	1000	777	testfile		17	0	
-file://host	/home/user/testpipe	p	0	1	1000	1000	644			18	0	
-Removed list: 3 element(s):
-file://host	/home/user/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	644		5252f242d27b8c2c9fdbdcbb33545d07-0	8	24	
-file://host	/home/user/testdir	d	0	0	1000	1000	755			15	26	
-file://host	/home/user/testfile	f	13	1	1000	1000	644			16	28	
-Directory should be under CVS control: test1/////cvs/dirbad
->List 16 file(s):
-cvs	d	0	0	1000	1000	755	
-cvs/CVS	d	0	0	1000	1000	755	
-cvs/CVS/Entries	f	141	1	1000	1000	644	
-cvs/dirbad	d	0	0	1000	1000	755	
-cvs/dirutd	d	0	0	1000	1000	755	
-cvs/dirutd/CVS	d	0	0	1000	1000	755	
-cvs/dirutd/CVS/Entries	f	42	1	1000	1000	775	
-cvs/dirutd/fileutd	f	0	1	1000	1000	644	
-cvs/filenew.c	f	0	1	1000	1000	644	
-cvs/fileutd.h	f	0	1	1000	1000	644	
-dir space	d	0	0	1000	1000	755	
-test space	f	0	1	1000	1000	644	
-testdir	d	0	0	1000	1000	775	
-testfile	f	13	1	1000	1000	644	
-testlink	l	8	1	1000	1000	777	testfile
-testpipe	p	0	1	1000	1000	644	
- --> Files to add: 0
- --> Files to remove: 1
-Added journal list: 3 element(s):
-file://host	/home/user/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	775		5252f242d27b8c2c9fdbdcbb33545d07-0	23	0	
-file://host	/home/user/testdir	d	0	0	1000	1000	775			25	0	
-file://host	/home/user/testfile	f	13	1	1000	1000	644			27	0	
-Removed journal list: 4 element(s):
-file://host	/home/user/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	644		5252f242d27b8c2c9fdbdcbb33545d07-0	8	24	
-file://host	/home/user/dir space/file space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	13	29	
-file://host	/home/user/testdir	d	0	0	1000	1000	755			15	26	
-file://host	/home/user/testfile	f	13	1	1000	1000	644			16	28	
-Really added journal list: 3 element(s):
-file://host	/home/user/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	775		5252f242d27b8c2c9fdbdcbb33545d07-0	23	0	
-file://host	/home/user/testdir	d	0	0	1000	1000	775			25	0	
-file://host	/home/user/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371bbc0355478d8-0	27	0	
-Active list: 20 element(s):
-file://client	/home/user2/testdir	d	0	0	1000	1000	755			19	0	
-file://client	/home/user2/testfile	f	145408	1	1000	1000	644		3d546a1ce46c6ae10ad34ab8a81c542e-0	20	0	
-file://client	/home/user2/testfile2	f	259072	1	1000	1000	644		fb00cd74a5f35e89a7fbdd3c1d05375a-0	21	0	
-file://client	/home/user2/testlink	l	8	1	1000	1000	777	testfile		22	0	
-file://host	/home/user/cvs	d	0	0	1000	1000	755			2	0	
-file://host	/home/user/cvs/CVS	d	0	0	1000	1000	755			3	0	
-file://host	/home/user/cvs/CVS/Entries	f	141	1	1000	1000	644		63b52e85e7a255c09df5cca819b74a88-0	4	0	
-file://host	/home/user/cvs/dirbad	d	0	0	1000	1000	755			5	0	
-file://host	/home/user/cvs/dirutd	d	0	0	1000	1000	755			6	0	
-file://host	/home/user/cvs/dirutd/CVS	d	0	0	1000	1000	755			7	0	
-file://host	/home/user/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	775		5252f242d27b8c2c9fdbdcbb33545d07-0	23	0	
-file://host	/home/user/cvs/dirutd/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	9	0	
-file://host	/home/user/cvs/filenew.c	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	10	0	
-file://host	/home/user/cvs/fileutd.h	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	11	0	
-file://host	/home/user/dir space	d	0	0	1000	1000	755			12	0	
-file://host	/home/user/test space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	14	0	
-file://host	/home/user/testdir	d	0	0	1000	1000	775			25	0	
-file://host	/home/user/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371bbc0355478d8-0	27	0	
-file://host	/home/user/testlink	l	8	1	1000	1000	777	testfile		17	0	
-file://host	/home/user/testpipe	p	0	1	1000	1000	644			18	0	
-Removed list: 4 element(s):
-file://host	/home/user/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	644		5252f242d27b8c2c9fdbdcbb33545d07-0	8	24	
-file://host	/home/user/testdir	d	0	0	1000	1000	755			15	26	
-file://host	/home/user/testfile	f	13	1	1000	1000	644			16	28	
-file://host	/home/user/dir space/file space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	13	29	
- --> Database active items part closed (contents: 20 files)
- --> Database removed items part open (contents: 4 files)
- --> Database removed items part closed (contents: 4 files)
- --> Database active items part open (contents: 20 files)
-Active list: 20 element(s):
-file://client	/home/user2/testdir	d	0	0	1000	1000	755			19	0	
-file://client	/home/user2/testfile	f	145408	1	1000	1000	644		3d546a1ce46c6ae10ad34ab8a81c542e-0	20	0	
-file://client	/home/user2/testfile2	f	259072	1	1000	1000	644		fb00cd74a5f35e89a7fbdd3c1d05375a-0	21	0	
-file://client	/home/user2/testlink	l	8	1	1000	1000	777	testfile		22	0	
-file://host	/home/user/cvs	d	0	0	1000	1000	755			2	0	
-file://host	/home/user/cvs/CVS	d	0	0	1000	1000	755			3	0	
-file://host	/home/user/cvs/CVS/Entries	f	141	1	1000	1000	644		63b52e85e7a255c09df5cca819b74a88-0	4	0	
-file://host	/home/user/cvs/dirbad	d	0	0	1000	1000	755			5	0	
-file://host	/home/user/cvs/dirutd	d	0	0	1000	1000	755			6	0	
-file://host	/home/user/cvs/dirutd/CVS	d	0	0	1000	1000	755			7	0	
-file://host	/home/user/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	775		5252f242d27b8c2c9fdbdcbb33545d07-0	23	0	
-file://host	/home/user/cvs/dirutd/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	9	0	
-file://host	/home/user/cvs/filenew.c	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	10	0	
-file://host	/home/user/cvs/fileutd.h	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	11	0	
-file://host	/home/user/dir space	d	0	0	1000	1000	755			12	0	
-file://host	/home/user/test space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	14	0	
-file://host	/home/user/testdir	d	0	0	1000	1000	775			25	0	
-file://host	/home/user/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371bbc0355478d8-0	27	0	
-file://host	/home/user/testlink	l	8	1	1000	1000	777	testfile		17	0	
-file://host	/home/user/testpipe	p	0	1	1000	1000	644			18	0	
+Added journal list: 0 element(s):
+Removed journal list: 0 element(s):
+Really added journal list: 0 element(s):
+Active list: 0 element(s):
 Removed list: 0 element(s):
-Official removed list: 4 element(s):
-file://host	/home/user/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	644		5252f242d27b8c2c9fdbdcbb33545d07-0	8	24	
-file://host	/home/user/dir space/file space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	13	29	
-file://host	/home/user/testdir	d	0	0	1000	1000	755			15	26	
-file://host	/home/user/testfile	f	13	1	1000	1000	644			16	28	
-Directory should be under CVS control: test1/////cvs/dirbad
->List 16 file(s):
-cvs	d	0	0	1000	1000	755	
-cvs/CVS	d	0	0	1000	1000	755	
-cvs/CVS/Entries	f	141	1	1000	1000	644	
-cvs/dirbad	d	0	0	1000	1000	755	
-cvs/dirutd	d	0	0	1000	1000	755	
-cvs/dirutd/CVS	d	0	0	1000	1000	755	
-cvs/dirutd/CVS/Entries	f	42	1	1000	1000	777	
-cvs/dirutd/fileutd	f	0	1	1000	1000	644	
-cvs/filenew.c	f	0	1	1000	1000	644	
-cvs/fileutd.h	f	0	1	1000	1000	644	
-dir space	d	0	0	1000	1000	755	
-test space	f	0	1	1000	1000	644	
-testdir	d	0	0	1000	1000	777	
-testfile	f	13	1	1000	1000	644	
-testlink	l	8	1	1000	1000	777	testfile
-testpipe	p	0	1	1000	1000	644	
- --> Files to add: 2 (0 bytes)
- --> Done: 1/2 --> Done: 2/2
- --> Files to remove: 2
-Added journal list: 2 element(s):
-file://host	/home/user/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	777		5252f242d27b8c2c9fdbdcbb33545d07-0	30	0	
-file://host	/home/user/testdir	d	0	0	1000	1000	777			32	0	
-Removed journal list: 2 element(s):
-file://host	/home/user/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	775		5252f242d27b8c2c9fdbdcbb33545d07-0	23	31	
-file://host	/home/user/testdir	d	0	0	1000	1000	775			25	33	
-Really added journal list: 2 element(s):
-file://host	/home/user/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	777		5252f242d27b8c2c9fdbdcbb33545d07-0	30	0	
-file://host	/home/user/testdir	d	0	0	1000	1000	777			32	0	
-Active list: 20 element(s):
-file://client	/home/user2/testdir	d	0	0	1000	1000	755			19	0	
-file://client	/home/user2/testfile	f	145408	1	1000	1000	644		3d546a1ce46c6ae10ad34ab8a81c542e-0	20	0	
-file://client	/home/user2/testfile2	f	259072	1	1000	1000	644		fb00cd74a5f35e89a7fbdd3c1d05375a-0	21	0	
-file://client	/home/user2/testlink	l	8	1	1000	1000	777	testfile		22	0	
-file://host	/home/user/cvs	d	0	0	1000	1000	755			2	0	
-file://host	/home/user/cvs/CVS	d	0	0	1000	1000	755			3	0	
-file://host	/home/user/cvs/CVS/Entries	f	141	1	1000	1000	644		63b52e85e7a255c09df5cca819b74a88-0	4	0	
-file://host	/home/user/cvs/dirbad	d	0	0	1000	1000	755			5	0	
-file://host	/home/user/cvs/dirutd	d	0	0	1000	1000	755			6	0	
-file://host	/home/user/cvs/dirutd/CVS	d	0	0	1000	1000	755			7	0	
-file://host	/home/user/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	777		5252f242d27b8c2c9fdbdcbb33545d07-0	30	0	
-file://host	/home/user/cvs/dirutd/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	9	0	
-file://host	/home/user/cvs/filenew.c	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	10	0	
-file://host	/home/user/cvs/fileutd.h	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	11	0	
-file://host	/home/user/dir space	d	0	0	1000	1000	755			12	0	
-file://host	/home/user/test space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	14	0	
-file://host	/home/user/testdir	d	0	0	1000	1000	777			32	0	
-file://host	/home/user/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371bbc0355478d8-0	27	0	
-file://host	/home/user/testlink	l	8	1	1000	1000	777	testfile		17	0	
-file://host	/home/user/testpipe	p	0	1	1000	1000	644			18	0	
-Removed list: 2 element(s):
-file://host	/home/user/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	775		5252f242d27b8c2c9fdbdcbb33545d07-0	23	31	
-file://host	/home/user/testdir	d	0	0	1000	1000	775			25	33	
-Directory should be under CVS control: test1/////cvs/dirbad
->List 16 file(s):
-cvs	d	0	0	1000	1000	755	
-cvs/CVS	d	0	0	1000	1000	755	
-cvs/CVS/Entries	f	141	1	1000	1000	644	
-cvs/dirbad	d	0	0	1000	1000	755	
-cvs/dirutd	d	0	0	1000	1000	755	
-cvs/dirutd/CVS	d	0	0	1000	1000	755	
-cvs/dirutd/CVS/Entries	f	42	1	1000	1000	777	
-cvs/dirutd/fileutd	f	0	1	1000	1000	644	
-cvs/filenew.c	f	0	1	1000	1000	644	
-cvs/fileutd.h	f	0	1	1000	1000	644	
-dir space	d	0	0	1000	1000	755	
-test space	f	0	1	1000	1000	644	
-testdir	d	0	0	1000	1000	777	
-testfile	f	13	1	1000	1000	644	
-testlink	l	8	1	1000	1000	777	testfile
-testpipe	p	0	1	1000	1000	644	
- --> Files to add: 0
- --> Files to remove: 0
-Added journal list: 2 element(s):
-file://host	/home/user/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	777		5252f242d27b8c2c9fdbdcbb33545d07-0	30	0	
-file://host	/home/user/testdir	d	0	0	1000	1000	777			32	0	
-Removed journal list: 2 element(s):
-file://host	/home/user/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	775		5252f242d27b8c2c9fdbdcbb33545d07-0	23	31	
-file://host	/home/user/testdir	d	0	0	1000	1000	775			25	33	
-Really added journal list: 2 element(s):
-file://host	/home/user/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	777		5252f242d27b8c2c9fdbdcbb33545d07-0	30	0	
-file://host	/home/user/testdir	d	0	0	1000	1000	777			32	0	
-Active list: 20 element(s):
-file://client	/home/user2/testdir	d	0	0	1000	1000	755			19	0	
-file://client	/home/user2/testfile	f	145408	1	1000	1000	644		3d546a1ce46c6ae10ad34ab8a81c542e-0	20	0	
-file://client	/home/user2/testfile2	f	259072	1	1000	1000	644		fb00cd74a5f35e89a7fbdd3c1d05375a-0	21	0	
-file://client	/home/user2/testlink	l	8	1	1000	1000	777	testfile		22	0	
-file://host	/home/user/cvs	d	0	0	1000	1000	755			2	0	
-file://host	/home/user/cvs/CVS	d	0	0	1000	1000	755			3	0	
-file://host	/home/user/cvs/CVS/Entries	f	141	1	1000	1000	644		63b52e85e7a255c09df5cca819b74a88-0	4	0	
-file://host	/home/user/cvs/dirbad	d	0	0	1000	1000	755			5	0	
-file://host	/home/user/cvs/dirutd	d	0	0	1000	1000	755			6	0	
-file://host	/home/user/cvs/dirutd/CVS	d	0	0	1000	1000	755			7	0	
-file://host	/home/user/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	777		5252f242d27b8c2c9fdbdcbb33545d07-0	30	0	
-file://host	/home/user/cvs/dirutd/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	9	0	
-file://host	/home/user/cvs/filenew.c	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	10	0	
-file://host	/home/user/cvs/fileutd.h	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	11	0	
-file://host	/home/user/dir space	d	0	0	1000	1000	755			12	0	
-file://host	/home/user/test space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	14	0	
-file://host	/home/user/testdir	d	0	0	1000	1000	777			32	0	
-file://host	/home/user/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371bbc0355478d8-0	27	0	
-file://host	/home/user/testlink	l	8	1	1000	1000	777	testfile		17	0	
-file://host	/home/user/testpipe	p	0	1	1000	1000	644			18	0	
-Removed list: 2 element(s):
-file://host	/home/user/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	775		5252f242d27b8c2c9fdbdcbb33545d07-0	23	31	
-file://host	/home/user/testdir	d	0	0	1000	1000	775			25	33	
+Added journal list: 0 element(s):
+Removed journal list: 0 element(s):
+Really added journal list: 0 element(s):
+Active list: 0 element(s):
+Removed list: 0 element(s):
+ --> Database active items part closed (contents: 0 files)
+ --> Database active items part open (contents: 0 files)
+dblist: load: seen.journal: No such file or directory
+dblist: load: gone.journal: No such file or directory
+dblist: load: written.journal: No such file or directory
+dblist: load: seen.journal: No such file or directory
+dblist: load: gone.journal: No such file or directory
+dblist: load: written.journal: No such file or directory
+Active list: 0 element(s):
+Removed list: 0 element(s):
+Official removed list: 0 element(s):
+Added journal list: 0 element(s):
+Removed journal list: 0 element(s):
+Really added journal list: 0 element(s):
+Active list: 0 element(s):
+Removed list: 0 element(s):
+Added journal list: 0 element(s):
+Removed journal list: 0 element(s):
+Really added journal list: 0 element(s):
+Active list: 0 element(s):
+Removed list: 0 element(s):
 Recovery test
-dblist: load: file corrupted, line 3
+head: cannot open `test_db/written.journal' for reading: No such file or directory
+dblist: load: file corrupted, line 1
 dblist: load: written.journal: Structure needs cleaning
-Really added journal list: 2 element(s):
-file://host	/home/user/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	777		5252f242d27b8c2c9fdbdcbb33545d07-0	30	0	
-file://host	/home/user/testdir	d	0	0	1000	1000	777			32	0	
 db: lock: lock reset
 db: open: journal found, attempting crash recovery
-dblist: load: file corrupted, line 3
+dblist: load: file corrupted, line 1
 dblist: load: written.journal: Structure needs cleaning
-db: open: adding 2 valid files to active list
-db: open: removing 2 files from active list
-db: open: new active list size: 20
-db: open: new removed list size: 6
- --> Database active items part open (contents: 20 files)
-Active list: 20 element(s):
-file://client	/home/user2/testdir	d	0	0	1000	1000	755			19	0	
-file://client	/home/user2/testfile	f	145408	1	1000	1000	644		3d546a1ce46c6ae10ad34ab8a81c542e-0	20	0	
-file://client	/home/user2/testfile2	f	259072	1	1000	1000	644		fb00cd74a5f35e89a7fbdd3c1d05375a-0	21	0	
-file://client	/home/user2/testlink	l	8	1	1000	1000	777	testfile		22	0	
-file://host	/home/user/cvs	d	0	0	1000	1000	755			2	0	
-file://host	/home/user/cvs/CVS	d	0	0	1000	1000	755			3	0	
-file://host	/home/user/cvs/CVS/Entries	f	141	1	1000	1000	644		63b52e85e7a255c09df5cca819b74a88-0	4	0	
-file://host	/home/user/cvs/dirbad	d	0	0	1000	1000	755			5	0	
-file://host	/home/user/cvs/dirutd	d	0	0	1000	1000	755			6	0	
-file://host	/home/user/cvs/dirutd/CVS	d	0	0	1000	1000	755			7	0	
-file://host	/home/user/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	777		5252f242d27b8c2c9fdbdcbb33545d07-0	30	0	
-file://host	/home/user/cvs/dirutd/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	9	0	
-file://host	/home/user/cvs/filenew.c	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	10	0	
-file://host	/home/user/cvs/fileutd.h	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	11	0	
-file://host	/home/user/dir space	d	0	0	1000	1000	755			12	0	
-file://host	/home/user/test space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	14	0	
-file://host	/home/user/testdir	d	0	0	1000	1000	777			32	0	
-file://host	/home/user/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371bbc0355478d8-0	27	0	
-file://host	/home/user/testlink	l	8	1	1000	1000	777	testfile		17	0	
-file://host	/home/user/testpipe	p	0	1	1000	1000	644			18	0	
-Directory should be under CVS control: test1/////cvs/dirbad
+db: open: adding 0 valid files to active list
+dblist: load: gone.journal: No such file or directory
+Really added journal list: 0 element(s):
+ --> Database active items part open (contents: 0 files)
+dblist: load: seen.journal: No such file or directory
+dblist: load: gone.journal: No such file or directory
+dblist: load: written.journal: No such file or directory
+dblist: load: seen.journal: No such file or directory
+dblist: load: gone.journal: No such file or directory
+dblist: load: written.journal: No such file or directory
+dblist: load: seen.journal: No such file or directory
+dblist: load: gone.journal: No such file or directory
+dblist: load: written.journal: No such file or directory
+Active list: 0 element(s):
 Removed list: 0 element(s):
->List 14 file(s):
-cvs	d	0	0	1000	1000	755	
-cvs/CVS	d	0	0	1000	1000	755	
-cvs/CVS/Entries	f	141	1	1000	1000	644	
-cvs/dirbad	d	0	0	1000	1000	755	
-cvs/dirutd	d	0	0	1000	1000	755	
-cvs/dirutd/CVS	d	0	0	1000	1000	755	
-cvs/dirutd/CVS/Entries	f	42	1	1000	1000	777	
-cvs/filenew.c	f	0	1	1000	1000	644	
-cvs/fileutd.h	f	0	1	1000	1000	644	
-dir space	d	0	0	1000	1000	755	
-test space	f	0	1	1000	1000	644	
-testdir	d	0	0	1000	1000	777	
-testlink	l	8	1	1000	1000	777	testfile
-testpipe	p	0	1	1000	1000	644	
- --> Files to add: 0
- --> Files to remove: 2
 Added journal list: 0 element(s):
-Removed journal list: 2 element(s):
-file://host	/home/user/cvs/dirutd/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	9	34	
-file://host	/home/user/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371bbc0355478d8-0	27	35	
-dblist: load: written.journal: No such file or directory
+Removed journal list: 0 element(s):
 Really added journal list: 0 element(s):
-Active list: 18 element(s):
-file://client	/home/user2/testdir	d	0	0	1000	1000	755			19	0	
-file://client	/home/user2/testfile	f	145408	1	1000	1000	644		3d546a1ce46c6ae10ad34ab8a81c542e-0	20	0	
-file://client	/home/user2/testfile2	f	259072	1	1000	1000	644		fb00cd74a5f35e89a7fbdd3c1d05375a-0	21	0	
-file://client	/home/user2/testlink	l	8	1	1000	1000	777	testfile		22	0	
-file://host	/home/user/cvs	d	0	0	1000	1000	755			2	0	
-file://host	/home/user/cvs/CVS	d	0	0	1000	1000	755			3	0	
-file://host	/home/user/cvs/CVS/Entries	f	141	1	1000	1000	644		63b52e85e7a255c09df5cca819b74a88-0	4	0	
-file://host	/home/user/cvs/dirbad	d	0	0	1000	1000	755			5	0	
-file://host	/home/user/cvs/dirutd	d	0	0	1000	1000	755			6	0	
-file://host	/home/user/cvs/dirutd/CVS	d	0	0	1000	1000	755			7	0	
-file://host	/home/user/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	777		5252f242d27b8c2c9fdbdcbb33545d07-0	30	0	
-file://host	/home/user/cvs/filenew.c	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	10	0	
-file://host	/home/user/cvs/fileutd.h	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	11	0	
-file://host	/home/user/dir space	d	0	0	1000	1000	755			12	0	
-file://host	/home/user/test space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	14	0	
-file://host	/home/user/testdir	d	0	0	1000	1000	777			32	0	
-file://host	/home/user/testlink	l	8	1	1000	1000	777	testfile		17	0	
-file://host	/home/user/testpipe	p	0	1	1000	1000	644			18	0	
-Removed list: 2 element(s):
-file://host	/home/user/cvs/dirutd/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	9	34	
-file://host	/home/user/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371bbc0355478d8-0	27	35	
-Directory should be under CVS control: test1/////cvs/dirbad
->List 14 file(s):
-cvs	d	0	0	1000	1000	755	
-cvs/CVS	d	0	0	1000	1000	755	
-cvs/CVS/Entries	f	141	1	1000	1000	644	
-cvs/dirbad	d	0	0	1000	1000	755	
-cvs/dirutd	d	0	0	1000	1000	755	
-cvs/dirutd/CVS	d	0	0	1000	1000	755	
-cvs/dirutd/CVS/Entries	f	42	1	1000	1000	777	
-cvs/filenew.c	f	0	1	1000	1000	644	
-cvs/fileutd.h	f	0	1	1000	1000	644	
-dir space	d	0	0	1000	1000	755	
-test space	f	0	1	1000	1000	644	
-testdir	d	0	0	1000	1000	777	
-testlink	l	8	1	1000	1000	777	testfile
-testpipe	p	0	1	1000	1000	644	
- --> Files to add: 0
- --> Files to remove: 0
+Active list: 0 element(s):
+Removed list: 0 element(s):
 Added journal list: 0 element(s):
-Removed journal list: 2 element(s):
-file://host	/home/user/cvs/dirutd/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	9	34	
-file://host	/home/user/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371bbc0355478d8-0	27	35	
-dblist: load: written.journal: No such file or directory
+Removed journal list: 0 element(s):
 Really added journal list: 0 element(s):
-Active list: 18 element(s):
-file://client	/home/user2/testdir	d	0	0	1000	1000	755			19	0	
-file://client	/home/user2/testfile	f	145408	1	1000	1000	644		3d546a1ce46c6ae10ad34ab8a81c542e-0	20	0	
-file://client	/home/user2/testfile2	f	259072	1	1000	1000	644		fb00cd74a5f35e89a7fbdd3c1d05375a-0	21	0	
-file://client	/home/user2/testlink	l	8	1	1000	1000	777	testfile		22	0	
-file://host	/home/user/cvs	d	0	0	1000	1000	755			2	0	
-file://host	/home/user/cvs/CVS	d	0	0	1000	1000	755			3	0	
-file://host	/home/user/cvs/CVS/Entries	f	141	1	1000	1000	644		63b52e85e7a255c09df5cca819b74a88-0	4	0	
-file://host	/home/user/cvs/dirbad	d	0	0	1000	1000	755			5	0	
-file://host	/home/user/cvs/dirutd	d	0	0	1000	1000	755			6	0	
-file://host	/home/user/cvs/dirutd/CVS	d	0	0	1000	1000	755			7	0	
-file://host	/home/user/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	777		5252f242d27b8c2c9fdbdcbb33545d07-0	30	0	
-file://host	/home/user/cvs/filenew.c	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	10	0	
-file://host	/home/user/cvs/fileutd.h	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	11	0	
-file://host	/home/user/dir space	d	0	0	1000	1000	755			12	0	
-file://host	/home/user/test space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	14	0	
-file://host	/home/user/testdir	d	0	0	1000	1000	777			32	0	
-file://host	/home/user/testlink	l	8	1	1000	1000	777	testfile		17	0	
-file://host	/home/user/testpipe	p	0	1	1000	1000	644			18	0	
-Removed list: 2 element(s):
-file://host	/home/user/cvs/dirutd/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	9	34	
-file://host	/home/user/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371bbc0355478d8-0	27	35	
->List 4 file(s):
-testdir	d	0	0	1000	1000	755	
-testfile	f	145408	1	1000	1000	644	
-testfile2	f	259072	1	1000	1000	644	
-testlink	l	8	1	1000	1000	777	testfile
- --> Files to add: 0
- --> Files to remove: 0
+Active list: 0 element(s):
+Removed list: 0 element(s):
 Added journal list: 0 element(s):
-Removed journal list: 2 element(s):
-file://host	/home/user/cvs/dirutd/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	9	34	
-file://host	/home/user/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371bbc0355478d8-0	27	35	
-dblist: load: written.journal: No such file or directory
+Removed journal list: 0 element(s):
 Really added journal list: 0 element(s):
-Active list: 18 element(s):
-file://client	/home/user2/testdir	d	0	0	1000	1000	755			19	0	
-file://client	/home/user2/testfile	f	145408	1	1000	1000	644		3d546a1ce46c6ae10ad34ab8a81c542e-0	20	0	
-file://client	/home/user2/testfile2	f	259072	1	1000	1000	644		fb00cd74a5f35e89a7fbdd3c1d05375a-0	21	0	
-file://client	/home/user2/testlink	l	8	1	1000	1000	777	testfile		22	0	
-file://host	/home/user/cvs	d	0	0	1000	1000	755			2	0	
-file://host	/home/user/cvs/CVS	d	0	0	1000	1000	755			3	0	
-file://host	/home/user/cvs/CVS/Entries	f	141	1	1000	1000	644		63b52e85e7a255c09df5cca819b74a88-0	4	0	
-file://host	/home/user/cvs/dirbad	d	0	0	1000	1000	755			5	0	
-file://host	/home/user/cvs/dirutd	d	0	0	1000	1000	755			6	0	
-file://host	/home/user/cvs/dirutd/CVS	d	0	0	1000	1000	755			7	0	
-file://host	/home/user/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	777		5252f242d27b8c2c9fdbdcbb33545d07-0	30	0	
-file://host	/home/user/cvs/filenew.c	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	10	0	
-file://host	/home/user/cvs/fileutd.h	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	11	0	
-file://host	/home/user/dir space	d	0	0	1000	1000	755			12	0	
-file://host	/home/user/test space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	14	0	
-file://host	/home/user/testdir	d	0	0	1000	1000	777			32	0	
-file://host	/home/user/testlink	l	8	1	1000	1000	777	testfile		17	0	
-file://host	/home/user/testpipe	p	0	1	1000	1000	644			18	0	
-Removed list: 2 element(s):
-file://host	/home/user/cvs/dirutd/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	9	34	
-file://host	/home/user/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371bbc0355478d8-0	27	35	
-Official removed list: 6 element(s):
-file://host	/home/user/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	644		5252f242d27b8c2c9fdbdcbb33545d07-0	8	24	
-file://host	/home/user/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	775		5252f242d27b8c2c9fdbdcbb33545d07-0	23	31	
-file://host	/home/user/dir space/file space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	13	29	
-file://host	/home/user/testdir	d	0	0	1000	1000	755			15	26	
-file://host	/home/user/testdir	d	0	0	1000	1000	775			25	33	
-file://host	/home/user/testfile	f	13	1	1000	1000	644			16	28	
- --> Database active items part closed (contents: 18 files)
- --> Database removed items part open (contents: 8 files)
- --> Database removed items part closed (contents: 8 files)
- --> Database active items part open (contents: 18 files)
-Active list: 18 element(s):
-file://client	/home/user2/testdir	d	0	0	1000	1000	755			19	0	
-file://client	/home/user2/testfile	f	145408	1	1000	1000	644		3d546a1ce46c6ae10ad34ab8a81c542e-0	20	0	
-file://client	/home/user2/testfile2	f	259072	1	1000	1000	644		fb00cd74a5f35e89a7fbdd3c1d05375a-0	21	0	
-file://client	/home/user2/testlink	l	8	1	1000	1000	777	testfile		22	0	
-file://host	/home/user/cvs	d	0	0	1000	1000	755			2	0	
-file://host	/home/user/cvs/CVS	d	0	0	1000	1000	755			3	0	
-file://host	/home/user/cvs/CVS/Entries	f	141	1	1000	1000	644		63b52e85e7a255c09df5cca819b74a88-0	4	0	
-file://host	/home/user/cvs/dirbad	d	0	0	1000	1000	755			5	0	
-file://host	/home/user/cvs/dirutd	d	0	0	1000	1000	755			6	0	
-file://host	/home/user/cvs/dirutd/CVS	d	0	0	1000	1000	755			7	0	
-file://host	/home/user/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	777		5252f242d27b8c2c9fdbdcbb33545d07-0	30	0	
-file://host	/home/user/cvs/filenew.c	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	10	0	
-file://host	/home/user/cvs/fileutd.h	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	11	0	
-file://host	/home/user/dir space	d	0	0	1000	1000	755			12	0	
-file://host	/home/user/test space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	14	0	
-file://host	/home/user/testdir	d	0	0	1000	1000	777			32	0	
-file://host	/home/user/testlink	l	8	1	1000	1000	777	testfile		17	0	
-file://host	/home/user/testpipe	p	0	1	1000	1000	644			18	0	
+Active list: 0 element(s):
+Removed list: 0 element(s):
+Official removed list: 0 element(s):
+ --> Database active items part closed (contents: 0 files)
+ --> Database active items part open (contents: 0 files)
+Active list: 0 element(s):
 Removed list: 0 element(s):
 
 Test: getdir
@@ -692,32 +144,14 @@ fedc76test6 status: 0, getdir_path: test_db/data/fe/dc/76/test6
 Expiration test
 db: expiration module not initialised
 db: expiration module not initialised
-Modified removed list: 8 element(s):
-file://host	/home/user/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	644		5252f242d27b8c2c9fdbdcbb33545d07-0	8	24	
-file://host	/home/user/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	775		5252f242d27b8c2c9fdbdcbb33545d07-0	23	31	
-file://host	/home/user/cvs/dirutd/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	9	34	
-file://host	/home/user/dir space/file space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	13	29	
-file://host	/home/user/testdir	d	0	0	1000	1000	755			15	26	
-file://host	/home/user/testdir	d	0	0	1000	1000	775			25	33	
-file://host	/home/user/testfile	f	13	1	1000	1000	644			16	28	
-file://host	/home/user/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371bbc0355478d8-0	27	1	
- --> Database active items part closed (contents: 18 files)
- --> Database removed items part open (contents: 8 files)
+Modified removed list: 0 element(s):
+ --> Database active items part closed (contents: 0 files)
+ --> Database removed items part open (contents: 0 files)
  -> Removing expired records
- --> Expired data: 1
- ---> Checksum: 59ca0efa9f5633cb0371bbc0355478d8-0
- --> Active data : 5
- ---> Checksum: 3d546a1ce46c6ae10ad34ab8a81c542e-0
- ---> Checksum: 5252f242d27b8c2c9fdbdcbb33545d07-0
- ---> Checksum: 63b52e85e7a255c09df5cca819b74a88-0
- ---> Checksum: d41d8cd98f00b204e9800998ecf8427e-0
- ---> Checksum: fb00cd74a5f35e89a7fbdd3c1d05375a-0
- --> Erased data : 1
- ---> Checksum: 59ca0efa9f5633cb0371bbc0355478d8-0
- --> Database removed items part closed (contents: 7 files)
+ --> Expired data: 0
+ --> Database removed items part closed (contents: 0 files)
 List cannot be saved
- --> Database active items part open (contents: 18 files)
-dblist: save: cannot create file
+ --> Database active items part open (contents: 0 files)
 dblist: failed to save active items list
 Error: Permission denied
 List cannot be read
@@ -725,10 +159,8 @@ dblist: load: active: Permission denied
 dblist: failed to load active items list
 Error: Permission denied
 List is garbaged
-dblist: load: file end not found
-dblist: load: active: Structure needs cleaning
-dblist: failed to load active items list
-Error: Structure needs cleaning
+ --> Database active items part open (contents: 0 files)
+ --> Database active items part closed (contents: 0 files)
 List is gone
 db: open: active files list not accessible: no backup accessible, aborting
 Error: No such file or directory
