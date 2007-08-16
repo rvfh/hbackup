@@ -291,7 +291,6 @@ public:
 
 class File {
   string          _path;      // file path
-  string          _checksum;  // file checksum
   string          _link;      // what the link points to (if a link, of course)
   char            _type;      // file type ('?' if metadata not available)
   time_t          _mtime;     // time of last modification
@@ -313,7 +312,6 @@ public:
     gid_t         gid,
     mode_t        mode) :
       _path(path),
-      _checksum(""),
       _link(link),
       _type(type),
       _mtime(mtime),
@@ -331,7 +329,6 @@ public:
   string name() const;
   string path() const { return _path; };
   string link() const { return _link; };
-  string checksum() const { return _checksum; }
   string fullPath(int max_size = -1) const;
   char type() const { return _type; }
   time_t mtime() const { return _mtime; };

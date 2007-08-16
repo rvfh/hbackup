@@ -345,7 +345,7 @@ int main(void) {
   cout << "\nMatch function test\n";
   condition = new Condition(filter_size_below, (off_t) 5000);
   node = new Node("", 'f', 0, 4000, 0, 0, 0);
-  if (! condition->match(*file_data)) {
+  if (! condition->match("this is/a path", *node)) {
     cout << "Not matching " << node->size() << "\n";
   } else {
     cout << "Matching " << node->size() << "\n";
