@@ -215,7 +215,6 @@ File::File(const string& access_path, const string& path) {
       free(link);
     }
   }
-  _checksum = "";
 }
 
 File::File(char* line, size_t size) {
