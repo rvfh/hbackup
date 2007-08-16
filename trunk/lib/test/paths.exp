@@ -126,44 +126,34 @@ Active list:  0 element(s):
 Removed list: 0 element(s):
 
 New classes test
- ---> Top dir
- ----> New: cvs
- ---> Dir: cvs
- ----> New: CVS
- ---> Dir: cvs/CVS
- ----> New: Entries
- ----> New: dirbad
- ---> Dir: cvs/dirbad
- ----> New: fileoth
- ----> New: fileutd
- ----> New: diroth
- ---> Dir: cvs/diroth
- ----> New: dirutd
- ---> Dir: cvs/dirutd
- ----> New: CVS
- ---> Dir: cvs/dirutd/CVS
- ----> New: Entries
- ----> New: fileoth
- ----> New: fileutd
- ----> New: filemod.o
- ----> New: filenew.c
- ----> New: fileoth
- ----> New: fileutd.h
- ----> New: dir space
- ---> Dir: dir space
- ----> New: file space
- ----> New: subdir
- ---> Dir: subdir
- ----> New: testfile
- ----> New: testfile1
- ----> New: testfile2
- ----> New: test space
- ----> New: testdir
- ---> Dir: testdir
- ----> New: testfile
- ----> New: testfile~
- ----> New: testlink
- ----> New: testpipe
+ ---> New: cvs
+ ---> New: cvs/CVS
+ ---> New: cvs/CVS/Entries
+ ---> New: cvs/dirbad
+ ---> New: cvs/dirbad/fileoth
+ ---> New: cvs/dirbad/fileutd
+ ---> New: cvs/diroth
+ ---> New: cvs/dirutd
+ ---> New: cvs/dirutd/CVS
+ ---> New: cvs/dirutd/CVS/Entries
+ ---> New: cvs/dirutd/fileoth
+ ---> New: cvs/dirutd/fileutd
+ ---> New: cvs/filemod.o
+ ---> New: cvs/filenew.c
+ ---> New: cvs/fileoth
+ ---> New: cvs/fileutd.h
+ ---> New: dir space
+ ---> New: dir space/file space
+ ---> New: subdir
+ ---> New: subdir/testfile
+ ---> New: subdir/testfile1
+ ---> New: subdir/testfile2
+ ---> New: test space
+ ---> New: testdir
+ ---> New: testfile
+ ---> New: testfile~
+ ---> New: testlink
+ ---> New: testpipe
 Active list:  28 element(s):
 file://localhost	/home/User/cvs	d	0	0	1000	1000	755			1	0	
 file://localhost	/home/User/cvs/CVS	d	0	0	1000	1000	755			2	0	
@@ -195,16 +185,7 @@ file://localhost	/home/User/testlink	l	8	0	1000	1000	777	testfile		27	0
 file://localhost	/home/User/testpipe	p	0	1	1000	1000	644			28	0	
 Removed list: 0 element(s):
 as previous with subdir in ignore list
- ---> Top dir
- ---> Dir: cvs
- ---> Dir: cvs/CVS
- ---> Dir: cvs/dirbad
- ---> Dir: cvs/diroth
- ---> Dir: cvs/dirutd
- ---> Dir: cvs/dirutd/CVS
- ---> Dir: dir space
- ----> Removed: subdir
- ---> Dir: testdir
+ ---> Removed: subdir
 Active list:  24 element(s):
 file://localhost	/home/User/cvs	d	0	0	1000	1000	755			1	0	
 file://localhost	/home/User/cvs/CVS	d	0	0	1000	1000	755			2	0	
@@ -236,16 +217,7 @@ file://localhost	/home/User/subdir/testfile	f	12	1	1000	1000	644			20	30
 file://localhost	/home/User/subdir/testfile1	f	0	1	1000	1000	644			21	31	
 file://localhost	/home/User/subdir/testfile2	f	12	1	1000	1000	644			22	32	
 as previous with testlink in ignore list
- ---> Top dir
- ---> Dir: cvs
- ---> Dir: cvs/CVS
- ---> Dir: cvs/dirbad
- ---> Dir: cvs/diroth
- ---> Dir: cvs/dirutd
- ---> Dir: cvs/dirutd/CVS
- ---> Dir: dir space
- ---> Dir: testdir
- ----> Removed: testlink
+ ---> Removed: testlink
 Active list:  23 element(s):
 file://localhost	/home/User/cvs	d	0	0	1000	1000	755			1	0	
 file://localhost	/home/User/cvs/CVS	d	0	0	1000	1000	755			2	0	
@@ -277,20 +249,12 @@ file://localhost	/home/User/subdir/testfile1	f	0	1	1000	1000	644			21	31
 file://localhost	/home/User/subdir/testfile2	f	12	1	1000	1000	644			22	32	
 file://localhost	/home/User/testlink	l	8	0	1000	1000	777	testfile		27	33	
 as previous with CVS parser
- ---> Top dir
- ---> Dir: cvs
- ---> Dir: cvs/CVS
- ---> Dir: cvs/dirbad
 Directory should be under CVS control: test1/cvs/dirbad
- ----> Removed: fileoth
- ----> Removed: fileutd
- ----> Removed: diroth
- ---> Dir: cvs/dirutd
- ---> Dir: cvs/dirutd/CVS
- ----> Removed: fileoth
- ----> Removed: fileoth
- ---> Dir: dir space
- ---> Dir: testdir
+ ---> Removed: cvs/dirbad/fileoth
+ ---> Removed: cvs/dirbad/fileutd
+ ---> Removed: cvs/diroth
+ ---> Removed: cvs/dirutd/fileoth
+ ---> Removed: cvs/fileoth
 Active list:  18 element(s):
 file://localhost	/home/User/cvs	d	0	0	1000	1000	755			1	0	
 file://localhost	/home/User/cvs/CVS	d	0	0	1000	1000	755			2	0	
@@ -322,15 +286,7 @@ file://localhost	/home/User/cvs/diroth	d	0	0	1000	1000	755			7	36
 file://localhost	/home/User/cvs/dirutd/fileoth	f	0	1	1000	1000	644			11	37	
 file://localhost	/home/User/cvs/fileoth	f	0	1	1000	1000	644			15	38	
 as previous
- ---> Top dir
- ---> Dir: cvs
- ---> Dir: cvs/CVS
- ---> Dir: cvs/dirbad
 Directory should be under CVS control: test1/cvs/dirbad
- ---> Dir: cvs/dirutd
- ---> Dir: cvs/dirutd/CVS
- ---> Dir: dir space
- ---> Dir: testdir
 Active list:  18 element(s):
 file://localhost	/home/User/cvs	d	0	0	1000	1000	755			1	0	
 file://localhost	/home/User/cvs/CVS	d	0	0	1000	1000	755			2	0	
@@ -362,14 +318,8 @@ file://localhost	/home/User/cvs/diroth	d	0	0	1000	1000	755			7	36
 file://localhost	/home/User/cvs/dirutd/fileoth	f	0	1	1000	1000	644			11	37	
 file://localhost	/home/User/cvs/fileoth	f	0	1	1000	1000	644			15	38	
 as previous with cvs/dirutd in ignore list
- ---> Top dir
- ---> Dir: cvs
- ---> Dir: cvs/CVS
- ---> Dir: cvs/dirbad
 Directory should be under CVS control: test1/cvs/dirbad
- ----> Removed: dirutd
- ---> Dir: dir space
- ---> Dir: testdir
+ ---> Removed: cvs/dirutd
 Active list:  14 element(s):
 file://localhost	/home/User/cvs	d	0	0	1000	1000	755			1	0	
 file://localhost	/home/User/cvs/CVS	d	0	0	1000	1000	755			2	0	

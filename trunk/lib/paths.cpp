@@ -324,7 +324,11 @@ int Path2::recurse(
           && ((cmp = strcmp((*j)->name(), (*i)->name())) < 0)) {
         db.remove(prefix, _path, rel_path, *j);
         if (verbosity() > 3) {
-          cout << " ----> Removed: " << (*j)->name() << endl;
+          cout << " ---> Removed: ";
+          if (rel_path[0] != '\0') {
+            cout << rel_path << "/";
+          }
+          cout << (*j)->name() << endl;
         }
         delete *j;
         j = db_list.erase(j);
@@ -332,12 +336,20 @@ int Path2::recurse(
       if ((j == db_list.end()) || (cmp > 0)) {
         db.add(prefix, _path, rel_path, *i);
         if (verbosity() > 3) {
-          cout << " ----> New: " << (*i)->name() << endl;
+          cout << " ---> New: ";
+          if (rel_path[0] != '\0') {
+            cout << rel_path << "/";
+          }
+          cout << (*i)->name() << endl;
         }
       } else if (**i != **j) {
         db.modify(prefix, _path, rel_path, *i);
         if (verbosity() > 3) {
-          cout << " ----> Modified: " << (*i)->name() << endl;
+          cout << " ---> Modified: ";
+          if (rel_path[0] != '\0') {
+            cout << rel_path << "/";
+          }
+          cout << (*i)->name() << endl;
         }
       } else {
         delete *j;
@@ -347,9 +359,6 @@ int Path2::recurse(
       // For directory, recurse into it
       if ((*i)->type() == 'd') {
         char* dir_path = Node::path(cur_path, (*i)->name());
-        if (verbosity() > 3) {
-          cout << " ---> Dir: " << &dir_path[_backup_path_length + 1] <<endl;
-        }
         recurse(db, prefix, dir_path, (Directory*) *i, parser);
         free(dir_path);
       }
@@ -359,7 +368,11 @@ int Path2::recurse(
     while (j != db_list.end()) {
       db.remove(prefix, _path, rel_path, *j);
       if (verbosity() > 3) {
-        cout << " ----> Removed: " << (*j)->name() << endl;
+        cout << " ---> Removed: ";
+        if (rel_path[0] != '\0') {
+          cout << rel_path << "/";
+        }
+        cout << (*j)->name() << endl;
       }
       delete *j;
       j = db_list.erase(j);
@@ -523,9 +536,6 @@ int Path2::parse(
   _backup_path_length = strlen(backup_path);
   _nodes = 0;
   _dir = new Directory(backup_path);
-  if (verbosity() > 3) {
-    cout << " ---> Top dir" <<endl;
-  }
   if (recurse(db, prefix, backup_path, _dir, NULL)) {
     delete _dir;
     _dir = NULL;
