@@ -108,7 +108,8 @@ public:
     const char* prefix,
     const char* base_path,
     const char* rel_path,
-    const Node* node);
+    const Node* node,
+    bool        descend = true);
 // For debug only
   void* active();
   void* removed();

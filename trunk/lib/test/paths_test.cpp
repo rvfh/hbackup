@@ -132,6 +132,7 @@ int main(void) {
 
   cout << endl << "New classes test" << endl;
   Path2* path2 = new Path2("/home/User");
+  system("touch test1/subdirfile");
 
   if (! path2->parse(db, "file://localhost", "test1")) {
 //     cout << ">List " << path2->nodes() << " file(s):\n";
