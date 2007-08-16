@@ -38,7 +38,7 @@ using namespace std;
 
 using namespace hbackup;
 
-int Path2::recurse(
+int Path::recurse(
     Database&   db,
     const char* prefix,
     const char* cur_path,
@@ -234,7 +234,7 @@ int Path2::recurse(
   return 0;
 }
 
-Path2::Path2(const char* path) {
+Path::Path(const char* path) {
   _path               = NULL;
   _dir                = NULL;
   _expiration         = 0;
@@ -256,7 +256,7 @@ Path2::Path2(const char* path) {
   }
 }
 
-int Path2::addFilter(
+int Path::addFilter(
     const string& type,
     const string& value,
     bool          append) {
@@ -341,7 +341,7 @@ int Path2::addFilter(
   return 0;
 }
 
-int Path2::addParser(
+int Path::addParser(
     const string& type,
     const string& string) {
   parser_mode_t mode;
@@ -379,7 +379,7 @@ int Path2::addParser(
   return 0;
 }
 
-int Path2::parse(
+int Path::parse(
     Database&   db,
     const char* prefix,
     const char* backup_path) {

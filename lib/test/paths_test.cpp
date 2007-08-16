@@ -50,7 +50,7 @@ time_t time(time_t *t) {
 }
 
 int main(void) {
-  Path2* path2 = new Path2("/home/User");
+  Path* path = new Path("/home/User");
   Database  db("test_db");
 
   db.open();
@@ -71,8 +71,8 @@ int main(void) {
 
   system("touch test1/subdirfile");
 
-  if (! path2->parse(db, "file://localhost", "test1")) {
-//     cout << ">List " << path2->nodes() << " file(s):\n";
+  if (! path->parse(db, "file://localhost", "test1")) {
+//     cout << ">List " << path->nodes() << " file(s):\n";
   }
 
   // Display DB contents
@@ -90,12 +90,12 @@ int main(void) {
   }
 
   cout << "as previous with subdir in ignore list" << endl;
-  if (path2->addFilter("type", "dir")
-   || path2->addFilter("path", "subdir", true)) {
+  if (path->addFilter("type", "dir")
+   || path->addFilter("path", "subdir", true)) {
     cout << "Failed to add filter" << endl;
   }
-  if (! path2->parse(db, "file://localhost", "test1")) {
-//     cout << ">List " << path2->nodes() << " file(s):\n";
+  if (! path->parse(db, "file://localhost", "test1")) {
+//     cout << ">List " << path->nodes() << " file(s):\n";
   }
 
   // Display DB contents
@@ -114,12 +114,12 @@ int main(void) {
 
   cout << "as previous with testlink modified" << endl;
   system("sleep 1 && ln -sf testnull test1/testlink");
-  if (path2->addFilter("type", "dir")
-   || path2->addFilter("path", "subdir", true)) {
+  if (path->addFilter("type", "dir")
+   || path->addFilter("path", "subdir", true)) {
     cout << "Failed to add filter" << endl;
   }
-  if (! path2->parse(db, "file://localhost", "test1")) {
-//     cout << ">List " << path2->nodes() << " file(s):\n";
+  if (! path->parse(db, "file://localhost", "test1")) {
+//     cout << ">List " << path->nodes() << " file(s):\n";
   }
 
   // Display DB contents
@@ -137,12 +137,12 @@ int main(void) {
   }
 
   cout << "as previous with testlink in ignore list" << endl;
-  if (path2->addFilter("type", "link")
-   || path2->addFilter("path_start", "testlink", true)) {
+  if (path->addFilter("type", "link")
+   || path->addFilter("path_start", "testlink", true)) {
     cout << "Failed to add filter" << endl;
   }
-  if (! path2->parse(db, "file://localhost", "test1")) {
-//     cout << ">List " << path2->nodes() << " file(s):\n";
+  if (! path->parse(db, "file://localhost", "test1")) {
+//     cout << ">List " << path->nodes() << " file(s):\n";
   }
 
   // Display DB contents
@@ -160,11 +160,11 @@ int main(void) {
   }
 
   cout << "as previous with CVS parser" << endl;
-  if (path2->addParser("cvs", "controlled")) {
+  if (path->addParser("cvs", "controlled")) {
     cout << "Failed to add parser" << endl;
   }
-  if (! path2->parse(db, "file://localhost", "test1")) {
-//     cout << ">List " << path2->nodes() << " file(s):\n";
+  if (! path->parse(db, "file://localhost", "test1")) {
+//     cout << ">List " << path->nodes() << " file(s):\n";
   }
 
   // Display DB contents
@@ -182,8 +182,8 @@ int main(void) {
   }
 
   cout << "as previous" << endl;
-  if (! path2->parse(db, "file://localhost", "test1")) {
-//     cout << ">List " << path2->nodes() << " file(s):\n";
+  if (! path->parse(db, "file://localhost", "test1")) {
+//     cout << ">List " << path->nodes() << " file(s):\n";
   }
 
   // Display DB contents
@@ -201,12 +201,12 @@ int main(void) {
   }
 
   cout << "as previous with cvs/dirutd in ignore list" << endl;
-  if (path2->addFilter("type", "dir")
-   || path2->addFilter("path", "cvs/dirutd", true)) {
+  if (path->addFilter("type", "dir")
+   || path->addFilter("path", "cvs/dirutd", true)) {
     cout << "Failed to add filter" << endl;
   }
-  if (! path2->parse(db, "file://localhost", "test1")) {
-//     cout << ">List " << path2->nodes() << " file(s):\n";
+  if (! path->parse(db, "file://localhost", "test1")) {
+//     cout << ">List " << path->nodes() << " file(s):\n";
   }
 
   // Display DB contents
@@ -225,8 +225,8 @@ int main(void) {
 
   cout << "as previous with testpipe gone" << endl;
   remove("test1/testpipe");
-  if (! path2->parse(db, "file://localhost", "test1")) {
-//     cout << ">List " << path2->nodes() << " file(s):\n";
+  if (! path->parse(db, "file://localhost", "test1")) {
+//     cout << ">List " << path->nodes() << " file(s):\n";
   }
 
   // Display DB contents
@@ -245,8 +245,8 @@ int main(void) {
 
   cout << "as previous with testfile mode changed" << endl;
   system("chmod 660 test1/testfile");
-  if (! path2->parse(db, "file://localhost", "test1")) {
-//     cout << ">List " << path2->nodes() << " file(s):\n";
+  if (! path->parse(db, "file://localhost", "test1")) {
+//     cout << ">List " << path->nodes() << " file(s):\n";
   }
 
   // Display DB contents
@@ -265,8 +265,8 @@ int main(void) {
 
   cout << "as previous with cvs/filenew.c touched" << endl;
   system("echo blah > test1/cvs/filenew.c");
-  if (! path2->parse(db, "file://localhost", "test1")) {
-//     cout << ">List " << path2->nodes() << " file(s):\n";
+  if (! path->parse(db, "file://localhost", "test1")) {
+//     cout << ">List " << path->nodes() << " file(s):\n";
   }
 
   // Display DB contents
@@ -283,7 +283,7 @@ int main(void) {
     cout << i->line(true) << endl;
   }
 
-  delete path2;
+  delete path;
   db.close();
 
   return 0;
