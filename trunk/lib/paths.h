@@ -41,7 +41,7 @@
 
 namespace hbackup {
 
-class Path2 {
+class Path {
   char*         _path;
   int           _backup_path_length;
   Directory*    _dir;
@@ -56,8 +56,8 @@ class Path2 {
     Directory*  dir,
     Parser*     parser);
 public:
-  Path2(const char* path);
-  ~Path2() {
+  Path(const char* path);
+  ~Path() {
     free(_path);
     delete _dir;
   }

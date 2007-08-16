@@ -39,7 +39,7 @@ using namespace std;
 using namespace hbackup;
 
 struct Client::Private {
-  list<Path2*>  paths;
+  list<Path*>  paths;
 };
 
 int Client::mountPath(
@@ -146,7 +146,7 @@ int Client::readListFile(const string& list_path) {
     }
 
     /* Read list file */
-    Path2 *path = NULL;
+    Path *path = NULL;
     while (! list_file.eof() && ! failed) {
       getline(list_file, buffer);
       unsigned int pos = buffer.find("\r");
@@ -174,7 +174,7 @@ int Client::readListFile(const string& list_path) {
             failed = 1;
           } else {
             /* New backup path */
-            path = new Path2(current->c_str());
+            path = new Path(current->c_str());
             _d->paths.push_back(path);
             if (verbosity() > 2) {
               cout << " --> Path: " << path->path() << endl;
@@ -282,7 +282,7 @@ Client::Client(string value) {
 }
 
 Client::~Client() {
-  for (list<Path2*>::iterator i = _d->paths.begin(); i != _d->paths.end();
+  for (list<Path*>::iterator i = _d->paths.begin(); i != _d->paths.end();
       i++) {
     delete *i;
   }
@@ -300,7 +300,7 @@ void Client::setProtocol(string value) {
 void Client::setListfile(string value) {
   {
     // Convert to UNIX style for paths
-    Path2 path(value.c_str());
+    Path path(value.c_str());
     value = string(path.path());
   }
   unsigned int pos = value.rfind('/');
@@ -351,7 +351,7 @@ int Client::backup(
     if (_d->paths.empty()) {
       failed = 1;
     } else if (! config_check) {
-      for (list<Path2*>::iterator i = _d->paths.begin(); i != _d->paths.end(); i++) {
+      for (list<Path*>::iterator i = _d->paths.begin(); i != _d->paths.end(); i++) {
         if (terminating() || clientfailed) {
           break;
         }
@@ -392,7 +392,7 @@ int Client::backup(
 
 int Client::expire(Database& db) {
   if (initialised()) {
-    for (list<Path2*>::iterator i = _d->paths.begin(); i != _d->paths.end(); i++) {
+    for (list<Path*>::iterator i = _d->paths.begin(); i != _d->paths.end(); i++) {
       if (terminating()) {
         break;
       }
@@ -422,7 +422,7 @@ void Client::show() {
   }
   if (_d->paths.size() > 0) {
     cout << "Paths:" << endl;
-    for (list<Path2*>::iterator i = _d->paths.begin(); i != _d->paths.end(); i++) {
+    for (list<Path*>::iterator i = _d->paths.begin(); i != _d->paths.end(); i++) {
       cout << " -> " << (*i)->path() << endl;
     }
   }
