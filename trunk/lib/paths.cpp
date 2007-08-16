@@ -322,8 +322,8 @@ int Path2::recurse(
       int cmp = -1;
       while ((j != db_list.end())
           && ((cmp = strcmp((*j)->name(), (*i)->name())) < 0)) {
-        if (verbosity() > 3) {
-          cout << " ---> R ";
+        if (verbosity() > 2) {
+          cout << " --> R ";
           if (rel_path[0] != '\0') {
             cout << rel_path << "/";
           }
@@ -337,8 +337,8 @@ int Path2::recurse(
       // Deal with data
       if ((j == db_list.end()) || (cmp > 0)) {
         // Not found in DB => new
-        if (verbosity() > 3) {
-          cout << " ---> A ";
+        if (verbosity() > 2) {
+          cout << " --> A ";
           if (rel_path[0] != '\0') {
             cout << rel_path << "/";
           }
@@ -355,13 +355,17 @@ int Path2::recurse(
            && ((*i)->mtime() == (*j)->mtime())) {
             // If the file data is there, just add new metadata
             db.modify(prefix, _path, rel_path, cur_path, *j, *i, true);
-            cout << " ---> ~ ";
+            if (verbosity() > 2) {
+              cout << " --> ~ ";
+            }
           } else {
             // Do it all
             db.modify(prefix, _path, rel_path, cur_path, *j, *i);
-            cout << " ---> M ";
+            if (verbosity() > 2) {
+              cout << " --> M ";
+            }
           }
-          if (verbosity() > 3) {
+          if (verbosity() > 2) {
             if (rel_path[0] != '\0') {
               cout << rel_path << "/";
             }
@@ -373,25 +377,35 @@ int Path2::recurse(
           if (((*i)->type() == 'l')
            && (strcmp(((Link*)(*i))->link(), ((Link*)(*j))->link()) != 0)) {
             db.modify(prefix, _path, rel_path, cur_path, *j, *i);
-            if (verbosity() > 3) {
-              cout << " ---> L ";
+            if (verbosity() > 2) {
+              cout << " --> L ";
               if (rel_path[0] != '\0') {
                 cout << rel_path << "/";
               }
               cout << (*i)->name() << endl;
             }
-          }
+          } else
           // Check that file data is present
           if (((*i)->type() == 'f')
            && (((File2*)(*j))->checksum()[0] == '\0')) {
             db.modify(prefix, _path, rel_path, cur_path, *j, *i, true);
-            if (verbosity() > 3) {
-              cout << " ---> ! ";
+            if (verbosity() > 2) {
+              cout << " --> ! ";
               if (rel_path[0] != '\0') {
                 cout << rel_path << "/";
               }
               cout << (*i)->name() << endl;
             }
+#if 0
+          } else {
+            if (verbosity() > 2) {
+              cout << " --> I ";
+              if (rel_path[0] != '\0') {
+                cout << rel_path << "/";
+              }
+              cout << (*i)->name() << endl;
+            }
+#endif
           }
         }
         delete *j;
@@ -411,8 +425,8 @@ int Path2::recurse(
     // Deal with remaining DB records
     while (j != db_list.end()) {
       db.remove(prefix, _path, rel_path, *j);
-      if (verbosity() > 3) {
-        cout << " ---> R ";
+      if (verbosity() > 2) {
+        cout << " --> R ";
         if (rel_path[0] != '\0') {
           cout << rel_path << "/";
         }
@@ -421,31 +435,31 @@ int Path2::recurse(
       delete *j;
       j = db_list.erase(j);
     }
+  } else {
+    cerr << "Failed to parse directory" << endl;
   }
   return 0;
 }
 
 Path2::Path2(const char* path) {
-  _path              = NULL;
-  _expiration        = 0;
+  _path               = NULL;
+  _dir                = NULL;
+  _expiration         = 0;
   _backup_path_length = 0;
-  char* current;
 
   // Copy path accross
   asprintf(&_path, "%s", path);
 
   // Change '\' into '/'
-  current = _path;
-  while (current < &_path[strlen(_path)]) {
-    if (*current == '\\') {
-      *current = '/';
-    }
-    current++;
+  char* pos;
+  while ((pos = strchr(_path, '\\')) != NULL) {
+    *pos = '/';
   }
 
   // Remove trailing '/'s
-  while ((--current >= _path) && (*current == '/')) {
-    *current = '\0';
+  pos = &_path[strlen(_path)];
+  while ((--pos >= _path) && (*pos == '/')) {
+    *pos = '\0';
   }
 }
 

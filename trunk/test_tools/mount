@@ -44,7 +44,7 @@ shift
 
 # Simulate mounting of share
 rm -rf "$dest"
-ln -sf "$src" "$dest"
+cp -a "$src" "$dest"
 
 # Success
 exit 0
