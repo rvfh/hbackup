@@ -692,7 +692,90 @@ int main(void) {
   }
   delete d;
 
-#warning difference test missing
+  cout << endl << "Difference test" << endl;
+
+  Node* f1 = new Node("some_name", 'f', 1, 2, 3, 4, 5);
+  Node* f2 = new Node("some_name", 'f', 1, 2, 3, 4, 5);
+  if (*f1 != *f2) {
+    cout << "f1 and f2 differ" << endl;
+  } else {
+    cout << "f1 and f2 are identical" << endl;
+  }
+  delete f2;
+  f2 = new Node("other_name", 'f', 1, 2, 3, 4, 5);
+  if (*f1 != *f2) {
+    cout << "f1 and f2 differ" << endl;
+  } else {
+    cout << "f1 and f2 are identical" << endl;
+  }
+  delete f2;
+  f2 = new Node("some_name", 'd', 1, 2, 3, 4, 5);
+  if (*f1 != *f2) {
+    cout << "f1 and f2 differ" << endl;
+  } else {
+    cout << "f1 and f2 are identical" << endl;
+  }
+  delete f2;
+  f2 = new Node("some_name", 'f', 10, 2, 3, 4, 5);
+  if (*f1 != *f2) {
+    cout << "f1 and f2 differ" << endl;
+  } else {
+    cout << "f1 and f2 are identical" << endl;
+  }
+  delete f2;
+  f2 = new Node("some_name", 'f', 1, 20, 3, 4, 5);
+  if (*f1 != *f2) {
+    cout << "f1 and f2 differ" << endl;
+  } else {
+    cout << "f1 and f2 are identical" << endl;
+  }
+  delete f2;
+  f2 = new Node("some_name", 'f', 1, 2, 30, 4, 5);
+  if (*f1 != *f2) {
+    cout << "f1 and f2 differ" << endl;
+  } else {
+    cout << "f1 and f2 are identical" << endl;
+  }
+  delete f2;
+  f2 = new Node("some_name", 'f', 1, 2, 3, 40, 5);
+  if (*f1 != *f2) {
+    cout << "f1 and f2 differ" << endl;
+  } else {
+    cout << "f1 and f2 are identical" << endl;
+  }
+  delete f2;
+  f2 = new Node("some_name", 'f', 1, 2, 3, 4, 50);
+  if (*f1 != *f2) {
+    cout << "f1 and f2 differ" << endl;
+  } else {
+    cout << "f1 and f2 are identical" << endl;
+  }
+  delete f2;
+  delete f1;
+
+  Link* l1 = new Link("some_link", 'l', 1, 2, 3, 4, 5, "linked");
+  Link* l2 = new Link("some_link", 'l', 1, 2, 3, 4, 5, "linked");
+  if (*l1 != *l2) {
+    cout << "l1 and l2 differ" << endl;
+  } else {
+    cout << "l1 and l2 are identical" << endl;
+  }
+  delete l2;
+  l2 = new Link("other_link", 'l', 1, 2, 3, 4, 5, "linked");
+  if (*l1 != *l2) {
+    cout << "l1 and l2 differ" << endl;
+  } else {
+    cout << "l1 and l2 are identical" << endl;
+  }
+  delete l2;
+  l2 = new Link("some_link", 'l', 1, 2, 3, 4, 5, "unlinked");
+  if (*l1 != *l2) {
+    cout << "l1 and l2 differ" << endl;
+  } else {
+    cout << "l1 and l2 are identical" << endl;
+  }
+  delete l2;
+  delete l1;
 
   cout << endl << "End of tests" << endl;
 
