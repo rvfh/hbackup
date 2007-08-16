@@ -197,7 +197,6 @@ public:
       Node(g),
       _link(NULL) {
     char* full_path = path(dir_path, _name);
-    _mtime = 0;
     _parsed = true;
     _link = (char*) malloc(_size + 1);
     readlink(full_path, _link, _size);
@@ -209,7 +208,6 @@ public:
       Node(dir_path, name),
       _link(NULL) {
     char* full_path = path(dir_path, name);
-    _mtime = 0;
     _parsed = true;
     _link = (char*) malloc(_size + 1);
     readlink(full_path, _link, _size);

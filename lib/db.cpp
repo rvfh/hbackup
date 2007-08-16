@@ -1063,7 +1063,8 @@ int Database::add(
     const char* base_path,
     const char* rel_path,
     const char* dir_path,
-    const Node* node) {
+    const Node* node,
+    const char* old_checksum) {
   // Add new record to active list
   if ((node->type() == 'l') && ! node->parsed()) {
     cerr << "Bug in db add: link is not parsed!" << endl;
@@ -1087,14 +1088,18 @@ int Database::add(
 
   // Copy data
   if (node->type() == 'f') {
-    char* local_path = NULL;
-    char* checksum   = NULL;
-    asprintf(&local_path, "%s/%s", dir_path, node->name());
-    if (! write(string(local_path), &checksum)) {
-      data.setChecksum(checksum);
-      free(checksum);
+    if (old_checksum != NULL) {
+      data.setChecksum(string(old_checksum));
+    } else {
+      char* local_path = NULL;
+      char* checksum   = NULL;
+      asprintf(&local_path, "%s/%s", dir_path, node->name());
+      if (! write(string(local_path), &checksum)) {
+        data.setChecksum(checksum);
+        free(checksum);
+      }
+      free(local_path);
     }
-    free(local_path);
   }
 
   // Insert entry
@@ -1107,13 +1112,29 @@ int Database::modify(
     const char* base_path,
     const char* rel_path,
     const char* dir_path,
+    const Node* old_node,
     const Node* node,
     bool        no_data) {
-#warning modify not implemented
+  if (! no_data) {
+    if (add(prefix, base_path, rel_path, dir_path, node, NULL)) {
+      return -1;
+    }
+  } else if (((File2*)old_node)->checksum()[0] == '\0') {
+      // File is in the list, but could not be copied last time, try again
+#warning retry not implemented
+    return -1;
+  } else {
+    // File metadata has changed, but we believe the data is the same
+    if (add(prefix, base_path, rel_path, dir_path, node,
+            ((File2*)old_node)->checksum())) {
+      return -1;
+    }
+  }
+  remove(prefix, base_path, rel_path, old_node, false);
   return 0;
 }
 
-int Database::remove(
+void Database::remove(
     const char* prefix,
     const char* base_path,
     const char* rel_path,
@@ -1162,7 +1183,6 @@ int Database::remove(
     }
   }
   free(full_path);
-  return 0;
 }
 
 // For debug only
