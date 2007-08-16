@@ -91,6 +91,21 @@ public:
     const string&   path,
     DbData&         db_data,
     int             compress = 0);
+  int add(
+    const char* prefix,
+    const char* base_path,
+    const char* rel_path,
+    const Node* node);
+  int modify(
+    const char* prefix,
+    const char* base_path,
+    const char* rel_path,
+    const Node* node);
+  int remove(
+    const char* prefix,
+    const char* base_path,
+    const char* rel_path,
+    const Node* node);
 // For debug only
   void* active();
   void* removed();

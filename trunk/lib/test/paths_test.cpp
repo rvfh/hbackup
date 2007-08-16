@@ -46,29 +46,13 @@ int terminating(void) {
   return 0;
 }
 
-void showList(const Directory* d, const char* path = "");
-
-void showFile(const Node* g, const char* path = "") {
-  printf("%s%s\t%c\t%lld\t%d\t%d\t%d\t%o\n", path, g->name(), g->type(),
-    g->size(), (g->mtime() != 0), g->uid(), g->gid(), g->mode());
-  if (g->type() == 'd') {
-    char* dir_path = NULL;
-    asprintf(&dir_path, "%s%s/", path, g->name());
-    Directory* d = (Directory*) g;
-    showList(d, dir_path);
-    free(dir_path);
-  }
-}
-
-void showList(const Directory* d, const char* path) {
-  list<Node*>::const_iterator i;
-  for (i = d->nodesListConst().begin(); i != d->nodesListConst().end(); i++) {
-    showFile(*i, path);
-  }
+time_t time(time_t *t) {
+  static time_t my_time = 0;
+  return ++my_time;
 }
 
 int main(void) {
-  Path* path = new Path("");
+  Path* path = new Path("/home/User");
   Database  db("test_db");
 
   if (! path->createList("test1")) {
@@ -132,12 +116,39 @@ int main(void) {
   verbose = 99;
   db.open();
 
+  // Display DB contents
+  cout << "Active list:  " << ((DbList*)db.active())->size()
+    << " element(s):\n";
+  for (DbList::iterator i = ((DbList*)db.active())->begin();
+       i != ((DbList*)db.active())->end(); i++) {
+    cout << i->line(true) << endl;
+  }
+  cout << "Removed list: " << ((DbList*)db.removed())->size()
+    << " element(s):\n";
+  for (DbList::iterator i = ((DbList*)db.removed())->begin();
+       i != ((DbList*)db.removed())->end(); i++) {
+    cout << i->line(true) << endl;
+  }
+
   cout << endl << "New classes test" << endl;
-  Path2* path2 = new Path2("");
+  Path2* path2 = new Path2("/home/User");
 
   if (! path2->parse(db, "file://localhost", "test1")) {
-    cout << ">List " << path2->nodes() << " file(s):\n";
-    showList(path2->dir());
+//     cout << ">List " << path2->nodes() << " file(s):\n";
+  }
+
+  // Display DB contents
+  cout << "Active list:  " << ((DbList*)db.active())->size()
+    << " element(s):\n";
+  for (DbList::iterator i = ((DbList*)db.active())->begin();
+       i != ((DbList*)db.active())->end(); i++) {
+    cout << i->line(true) << endl;
+  }
+  cout << "Removed list: " << ((DbList*)db.removed())->size()
+    << " element(s):\n";
+  for (DbList::iterator i = ((DbList*)db.removed())->begin();
+       i != ((DbList*)db.removed())->end(); i++) {
+    cout << i->line(true) << endl;
   }
 
   cout << "as previous with subdir in ignore list" << endl;
@@ -146,8 +157,21 @@ int main(void) {
     cout << "Failed to add filter" << endl;
   }
   if (! path2->parse(db, "file://localhost", "test1")) {
-    cout << ">List " << path2->nodes() << " file(s):\n";
-    showList(path2->dir());
+//     cout << ">List " << path2->nodes() << " file(s):\n";
+  }
+
+  // Display DB contents
+  cout << "Active list:  " << ((DbList*)db.active())->size()
+    << " element(s):\n";
+  for (DbList::iterator i = ((DbList*)db.active())->begin();
+       i != ((DbList*)db.active())->end(); i++) {
+    cout << i->line(true) << endl;
+  }
+  cout << "Removed list: " << ((DbList*)db.removed())->size()
+    << " element(s):\n";
+  for (DbList::iterator i = ((DbList*)db.removed())->begin();
+       i != ((DbList*)db.removed())->end(); i++) {
+    cout << i->line(true) << endl;
   }
 
   cout << "as previous with testlink in ignore list" << endl;
@@ -156,8 +180,21 @@ int main(void) {
     cout << "Failed to add filter" << endl;
   }
   if (! path2->parse(db, "file://localhost", "test1")) {
-    cout << ">List " << path2->nodes() << " file(s):\n";
-    showList(path2->dir());
+//     cout << ">List " << path2->nodes() << " file(s):\n";
+  }
+
+  // Display DB contents
+  cout << "Active list:  " << ((DbList*)db.active())->size()
+    << " element(s):\n";
+  for (DbList::iterator i = ((DbList*)db.active())->begin();
+       i != ((DbList*)db.active())->end(); i++) {
+    cout << i->line(true) << endl;
+  }
+  cout << "Removed list: " << ((DbList*)db.removed())->size()
+    << " element(s):\n";
+  for (DbList::iterator i = ((DbList*)db.removed())->begin();
+       i != ((DbList*)db.removed())->end(); i++) {
+    cout << i->line(true) << endl;
   }
 
   cout << "as previous with CVS parser" << endl;
@@ -165,14 +202,40 @@ int main(void) {
     cout << "Failed to add parser" << endl;
   }
   if (! path2->parse(db, "file://localhost", "test1")) {
-    cout << ">List " << path2->nodes() << " file(s):\n";
-    showList(path2->dir());
+//     cout << ">List " << path2->nodes() << " file(s):\n";
+  }
+
+  // Display DB contents
+  cout << "Active list:  " << ((DbList*)db.active())->size()
+    << " element(s):\n";
+  for (DbList::iterator i = ((DbList*)db.active())->begin();
+       i != ((DbList*)db.active())->end(); i++) {
+    cout << i->line(true) << endl;
+  }
+  cout << "Removed list: " << ((DbList*)db.removed())->size()
+    << " element(s):\n";
+  for (DbList::iterator i = ((DbList*)db.removed())->begin();
+       i != ((DbList*)db.removed())->end(); i++) {
+    cout << i->line(true) << endl;
   }
 
   cout << "as previous" << endl;
   if (! path2->parse(db, "file://localhost", "test1")) {
-    cout << ">List " << path2->nodes() << " file(s):\n";
-    showList(path2->dir());
+//     cout << ">List " << path2->nodes() << " file(s):\n";
+  }
+
+  // Display DB contents
+  cout << "Active list:  " << ((DbList*)db.active())->size()
+    << " element(s):\n";
+  for (DbList::iterator i = ((DbList*)db.active())->begin();
+       i != ((DbList*)db.active())->end(); i++) {
+    cout << i->line(true) << endl;
+  }
+  cout << "Removed list: " << ((DbList*)db.removed())->size()
+    << " element(s):\n";
+  for (DbList::iterator i = ((DbList*)db.removed())->begin();
+       i != ((DbList*)db.removed())->end(); i++) {
+    cout << i->line(true) << endl;
   }
 
   cout << "as previous with cvs/dirutd in ignore list" << endl;
@@ -181,8 +244,21 @@ int main(void) {
     cout << "Failed to add filter" << endl;
   }
   if (! path2->parse(db, "file://localhost", "test1")) {
-    cout << ">List " << path2->nodes() << " file(s):\n";
-    showList(path2->dir());
+//     cout << ">List " << path2->nodes() << " file(s):\n";
+  }
+
+  // Display DB contents
+  cout << "Active list:  " << ((DbList*)db.active())->size()
+    << " element(s):\n";
+  for (DbList::iterator i = ((DbList*)db.active())->begin();
+       i != ((DbList*)db.active())->end(); i++) {
+    cout << i->line(true) << endl;
+  }
+  cout << "Removed list: " << ((DbList*)db.removed())->size()
+    << " element(s):\n";
+  for (DbList::iterator i = ((DbList*)db.removed())->begin();
+       i != ((DbList*)db.removed())->end(); i++) {
+    cout << i->line(true) << endl;
   }
 
   delete path2;

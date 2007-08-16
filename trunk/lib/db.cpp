@@ -198,7 +198,7 @@ int Database::write(
 
   /* If anything failed, delete temporary file */
   if (failed || deleteit) {
-    remove(temp_path.c_str());
+    std::remove(temp_path.c_str());
   }
 
   // Report checksum
@@ -243,7 +243,7 @@ int Database::lock() {
       kill(pid, 0);
       if (errno == ESRCH) {
         cerr << "db: lock: lock reset" << endl;
-        remove(lock_path.c_str());
+        std::remove(lock_path.c_str());
         status = 1;
       } else {
         cerr << "db: lock: lock taken by process with pid " << pid << endl;
@@ -272,7 +272,7 @@ int Database::lock() {
 
 void Database::unlock() {
   string lock_path = _path + "/lock";
-  remove(lock_path.c_str());
+  std::remove(lock_path.c_str());
 }
 
 int Database::getDir(
@@ -309,15 +309,15 @@ int Database::move_journals() {
 
   if (rename((_path + "/seen.journal").c_str(),
     (_path + "/seen").c_str())) {
-    remove((_path + "/seen.journal").c_str());
+    std::remove((_path + "/seen.journal").c_str());
     status |= 1;
   }
   if (rename((_path + "/gone.journal").c_str(),
     (_path + "/gone").c_str())) {
-    remove((_path + "/gone.journal").c_str());
+    std::remove((_path + "/gone.journal").c_str());
     status |= 1;
   }
-  if (remove((_path + "/written.journal").c_str())) {
+  if (std::remove((_path + "/written.journal").c_str())) {
     status |= 1;
   }
 
@@ -629,8 +629,8 @@ int Database::expire_finalise() {
         cerr << "db: expired data not found" << endl;
       } else {
         // Remove data from DB
-        remove((path + "/data").c_str());
-        remove(path.c_str());
+        std::remove((path + "/data").c_str());
+        std::remove(path.c_str());
       }
     }
   }
@@ -645,6 +645,9 @@ void Database::getList(
     list<Node*>& list) {
   char* full_path = NULL;
   int length = asprintf(&full_path, "%s/%s/%s/", prefix, base_path, rel_path);
+  if (rel_path[0] == '\0') {
+    full_path[--length] = '\0';
+  }
 
   // Look for beginning
   SortedList<DbData>::iterator entry = _d->active.begin();
@@ -941,7 +944,7 @@ int Database::read(const string& path, const string& checksum) {
   }
 
   if (failed) {
-    remove(temp_path.c_str());
+    std::remove(temp_path.c_str());
   }
 
   return failed;
@@ -1039,7 +1042,7 @@ int Database::scan(const string& checksum, bool thorough) {
 
       // Remove corrupted file if any
       if (filefailed) {
-        remove(check_path.c_str());
+        std::remove(check_path.c_str());
       }
     }
     if (filefailed) {
@@ -1047,6 +1050,74 @@ int Database::scan(const string& checksum, bool thorough) {
     }
   }
   return failed;
+}
+
+int Database::add(
+    const char* prefix,
+    const char* base_path,
+    const char* rel_path,
+    const Node* node) {
+  // Add new record to active list
+  if ((node->type() == 'l') && ! node->parsed()) {
+    cerr << "Bug in db add: link is not parsed!" << endl;
+    return -1;
+  }
+  string full_path = base_path;
+  if (rel_path[0] != '\0') {
+    full_path += string("/") + rel_path;
+  }
+  full_path += string("/") + node->name();
+  DbData data(
+    File(
+      full_path, (node->type() == 'l') ? ((Link*)node)->link() : "",
+      node->type(), node->mtime(), node->size(),
+      node->uid(), node->gid(), node->mode()));
+  data.setPrefix(prefix);
+  _d->active.add(data);
+  return 0;
+}
+
+int Database::modify(
+    const char* prefix,
+    const char* base_path,
+    const char* rel_path,
+    const Node* node) {
+  return 0;
+}
+
+int Database::remove(
+    const char* prefix,
+    const char* base_path,
+    const char* rel_path,
+    const Node* node) {
+  // Find record in active list, move it to removed list
+  char* full_path = NULL;
+  int length;
+  if (rel_path[0] != '\0') {
+    length = asprintf(&full_path, "%s/%s/%s/%s", prefix, base_path, rel_path,
+      node->name());
+  } else {
+    length = asprintf(&full_path, "%s/%s/%s", prefix, base_path, node->name());
+  }
+
+  SortedList<DbData>::iterator entry = _d->active.begin();
+  // Jump irrelevant first records
+  int cmp = -1;
+  while ((entry != _d->active.end())
+      && ((cmp = strncmp(entry->fullPath().c_str(), full_path, length)) < 0)) {
+    entry++;
+  }
+  while ((entry != _d->active.end())
+      && (strncmp(entry->fullPath().c_str(), full_path, length) == 0)) {
+    // Mark removed
+    entry->setOut();
+    // Append to removed list
+    _d->removed.push_back(*entry);
+    // Remove from active list / Go on to next
+    entry = _d->active.erase(entry);
+  }
+  free(full_path);
+  return 0;
 }
 
 // For debug only
