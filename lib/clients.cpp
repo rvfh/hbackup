@@ -39,7 +39,7 @@ using namespace std;
 using namespace hbackup;
 
 struct Client::Private {
-  list<Path>  paths;
+  list<Path2*>  paths;
 };
 
 int Client::mountPath(
@@ -146,6 +146,7 @@ int Client::readListFile(const string& list_path) {
     }
 
     /* Read list file */
+    Path2 *path = NULL;
     while (! list_file.eof() && ! failed) {
       getline(list_file, buffer);
       unsigned int pos = buffer.find("\r");
@@ -165,7 +166,6 @@ int Client::readListFile(const string& list_path) {
       if (params.size() > 0) {
         list<string>::iterator current = params.begin();
         string                 keyword = *current++;
-
         if (keyword == "path") {
           // Expect exactly two parameters
           if (params.size() != 2) {
@@ -174,12 +174,13 @@ int Client::readListFile(const string& list_path) {
             failed = 1;
           } else {
             /* New backup path */
-            _d->paths.push_back(Path(*current));
+            path = new Path2(current->c_str());
+            _d->paths.push_back(path);
             if (verbosity() > 2) {
-              cout << " --> Path: " << _d->paths.back().path() << endl;
+              cout << " --> Path: " << path->path() << endl;
             }
           }
-        } else if (_d->paths.size() != 0) {
+        } else if (path != NULL) {
           string type;
           int rc;
 
@@ -194,7 +195,7 @@ int Client::readListFile(const string& list_path) {
                 << " 'filter' takes exactly two arguments" << endl;
               failed = 1;
             } else
-            if ((rc = _d->paths.back().addFilter(type, *current, keyword
+            if ((rc = path->addFilter(type, *current, keyword
              == "ignand"))) {
               switch (rc) {
                 case 1:
@@ -223,7 +224,7 @@ int Client::readListFile(const string& list_path) {
                 << " 'parser' takes exactly two arguments" << endl;
               failed = 1;
             } else
-            if ((rc = _d->paths.back().addParser(type, *current))) {
+            if ((rc = path->addParser(type, *current))) {
               switch (rc) {
                 case 1:
                   cerr << "Error: in list file " << list_path << ", line "
@@ -242,7 +243,7 @@ int Client::readListFile(const string& list_path) {
             int time_out;
             if ((sscanf(type.c_str(), "%d", &time_out) != 0)
              && (time_out != 0)) {
-              _d->paths.back().setExpiration(time_out * 3600 * 24);
+              path->setExpiration(time_out * 3600 * 24);
             }
           } else {
             // What was that?
@@ -281,6 +282,10 @@ Client::Client(string value) {
 }
 
 Client::~Client() {
+  for (list<Path2*>::iterator i = _d->paths.begin(); i != _d->paths.end();
+      i++) {
+    delete *i;
+  }
   delete _d;
 }
 
@@ -293,14 +298,17 @@ void Client::setProtocol(string value) {
 }
 
 void Client::setListfile(string value) {
-  // Convert to UNIX style for paths
-  Path path(value);
-  unsigned int pos = path.path().rfind('/');
-  if ((pos != string::npos) && (pos < path.path().size()) && (pos > 0)) {
-    _listfilename = path.path().substr(pos + 1);
-    _listfiledir  = path.path().substr(0, pos);
+  {
+    // Convert to UNIX style for paths
+    Path2 path(value.c_str());
+    value = string(path.path());
+  }
+  unsigned int pos = value.rfind('/');
+  if ((pos != string::npos) && (pos < value.size()) && (pos > 0)) {
+    _listfilename = value.substr(pos + 1);
+    _listfiledir  = value.substr(0, pos);
   } else {
-    _listfilename = path.path();
+    _listfilename = value;
     _listfiledir  = "";
   }
 }
@@ -343,40 +351,27 @@ int Client::backup(
     if (_d->paths.empty()) {
       failed = 1;
     } else if (! config_check) {
-      for (list<Path>::iterator i = _d->paths.begin(); i != _d->paths.end(); i++) {
+      for (list<Path2*>::iterator i = _d->paths.begin(); i != _d->paths.end(); i++) {
         if (terminating() || clientfailed) {
           break;
         }
         string  backup_path;
 
         if (verbosity() > 0) {
-          cout << "Backup path '" << i->path() << "'" << endl;
-          if (verbosity() > 1) {
-            cout << " -> Building list of files" << endl;
-          }
+          cout << "Backup path '" << (*i)->path() << "'" << endl;
         }
 
-        if (mountPath(i->path(), &backup_path)) {
-          cerr << "clients: backup: mount failed for " << i->path() << endl;
+        if (mountPath((*i)->path(), &backup_path)) {
+          cerr << "clients: backup: mount failed for " << (*i)->path() << endl;
           failed = 1;
         } else
-        if (i->createList(backup_path)) {
+        if ((*i)->parse(db, prefix().c_str(), backup_path.c_str())) {
           // prepare_share sets errno
           if (! terminating()) {
             cerr << "clients: backup: list creation failed" << endl;
           }
           failed        = 1;
           clientfailed  = 1;
-        } else {
-          if (verbosity() > 1) {
-            cout << " -> Parsing list of files (" << i->list()->size()
-              << ")" << endl;
-          }
-          if (db.parse(_protocol + "://" + _name, i->path(), backup_path,
-           i->list())) {
-            failed        = 1;
-          }
-          i->clearList();
         }
       }
     }
@@ -397,15 +392,16 @@ int Client::backup(
 
 int Client::expire(Database& db) {
   if (initialised()) {
-    for (list<Path>::iterator i = _d->paths.begin(); i != _d->paths.end(); i++) {
+    for (list<Path2*>::iterator i = _d->paths.begin(); i != _d->paths.end(); i++) {
       if (terminating()) {
         break;
       }
-      if (i->expiration() > 0) {
+      if ((*i)->expiration() > 0) {
         if (verbosity() > 0) {
-          cout << "Expire path '" << i->path() << "'" << endl;
+          cout << "Expire path '" << (*i)->path() << "'" << endl;
         }
-        db.expire_share(_protocol + "://" + _name, i->path(), i->expiration());
+        db.expire_share(_protocol + "://" + _name, (*i)->path(),
+          (*i)->expiration());
       }
     }
   }
@@ -426,8 +422,8 @@ void Client::show() {
   }
   if (_d->paths.size() > 0) {
     cout << "Paths:" << endl;
-    for (list<Path>::iterator i = _d->paths.begin(); i != _d->paths.end(); i++) {
-      cout << " -> " << i->path() << endl;
+    for (list<Path2*>::iterator i = _d->paths.begin(); i != _d->paths.end(); i++) {
+      cout << " -> " << (*i)->path() << endl;
     }
   }
 }

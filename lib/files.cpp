@@ -76,6 +76,7 @@ Node::Node(const char* dir_path, const char* name) {
   if (_name[0] == '\0') {
     _type = '?';
   } else {
+    errno = 0;
     metadata(full_path);
   }
   free(full_path);

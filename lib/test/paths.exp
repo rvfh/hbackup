@@ -126,35 +126,35 @@ Active list:  0 element(s):
 Removed list: 0 element(s):
 
 New classes test
- ---> A cvs
- ---> A cvs/CVS
- ---> A cvs/CVS/Entries
- ---> A cvs/dirbad
- ---> A cvs/dirbad/fileoth
- ---> A cvs/dirbad/fileutd
- ---> A cvs/diroth
- ---> A cvs/dirutd
- ---> A cvs/dirutd/CVS
- ---> A cvs/dirutd/CVS/Entries
- ---> A cvs/dirutd/fileoth
- ---> A cvs/dirutd/fileutd
- ---> A cvs/filemod.o
- ---> A cvs/filenew.c
- ---> A cvs/fileoth
- ---> A cvs/fileutd.h
- ---> A dir space
- ---> A dir space/file space
- ---> A subdir
- ---> A subdir/testfile
- ---> A subdir/testfile1
- ---> A subdir/testfile2
- ---> A subdirfile
- ---> A test space
- ---> A testdir
- ---> A testfile
- ---> A testfile~
- ---> A testlink
- ---> A testpipe
+ --> A cvs
+ --> A cvs/CVS
+ --> A cvs/CVS/Entries
+ --> A cvs/dirbad
+ --> A cvs/dirbad/fileoth
+ --> A cvs/dirbad/fileutd
+ --> A cvs/diroth
+ --> A cvs/dirutd
+ --> A cvs/dirutd/CVS
+ --> A cvs/dirutd/CVS/Entries
+ --> A cvs/dirutd/fileoth
+ --> A cvs/dirutd/fileutd
+ --> A cvs/filemod.o
+ --> A cvs/filenew.c
+ --> A cvs/fileoth
+ --> A cvs/fileutd.h
+ --> A dir space
+ --> A dir space/file space
+ --> A subdir
+ --> A subdir/testfile
+ --> A subdir/testfile1
+ --> A subdir/testfile2
+ --> A subdirfile
+ --> A test space
+ --> A testdir
+ --> A testfile
+ --> A testfile~
+ --> A testlink
+ --> A testpipe
 Active list:  29 element(s):
 file://localhost	/home/User/cvs	d	0	0	1000	1000	755			1	0	
 file://localhost	/home/User/cvs/CVS	d	0	0	1000	1000	755			2	0	
@@ -187,7 +187,7 @@ file://localhost	/home/User/testlink	l	8	1	1000	1000	777	testfile		28	0
 file://localhost	/home/User/testpipe	p	0	1	1000	1000	644			29	0	
 Removed list: 0 element(s):
 as previous with subdir in ignore list
- ---> R subdir
+ --> R subdir
 Active list:  25 element(s):
 file://localhost	/home/User/cvs	d	0	0	1000	1000	755			1	0	
 file://localhost	/home/User/cvs/CVS	d	0	0	1000	1000	755			2	0	
@@ -220,7 +220,7 @@ file://localhost	/home/User/subdir/testfile	f	12	1	1000	1000	644		285b35198a5e18
 file://localhost	/home/User/subdir/testfile1	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	21	32	
 file://localhost	/home/User/subdir/testfile2	f	12	1	1000	1000	644		285b35198a5e188b3a0df3ed33f93a26-0	22	33	
 as previous with testlink modified
- ---> M testlink
+ --> M testlink
 Active list:  25 element(s):
 file://localhost	/home/User/cvs	d	0	0	1000	1000	755			1	0	
 file://localhost	/home/User/cvs/CVS	d	0	0	1000	1000	755			2	0	
@@ -254,7 +254,7 @@ file://localhost	/home/User/subdir/testfile1	f	0	1	1000	1000	644		d41d8cd98f00b2
 file://localhost	/home/User/subdir/testfile2	f	12	1	1000	1000	644		285b35198a5e188b3a0df3ed33f93a26-0	22	33	
 file://localhost	/home/User/testlink	l	8	1	1000	1000	777	testfile		28	35	
 as previous with testlink in ignore list
- ---> R testlink
+ --> R testlink
 Active list:  24 element(s):
 file://localhost	/home/User/cvs	d	0	0	1000	1000	755			1	0	
 file://localhost	/home/User/cvs/CVS	d	0	0	1000	1000	755			2	0	
@@ -289,11 +289,11 @@ file://localhost	/home/User/testlink	l	8	1	1000	1000	777	testfile		28	35
 file://localhost	/home/User/testlink	l	8	1	1000	1000	777	testnull		34	36	
 as previous with CVS parser
 Directory should be under CVS control: test1/cvs/dirbad
- ---> R cvs/dirbad/fileoth
- ---> R cvs/dirbad/fileutd
- ---> R cvs/diroth
- ---> R cvs/dirutd/fileoth
- ---> R cvs/fileoth
+ --> R cvs/dirbad/fileoth
+ --> R cvs/dirbad/fileutd
+ --> R cvs/diroth
+ --> R cvs/dirutd/fileoth
+ --> R cvs/fileoth
 Active list:  19 element(s):
 file://localhost	/home/User/cvs	d	0	0	1000	1000	755			1	0	
 file://localhost	/home/User/cvs/CVS	d	0	0	1000	1000	755			2	0	
@@ -362,7 +362,7 @@ file://localhost	/home/User/cvs/dirutd/fileoth	f	0	1	1000	1000	644		d41d8cd98f00
 file://localhost	/home/User/cvs/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	15	41	
 as previous with cvs/dirutd in ignore list
 Directory should be under CVS control: test1/cvs/dirbad
- ---> R cvs/dirutd
+ --> R cvs/dirutd
 Active list:  15 element(s):
 file://localhost	/home/User/cvs	d	0	0	1000	1000	755			1	0	
 file://localhost	/home/User/cvs/CVS	d	0	0	1000	1000	755			2	0	
@@ -397,7 +397,7 @@ file://localhost	/home/User/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	644		5252f24
 file://localhost	/home/User/cvs/dirutd/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	12	45	
 as previous with testpipe gone
 Directory should be under CVS control: test1/cvs/dirbad
- ---> R testpipe
+ --> R testpipe
 Active list:  14 element(s):
 file://localhost	/home/User/cvs	d	0	0	1000	1000	755			1	0	
 file://localhost	/home/User/cvs/CVS	d	0	0	1000	1000	755			2	0	
@@ -432,7 +432,7 @@ file://localhost	/home/User/cvs/dirutd/fileutd	f	0	1	1000	1000	644		d41d8cd98f00
 file://localhost	/home/User/testpipe	p	0	1	1000	1000	644			29	46	
 as previous with testfile mode changed
 Directory should be under CVS control: test1/cvs/dirbad
- ---> ~ testfile
+ --> ~ testfile
 Active list:  14 element(s):
 file://localhost	/home/User/cvs	d	0	0	1000	1000	755			1	0	
 file://localhost	/home/User/cvs/CVS	d	0	0	1000	1000	755			2	0	
@@ -468,7 +468,7 @@ file://localhost	/home/User/testpipe	p	0	1	1000	1000	644			29	46
 file://localhost	/home/User/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371bbc0355478d8-0	26	48	
 as previous with cvs/filenew.c touched
 Directory should be under CVS control: test1/cvs/dirbad
- ---> M cvs/filenew.c
+ --> M cvs/filenew.c
 Active list:  14 element(s):
 file://localhost	/home/User/cvs	d	0	0	1000	1000	755			1	0	
 file://localhost	/home/User/cvs/CVS	d	0	0	1000	1000	755			2	0	

@@ -11,38 +11,39 @@ Backup client 'myhost' using protocol 'file'
  --> Path: test1
  --> Path: test2
 Backup path 'test1'
- -> Building list of files
+ --> A cvs
+ --> A cvs/CVS
+ --> A cvs/dirbad
 Directory should be under CVS control: test1/cvs/dirbad
- -> Parsing list of files (14)
- --> Files to add: 14 (0 bytes)
- --> Done: 1/14 --> Done: 2/14 --> Done: 3/14 --> Done: 4/14 --> Done: 5/14 --> Done: 6/14 --> Done: 7/14 --> Done: 8/14 --> Done: 9/14 --> Done: 10/14 --> Done: 11/14 --> Done: 12/14 --> Done: 13/14 --> Done: 14/14
- --> Files to remove: 0
+ --> A cvs/dirutd
+ --> A cvs/dirutd/CVS
+ --> A cvs/dirutd/fileutd
+ --> A cvs/filenew.c
+ --> A cvs/fileutd.h
+ --> A dir space
+ --> A dir space/file space
+ --> A test space
+ --> A testdir
+ --> A testlink
+ --> A testpipe
 Backup path 'test2'
- -> Building list of files
- -> Parsing list of files (5)
- --> Files to add: 5 (928768 bytes)
- --> Done: 1/5 (0.0%) --> Done: 2/5 (15.7%) --> Done: 3/5 (43.6%) --> Done: 4/5 (100.0%) --> Done: 5/5 (100.0%)
- --> Files to remove: 0
+ --> A testdir
+ --> A testfile
+ --> A testfile2
+ --> A testfile~
+ --> A testlink
 Backup client 'myClient' using protocol 'nfs'
  -> Reading backup list file
  --> Path: /home/User/test
 Backup path '/home/User/test'
- -> Building list of files
 Unmounted test_db/mount
- -> Parsing list of files (1)
- --> Files to add: 1 (0 bytes)
- --> Done: 1/1
- --> Files to remove: 0
+ --> A File2.txt
 Unmounted test_db/mount
 Backup client 'client' using protocol 'smb'
  -> Reading backup list file
  --> Path: C:/Test
 Backup path 'C:/Test'
- -> Building list of files
- -> Parsing list of files (1)
- --> Files to add: 1 (0 bytes)
- --> Done: 1/1
- --> Files to remove: 0
+ --> A File.TXT
 Unmounted test_db/mount
 Protocol not supported: ssh
  --> Database active items part closed (contents: 21 files)
@@ -64,24 +65,12 @@ Backup client 'myhost' using protocol 'file'
  --> Path: test1
  --> Path: test2
 Backup path 'test1'
- -> Building list of files
 Directory should be under CVS control: test1/cvs/dirbad
- -> Parsing list of files (14)
- --> Files to add: 0
- --> Files to remove: 0
 Backup path 'test2'
- -> Building list of files
- -> Parsing list of files (5)
- --> Files to add: 0
- --> Files to remove: 0
 Backup client 'client' using protocol 'smb'
  -> Reading backup list file
  --> Path: C:/Test
 Backup path 'C:/Test'
- -> Building list of files
- -> Parsing list of files (1)
- --> Files to add: 0
- --> Files to remove: 0
 Unmounted test_db/mount
  --> Database active items part closed (contents: 21 files)
  --> Database removed items part open (contents: 0 files)
