@@ -47,11 +47,17 @@ int DbList::load(
     // errno set by load_v*
     if (getline(&buffer, &bsize, readfile) >= 0) {
       if (buffer[0] != '#') {
+        // Version 0
         rewind(readfile);
+        cout << "Reading version 0 lists" << endl;
         failed = load_v0(readfile);
-      } else {
-        // Only v1 for now
+      } else if (! strcmp(buffer, "# version 1\n")) {
+        // Version 1
+        cout << "Reading version 1 lists" << endl;
         failed = load_v1(readfile);
+      } else {
+        // Version 2
+        failed = load_v2(readfile);
       }
     }
     free(buffer);
@@ -247,7 +253,152 @@ int DbList::load_v1(FILE* readfile, unsigned int offset) {
     failed = -1;
   }
 
- return failed;
+  return failed;
+}
+
+int DbList::load_v2(FILE* readfile, unsigned int offset) {
+  /* Read the active part of the file into memory */
+  char          *buffer = NULL;
+  size_t        bsize   = 0;
+  unsigned int  line    = 0;
+  ssize_t       size    = 0;
+  int           failed  = 0;
+
+  char*         prefix  = NULL;
+  char*         path    = NULL;
+
+
+  SortedList<DbData>::iterator db_data;
+  bool          end_found = false;
+
+  errno = 0;
+  while (((size = getline(&buffer, &bsize, readfile)) >= 0) && ! failed) {
+    if (++line <= offset) {
+      continue;
+    }
+    // Remove ending '\n'
+    buffer[strlen(buffer) - 1] = '\0';
+    if (buffer[0] == '#') {
+      end_found = true;
+      break;
+    } else
+    if (buffer[0] != '\t') {
+      free(prefix);
+      prefix = NULL;
+      asprintf(&prefix, buffer);
+    } else
+    if ((prefix != NULL) && (buffer[1] != '\t')) {
+      free(path);
+      path = NULL;
+      asprintf(&path, &buffer[1]);
+      db_data = end();
+    } else if (path != NULL) {
+      char* start  = &buffer[2];
+      char* value  = (char *) malloc(size + 1);
+      int   failed = 0;
+      int   fields = 7;
+      // Fields
+      time_t    db_time;        // DB time
+      char      type;           // file type ('?' if metadata not available)
+      time_t    mtime;          // time of last modification
+      long long size;           // on-disk size, in bytes
+      uid_t     uid;            // user ID of owner
+      gid_t     gid;            // group ID of owner
+      mode_t    mode;           // permissions
+      string    checksum;       // file checksum
+      string    link;           // what the link points to
+
+      for (int field = 1; field <= fields; field++) {
+        // Get tabulation position
+        char* delim = strchr(start, '\t');
+        if (delim == NULL) {
+          failed = 1;
+        } else {
+          // Get string portion
+          strncpy(value, start, delim - start);
+          value[delim - start] = '\0';
+          /* Extract data */
+          switch (field) {
+            case 1:   /* DB timestamp */
+              if (sscanf(value, "%ld", &db_time) != 1) {
+                failed = -1;
+              }
+              break;
+            case 2:   /* Type */
+              if (sscanf(value, "%c", &type) != 1) {
+                failed = 2;
+              } else if (type == '-') {
+                fields = 2;
+              } else if ((type == 'f') || (type == 'l')) {
+                fields++;
+              }
+              if (db_data != end()) {
+                db_data->setOut(db_time);
+                db_data = end();
+              }
+              break;
+            case 3:   /* Size */
+              if (sscanf(value, "%lld", &size) != 1) {
+                failed = 2;
+              }
+              break;
+            case 4:   /* Modification time */
+              if (sscanf(value, "%ld", &mtime) != 1) {
+                failed = 2;
+              }
+              break;
+            case 5:   /* User */
+              if (sscanf(value, "%u", &uid) != 1) {
+                failed = 2;
+              }
+              break;
+            case 6:   /* Group */
+              if (sscanf(value, "%u", &gid) != 1) {
+                failed = 2;
+              }
+              break;
+            case 7:   /* Permissions */
+              if (sscanf(value, "%o", &mode) != 1) {
+                failed = 2;
+              }
+              break;
+            case 8:  /* Checksum or Link */
+                if (type == 'f') {
+                  checksum = value;;
+                } else if (type == 'l') {
+                  link = value;;
+                }
+              break;
+          }
+          start = delim + 1;
+        }
+        if (failed) {
+          cerr << "dblist: load: file corrupted, line " << line << endl;
+          errno = EUCLEAN;
+          break;
+        }
+      }
+      free(value);
+      if ((type != '-') && (failed == 0)) {
+        DbData data(File(path, link, type, mtime, size, uid, gid, mode),
+          db_time);
+        data.setPrefix(prefix);
+        data.setChecksum(checksum);
+        db_data = add(data);
+      }
+      // Only take first file data (active)
+      path = NULL;
+    }
+  }
+  free(buffer);
+
+  if (! end_found) {
+    cerr << "dblist: load: file end not found" << endl;
+    errno = EUCLEAN;
+    failed = -1;
+  }
+
+  return failed;
 }
 
 int DbList::save(

@@ -125,6 +125,7 @@ Unmounted test_db/mount
 >List 1 client(s):
 Client: testhost
 -> file://localhost etc/localhost.list
+Reading version 1 lists
  --> Database active items part open (contents: 2 files)
 Backup client 'testhost' using protocol 'file'
  -> Reading backup list file
@@ -157,6 +158,7 @@ Backup path 'test2'
 >List 1 client(s):
 Client: testhost
 -> file://testhost etc/localhost.list
+Reading version 1 lists
  --> Database active items part open (contents: 21 files)
 Backup client 'testhost' using protocol 'file'
  -> Reading backup list file

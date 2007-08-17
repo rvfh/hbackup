@@ -1,0 +1,19 @@
+# version 1
+file://host
+	/home/user/cvs/dirutd/CVS/Entries
+		22	f	42	1187315785	1000	1000	775	5252f242d27b8c2c9fdbdcbb33545d07-0	
+		30	-	
+	/home/user/cvs/dirutd/fileutd
+		9	f	0	1187315785	1000	1000	644	d41d8cd98f00b204e9800998ecf8427e-0	
+		33	-	
+	/home/user/dir space/file space
+		13	f	0	1187315785	1000	1000	644	d41d8cd98f00b204e9800998ecf8427e-0	
+		28	-	
+	/home/user/testdir
+		15	d	0	0	1000	1000	755	
+		24	d	0	0	1000	1000	775	
+		32	-	
+	/home/user/testfile
+		16	f	13	1161486000	1000	1000	644		
+		27	-	
+#

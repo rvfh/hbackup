@@ -32,6 +32,9 @@ class DbList : public SortedList<DbData> {
   int  load_v1(
     FILE* readfile,
     unsigned int offset = 0);
+  int  load_v2(
+    FILE* readfile,
+    unsigned int offset = 0);
 public:
   DbList() : _open(false) {}
   bool isOpen() { return _open; }
@@ -42,6 +45,10 @@ public:
     unsigned int  offset = 0);
   // Save list, creating a backup of the old one first
   int  save(
+    const string& path,
+    const string& filename,
+    bool          backup = false);
+  int  save_v2(
     const string& path,
     const string& filename,
     bool          backup = false);
