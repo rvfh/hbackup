@@ -43,8 +43,6 @@ public:
   int  open_removed();
   /* Close active part of database */
   int  close_active();
-  /* Save journals for review */
-  int  move_journals();
   /* Close database */
   int  close();
   // Prepare list for parser
@@ -53,12 +51,6 @@ public:
     const char*  base_path,
     const char*  rel_path,
     list<Node*>& list);
-  /* Check what needs to be done for given host & path */
-  int  parse(
-    const string& prefix,
-    const string& real_path,
-    const string& mount_path,
-    list<File>*   list);
   // Run this before closing active list to enable expiration
   int expire_init();
   // Expire data older then given time out (seconds)
