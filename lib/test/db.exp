@@ -1,136 +1,5 @@
  --> Database initialized
  --> Database active items part open (contents: 0 files)
-59ca0efa9f5633cb0371bbc0355478d8-0  test1/testfile
-dblist: load: seen.journal: No such file or directory
-dblist: load: gone.journal: No such file or directory
-dblist: load: written.journal: No such file or directory
-Added journal list: 0 element(s):
-Removed journal list: 0 element(s):
-Really added journal list: 0 element(s):
-Active list: 0 element(s):
-Removed list: 0 element(s):
- --> Database active items part closed (contents: 0 files)
- --> Database active items part open (contents: 0 files)
-Active list: 0 element(s):
-Removed list: 0 element(s):
-List select test
-Got 0 elements
-Got 0 elements
-dblist: load: seen.journal: No such file or directory
-dblist: load: gone.journal: No such file or directory
-dblist: load: written.journal: No such file or directory
-dblist: load: seen.journal: No such file or directory
-dblist: load: gone.journal: No such file or directory
-dblist: load: written.journal: No such file or directory
-Added journal list: 0 element(s):
-Removed journal list: 0 element(s):
-Really added journal list: 0 element(s):
-Active list: 0 element(s):
-Removed list: 0 element(s):
-Added journal list: 0 element(s):
-Removed journal list: 0 element(s):
-Really added journal list: 0 element(s):
-Active list: 0 element(s):
-Removed list: 0 element(s):
- --> Database active items part closed (contents: 0 files)
- --> Database active items part open (contents: 0 files)
- --> Scanning database contents: 0 files
- --> Database active items part closed (contents: 0 files)
- --> Database active items part open (contents: 0 files)
- --> Scanning database contents thoroughly: 0 files
- --> Database active items part closed (contents: 0 files)
- --> Database active items part open (contents: 0 files)
- --> Scanning database contents: 0 files
- --> Database active items part closed (contents: 0 files)
- --> Database active items part open (contents: 0 files)
- --> Scanning database contents thoroughly: 0 files
- --> Database active items part closed (contents: 0 files)
- --> Database active items part open (contents: 0 files)
- --> Scanning database contents thoroughly: 0 files
- --> Database active items part closed (contents: 0 files)
- --> Database active items part open (contents: 0 files)
-dblist: load: seen.journal: No such file or directory
-dblist: load: gone.journal: No such file or directory
-dblist: load: written.journal: No such file or directory
-dblist: load: seen.journal: No such file or directory
-dblist: load: gone.journal: No such file or directory
-dblist: load: written.journal: No such file or directory
-Active list: 0 element(s):
-Removed list: 0 element(s):
-Added journal list: 0 element(s):
-Removed journal list: 0 element(s):
-Really added journal list: 0 element(s):
-Active list: 0 element(s):
-Removed list: 0 element(s):
-Added journal list: 0 element(s):
-Removed journal list: 0 element(s):
-Really added journal list: 0 element(s):
-Active list: 0 element(s):
-Removed list: 0 element(s):
- --> Database active items part closed (contents: 0 files)
- --> Database active items part open (contents: 0 files)
-dblist: load: seen.journal: No such file or directory
-dblist: load: gone.journal: No such file or directory
-dblist: load: written.journal: No such file or directory
-dblist: load: seen.journal: No such file or directory
-dblist: load: gone.journal: No such file or directory
-dblist: load: written.journal: No such file or directory
-Active list: 0 element(s):
-Removed list: 0 element(s):
-Official removed list: 0 element(s):
-Added journal list: 0 element(s):
-Removed journal list: 0 element(s):
-Really added journal list: 0 element(s):
-Active list: 0 element(s):
-Removed list: 0 element(s):
-Added journal list: 0 element(s):
-Removed journal list: 0 element(s):
-Really added journal list: 0 element(s):
-Active list: 0 element(s):
-Removed list: 0 element(s):
-Recovery test
-head: cannot open `test_db/written.journal' for reading: No such file or directory
-dblist: load: file corrupted, line 1
-dblist: load: written.journal: Structure needs cleaning
-db: lock: lock reset
-db: open: journal found, attempting crash recovery
-dblist: load: file corrupted, line 1
-dblist: load: written.journal: Structure needs cleaning
-db: open: adding 0 valid files to active list
-dblist: load: gone.journal: No such file or directory
-Really added journal list: 0 element(s):
- --> Database active items part open (contents: 0 files)
-dblist: load: seen.journal: No such file or directory
-dblist: load: gone.journal: No such file or directory
-dblist: load: written.journal: No such file or directory
-dblist: load: seen.journal: No such file or directory
-dblist: load: gone.journal: No such file or directory
-dblist: load: written.journal: No such file or directory
-dblist: load: seen.journal: No such file or directory
-dblist: load: gone.journal: No such file or directory
-dblist: load: written.journal: No such file or directory
-Active list: 0 element(s):
-Removed list: 0 element(s):
-Added journal list: 0 element(s):
-Removed journal list: 0 element(s):
-Really added journal list: 0 element(s):
-Active list: 0 element(s):
-Removed list: 0 element(s):
-Added journal list: 0 element(s):
-Removed journal list: 0 element(s):
-Really added journal list: 0 element(s):
-Active list: 0 element(s):
-Removed list: 0 element(s):
-Added journal list: 0 element(s):
-Removed journal list: 0 element(s):
-Really added journal list: 0 element(s):
-Active list: 0 element(s):
-Removed list: 0 element(s):
-Official removed list: 0 element(s):
- --> Database active items part closed (contents: 0 files)
- --> Database active items part open (contents: 0 files)
-Active list: 0 element(s):
-Removed list: 0 element(s):
 
 Test: getdir
 Check test_db/data dir: 0
@@ -141,6 +10,62 @@ fetest4 status: 1, getdir_path: test_db/data/fe/te/st4
 fedc76test5 status: 1, getdir_path: test_db/data/fe/dc/76/test5
 fedc76test6 status: 1, getdir_path: test_db/data/fe/dc/76/test6
 fedc76test6 status: 0, getdir_path: test_db/data/fe/dc/76/test6
+
+Test: write and read back
+59ca0efa9f5633cb0371bbc0355478d8-0  test1/testfile
+59ca0efa9f5633cb0371bbc0355478d8-0  test_db/blah
+Active list: 0 element(s):
+Removed list: 0 element(s):
+ --> Database active items part closed (contents: 0 files)
+ --> Database active items part open (contents: 0 files)
+Active list: 0 element(s):
+Removed list: 0 element(s):
+List select test
+Got 0 elements
+Got 0 elements
+Active list: 0 element(s):
+Removed list: 0 element(s):
+ --> Database active items part closed (contents: 0 files)
+ --> Database active items part open (contents: 0 files)
+ --> Scanning database contents: 0 files
+ --> Database active items part closed (contents: 0 files)
+ --> Database active items part open (contents: 0 files)
+ --> Scanning database contents thoroughly: 0 files
+ --> Database active items part closed (contents: 0 files)
+ --> Database active items part open (contents: 0 files)
+ --> Scanning database contents: 0 files
+ --> Database active items part closed (contents: 0 files)
+ --> Database active items part open (contents: 0 files)
+ --> Scanning database contents thoroughly: 0 files
+ --> Database active items part closed (contents: 0 files)
+ --> Database active items part open (contents: 0 files)
+ --> Scanning database contents thoroughly: 0 files
+ --> Database active items part closed (contents: 0 files)
+ --> Database active items part open (contents: 0 files)
+Active list: 0 element(s):
+Removed list: 0 element(s):
+Active list: 0 element(s):
+Removed list: 0 element(s):
+Active list: 0 element(s):
+Removed list: 0 element(s):
+ --> Database active items part closed (contents: 0 files)
+ --> Database active items part open (contents: 0 files)
+Active list: 0 element(s):
+Removed list: 0 element(s):
+Active list: 0 element(s):
+Removed list: 0 element(s):
+Active list: 0 element(s):
+Removed list: 0 element(s):
+ --> Database active items part closed (contents: 0 files)
+ --> Database active items part open (contents: 0 files)
+Active list: 0 element(s):
+Removed list: 0 element(s):
+Active list: 0 element(s):
+Removed list: 0 element(s):
+ --> Database active items part closed (contents: 0 files)
+ --> Database active items part open (contents: 0 files)
+Active list: 0 element(s):
+Removed list: 0 element(s):
 Expiration test
 db: expiration module not initialised
 db: expiration module not initialised

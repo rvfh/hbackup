@@ -52,6 +52,8 @@ using namespace std;
 
 using namespace hbackup;
 
+#warning journals gone
+
 struct Database::Private {
   DbList  active;
   DbList  removed;
@@ -305,26 +307,6 @@ int Database::open_removed() {
   return _d->removed.open(_path, "removed");
 }
 
-int Database::move_journals() {
-  int status = 0;
-
-  if (rename((_path + "/seen.journal").c_str(),
-    (_path + "/seen").c_str())) {
-    std::remove((_path + "/seen.journal").c_str());
-    status |= 1;
-  }
-  if (rename((_path + "/gone.journal").c_str(),
-    (_path + "/gone").c_str())) {
-    std::remove((_path + "/gone.journal").c_str());
-    status |= 1;
-  }
-  if (std::remove((_path + "/written.journal").c_str())) {
-    status |= 1;
-  }
-
-  return status;
-}
-
 Database::Database(const string& path) {
   _path          = path;
   _expire_inited = false;
@@ -389,50 +371,6 @@ int Database::open() {
     cerr << "db: open: cannot create data directory" << endl;
   }
 
-  // Recover lists
-  if ((status != 2) && File2(_path.c_str(), "written.journal").isValid()) {
-    cerr << "db: open: journal found, attempting crash recovery" << endl;
-    DbList  active;
-    DbList  removed;
-
-    // Add written and missing items to active list
-    if (! active.load(_path, "written.journal") || (errno == EUCLEAN)) {
-      cerr << "db: open: adding " << active.size()
-        << " valid files to active list" << endl;
-
-      // Get removed items journal
-      removed.load(_path, "gone.journal");
-
-      if ((errno == 0)
-       && ! active.load(_path, "seen.journal", active.size())
-       && ! active.load(_path, "active")) {
-        cerr << "db: open: removing " << removed.size()
-          << " files from active list" << endl;
-        // Remove removed items from active list
-        SortedList<DbData>::iterator i;
-        for (i = removed.begin(); i != removed.end(); i++) {
-          SortedList<DbData>::iterator j = active.find(*i);
-          if (*i == *j) {
-            active.erase(j);
-          }
-        }
-        active.save(_path, "active");
-
-        cerr << "db: open: new active list size: " << active.size() << endl;
-      }
-      active.clear();
-
-      if ((removed.size() != 0) && ! removed.load(_path, "removed")) {
-        removed.save(_path, "removed");
-        cerr << "db: open: new removed list size: " << removed.size() << endl;
-      }
-      removed.clear();
-    }
-
-    // Move/delete journals
-    move_journals();
-  }
-
   // Make sure we start clean
   _d->active.clear();
   _d->removed.clear();
@@ -475,9 +413,6 @@ int Database::close() {
   if (_d->removed.isOpen() && (status != 2)) {
     status = _d->removed.close(_path, "removed");
   }
-
-  // Delete journals
-  move_journals();
 
   // Release lock
   unlock();
@@ -694,208 +629,6 @@ void Database::getList(
   }
   free(last_dir);
   free(full_path);
-}
-
-int Database::parse(
-    const string& prefix,
-    const string& mounted_path,
-    const string& mount_path,
-    list<File>*   file_list) {
-  int     failed        = 0;
-  int     removed_size  = _d->removed.size();
-  DbList  added;
-
-  string full_path = prefix + "/" + mounted_path + "/";
-  SortedList<DbData>::iterator entry_active = _d->active.begin();
-  // Jump irrelevant first records
-  while ((entry_active != _d->active.end())
-   && (entry_active->fullPath(full_path.size()) < full_path)) {
-    entry_active++;
-  }
-  SortedList<DbData>::iterator active_last = _d->active.end();
-
-  list<File>::iterator          entry_file_list = file_list->begin();
-  while (! terminating()) {
-    bool file_add  = false;
-    bool db_remove = false;
-    bool same_file = false;
-
-    // Check whether db data is (still) relevant
-    if ((entry_active != _d->active.end()) && (active_last != entry_active)
-     && (entry_active->fullPath(full_path.size()) > full_path)) {
-      // Irrelevant rest of list
-      entry_active = _d->active.end();
-    }
-    active_last = entry_active;
-
-    // Check whether we have more work to do
-    if ((entry_active == _d->active.end())
-     && (entry_file_list == file_list->end())) {
-      break;
-    }
-
-    // Deal with each case
-    if (entry_active == _d->active.end()) {
-      // End of db relevant data reached: add element
-      file_add = true;
-    } else
-    if (entry_file_list == file_list->end()) {
-      // End of file data reached: remove element
-      db_remove = true;
-    } else {
-      int result = entry_active->data()->path().substr(mounted_path.size() + 1).compare(entry_file_list->path());
-
-      if (result < 0) {
-        db_remove = true;
-      } else
-      if (result > 0) {
-        file_add = true;
-      } else
-      if (entry_active->data()->metadiffer(*entry_file_list)) {
-        db_remove = true;
-        file_add = true;
-
-        /* If it's a file and size and mtime are the same, copy checksum accross */
-        if ((entry_active->data()->type() == 'f')
-         && (entry_active->data()->size() == entry_file_list->size())
-         && (entry_active->data()->mtime() == entry_file_list->mtime())) {
-          // Same file, just ownership changed or something
-          same_file = true;
-         }
-      } else
-      if ((entry_active->data()->type() == 'f')
-       && (entry_active->checksum().size() == 0)) {
-        // Previously failed write
-        db_remove = true;
-        file_add = true;
-      } else {
-        entry_active++;
-        entry_file_list++;
-      }
-    }
-
-    if (file_add) {
-      // Create new record
-      File file_data(*entry_file_list);
-      file_data.setPath(mounted_path + "/" + entry_file_list->path());
-      DbData db_data(file_data);
-      db_data.setPrefix(prefix);
-      if (same_file) {
-        db_data.setChecksum(entry_active->checksum());
-      }
-      // Add to added list
-      added.add(db_data);
-      // Go on to next
-      entry_file_list++;
-    }
-
-    // DB data is used above!
-    if (db_remove) {
-      // Mark removed
-      entry_active->setOut();
-      // Append to removed list
-      _d->removed.push_back(*entry_active);
-      // Remove from active list / Go on to next
-      entry_active = _d->active.erase(entry_active);
-    }
-  }
-
-  // Append to recovery journals
-  if (added.save_journal(_path, "seen.journal")
-   || _d->removed.save_journal(_path, "gone.journal", removed_size)) {
-    // Unlikely
-    failed = 1;
-  }
-
-  // Deal with new/modified data
-  if (! added.empty()) {
-    // Static to be global to all shares
-    long long sizetobackup  = 0;
-    long long sizebackedup  = 0;
-    int       filestobackup = 0;
-    int       filesbackedup = 0;
-    SortedList<DbData>::iterator i;
-
-    // Determine volume to be copied
-    if (verbosity() > 2) {
-      for (i = added.begin(); i != added.end(); i++) {
-        /* Same data as in file_list */
-        filestobackup++;
-        if ((i->data()->type() == 'f') && i->checksum().empty()) {
-          sizetobackup += i->data()->size();
-        }
-      }
-      printf(" --> Files to add: %u (%lld bytes)\n",
-        added.size(), sizetobackup);
-    }
-
-    // Create recovery journal for added files
-    FILE  *writefile;
-    bool  journal_ok = true;
-
-    string dest_path = _path + "/written.journal";
-    if ((writefile = fopen(dest_path.c_str(), "a")) == NULL) {
-      journal_ok = false;
-    }
-
-    for (i = added.begin(); i != added.end(); i++) {
-      if (terminating()) {
-        break;
-      }
-      // Set checksum
-      if ((i->data()->type() == 'f') && i->checksum().empty()) {
-        char* checksum = NULL;
-        if (write(mount_path + i->data()->path().substr(mounted_path.size()),
-         &checksum) != 0) {
-          /* Write failed, need to go on */
-          i->setChecksum("");
-          failed = 1;
-        } else {
-          i->setChecksum(checksum);
-          free(checksum);
-        }
-        if (verbosity() > 2) {
-          sizebackedup += i->data()->size();
-        }
-      }
-      _d->active.add(*i);
-      if (journal_ok) {
-        // Update journal
-        fprintf(writefile, "%s\n", i->line().c_str());
-      }
-
-      // Update/show information
-      if (verbosity() > 2) {
-        filesbackedup++;
-        if (sizetobackup != 0) {
-          printf(" --> Done: %d/%d (%.1f%%)\r", filesbackedup, filestobackup,
-            100.0 * sizebackedup / sizetobackup);
-        } else {
-          printf(" --> Done: %d/%d\r", filesbackedup, filestobackup);
-        }
-        fflush(stdout);
-      }
-    }
-    if (journal_ok) {
-      fclose(writefile);
-    }
-    if ((verbosity() > 2) && (filesbackedup != 0.0)) {
-      cout << endl;
-    }
-  } else if (verbosity() > 2) {
-    cout << " --> Files to add: 0" << endl;
-  }
-
-  // Deal with removed/modified data
-  if (verbosity() > 2) {
-    cout << " --> Files to remove: " << _d->removed.size() - removed_size << endl;
-  }
-
-  // Report errors
-  if (failed) {
-    return 1;
-  }
-  return 0;
 }
 
 int Database::read(const string& path, const string& checksum) {

@@ -57,7 +57,6 @@ time_t time(time_t *t) {
 int main(void) {
   string            checksum;
   string            zchecksum;
-  DbData*           db_data;
   DbList::iterator  i;
   DbList            journal;
   int               status;
@@ -72,8 +71,38 @@ int main(void) {
     }
   }
 
-  /* Write check */
-  db_data = new DbData(File("test1/testfile"));
+  cout << endl << "Test: getdir" << endl;
+  cout << "Check test_db/data dir: " << ! Directory("test_db/data").isValid() << endl;
+  File2("").create("test_db/data/.nofiles");
+  Directory("").create("test_db/data/fe");
+  File2("").create("test_db/data/fe/.nofiles");
+  File2("").create("test_db/data/fe/test4");
+  Directory("").create("test_db/data/fe/dc");
+  File2("").create("test_db/data/fe/dc/.nofiles");
+  Directory("").create("test_db/data/fe/ba");
+  Directory("").create("test_db/data/fe/ba/test1");
+  Directory("").create("test_db/data/fe/98");
+  Directory("").create("test_db/data/fe/98/test2");
+  string  getdir_path;
+  cout << "febatest1 status: " << db.getDir("febatest1", getdir_path, true)
+    << ", getdir_path: " << getdir_path << endl;
+  cout << "fe98test2 status: " << db.getDir("fe98test2", getdir_path, true)
+    << ", getdir_path: " << getdir_path << endl;
+  cout << "fe98test3 status: " << db.getDir("fe98test3", getdir_path, true)
+    << ", getdir_path: " << getdir_path << endl;
+  cout << "fetest4 status: " << db.getDir("fetest4", getdir_path, true)
+    << ", getdir_path: " << getdir_path << endl;
+  cout << "fedc76test5 status: " << db.getDir("fedc76test5", getdir_path, true)
+    << ", getdir_path: " << getdir_path << endl;
+  Directory("").create("test_db/data/fe/dc/76");
+  cout << "fedc76test6 status: " << db.getDir("fedc76test6", getdir_path, true)
+    << ", getdir_path: " << getdir_path << endl;
+  mkdir("test_db/data/fe/dc/76/test6", 0755);
+  cout << "fedc76test6 status: " << db.getDir("fedc76test6", getdir_path, true)
+    << ", getdir_path: " << getdir_path << endl;
+
+  cout << endl << "Test: write and read back" << endl;
+  /* Write */
   char* chksm = NULL;
   if ((status = db.write("test1/testfile", &chksm))) {
     printf("db.write error status %u\n", status);
@@ -86,32 +115,26 @@ int main(void) {
     return 0;
   }
   cout << chksm << "  test1/testfile" << endl;
-
-  /* Read check */
+  /* Read */
   if ((status = db.read("test_db/blah", chksm))) {
     printf("db.read error status %u\n", status);
     db.close();
     return 0;
   }
+  /* Write again */
+  chksm = NULL;
+  if ((status = db.write("test_db/blah", &chksm))) {
+    printf("db.write error status %u\n", status);
+    db.close();
+    return 0;
+  }
+  if (chksm == NULL) {
+    printf("db.write returned unexpected null checksum\n");
+    db.close();
+    return 0;
+  }
+  cout << chksm << "  test_db/blah" << endl;
 
-  journal.load("test_db", "seen.journal");
-  cout << "Added journal list: " << journal.size() << " element(s):\n";
-  for (i = journal.begin(); i != journal.end(); i++) {
-    cout << i->line(true) << endl;
-  }
-  journal.clear();
-  journal.load("test_db", "gone.journal");
-  cout << "Removed journal list: " << journal.size() << " element(s):\n";
-  for (i = journal.begin(); i != journal.end(); i++) {
-    cout << i->line(true) << endl;
-  }
-  journal.clear();
-  journal.load("test_db", "written.journal");
-  cout << "Really added journal list: " << journal.size() << " element(s):\n";
-  for (i = journal.begin(); i != journal.end(); i++) {
-    cout << i->line(true) << endl;
-  }
-  journal.clear();
   cout << "Active list: " << ((DbList*)db.active())->size() << " element(s):\n";
   for (i = ((DbList*)db.active())->begin(); i != ((DbList*)db.active())->end(); i++) {
     cout << i->line(true) << endl;
@@ -122,6 +145,7 @@ int main(void) {
   }
 
   db.close();
+
 
   /* Re-open database => no change */
   if ((status = db.open())) {
@@ -160,51 +184,6 @@ int main(void) {
     }
   }
 
-  journal.load("test_db", "seen.journal");
-  cout << "Added journal list: " << journal.size() << " element(s):\n";
-  for (i = journal.begin(); i != journal.end(); i++) {
-    cout << i->line(true) << endl;
-  }
-  journal.clear();
-  journal.load("test_db", "gone.journal");
-  cout << "Removed journal list: " << journal.size() << " element(s):\n";
-  for (i = journal.begin(); i != journal.end(); i++) {
-    cout << i->line(true) << endl;
-  }
-  journal.clear();
-  journal.load("test_db", "written.journal");
-  cout << "Really added journal list: " << journal.size() << " element(s):\n";
-  for (i = journal.begin(); i != journal.end(); i++) {
-    cout << i->line(true) << endl;
-  }
-  journal.clear();
-  cout << "Active list: " << ((DbList*)db.active())->size() << " element(s):\n";
-  for (i = ((DbList*)db.active())->begin(); i != ((DbList*)db.active())->end(); i++) {
-    cout << i->line(true) << endl;
-  }
-  cout << "Removed list: " << ((DbList*)db.removed())->size() << " element(s):\n";
-  for (i = ((DbList*)db.removed())->begin(); i != ((DbList*)db.removed())->end(); i++) {
-    cout << i->line(true) << endl;
-  }
-
-  journal.load("test_db", "seen.journal");
-  cout << "Added journal list: " << journal.size() << " element(s):\n";
-  for (i = journal.begin(); i != journal.end(); i++) {
-    cout << i->line(true) << endl;
-  }
-  journal.clear();
-  journal.load("test_db", "gone.journal");
-  cout << "Removed journal list: " << journal.size() << " element(s):\n";
-  for (i = journal.begin(); i != journal.end(); i++) {
-    cout << i->line(true) << endl;
-  }
-  journal.clear();
-  journal.load("test_db", "written.journal");
-  cout << "Really added journal list: " << journal.size() << " element(s):\n";
-  for (i = journal.begin(); i != journal.end(); i++) {
-    cout << i->line(true) << endl;
-  }
-  journal.clear();
   cout << "Active list: " << ((DbList*)db.active())->size() << " element(s):\n";
   for (i = ((DbList*)db.active())->begin(); i != ((DbList*)db.active())->end(); i++) {
     cout << i->line(true) << endl;
@@ -247,6 +226,8 @@ int main(void) {
   verbose = 4;
 
   db.close();
+
+
   db.open();
 
   verbose = 3;
@@ -259,6 +240,7 @@ int main(void) {
   verbose = 4;
 
   db.close();
+
 
   // Save list
   system("cp test_db/active test_db/active.save");
@@ -274,6 +256,7 @@ int main(void) {
 
   db.close();
 
+
   // Restore list
   system("cp test_db/active.save test_db/active");
 
@@ -286,6 +269,7 @@ int main(void) {
   verbose = 4;
 
   db.close();
+
 
   // Restore list
   system("cp test_db/active.save test_db/active");
@@ -301,7 +285,6 @@ int main(void) {
   verbose = 4;
 
   db.close();
-
 
 
   /* Re-open database */
@@ -323,24 +306,6 @@ int main(void) {
   system("chmod 0775 test1/testdir");
   system("chmod 0775 test1/cvs/dirutd/CVS/Entries");
 
-  journal.load("test_db", "seen.journal");
-  cout << "Added journal list: " << journal.size() << " element(s):\n";
-  for (i = journal.begin(); i != journal.end(); i++) {
-    cout << i->line(true) << endl;
-  }
-  journal.clear();
-  journal.load("test_db", "gone.journal");
-  cout << "Removed journal list: " << journal.size() << " element(s):\n";
-  for (i = journal.begin(); i != journal.end(); i++) {
-    cout << i->line(true) << endl;
-  }
-  journal.clear();
-  journal.load("test_db", "written.journal");
-  cout << "Really added journal list: " << journal.size() << " element(s):\n";
-  for (i = journal.begin(); i != journal.end(); i++) {
-    cout << i->line(true) << endl;
-  }
-  journal.clear();
   cout << "Active list: " << ((DbList*)db.active())->size() << " element(s):\n";
   for (i = ((DbList*)db.active())->begin(); i != ((DbList*)db.active())->end(); i++) {
     cout << i->line(true) << endl;
@@ -353,24 +318,6 @@ int main(void) {
   remove("test1/dir space/file space");
   verbose = 3;
 
-  journal.load("test_db", "seen.journal");
-  cout << "Added journal list: " << journal.size() << " element(s):\n";
-  for (i = journal.begin(); i != journal.end(); i++) {
-    cout << i->line(true) << endl;
-  }
-  journal.clear();
-  journal.load("test_db", "gone.journal");
-  cout << "Removed journal list: " << journal.size() << " element(s):\n";
-  for (i = journal.begin(); i != journal.end(); i++) {
-    cout << i->line(true) << endl;
-  }
-  journal.clear();
-  journal.load("test_db", "written.journal");
-  cout << "Really added journal list: " << journal.size() << " element(s):\n";
-  for (i = journal.begin(); i != journal.end(); i++) {
-    cout << i->line(true) << endl;
-  }
-  journal.clear();
   cout << "Active list: " << ((DbList*)db.active())->size() << " element(s):\n";
   for (i = ((DbList*)db.active())->begin(); i != ((DbList*)db.active())->end(); i++) {
     cout << i->line(true) << endl;
@@ -381,7 +328,6 @@ int main(void) {
   }
 
   db.close();
-
 
 
   /* Re-open database */
@@ -399,34 +345,10 @@ int main(void) {
   for (i = ((DbList*)db.removed())->begin(); i != ((DbList*)db.removed())->end(); i++) {
     cout << i->line(true) << endl;
   }
-  journal.load("test_db", "removed");
-  cout << "Official removed list: " << journal.size() << " element(s):\n";
-  for (i = journal.begin(); i != journal.end(); i++) {
-    cout << i->line(true) << endl;
-  }
-  journal.clear();
 
   system("chmod 0777 test1/testdir");
   system("chmod 0777 test1/cvs/dirutd/CVS/Entries");
 
-  journal.load("test_db", "seen.journal");
-  cout << "Added journal list: " << journal.size() << " element(s):\n";
-  for (i = journal.begin(); i != journal.end(); i++) {
-    cout << i->line(true) << endl;
-  }
-  journal.clear();
-  journal.load("test_db", "gone.journal");
-  cout << "Removed journal list: " << journal.size() << " element(s):\n";
-  for (i = journal.begin(); i != journal.end(); i++) {
-    cout << i->line(true) << endl;
-  }
-  journal.clear();
-  journal.load("test_db", "written.journal");
-  cout << "Really added journal list: " << journal.size() << " element(s):\n";
-  for (i = journal.begin(); i != journal.end(); i++) {
-    cout << i->line(true) << endl;
-  }
-  journal.clear();
   cout << "Active list: " << ((DbList*)db.active())->size() << " element(s):\n";
   for (i = ((DbList*)db.active())->begin(); i != ((DbList*)db.active())->end(); i++) {
     cout << i->line(true) << endl;
@@ -439,24 +361,6 @@ int main(void) {
   remove("test1/dir space/file space");
   verbose = 3;
 
-  journal.load("test_db", "seen.journal");
-  cout << "Added journal list: " << journal.size() << " element(s):\n";
-  for (i = journal.begin(); i != journal.end(); i++) {
-    cout << i->line(true) << endl;
-  }
-  journal.clear();
-  journal.load("test_db", "gone.journal");
-  cout << "Removed journal list: " << journal.size() << " element(s):\n";
-  for (i = journal.begin(); i != journal.end(); i++) {
-    cout << i->line(true) << endl;
-  }
-  journal.clear();
-  journal.load("test_db", "written.journal");
-  cout << "Really added journal list: " << journal.size() << " element(s):\n";
-  for (i = journal.begin(); i != journal.end(); i++) {
-    cout << i->line(true) << endl;
-  }
-  journal.clear();
   cout << "Active list: " << ((DbList*)db.active())->size() << " element(s):\n";
   for (i = ((DbList*)db.active())->begin(); i != ((DbList*)db.active())->end(); i++) {
     cout << i->line(true) << endl;
@@ -466,21 +370,7 @@ int main(void) {
     cout << i->line(true) << endl;
   }
 
-  // Test recovery
-  cout << "Recovery test" << endl;
-  system("head -2 test_db/written.journal > tmp");
-  system("mv tmp test_db/written.journal");
-  system("echo blah >> test_db/written.journal");
-  journal.load("test_db", "written.journal");
-  cout << "Really added journal list: " << journal.size() << " element(s):\n";
-  for (i = journal.begin(); i != journal.end(); i++) {
-    cout << i->line(true) << endl;
-  }
-  journal.clear();
-
-  // Simulate crash
-  system("echo 1234567890 > test_db/lock");
-
+  db.close();
 
 
   /* Re-open database => remove some files */
@@ -502,78 +392,6 @@ int main(void) {
   remove("test1/testfile");
   remove("test1/cvs/dirutd/fileutd");
 
-  journal.load("test_db", "seen.journal");
-  cout << "Added journal list: " << journal.size() << " element(s):\n";
-  for (i = journal.begin(); i != journal.end(); i++) {
-    cout << i->line(true) << endl;
-  }
-  journal.clear();
-  journal.load("test_db", "gone.journal");
-  cout << "Removed journal list: " << journal.size() << " element(s):\n";
-  for (i = journal.begin(); i != journal.end(); i++) {
-    cout << i->line(true) << endl;
-  }
-  journal.clear();
-  journal.load("test_db", "written.journal");
-  cout << "Really added journal list: " << journal.size() << " element(s):\n";
-  for (i = journal.begin(); i != journal.end(); i++) {
-    cout << i->line(true) << endl;
-  }
-  journal.clear();
-  cout << "Active list: " << ((DbList*)db.active())->size() << " element(s):\n";
-  for (i = ((DbList*)db.active())->begin(); i != ((DbList*)db.active())->end(); i++) {
-    cout << i->line(true) << endl;
-  }
-  cout << "Removed list: " << ((DbList*)db.removed())->size() << " element(s):\n";
-  for (i = ((DbList*)db.removed())->begin(); i != ((DbList*)db.removed())->end(); i++) {
-    cout << i->line(true) << endl;
-  }
-
-  journal.load("test_db", "seen.journal");
-  cout << "Added journal list: " << journal.size() << " element(s):\n";
-  for (i = journal.begin(); i != journal.end(); i++) {
-    cout << i->line(true) << endl;
-  }
-  journal.clear();
-  journal.load("test_db", "gone.journal");
-  cout << "Removed journal list: " << journal.size() << " element(s):\n";
-  for (i = journal.begin(); i != journal.end(); i++) {
-    cout << i->line(true) << endl;
-  }
-  journal.clear();
-  journal.load("test_db", "written.journal");
-  cout << "Really added journal list: " << journal.size() << " element(s):\n";
-  for (i = journal.begin(); i != journal.end(); i++) {
-    cout << i->line(true) << endl;
-  }
-  journal.clear();
-  cout << "Active list: " << ((DbList*)db.active())->size() << " element(s):\n";
-  for (i = ((DbList*)db.active())->begin(); i != ((DbList*)db.active())->end(); i++) {
-    cout << i->line(true) << endl;
-  }
-  cout << "Removed list: " << ((DbList*)db.removed())->size() << " element(s):\n";
-  for (i = ((DbList*)db.removed())->begin(); i != ((DbList*)db.removed())->end(); i++) {
-    cout << i->line(true) << endl;
-  }
-
-  journal.load("test_db", "seen.journal");
-  cout << "Added journal list: " << journal.size() << " element(s):\n";
-  for (i = journal.begin(); i != journal.end(); i++) {
-    cout << i->line(true) << endl;
-  }
-  journal.clear();
-  journal.load("test_db", "gone.journal");
-  cout << "Removed journal list: " << journal.size() << " element(s):\n";
-  for (i = journal.begin(); i != journal.end(); i++) {
-    cout << i->line(true) << endl;
-  }
-  journal.clear();
-  journal.load("test_db", "written.journal");
-  cout << "Really added journal list: " << journal.size() << " element(s):\n";
-  for (i = journal.begin(); i != journal.end(); i++) {
-    cout << i->line(true) << endl;
-  }
-  journal.clear();
   cout << "Active list: " << ((DbList*)db.active())->size() << " element(s):\n";
   for (i = ((DbList*)db.active())->begin(); i != ((DbList*)db.active())->end(); i++) {
     cout << i->line(true) << endl;
@@ -584,13 +402,6 @@ int main(void) {
   }
 
   db.organise("test_db/data", 2);
-
-  journal.load("test_db", "removed");
-  cout << "Official removed list: " << journal.size() << " element(s):\n";
-  for (i = journal.begin(); i != journal.end(); i++) {
-    cout << i->line(true) << endl;
-  }
-  journal.clear();
 
   db.close();
 
@@ -610,36 +421,6 @@ int main(void) {
   for (i = ((DbList*)db.removed())->begin(); i != ((DbList*)db.removed())->end(); i++) {
     cout << i->line(true) << endl;
   }
-
-  cout << endl << "Test: getdir" << endl;
-  cout << "Check test_db/data dir: " << ! Directory("test_db/data").isValid() << endl;
-  File2("").create("test_db/data/.nofiles");
-  Directory("").create("test_db/data/fe");
-  File2("").create("test_db/data/fe/.nofiles");
-  File2("").create("test_db/data/fe/test4");
-  Directory("").create("test_db/data/fe/dc");
-  File2("").create("test_db/data/fe/dc/.nofiles");
-  Directory("").create("test_db/data/fe/ba");
-  Directory("").create("test_db/data/fe/ba/test1");
-  Directory("").create("test_db/data/fe/98");
-  Directory("").create("test_db/data/fe/98/test2");
-  string  getdir_path;
-  cout << "febatest1 status: " << db.getDir("febatest1", getdir_path, true)
-    << ", getdir_path: " << getdir_path << endl;
-  cout << "fe98test2 status: " << db.getDir("fe98test2", getdir_path, true)
-    << ", getdir_path: " << getdir_path << endl;
-  cout << "fe98test3 status: " << db.getDir("fe98test3", getdir_path, true)
-    << ", getdir_path: " << getdir_path << endl;
-  cout << "fetest4 status: " << db.getDir("fetest4", getdir_path, true)
-    << ", getdir_path: " << getdir_path << endl;
-  cout << "fedc76test5 status: " << db.getDir("fedc76test5", getdir_path, true)
-    << ", getdir_path: " << getdir_path << endl;
-  Directory("").create("test_db/data/fe/dc/76");
-  cout << "fedc76test6 status: " << db.getDir("fedc76test6", getdir_path, true)
-    << ", getdir_path: " << getdir_path << endl;
-  mkdir("test_db/data/fe/dc/76/test6", 0755);
-  cout << "fedc76test6 status: " << db.getDir("fedc76test6", getdir_path, true)
-    << ", getdir_path: " << getdir_path << endl;
 
   // Test expiration
   cout << "Expiration test" << endl;
