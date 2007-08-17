@@ -76,140 +76,140 @@ int Path::recurse(
     list<Node*>::iterator i = dir->nodesList().begin();
     list<Node*>::iterator j = db_list.begin();
     while (i != dir->nodesList().end()) {
-      // Ignore inaccessible files
-      if ((*i)->type() == '?') {
-        i = dir->nodesList().erase(i);
-        continue;
-      }
-
-      // Let the parser analyse the file data to know whether to back it up
-      if ((parser != NULL) && (parser->ignore(*(*i)))) {
-        i = dir->nodesList().erase(i);
-        continue;
-      }
-
-      // Now pass it through the filters
-      if (! _filters.empty() && _filters.match(rel_path, *(*i))) {
-        i = dir->nodesList().erase(i);
-        continue;
-      }
-
-      // Count the nodes considered, for info
-      _nodes++;
-
-      // For link, find out linked path
-      if ((*i)->type() == 'l') {
-        Link *l = new Link(*(*i), cur_path);
-        delete *i;
-        *i = l;
-      }
-
-      // Also deal with directory, as some fields should not be considered
-      if ((*i)->type() == 'd') {
-        Directory *d = new Directory(*(*i));
-        delete *i;
-        *i = d;
-      }
-
-      // Synchronize with DB records
-      int cmp = -1;
-      while ((j != db_list.end())
-          && ((cmp = strcmp((*j)->name(), (*i)->name())) < 0)) {
-        if (verbosity() > 2) {
-          cout << " --> R ";
-          if (rel_path[0] != '\0') {
-            cout << rel_path << "/";
-          }
-          cout << (*j)->name() << endl;
+      if (! terminating()) {
+        // Ignore inaccessible files
+        if ((*i)->type() == '?') {
+          i = dir->nodesList().erase(i);
+          continue;
         }
-        db.remove(prefix, _path, rel_path, *j);
-        delete *j;
-        j = db_list.erase(j);
-      }
 
-      // Deal with data
-      if ((j == db_list.end()) || (cmp > 0)) {
-        // Not found in DB => new
-        if (verbosity() > 2) {
-          cout << " --> A ";
-          if (rel_path[0] != '\0') {
-            cout << rel_path << "/";
-          }
-          cout << (*i)->name() << endl;
+        // Let the parser analyse the file data to know whether to back it up
+        if ((parser != NULL) && (parser->ignore(*(*i)))) {
+          i = dir->nodesList().erase(i);
+          continue;
         }
-        db.add(prefix, _path, rel_path, cur_path, *i);
-      } else {
-        // Found in DB
-        if (**i != **j) {
-          // Metadata differ
-          if (((*i)->type() == 'f')
-           && ((*j)->type() == 'f')
-           && ((*i)->size() == (*j)->size())
-           && ((*i)->mtime() == (*j)->mtime())) {
-            // If the file data is there, just add new metadata
-            db.modify(prefix, _path, rel_path, cur_path, *j, *i, true);
-            if (verbosity() > 2) {
-              cout << " --> ~ ";
-            }
-          } else {
-            // Do it all
-            db.modify(prefix, _path, rel_path, cur_path, *j, *i);
-            if (verbosity() > 2) {
-              cout << " --> M ";
-            }
-          }
+
+        // Now pass it through the filters
+        if (! _filters.empty() && _filters.match(rel_path, *(*i))) {
+          i = dir->nodesList().erase(i);
+          continue;
+        }
+
+        // Count the nodes considered, for info
+        _nodes++;
+
+        // For link, find out linked path
+        if ((*i)->type() == 'l') {
+          Link *l = new Link(*(*i), cur_path);
+          delete *i;
+          *i = l;
+        }
+
+        // Also deal with directory, as some fields should not be considered
+        if ((*i)->type() == 'd') {
+          Directory *d = new Directory(*(*i));
+          delete *i;
+          *i = d;
+        }
+
+        // Synchronize with DB records
+        int cmp = -1;
+        while ((j != db_list.end())
+            && ((cmp = strcmp((*j)->name(), (*i)->name())) < 0)) {
           if (verbosity() > 2) {
+            cout << " --> R ";
+            if (rel_path[0] != '\0') {
+              cout << rel_path << "/";
+            }
+            cout << (*j)->name() << endl;
+          }
+          db.remove(prefix, _path, rel_path, *j);
+          delete *j;
+          j = db_list.erase(j);
+        }
+
+        // Deal with data
+        if ((j == db_list.end()) || (cmp > 0)) {
+          // Not found in DB => new
+          if (verbosity() > 2) {
+            cout << " --> A ";
             if (rel_path[0] != '\0') {
               cout << rel_path << "/";
             }
             cout << (*i)->name() << endl;
           }
+          db.add(prefix, _path, rel_path, cur_path, *i);
         } else {
-          // i and j have same metadata, hence same type...
-          // Compare linked data
-          if (((*i)->type() == 'l')
-           && (strcmp(((Link*)(*i))->link(), ((Link*)(*j))->link()) != 0)) {
-            db.modify(prefix, _path, rel_path, cur_path, *j, *i);
+          // Found in DB
+          if (**i != **j) {
+            // Metadata differ
+            if (((*i)->type() == 'f')
+            && ((*j)->type() == 'f')
+            && ((*i)->size() == (*j)->size())
+            && ((*i)->mtime() == (*j)->mtime())) {
+              // If the file data is there, just add new metadata
+              db.modify(prefix, _path, rel_path, cur_path, *j, *i, true);
+              if (verbosity() > 2) {
+                cout << " --> ~ ";
+              }
+            } else {
+              // Do it all
+              db.modify(prefix, _path, rel_path, cur_path, *j, *i);
+              if (verbosity() > 2) {
+                cout << " --> M ";
+              }
+            }
             if (verbosity() > 2) {
-              cout << " --> L ";
               if (rel_path[0] != '\0') {
                 cout << rel_path << "/";
               }
               cout << (*i)->name() << endl;
             }
-          } else
-          // Check that file data is present
-          if (((*i)->type() == 'f')
-           && (((File2*)(*j))->checksum()[0] == '\0')) {
-            db.modify(prefix, _path, rel_path, cur_path, *j, *i, true);
-            if (verbosity() > 2) {
-              cout << " --> ! ";
-              if (rel_path[0] != '\0') {
-                cout << rel_path << "/";
-              }
-              cout << (*i)->name() << endl;
-            }
-#if 0
           } else {
-            if (verbosity() > 2) {
-              cout << " --> I ";
-              if (rel_path[0] != '\0') {
-                cout << rel_path << "/";
+            // i and j have same metadata, hence same type...
+            // Compare linked data
+            if (((*i)->type() == 'l')
+            && (strcmp(((Link*)(*i))->link(), ((Link*)(*j))->link()) != 0)) {
+              db.modify(prefix, _path, rel_path, cur_path, *j, *i);
+              if (verbosity() > 2) {
+                cout << " --> L ";
+                if (rel_path[0] != '\0') {
+                  cout << rel_path << "/";
+                }
+                cout << (*i)->name() << endl;
               }
-              cout << (*i)->name() << endl;
+            } else
+            // Check that file data is present
+            if (((*i)->type() == 'f')
+            && (((File2*)(*j))->checksum()[0] == '\0')) {
+              db.modify(prefix, _path, rel_path, cur_path, *j, *i, true);
+              if (verbosity() > 2) {
+                cout << " --> ! ";
+                if (rel_path[0] != '\0') {
+                  cout << rel_path << "/";
+                }
+                cout << (*i)->name() << endl;
+              }
+            } else if ((*i)->type() == 'd') {
+              if (verbosity() > 2) {
+                cout << " --> D ";
+                if (rel_path[0] != '\0') {
+                  cout << rel_path << "/";
+                }
+                cout << (*i)->name() << endl;
+              }
             }
-#endif
           }
+          delete *j;
+          j = db_list.erase(j);
         }
-        delete *j;
-        j = db_list.erase(j);
-      }
 
-      // For directory, recurse into it
-      if ((*i)->type() == 'd') {
-        char* dir_path = Node::path(cur_path, (*i)->name());
-        recurse(db, prefix, dir_path, (Directory*) *i, parser);
-        free(dir_path);
+        // For directory, recurse into it
+        if ((*i)->type() == 'd') {
+          char* dir_path = Node::path(cur_path, (*i)->name());
+          recurse(db, prefix, dir_path, (Directory*) *i, parser);
+          free(dir_path);
+        }
       }
       delete *i;
       i = dir->nodesList().erase(i);
@@ -217,13 +217,15 @@ int Path::recurse(
 
     // Deal with remaining DB records
     while (j != db_list.end()) {
-      db.remove(prefix, _path, rel_path, *j);
-      if (verbosity() > 2) {
-        cout << " --> R ";
-        if (rel_path[0] != '\0') {
-          cout << rel_path << "/";
+      if (! terminating()) {
+        db.remove(prefix, _path, rel_path, *j);
+        if (verbosity() > 2) {
+          cout << " --> R ";
+          if (rel_path[0] != '\0') {
+            cout << rel_path << "/";
+          }
+          cout << (*j)->name() << endl;
         }
-        cout << (*j)->name() << endl;
       }
       delete *j;
       j = db_list.erase(j);
