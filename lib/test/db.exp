@@ -17,6 +17,7 @@ Test: write and read back
 Active list: 0 element(s):
 Removed list: 0 element(s):
  --> Database active items part closed (contents: 0 files)
+Reading version 1 lists
  --> Database active items part open (contents: 0 files)
 Active list: 0 element(s):
 Removed list: 0 element(s):
@@ -26,21 +27,27 @@ Got 0 elements
 Active list: 0 element(s):
 Removed list: 0 element(s):
  --> Database active items part closed (contents: 0 files)
+Reading version 1 lists
  --> Database active items part open (contents: 0 files)
  --> Scanning database contents: 0 files
  --> Database active items part closed (contents: 0 files)
+Reading version 1 lists
  --> Database active items part open (contents: 0 files)
  --> Scanning database contents thoroughly: 0 files
  --> Database active items part closed (contents: 0 files)
+Reading version 1 lists
  --> Database active items part open (contents: 0 files)
  --> Scanning database contents: 0 files
  --> Database active items part closed (contents: 0 files)
+Reading version 1 lists
  --> Database active items part open (contents: 0 files)
  --> Scanning database contents thoroughly: 0 files
  --> Database active items part closed (contents: 0 files)
+Reading version 1 lists
  --> Database active items part open (contents: 0 files)
  --> Scanning database contents thoroughly: 0 files
  --> Database active items part closed (contents: 0 files)
+Reading version 1 lists
  --> Database active items part open (contents: 0 files)
 Active list: 0 element(s):
 Removed list: 0 element(s):
@@ -49,6 +56,7 @@ Removed list: 0 element(s):
 Active list: 0 element(s):
 Removed list: 0 element(s):
  --> Database active items part closed (contents: 0 files)
+Reading version 1 lists
  --> Database active items part open (contents: 0 files)
 Active list: 0 element(s):
 Removed list: 0 element(s):
@@ -57,12 +65,14 @@ Removed list: 0 element(s):
 Active list: 0 element(s):
 Removed list: 0 element(s):
  --> Database active items part closed (contents: 0 files)
+Reading version 1 lists
  --> Database active items part open (contents: 0 files)
 Active list: 0 element(s):
 Removed list: 0 element(s):
 Active list: 0 element(s):
 Removed list: 0 element(s):
  --> Database active items part closed (contents: 0 files)
+Reading version 1 lists
  --> Database active items part open (contents: 0 files)
 Active list: 0 element(s):
 Removed list: 0 element(s):
@@ -71,11 +81,13 @@ db: expiration module not initialised
 db: expiration module not initialised
 Modified removed list: 0 element(s):
  --> Database active items part closed (contents: 0 files)
+Reading version 1 lists
  --> Database removed items part open (contents: 0 files)
  -> Removing expired records
  --> Expired data: 0
  --> Database removed items part closed (contents: 0 files)
 List cannot be saved
+Reading version 1 lists
  --> Database active items part open (contents: 0 files)
 dblist: failed to save active items list
 Error: Permission denied
@@ -84,6 +96,7 @@ dblist: load: active: Permission denied
 dblist: failed to load active items list
 Error: Permission denied
 List is garbaged
+Reading version 1 lists
  --> Database active items part open (contents: 0 files)
  --> Database active items part closed (contents: 0 files)
 List is gone
