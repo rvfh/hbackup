@@ -191,7 +191,7 @@ int Path::recurse(
                 cout << (*i)->name() << endl;
               }
             } else if ((*i)->type() == 'd') {
-              if (verbosity() > 2) {
+              if (verbosity() > 3) {
                 cout << " --> D ";
                 if (rel_path[0] != '\0') {
                   cout << rel_path << "/";

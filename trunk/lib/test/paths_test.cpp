@@ -37,7 +37,7 @@ using namespace std;
 using namespace hbackup;
 
 int verbosity(void) {
-  return 3;
+  return 4;
 }
 
 int terminating(void) {
