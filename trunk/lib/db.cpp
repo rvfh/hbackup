@@ -73,6 +73,8 @@ int Database::organise(const string& path, int number) {
   if ((directory = opendir(path.c_str())) == NULL) {
     return 1;
   }
+  // Skip . and ..
+  number += 2;
   while (((dir_entry = readdir(directory)) != NULL) && (number > 0)) {
     number--;
   }
@@ -85,24 +87,24 @@ int Database::organise(const string& path, int number) {
        || ! strcmp(dir_entry->d_name, "..")) {
         continue;
       }
-      File file_data(path, dir_entry->d_name);
+      Node node(path.c_str(), dir_entry->d_name);
       string source_path = path + "/" + dir_entry->d_name;
-      if (file_data.type() == '?') {
+      if (node.type() == '?') {
         cerr << "db: organise: cannot get metadata: " << source_path << endl;
         failed = 2;
       } else
-      if ((file_data.type() == 'd')
+      if ((node.type() == 'd')
        // If we crashed, we might have some two-letter dirs already
-       && (file_data.name().size() != 2)
+       && (strlen(node.name()) != 2)
        // If we've reached the point where the dir is ??-?, stop!
-       && (file_data.name()[2] != '-')) {
+       && (node.name()[2] != '-')) {
         // Create two-letter directory
-        string dir_path = path + "/" + file_data.name().substr(0,2);
+        string dir_path = path + "/" + node.name()[0] + node.name()[1];
         if (Directory("").create(dir_path.c_str())) {
           failed = 2;
         } else {
           // Create destination path
-          string dest_path = dir_path + "/" + file_data.name().substr(2);
+          string dest_path = dir_path + "/" + &node.name()[2];
           // Move directory accross, changing its name
           if (rename(source_path.c_str(), dest_path.c_str())) {
             failed = 1;

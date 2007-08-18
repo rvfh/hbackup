@@ -306,56 +306,6 @@ public:
   static int decodeLine(const string& line, list<string>& params);
 };
 
-class File {
-  string          _path;      // file path
-  string          _link;      // what the link points to (if a link, of course)
-  char            _type;      // file type ('?' if metadata not available)
-  time_t          _mtime;     // time of last modification
-  long long       _size;      // on-disk size, in bytes
-  uid_t           _uid;       // user ID of owner
-  gid_t           _gid;       // group ID of owner
-  mode_t          _mode;      // permissions
-public:
-  // Constructor for existing file (if only one argument, it will be the path)
-  File(const string& access_path, const string& path = "");
-  // Constructor for given file data
-  File(
-    const string& path,
-    const string& link,
-    char          type,
-    time_t        mtime,
-    long long     size,
-    uid_t         uid,
-    gid_t         gid,
-    mode_t        mode) :
-      _path(path),
-      _link(link),
-      _type(type),
-      _mtime(mtime),
-      _size(size),
-      _uid(uid),
-      _gid(gid),
-      _mode(mode) {}
-  // Need '<' to sort list
-  bool operator<(const File&) const;
-  bool operator!=(const File&) const;
-  bool operator==(const File& right) const { return ! (*this != right); }
-  bool metadiffer(const File&) const;
-  string name() const;
-  string path() const { return _path; };
-  string link() const { return _link; };
-  string fullPath(int max_size = -1) const;
-  char type() const { return _type; }
-  time_t mtime() const { return _mtime; };
-  long long size() const { return _size; };
-  uid_t uid() const { return _uid; };
-  gid_t gid() const { return _gid; };
-  mode_t mode() const { return _mode; };
-  // Line containing all data (argument for debug only)
-  string line(bool nodates = false) const;
-  void setPath(const string& path) { _path = path; }
-};
-
 }
 
 #endif

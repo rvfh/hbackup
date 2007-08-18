@@ -135,6 +135,22 @@ int main(void) {
   }
   cout << chksm << "  test_db/blah" << endl;
 
+  cout << endl << "Test: organise" << endl;
+  mkdir("test_db/data/zz", 0755);
+  mkdir("test_db/data/zz/000001", 0755);
+  cout << "Lesser:" << endl;
+  db.organise("test_db/data/zz", 2);
+  system("find test_db/data/zz");
+  mkdir("test_db/data/zz/000002", 0755);
+  cout << "Equal:" << endl;
+  db.organise("test_db/data/zz", 2);
+  system("find test_db/data/zz");
+  mkdir("test_db/data/zz/00/0003", 0755);
+  cout << "Greater:" << endl;
+  db.organise("test_db/data/zz/00", 2);
+  system("find test_db/data/zz");
+
+
   cout << "Active list: " << ((DbList*)db.active())->size() << " element(s):\n";
   for (i = ((DbList*)db.active())->begin(); i != ((DbList*)db.active())->end(); i++) {
     i->line();
