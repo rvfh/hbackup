@@ -317,8 +317,6 @@ public:
       _uid(uid),
       _gid(gid),
       _mode(mode) {}
-  // Constructor for given line
-  File(char* line, size_t size);
   // Need '<' to sort list
   bool operator<(const File&) const;
   bool operator!=(const File&) const;

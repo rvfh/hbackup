@@ -69,7 +69,8 @@ int main(void) {
     cout << i->line(true) << endl;
   }
 
-  system("touch test1/subdirfile");
+  // '-' is before '/' in the ASCII table...
+  system("touch test1/subdir-file");
 
   if (! path->parse(db, "file://localhost", "test1")) {
 //     cout << ">List " << path->nodes() << " file(s):\n";

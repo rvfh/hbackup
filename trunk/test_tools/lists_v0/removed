@@ -1,6 +1,0 @@
-file://host	/home/user/cvs/dirutd/CVS/Entries	f	42	1187315785	1000	1000	775		5252f242d27b8c2c9fdbdcbb33545d07-0	22	30	
-file://host	/home/user/cvs/dirutd/fileutd	f	0	1187315785	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	9	33	
-file://host	/home/user/dir space/file space	f	0	1187315785	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	13	28	
-file://host	/home/user/testdir	d	0	0	1000	1000	755			15	24	
-file://host	/home/user/testdir	d	0	0	1000	1000	775			24	32	
-file://host	/home/user/testfile	f	13	1161486000	1000	1000	644			16	27	

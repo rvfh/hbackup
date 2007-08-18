@@ -29,14 +29,6 @@ fi
 # Check DB
 ../hbackup -vvv -c etc/hbackup.conf -t >> $output 2>&1 #|| exit 1
 
-# Update DB from v0
-cp -af ../../test_tools/lists_v0/* test_db/
-../hbackup -u -vvv -c etc/hbackup.conf >> $output 2>&1 || exit 1
-echo >> $output
-cat test_db/active >> $output
-echo >> $output
-cat test_db/removed >> $output
-
 # Update DB from v1
 cp -af ../../test_tools/lists_v1/* test_db/
 ../hbackup -u -vvv -c etc/hbackup.conf >> $output 2>&1 || exit 1
