@@ -175,10 +175,15 @@ int Client::readListFile(const string& list_path) {
           } else {
             /* New backup path */
             path = new Path(current->c_str());
-            _d->paths.push_back(path);
             if (verbosity() > 2) {
               cout << " --> Path: " << path->path() << endl;
             }
+            list<Path*>::iterator i = _d->paths.begin();
+            while ((i != _d->paths.end())
+                && (strcmp((*i)->path(), path->path()) < 0)) {
+              i++;
+            }
+            _d->paths.insert(i, path);
           }
         } else if (path != NULL) {
           string type;

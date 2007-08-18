@@ -129,6 +129,8 @@ EOF
 
 cat << EOF > "$CONFIGDIR/localhost.list"
 # Share test
+path test2//
+
 path "test1" # should work
 expire 1
 ignore path_start subdir
@@ -138,6 +140,4 @@ ignore path_end ".o"
 ignore size_above 10
 ignand type file
 parser cvs controlled
-
-path test2//
 EOF
