@@ -43,7 +43,7 @@ public:
         _node = new Link(*((Link*)data._node));
         break;
       case 'f':
-        _node = new File2(*((File2*)data._node));
+        _node = new File(*((File*)data._node));
         break;
       default:
         _node = new Node(*data._node);
@@ -122,7 +122,7 @@ public:
     }
     printf("\t");
     if (_node->type() == 'f') {
-      printf(((File2*)_node)->checksum());
+      printf(((File*)_node)->checksum());
     }
     printf("\t%ld\t%ld\t\n", _in, _out);
   }

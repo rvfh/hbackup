@@ -116,30 +116,30 @@ public:
   }
 };
 
-class File2 : public Node {
+class File : public Node {
 protected:
   char*     _checksum;
 public:
   // Constructor for existing Node
-  File2(const File2& g) :
+  File(const File& g) :
       Node(g),
       _checksum(NULL) {
     _parsed = true;
     asprintf(&_checksum, "%s", g._checksum);
   }
-  File2(const Node& g) :
+  File(const Node& g) :
       Node(g),
       _checksum(NULL) {
     _parsed = true;
   }
   // Constructor for path in the VFS
-  File2(const char *path, const char* name = "") :
+  File(const char *path, const char* name = "") :
       Node(path, name),
       _checksum(NULL) {
     _parsed = true;
   }
   // Constructor for given file metadata
-  File2(
+  File(
     const char* name,
     char        type,
     time_t      mtime,
@@ -153,7 +153,7 @@ public:
     _parsed = true;
     setChecksum(checksum);
   }
-  ~File2() {
+  ~File() {
     free(_checksum);
   }
   // Create empty file
@@ -256,7 +256,7 @@ public:
   const char* link()    const { return _link;  }
 };
 
-class Stream : public File2 {
+class Stream : public File {
   char*           _path;      // file path
   int             _fd;        // file descriptor
   mode_t          _fmode;     // file open mode
@@ -271,10 +271,10 @@ public:
   // Max buffer size for read/write
   static const size_t chunk = 409600;
 //   // Constructor for existing File
-//   Stream(const File2& g, const char* dir_path) {}
+//   Stream(const File& g, const char* dir_path) {}
   // Constructor for path in the VFS
   Stream(const char *dir_path, const char* name = "") :
-      File2(dir_path, name),
+      File(dir_path, name),
       _fd(-1) {
     _path = path(dir_path, name);
   }

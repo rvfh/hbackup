@@ -193,7 +193,7 @@ int DbList::load_v1(FILE* readfile, unsigned int offset) {
         Node* node;
         switch (type) {
           case 'f':
-            node = new File2(path, type, mtime, size, uid, gid, mode, checksum);
+            node = new File(path, type, mtime, size, uid, gid, mode, checksum);
             break;
           case 'l':
             node = new Link(path, type, mtime, size, uid, gid, mode, link);
@@ -346,7 +346,7 @@ int DbList::load_v2(FILE* readfile, unsigned int offset) {
         Node* node;
         switch (type) {
           case 'f':
-            node = new File2(path, type, mtime, size, uid, gid, mode, checksum);
+            node = new File(path, type, mtime, size, uid, gid, mode, checksum);
             break;
           case 'l':
             node = new Link(path, type, mtime, size, uid, gid, mode, link);
@@ -417,7 +417,7 @@ int DbList::save(
         i->in(), i->data()->type(), i->data()->size(), i->data()->mtime(),
         i->data()->uid(), i->data()->gid(), i->data()->mode());
       if (i->data()->type() == 'f') {
-        fprintf(writefile, "%s\t", ((File2*) (i->data()))->checksum());
+        fprintf(writefile, "%s\t", ((File*) (i->data()))->checksum());
       }
       if (i->data()->type() == 'l') {
         fprintf(writefile, "%s\t", ((Link*) (i->data()))->link());

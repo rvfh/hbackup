@@ -62,7 +62,7 @@ struct Database::Private {
 int Database::organise(const string& path, int number) {
   DIR           *directory;
   struct dirent *dir_entry;
-  File2         nofiles(path.c_str(), ".nofiles");
+  File          nofiles(path.c_str(), ".nofiles");
   int           failed   = 0;
 
   /* Already organised? */
@@ -177,10 +177,10 @@ int Database::write(
       final_path += str;
       if (! Directory("").create(final_path.c_str())) {
         /* Directory exists */
-        File2 try_file(final_path.c_str(), "data");
+        File try_file(final_path.c_str(), "data");
         if (try_file.isValid()) {
           /* A file already exists, let's compare */
-          File2 temp_md(temp_path.c_str());
+          File temp_md(temp_path.c_str());
 
           differ = (try_file.size() != temp_md.size());
         }
@@ -290,7 +290,7 @@ int Database::getDir(
   // Two cases: either there are files, or a .nofiles file and directories
   do {
     // If we can find a .nofiles file, then go down one more directory
-    if (File2(path.c_str(), ".nofiles").isValid()) {
+    if (File(path.c_str(), ".nofiles").isValid()) {
       path += "/" + checksum.substr(level, 2);
       level += 2;
       if (create && Directory("").create(path.c_str())) {
@@ -329,8 +329,8 @@ int Database::open() {
     return 2;
   }
 
-  File2 active(_path.c_str(), "active");
-  File2 removed(_path.c_str(), "removed");
+  File active(_path.c_str(), "active");
+  File removed(_path.c_str(), "removed");
 
   // Check that data dir exists, if not create it
   if (Directory(_path.c_str(), "data").isValid()) {
@@ -449,7 +449,7 @@ void Database::getList(
       Node* node;
       switch (entry->data()->type()) {
         case 'f':
-          node = new File2(*((File2*) entry->data()));
+          node = new File(*((File*) entry->data()));
           break;
         case 'l':
           node = new Link(*((Link*) entry->data()));
@@ -553,7 +553,7 @@ int Database::scan(const string& checksum, bool thorough) {
       }
       files--;
       if (i->data()->type() == 'f') {
-        File2* f = (File2*) i->data();
+        File* f = (File*) i->data();
         if ((f->checksum()[0] != '\0') && scan(f->checksum(), thorough)) {
 #warning need to signal problem in DB list
           failed = 1;
@@ -590,7 +590,7 @@ int Database::scan(const string& checksum, bool thorough) {
       filefailed = true;
       cerr << "db: scan: failed to get directory for checksum " << checksum << endl;
     } else
-    if (! File2(path.c_str(), "data").isValid()) {
+    if (! File(path.c_str(), "data").isValid()) {
       errno = ENOENT;
       filefailed = true;
       cerr << "db: scan: file data missing for checksum " << checksum << endl;
@@ -654,17 +654,17 @@ int Database::add(
       node2 = new Link(*(Link*)node);
       break;
     case 'f':
-      node2 = new File2(*node);
+      node2 = new File(*node);
       if (old_checksum != NULL) {
         // Use same checksum
-        ((File2*)node2)->setChecksum(old_checksum);
+        ((File*)node2)->setChecksum(old_checksum);
       } else {
         // Copy data
         char* local_path = NULL;
         char* checksum   = NULL;
         asprintf(&local_path, "%s/%s", dir_path, node->name());
         if (! write(string(local_path), &checksum)) {
-          ((File2*)node2)->setChecksum(checksum);
+          ((File*)node2)->setChecksum(checksum);
           free(checksum);
         }
         free(local_path);
@@ -693,14 +693,14 @@ int Database::modify(
     if (add(prefix, base_path, rel_path, dir_path, node, NULL)) {
       return -1;
     }
-  } else if (((File2*)old_node)->checksum()[0] == '\0') {
+  } else if (((File*)old_node)->checksum()[0] == '\0') {
       // File is in the list, but could not be copied last time, try again
 #warning retry not implemented
     return -1;
   } else {
     // File metadata has changed, but we believe the data is the same
     if (add(prefix, base_path, rel_path, dir_path, node,
-            ((File2*)old_node)->checksum())) {
+            ((File*)old_node)->checksum())) {
       return -1;
     }
   }
