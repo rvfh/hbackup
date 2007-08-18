@@ -76,16 +76,7 @@ Reading version 1 lists
  --> Database active items part open (contents: 0 files)
 Active list: 0 element(s):
 Removed list: 0 element(s):
-Expiration test
-db: expiration module not initialised
-db: expiration module not initialised
-Modified removed list: 0 element(s):
  --> Database active items part closed (contents: 0 files)
-Reading version 1 lists
- --> Database removed items part open (contents: 0 files)
- -> Removing expired records
- --> Expired data: 0
- --> Database removed items part closed (contents: 0 files)
 List cannot be saved
 Reading version 1 lists
  --> Database active items part open (contents: 0 files)

@@ -51,15 +51,6 @@ public:
     const char*  base_path,
     const char*  rel_path,
     list<Node*>& list);
-  // Run this before closing active list to enable expiration
-  int expire_init();
-  // Expire data older then given time out (seconds)
-  int expire_share(
-    const string&   prefix,
-    const string&   path,
-    time_t          time_out);
-  // That's where the job gets done
-  int expire_finalise();
   /* Read file with given checksum, extract it to path */
   int  read(
     const string& path,
