@@ -435,34 +435,25 @@ void Database::getList(
   SortedList<DbData>::iterator entry = _d->active.begin();
   // Jump irrelevant first records
   while ((entry != _d->active.end())
-      && (strncmp(entry->fullPath().c_str(), full_path, length) != 0)) {
+      && (entry->comparePath(full_path, length) != 0)) {
     entry++;
   }
   // Copy relevant records
   char* last_dir     = NULL;
   int   last_dir_len = 0;
   while ((entry != _d->active.end())
-      && (strncmp(entry->fullPath().c_str(), full_path, length) == 0)) {
-    if ((last_dir == NULL)
-     || strncmp(last_dir, entry->fullPath().c_str(), last_dir_len)) {
+      && (entry->comparePath(full_path, length) == 0)) {
+    if ((last_dir == NULL) || entry->comparePath(last_dir, last_dir_len)) {
       Node* node;
       switch (entry->data()->type()) {
         case 'f':
-          node = new File2(entry->data()->name().c_str(), entry->data()->type(),
-            entry->data()->mtime(), entry->data()->size(),
-            entry->data()->uid(), entry->data()->gid(), entry->data()->mode(),
-            entry->checksum().c_str());
+          node = new File2(*((File2*) entry->data()));
           break;
         case 'l':
-          node = new Link(entry->data()->name().c_str(), entry->data()->type(),
-            entry->data()->mtime(), entry->data()->size(),
-            entry->data()->uid(), entry->data()->gid(), entry->data()->mode(),
-            entry->data()->link().c_str());
+          node = new Link(*((Link*) entry->data()));
           break;
         default:
-          node = new Node(entry->data()->name().c_str(), entry->data()->type(),
-            entry->data()->mtime(), entry->data()->size(),
-            entry->data()->uid(), entry->data()->gid(), entry->data()->mode());
+          node = new Node(*entry->data());
       }
       if (node->type() == 'd') {
         free(last_dir);
@@ -559,28 +550,24 @@ int Database::scan(const string& checksum, bool thorough) {
         printf(" --> Files left to go: %u\n", files);
       }
       files--;
-      if ((! i->checksum().empty()) && scan(i->checksum(), thorough)) {
-        i->setChecksum("");
-        failed = 1;
-        if (! terminating() && verbosity() > 2) {
-          struct tm *time;
-          cout << " --> Client:      " << i->prefix() << endl;
-          cout << " --> File name:   " << i->data()->path() << endl;
-          if (verbosity() > 3) {
-            time_t file_mtime = i->data()->mtime();
-            time = localtime(&file_mtime);
-            printf(" --> Modified:    %04u-%02u-%02u %2u:%02u:%02u %s\n",
-              time->tm_year + 1900, time->tm_mon + 1, time->tm_mday,
-              time->tm_hour, time->tm_min, time->tm_sec, time->tm_zone);
-              time_t local = i->in();
-              time = localtime(&local);
-            printf(" --> Seen first: %04u-%02u-%02u %2u:%02u:%02u %s\n",
-              time->tm_year + 1900, time->tm_mon + 1, time->tm_mday,
-              time->tm_hour, time->tm_min, time->tm_sec, time->tm_zone);
-            if (i->out() != 0) {
-              time_t local = i->out();
-              time = localtime(&local);
-              printf(" --> Seen gone:  %04u-%02u-%02u %2u:%02u:%02u %s\n",
+      if (i->data()->type() == 'f') {
+        File2* f = (File2*) i->data();
+        if ((f->checksum()[0] != '\0') && scan(f->checksum(), thorough)) {
+#warning need to signal problem in DB list
+          failed = 1;
+          if (! terminating() && verbosity() > 2) {
+            struct tm *time;
+            cout << " --> Client:      " << i->prefix() << endl;
+            cout << " --> File:        " << i->path() << endl;
+            if (verbosity() > 3) {
+              time_t file_mtime = i->data()->mtime();
+              time = localtime(&file_mtime);
+              printf(" --> Modified:    %04u-%02u-%02u %2u:%02u:%02u %s\n",
+                time->tm_year + 1900, time->tm_mon + 1, time->tm_mday,
+                time->tm_hour, time->tm_min, time->tm_sec, time->tm_zone);
+                time_t local = i->in();
+                time = localtime(&local);
+              printf(" --> Seen first: %04u-%02u-%02u %2u:%02u:%02u %s\n",
                 time->tm_year + 1900, time->tm_mon + 1, time->tm_mday,
                 time->tm_hour, time->tm_min, time->tm_sec, time->tm_zone);
             }
@@ -651,35 +638,41 @@ int Database::add(
   }
 
   // Determine path
-  string full_path = base_path;
+  char* full_path = NULL;
   if (rel_path[0] != '\0') {
-    full_path += string("/") + rel_path;
+    asprintf(&full_path, "%s/%s/%s", base_path, rel_path, node->name());
+  } else {
+    asprintf(&full_path, "%s/%s", base_path, node->name());
   }
-  full_path += string("/") + node->name();
 
   // Create data
-  DbData data(
-    File(
-      full_path, (node->type() == 'l') ? ((Link*)node)->link() : "",
-      node->type(), node->mtime(), node->size(),
-      node->uid(), node->gid(), node->mode()));
-  data.setPrefix(prefix);
-
-  // Copy data
-  if (node->type() == 'f') {
-    if (old_checksum != NULL) {
-      data.setChecksum(string(old_checksum));
-    } else {
-      char* local_path = NULL;
-      char* checksum   = NULL;
-      asprintf(&local_path, "%s/%s", dir_path, node->name());
-      if (! write(string(local_path), &checksum)) {
-        data.setChecksum(checksum);
-        free(checksum);
+  Node* node2;
+  switch (node->type()) {
+    case 'l':
+      node2 = new Link(*(Link*)node);
+      break;
+    case 'f':
+      node2 = new File2(*node);
+      if (old_checksum != NULL) {
+        // Use same checksum
+        ((File2*)node2)->setChecksum(old_checksum);
+      } else {
+        // Copy data
+        char* local_path = NULL;
+        char* checksum   = NULL;
+        asprintf(&local_path, "%s/%s", dir_path, node->name());
+        if (! write(string(local_path), &checksum)) {
+          ((File2*)node2)->setChecksum(checksum);
+          free(checksum);
+        }
+        free(local_path);
       }
-      free(local_path);
-    }
+      break;
+    default:
+      node2 = new Node(*node);
   }
+  DbData data(prefix, full_path, node2);
+  free(full_path);
 
   // Insert entry
   _d->active.add(data);
@@ -736,7 +729,7 @@ void Database::remove(
   // Jump irrelevant first records
   int cmp = -1;
   while ((entry != _d->active.end())
-      && ((cmp = strcmp(entry->fullPath().c_str(), full_path)) < 0)) {
+      && ((cmp = entry->comparePath(full_path)) < 0)) {
     entry++;
   }
   if ((entry != _d->active.end()) && (cmp == 0)) {
@@ -751,7 +744,7 @@ void Database::remove(
       // Now we need the trailing '/'
       full_path[length - 1] = '/';
       while ((entry != _d->active.end())
-          && (strncmp(entry->fullPath().c_str(), full_path, length) == 0)) {
+          && (entry->comparePath(full_path, length) == 0)) {
         // Mark removed
         entry->setOut();
         // Append to removed list

@@ -472,7 +472,8 @@ int main(void) {
   // Start simple: one argument
   line = "a";
   params = new list<string>;
-  cout << "readline(" << line << "): " << File::decodeLine(line, *params) << endl;
+  cout << "readline(" << line << "): " << Stream::decodeLine(line, *params)
+    << endl;
   for (i = params->begin(); i != params->end(); i++) {
     cout << *i << endl;
   }
@@ -482,7 +483,8 @@ int main(void) {
   // Two arguments, test blanks
   line = " \ta \tb";
   params = new list<string>;
-  cout << "readline(" << line << "): " << File::decodeLine(line, *params) << endl;
+  cout << "readline(" << line << "): " << Stream::decodeLine(line, *params)
+    << endl;
   for (i = params->begin(); i != params->end(); i++) {
     cout << *i << endl;
   }
@@ -492,7 +494,7 @@ int main(void) {
   // Not single character argument
   line = "\t ab";
   params = new list<string>;
-  cout << "readline(" << line << "): " << File::decodeLine(line, *params)
+  cout << "readline(" << line << "): " << Stream::decodeLine(line, *params)
     << endl;
   for (i = params->begin(); i != params->end(); i++) {
     cout << *i << endl;
@@ -503,7 +505,7 @@ int main(void) {
   // Two of them
   line = "\t ab cd";
   params = new list<string>;
-  cout << "readline(" << line << "): " << File::decodeLine(line, *params)
+  cout << "readline(" << line << "): " << Stream::decodeLine(line, *params)
     << endl;
   for (i = params->begin(); i != params->end(); i++) {
     cout << *i << endl;
@@ -514,7 +516,7 @@ int main(void) {
   // Three, with comment
   line = "\t ab cd\tef # blah";
   params = new list<string>;
-  cout << "readline(" << line << "): " << File::decodeLine(line, *params)
+  cout << "readline(" << line << "): " << Stream::decodeLine(line, *params)
     << endl;
   for (i = params->begin(); i != params->end(); i++) {
     cout << *i << endl;
@@ -525,7 +527,7 @@ int main(void) {
   // Single quotes
   line = "\t 'ab' 'cd'\t'ef' # blah";
   params = new list<string>;
-  cout << "readline(" << line << "): " << File::decodeLine(line, *params)
+  cout << "readline(" << line << "): " << Stream::decodeLine(line, *params)
     << endl;
   for (i = params->begin(); i != params->end(); i++) {
     cout << *i << endl;
@@ -536,7 +538,7 @@ int main(void) {
   // And double quotes
   line = "\t \"ab\" 'cd'\t\"ef\" # blah";
   params = new list<string>;
-  cout << "readline(" << line << "): " << File::decodeLine(line, *params)
+  cout << "readline(" << line << "): " << Stream::decodeLine(line, *params)
     << endl;
   for (i = params->begin(); i != params->end(); i++) {
     cout << *i << endl;
@@ -547,7 +549,7 @@ int main(void) {
   // With blanks in quotes
   line = "\t ab cd\tef 'gh ij\tkl' \"mn op\tqr\" \t# blah";
   params = new list<string>;
-  cout << "readline(" << line << "): " << File::decodeLine(line, *params)
+  cout << "readline(" << line << "): " << Stream::decodeLine(line, *params)
     << endl;
   for (i = params->begin(); i != params->end(); i++) {
     cout << *i << endl;
@@ -558,7 +560,7 @@ int main(void) {
   // With quotes in quotes
   line = "\t ab cd\tef 'gh \"ij\\\'\tkl' \"mn 'op\\\"\tqr\" \t# blah";
   params = new list<string>;
-  cout << "readline(" << line << "): " << File::decodeLine(line, *params)
+  cout << "readline(" << line << "): " << Stream::decodeLine(line, *params)
     << endl;
   for (i = params->begin(); i != params->end(); i++) {
     cout << *i << endl;
@@ -569,7 +571,7 @@ int main(void) {
   // With escape characters
   line = "\t a\\b cd\tef 'g\\h \"ij\\\'\tkl' \"m\\n 'op\\\"\tqr\" \t# blah";
   params = new list<string>;
-  cout << "readline(" << line << "): " << File::decodeLine(line, *params)
+  cout << "readline(" << line << "): " << Stream::decodeLine(line, *params)
     << endl;
   for (i = params->begin(); i != params->end(); i++) {
     cout << *i << endl;
@@ -580,7 +582,7 @@ int main(void) {
   // Missing ending single quote
   line = "\t a\\b cd\tef 'g\\h \"ij\\\'\tkl";
   params = new list<string>;
-  cout << "readline(" << line << "): " << File::decodeLine(line, *params)
+  cout << "readline(" << line << "): " << Stream::decodeLine(line, *params)
     << endl;
   for (i = params->begin(); i != params->end(); i++) {
     cout << *i << endl;
@@ -591,7 +593,7 @@ int main(void) {
   // Missing ending double quote
   line = "\t a\\b cd\tef 'g\\h \"ij\\\'\tkl' \"m\\n 'op\\\"\tqr";
   params = new list<string>;
-  cout << "readline(" << line << "): " << File::decodeLine(line, *params)
+  cout << "readline(" << line << "): " << Stream::decodeLine(line, *params)
     << endl;
   for (i = params->begin(); i != params->end(); i++) {
     cout << *i << endl;

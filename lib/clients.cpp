@@ -156,7 +156,7 @@ int Client::readListFile(const string& list_path) {
       list<string> params;
 
       line++;
-      if (File::decodeLine(buffer, params)) {
+      if (Stream::decodeLine(buffer, params)) {
         errno = EUCLEAN;
         cerr << "Warning: in list file " << list_path << ", line " << line
           << " missing single- or double-quote," << endl;

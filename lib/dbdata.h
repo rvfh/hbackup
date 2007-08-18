@@ -24,74 +24,107 @@
 namespace hbackup {
 
 class DbData {
-  File    _data;
-  string  _prefix;
-  string  _checksum;
+  char*   _prefix;
+  char*   _path;
+  Node*   _node;
   time_t  _in;
   time_t  _out;
-  bool    _expired;
 public:
-  DbData(const File& data, time_t in = 0) :
-      _data(data), _checksum(""), _out(0), _expired(false) {
+  DbData(const DbData& data) :
+      _prefix(NULL),
+      _path(NULL),
+      _node(NULL),
+      _in(data._in),
+      _out(data._out) {
+    asprintf(&_prefix, "%s", data._prefix);
+    asprintf(&_path, "%s", data._path);
+    switch (data._node->type()) {
+      case 'l':
+        _node = new Link(*((Link*)data._node));
+        break;
+      case 'f':
+        _node = new File2(*((File2*)data._node));
+        break;
+      default:
+        _node = new Node(*data._node);
+    }
+  }
+  DbData(
+      const char* prefix,
+      const char* path,
+      Node*       data,
+      time_t      in = 0) :
+      _prefix(NULL),
+      _path(NULL),
+      _node(data),
+      _out(0) {
+    asprintf(&_prefix, "%s", prefix);
+    asprintf(&_path, "%s", path);
     if (in == 0) {
       _in = time(NULL);
     } else {
       _in = in;
     }
   }
+  ~DbData() {
+    free(_prefix);
+    free(_path);
+    free(_node);
+  }
   bool operator<(const DbData& right) const {
-    int cmp = strcmp(_prefix.c_str(), right._prefix.c_str());
-    if (cmp < 0)return true;
+    int cmp = strcmp(_prefix, right._prefix);
+    if (cmp < 0)      return true;
     else if (cmp > 0) return false;
 
-    if (_data < right._data) return true;
-    else if (right._data < _data) return false;
+    // This will hopefully go when we just follow the Directory order
+    string path1 = _path;
+    string path2 = right._path;
+    unsigned int pos = 0;
+    while ((pos = path1.find('/', pos)) != string::npos) {
+      path1.replace(pos, 1, "\31");
+    }
+    pos = 0;
+    while ((pos = path2.find('/', pos)) != string::npos) {
+      path2.replace(pos, 1, "\31");
+    }
+    cmp = path1.compare(path2);
+    if (cmp < 0)      return true;
+    else if (cmp > 0) return false;
 
     // Equal then...
-    return (_in < right._in)
-      || ((_in == right._in) && (_checksum < right._checksum));
-    // Note: checking for _out would break the journal replay stuff (uses find)
+    return _in < right._in;
   }
-  // Equality and difference exclude _out
-  bool operator!=(const DbData& right) const {
-    return (_prefix != right._prefix) || (_in != right._in)
-        || (_checksum != right._checksum) || (_data != right._data);
-  }
-  bool   operator==(const DbData& right) const { return ! (*this != right); }
-  File*  data() { return &_data; }
-  string prefix() const { return _prefix; }
-  string checksum() const { return _checksum; }
-  time_t in() const { return _in; }
-  time_t out() const { return _out; }
-  bool   expired() { return _expired; }
-  void   setPrefix(const string& prefix) { _prefix = prefix; }
-  void   setChecksum(const string& checksum) { _checksum = checksum; }
-  void   setOut() { _out = time(NULL); }
-  void   setOut(time_t out) { _out = out; }
-  void   resetExpired() { _expired = false; }
-  void   setExpired() { _expired = true; }
-  string fullPath(int size_max = 0) const {
-    // Simple and inefficient
-    string full_path = _prefix + "/" + _data.path();
-    if (size_max <= 0) {
-      return full_path;
+  const Node* data()            { return _node; }
+  const char* prefix() const    { return _prefix; }
+  const char* path() const      { return _path; }
+  time_t      in() const        { return _in; }
+  time_t      out() const        { return _out; }
+  void setOut() { _out = time(NULL); }
+  void setOut(time_t out) { _out = out; }
+  int comparePath(const char* path, int length = -1) {
+    char* full_path = NULL;
+    asprintf(&full_path, "%s/%s", _prefix, _path);
+    int cmp;
+    if (length >= 0) {
+      cmp = strncmp(full_path, path, length);
+    } else {
+      cmp = strcmp(full_path, path);
     }
-    return full_path.substr(0, size_max);
+    free(full_path);
+    return cmp;
   }
-  string line(bool nodates = false) const {
-    char*   numbers = NULL;
-    string  output = _prefix + "\t" + _data.path();
-
-    asprintf(&numbers, "%c\t%lld\t%ld\t%u\t%u\t%o", _data.type(),
-      _data.size(), nodates ? (_data.mtime() != 0) : _data.mtime(),
-      _data.uid(), _data.gid(), _data.mode());
-    output += "\t" + string(numbers) + "\t" + _data.link() + "\t" + _checksum;
-    delete numbers;
-
-    asprintf(&numbers, "%ld\t%ld", _in, _out);
-    output += "\t" + string(numbers) + "\t";
-    delete numbers;
-    return output;
+  void line() {
+    printf("%s\t%s\t%c\t%lld\t%d\t%u\t%u\t%o\t",
+      _prefix, _path, _node->type(), _node->size(), _node->mtime() != 0,
+      _node->uid(), _node->gid(), _node->mode());
+    if (_node->type() == 'l') {
+      printf(((Link*)_node)->link());
+    }
+    printf("\t");
+    if (_node->type() == 'f') {
+      printf(((File2*)_node)->checksum());
+    }
+    printf("\t%ld\t%ld\t\n", _in, _out);
   }
 };
 

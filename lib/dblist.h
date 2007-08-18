@@ -49,10 +49,6 @@ public:
     const string& path,
     const string& filename,
     bool          backup = false);
-  int  save_journal(
-    const string& path,
-    const string& filename,
-    unsigned int  offset = 0);
   int  open(
     const string& path,
     const string& filename);
