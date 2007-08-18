@@ -395,24 +395,6 @@ int Client::backup(
   return failed;
 }
 
-int Client::expire(Database& db) {
-  if (initialised()) {
-    for (list<Path*>::iterator i = _d->paths.begin(); i != _d->paths.end(); i++) {
-      if (terminating()) {
-        break;
-      }
-      if ((*i)->expiration() > 0) {
-        if (verbosity() > 0) {
-          cout << "Expire path '" << (*i)->path() << "'" << endl;
-        }
-        db.expire_share(_protocol + "://" + _name, (*i)->path(),
-          (*i)->expiration());
-      }
-    }
-  }
-  return 0;
-}
-
 void Client::show() {
   cout << "Client: " << _name << endl;
   cout << "-> " << _protocol << "://" << _host_or_ip << " "

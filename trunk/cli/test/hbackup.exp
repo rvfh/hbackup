@@ -46,13 +46,8 @@ Backup path 'C:/Test'
  --> A File.TXT
 Unmounted test_db/mount
 Protocol not supported: ssh
- --> Database active items part closed (contents: 21 files)
- --> Database removed items part open (contents: 0 files)
-Expire path 'test1'
- -> Removing expired records
- --> Expired data: 0
  -> Closing database
- --> Database removed items part closed (contents: 0 files)
+ --> Database active items part closed (contents: 21 files)
  -> Reading configuration file
  --> Client: myhost
  --> Client: myClient
@@ -73,14 +68,8 @@ Backup client 'client' using protocol 'smb'
  --> Path: C:/Test
 Backup path 'C:/Test'
 Unmounted test_db/mount
- --> Database active items part closed (contents: 21 files)
-Reading version 1 lists
- --> Database removed items part open (contents: 0 files)
-Expire path 'test1'
- -> Removing expired records
- --> Expired data: 0
  -> Closing database
- --> Database removed items part closed (contents: 0 files)
+ --> Database active items part closed (contents: 21 files)
  -> Reading configuration file
  --> Client: myhost
  --> Client: myClient

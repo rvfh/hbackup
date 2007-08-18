@@ -422,25 +422,6 @@ int main(void) {
     cout << i->line(true) << endl;
   }
 
-  // Test expiration
-  cout << "Expiration test" << endl;
-  db.expire_share("file://host", "/home/user", 1);
-  db.expire_finalise();
-  // Modify the specific record I need
-  journal.load("test_db", "removed");
-  journal.back().setOut(1);
-  cout << "Modified removed list: " << journal.size() << " element(s):\n";
-  for (i = journal.begin(); i != journal.end(); i++) {
-    cout << i->line(true) << endl;
-  }
-  journal.save("test_db", "removed");
-  journal.clear();
-  db.expire_init();
-  db.close_active();
-  db.open_removed();
-  db.expire_share("file://host", "/home/user", 30);
-  db.expire_finalise();
-
   db.close();
 
 

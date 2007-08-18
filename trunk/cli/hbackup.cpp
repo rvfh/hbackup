@@ -382,39 +382,6 @@ int main(int argc, char **argv) {
               failed = 1;
             }
           }
-
-          switch (db.expire_init()) {
-            case 2:
-              failed = 1;
-              break;
-            case 0:
-              db.close_active();
-              db.open_removed();
-              for (list<Client*>::iterator client = clients.begin();
-                  client != clients.end(); client++) {
-                if (terminating()) {
-                  break;
-                }
-                // Skip unrequested clients
-                if (requested_clients.size() != 0) {
-                  bool found = false;
-                  for (list<string>::iterator i = requested_clients.begin();
-                  i != requested_clients.end(); i++) {
-                    if (*i == (*client)->name()) {
-                      found = true;
-                      break;
-                    }
-                  }
-                  if (! found) {
-                    continue;
-                  }
-                }
-                if ((*client)->expire(db)) {
-                  failed = 1;
-                }
-              }
-              db.expire_finalise();
-          }
         }
         if (verbosity() > 1) {
           cout << " -> Closing database" << endl;

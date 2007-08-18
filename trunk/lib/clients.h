@@ -79,7 +79,6 @@ public:
   }
   string mountPoint() { return _mount_point; }
   int  backup(Database& db, bool config_check = false);
-  int  expire(Database& db);
   void show();
 };
 
