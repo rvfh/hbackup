@@ -73,12 +73,12 @@ int main(void) {
 
   cout << endl << "Test: getdir" << endl;
   cout << "Check test_db/data dir: " << ! Directory("test_db/data").isValid() << endl;
-  File2("").create("test_db/data/.nofiles");
+  File("").create("test_db/data/.nofiles");
   Directory("").create("test_db/data/fe");
-  File2("").create("test_db/data/fe/.nofiles");
-  File2("").create("test_db/data/fe/test4");
+  File("").create("test_db/data/fe/.nofiles");
+  File("").create("test_db/data/fe/test4");
   Directory("").create("test_db/data/fe/dc");
-  File2("").create("test_db/data/fe/dc/.nofiles");
+  File("").create("test_db/data/fe/dc/.nofiles");
   Directory("").create("test_db/data/fe/ba");
   Directory("").create("test_db/data/fe/ba/test1");
   Directory("").create("test_db/data/fe/98");
@@ -293,7 +293,7 @@ int main(void) {
   db.open();
 
   Directory("").create("test_db/data/59ca0efa9f5633cb0371bbc0355478d8-0");
-  File2("").create("test_db/data/59ca0efa9f5633cb0371bbc0355478d8-0/data");
+  File("").create("test_db/data/59ca0efa9f5633cb0371bbc0355478d8-0/data");
   verbose = 3;
   if ((status = db.scan("", true))) {
     printf("full thorough scan error status %u\n", status);

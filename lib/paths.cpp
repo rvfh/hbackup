@@ -181,7 +181,7 @@ int Path::recurse(
             } else
             // Check that file data is present
             if (((*i)->type() == 'f')
-            && (((File2*)(*j))->checksum()[0] == '\0')) {
+            && (((File*)(*j))->checksum()[0] == '\0')) {
               db.modify(prefix, _path, rel_path, cur_path, *j, *i, true);
               if (verbosity() > 2) {
                 cout << " --> ! ";

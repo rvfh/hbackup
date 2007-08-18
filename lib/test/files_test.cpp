@@ -41,7 +41,7 @@ int parseList(Directory *d, const char* cur_dir) {
     Node* payload = *i;
     switch (payload->type()) {
       case 'f': {
-        File2 *f = new File2(*payload);
+        File *f = new File(*payload);
         delete *i;
         *i = f;
       }
@@ -93,7 +93,7 @@ void showFile(const Node* g, int level = 1) {
   if (g->parsed()) {
     switch (g->type()) {
       case 'f': {
-        const File2* f = (const File2*) g;
+        const File* f = (const File*) g;
         cout << "File: " << f->name()
           << ", type = " << f->type()
           << ", mtime = " << (f->mtime() != 0)
@@ -150,7 +150,7 @@ void showList(const Directory* d, int level) {
 void createNshowFile(const Node &g, const char* dir_path) {
   switch (g.type()) {
   case 'f': {
-    File2 *f = new File2(g);
+    File *f = new File(g);
     cout << "Name: " << f->name()
       << ", type = " << f->type()
       << ", mtime = " << (f->mtime() != 0)
@@ -605,56 +605,56 @@ int main(void) {
   delete g;
 
   cout << endl << "Validity tests" << endl;
-  cout << "File is file? " << File2("test1/testfile").isValid() << endl;
+  cout << "File is file? " << File("test1/testfile").isValid() << endl;
   cout << "File is dir? " << Directory("test1/testfile").isValid() << endl;
   cout << "File is link? " << Link("test1/testfile").isValid() << endl;
-  cout << "Dir is file? " << File2("test1/testdir").isValid() << endl;
+  cout << "Dir is file? " << File("test1/testdir").isValid() << endl;
   cout << "Dir is dir? " << Directory("test1/testdir").isValid() << endl;
   cout << "Dir is link? " << Link("test1/testdir").isValid() << endl;
-  cout << "Link is file? " << File2("test1/testlink").isValid() << endl;
+  cout << "Link is file? " << File("test1/testlink").isValid() << endl;
   cout << "Link is dir? " << Directory("test1/testlink").isValid() << endl;
   cout << "Link is link? " << Link("test1/testlink").isValid() << endl;
 
   cout << endl << "Creation tests" << endl;
-  cout << "File is file? " << File2("test1/touchedfile").isValid() << endl;
+  cout << "File is file? " << File("test1/touchedfile").isValid() << endl;
   cout << "File is dir? " << Directory("test1/touchedfile").isValid() << endl;
   cout << "File is link? " << Link("test1/touchedfile").isValid() << endl;
-  cout << "Dir is file? " << File2("test1/toucheddir").isValid() << endl;
+  cout << "Dir is file? " << File("test1/toucheddir").isValid() << endl;
   cout << "Dir is dir? " << Directory("test1/toucheddir").isValid() << endl;
   cout << "Dir is link? " << Link("test1/toucheddir").isValid() << endl;
-  cout << "Link is file? " << File2("test1/touchedlink").isValid() << endl;
+  cout << "Link is file? " << File("test1/touchedlink").isValid() << endl;
   cout << "Link is dir? " << Directory("test1/touchedlink").isValid() << endl;
   cout << "Link is link? " << Link("test1/touchedlink").isValid() << endl;
 
   cout << "Create" << endl;
-  if (File2("test1/touchedfile").create("test1"))
+  if (File("test1/touchedfile").create("test1"))
     cout << "failed to create file: " << strerror(errno) << endl;
   if (Directory("test1/toucheddir").create("test1"))
     cout << "failed to create dir" << endl;
 
-  cout << "File is file? " << File2("test1/touchedfile").isValid() << endl;
+  cout << "File is file? " << File("test1/touchedfile").isValid() << endl;
   cout << "File is dir? " << Directory("test1/touchedfile").isValid() << endl;
   cout << "File is link? " << Link("test1/touchedfile").isValid() << endl;
-  cout << "Dir is file? " << File2("test1/toucheddir").isValid() << endl;
+  cout << "Dir is file? " << File("test1/toucheddir").isValid() << endl;
   cout << "Dir is dir? " << Directory("test1/toucheddir").isValid() << endl;
   cout << "Dir is link? " << Link("test1/toucheddir").isValid() << endl;
-  cout << "Link is file? " << File2("test1/touchedlink").isValid() << endl;
+  cout << "Link is file? " << File("test1/touchedlink").isValid() << endl;
   cout << "Link is dir? " << Directory("test1/touchedlink").isValid() << endl;
   cout << "Link is link? " << Link("test1/touchedlink").isValid() << endl;
 
   cout << "Create again" << endl;
-  if (File2("test1/touchedfile").create("test1"))
+  if (File("test1/touchedfile").create("test1"))
     cout << "failed to create file: " << strerror(errno) << endl;
   if (Directory("test1/toucheddir").create("test1"))
     cout << "failed to create dir" << endl;
 
-  cout << "File is file? " << File2("test1/touchedfile").isValid() << endl;
+  cout << "File is file? " << File("test1/touchedfile").isValid() << endl;
   cout << "File is dir? " << Directory("test1/touchedfile").isValid() << endl;
   cout << "File is link? " << Link("test1/touchedfile").isValid() << endl;
-  cout << "Dir is file? " << File2("test1/toucheddir").isValid() << endl;
+  cout << "Dir is file? " << File("test1/toucheddir").isValid() << endl;
   cout << "Dir is dir? " << Directory("test1/toucheddir").isValid() << endl;
   cout << "Dir is link? " << Link("test1/toucheddir").isValid() << endl;
-  cout << "Link is file? " << File2("test1/touchedlink").isValid() << endl;
+  cout << "Link is file? " << File("test1/touchedlink").isValid() << endl;
   cout << "Link is dir? " << Directory("test1/touchedlink").isValid() << endl;
   cout << "Link is link? " << Link("test1/touchedlink").isValid() << endl;
 

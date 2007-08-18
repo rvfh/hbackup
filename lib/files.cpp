@@ -89,7 +89,7 @@ bool Node::operator!=(const Node& right) const {
       || (strcmp(_name, right._name) != 0);
 }
 
-int File2::create(const char* dir_path) {
+int File::create(const char* dir_path) {
   errno = 0;
   char* full_path = path(dir_path, _name);
   if (_name[0] == '\0') {
