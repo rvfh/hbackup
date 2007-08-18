@@ -14,6 +14,26 @@ fedc76test6 status: 0, getdir_path: test_db/data/fe/dc/76/test6
 Test: write and read back
 59ca0efa9f5633cb0371bbc0355478d8-0  test1/testfile
 59ca0efa9f5633cb0371bbc0355478d8-0  test_db/blah
+
+Test: organise
+Lesser:
+test_db/data/zz
+test_db/data/zz/000001
+Equal:
+test_db/data/zz
+test_db/data/zz/00
+test_db/data/zz/00/0001
+test_db/data/zz/00/0002
+test_db/data/zz/.nofiles
+Greater:
+test_db/data/zz
+test_db/data/zz/00
+test_db/data/zz/00/00
+test_db/data/zz/00/00/01
+test_db/data/zz/00/00/02
+test_db/data/zz/00/00/03
+test_db/data/zz/00/.nofiles
+test_db/data/zz/.nofiles
 Active list: 0 element(s):
 Removed list: 0 element(s):
  --> Database active items part closed (contents: 0 files)

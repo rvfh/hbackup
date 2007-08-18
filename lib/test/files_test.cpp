@@ -453,18 +453,6 @@ int main(void) {
   delete writefile;
 
 
-  cout << "\nmetadata" << endl;
-  {
-    struct tm *time;
-    File file_data("test1/testfile");
-    time_t file_time = file_data.mtime();
-    time = localtime(&file_time);
-    cout << "Line: " << file_data.line(true) << endl;;
-    printf(" * mtime (local): %04u-%02u-%02u %2u:%02u:%02u\n",
-      time->tm_year + 1900, time->tm_mon + 1, time->tm_mday,
-      time->tm_hour, time->tm_min, time->tm_sec);
-  }
-
   cout << "\nreadline" << endl;
   list<string> *params;
   list<string>::iterator i;
