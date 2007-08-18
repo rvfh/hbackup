@@ -551,7 +551,7 @@ int Stream::copy(Stream& source) {
 }
 
 // Public functions
-int File::decodeLine(const string& line, list<string>& params) {
+int Stream::decodeLine(const string& line, list<string>& params) {
   const char* read  = line.c_str();
   const char* end   = &read[line.size()];
   char* value       = NULL;

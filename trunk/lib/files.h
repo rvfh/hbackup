@@ -121,6 +121,12 @@ protected:
   char*     _checksum;
 public:
   // Constructor for existing Node
+  File2(const File2& g) :
+      Node(g),
+      _checksum(NULL) {
+    _parsed = true;
+    asprintf(&_checksum, "%s", g._checksum);
+  }
   File2(const Node& g) :
       Node(g),
       _checksum(NULL) {
@@ -145,7 +151,7 @@ public:
       Node(name, type, mtime, size, uid, gid, mode),
       _checksum(NULL) {
     _parsed = true;
-    asprintf(&_checksum, "%s", checksum);
+    setChecksum(checksum);
   }
   ~File2() {
     free(_checksum);
@@ -155,6 +161,11 @@ public:
   bool isValid() const { return _type == 'f'; }
   // Data read access
   const char* checksum() const { return _checksum;  }
+  void setChecksum(const char* checksum) {
+    free(_checksum);
+    _checksum = NULL;
+    asprintf(&_checksum, "%s", checksum);
+  }
 };
 
 class Directory : public Node {
@@ -193,6 +204,12 @@ class Link : public Node {
   char*     _link;
 public:
   // Constructor for existing Node
+  Link(const Link& g) :
+      Node(g),
+      _link(NULL) {
+    _parsed = true;
+    asprintf(&_link, "%s", g._link);
+  }
   Link(const Node& g, const char* dir_path) :
       Node(g),
       _link(NULL) {
@@ -285,6 +302,8 @@ public:
   int       copy(Stream& source);
   // Data access
   long long dsize() const   { return _dsize; };
+  // Read parameters from line
+  static int decodeLine(const string& line, list<string>& params);
 };
 
 class File {
@@ -335,9 +354,6 @@ public:
   // Line containing all data (argument for debug only)
   string line(bool nodates = false) const;
   void setPath(const string& path) { _path = path; }
-
-  // Read parameters from line
-  static int decodeLine(const string& line, list<string>& params);
 };
 
 }

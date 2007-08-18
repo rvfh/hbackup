@@ -137,11 +137,11 @@ int main(void) {
 
   cout << "Active list: " << ((DbList*)db.active())->size() << " element(s):\n";
   for (i = ((DbList*)db.active())->begin(); i != ((DbList*)db.active())->end(); i++) {
-    cout << i->line(true) << endl;
+    i->line();
   }
   cout << "Removed list: " << ((DbList*)db.removed())->size() << " element(s):\n";
   for (i = ((DbList*)db.removed())->begin(); i != ((DbList*)db.removed())->end(); i++) {
-    cout << i->line(true) << endl;
+    i->line();
   }
 
   db.close();
@@ -156,11 +156,11 @@ int main(void) {
   }
   cout << "Active list: " << ((DbList*)db.active())->size() << " element(s):\n";
   for (i = ((DbList*)db.active())->begin(); i != ((DbList*)db.active())->end(); i++) {
-    cout << i->line(true) << endl;
+    i->line();
   }
   cout << "Removed list: " << ((DbList*)db.removed())->size() << " element(s):\n";
   for (i = ((DbList*)db.removed())->begin(); i != ((DbList*)db.removed())->end(); i++) {
-    cout << i->line(true) << endl;
+    i->line();
   }
 
   cout << "List select test" << endl;
@@ -186,11 +186,11 @@ int main(void) {
 
   cout << "Active list: " << ((DbList*)db.active())->size() << " element(s):\n";
   for (i = ((DbList*)db.active())->begin(); i != ((DbList*)db.active())->end(); i++) {
-    cout << i->line(true) << endl;
+    i->line();
   }
   cout << "Removed list: " << ((DbList*)db.removed())->size() << " element(s):\n";
   for (i = ((DbList*)db.removed())->begin(); i != ((DbList*)db.removed())->end(); i++) {
-    cout << i->line(true) << endl;
+    i->line();
   }
 
   verbose = 3;
@@ -296,11 +296,11 @@ int main(void) {
   }
   cout << "Active list: " << ((DbList*)db.active())->size() << " element(s):\n";
   for (i = ((DbList*)db.active())->begin(); i != ((DbList*)db.active())->end(); i++) {
-    cout << i->line(true) << endl;
+    i->line();
   }
   cout << "Removed list: " << ((DbList*)db.removed())->size() << " element(s):\n";
   for (i = ((DbList*)db.removed())->begin(); i != ((DbList*)db.removed())->end(); i++) {
-    cout << i->line(true) << endl;
+    i->line();
   }
 
   system("chmod 0775 test1/testdir");
@@ -308,11 +308,11 @@ int main(void) {
 
   cout << "Active list: " << ((DbList*)db.active())->size() << " element(s):\n";
   for (i = ((DbList*)db.active())->begin(); i != ((DbList*)db.active())->end(); i++) {
-    cout << i->line(true) << endl;
+    i->line();
   }
   cout << "Removed list: " << ((DbList*)db.removed())->size() << " element(s):\n";
   for (i = ((DbList*)db.removed())->begin(); i != ((DbList*)db.removed())->end(); i++) {
-    cout << i->line(true) << endl;
+    i->line();
   }
 
   remove("test1/dir space/file space");
@@ -320,11 +320,11 @@ int main(void) {
 
   cout << "Active list: " << ((DbList*)db.active())->size() << " element(s):\n";
   for (i = ((DbList*)db.active())->begin(); i != ((DbList*)db.active())->end(); i++) {
-    cout << i->line(true) << endl;
+    i->line();
   }
   cout << "Removed list: " << ((DbList*)db.removed())->size() << " element(s):\n";
   for (i = ((DbList*)db.removed())->begin(); i != ((DbList*)db.removed())->end(); i++) {
-    cout << i->line(true) << endl;
+    i->line();
   }
 
   db.close();
@@ -339,11 +339,11 @@ int main(void) {
   }
   cout << "Active list: " << ((DbList*)db.active())->size() << " element(s):\n";
   for (i = ((DbList*)db.active())->begin(); i != ((DbList*)db.active())->end(); i++) {
-    cout << i->line(true) << endl;
+    i->line();
   }
   cout << "Removed list: " << ((DbList*)db.removed())->size() << " element(s):\n";
   for (i = ((DbList*)db.removed())->begin(); i != ((DbList*)db.removed())->end(); i++) {
-    cout << i->line(true) << endl;
+    i->line();
   }
 
   system("chmod 0777 test1/testdir");
@@ -351,11 +351,11 @@ int main(void) {
 
   cout << "Active list: " << ((DbList*)db.active())->size() << " element(s):\n";
   for (i = ((DbList*)db.active())->begin(); i != ((DbList*)db.active())->end(); i++) {
-    cout << i->line(true) << endl;
+    i->line();
   }
   cout << "Removed list: " << ((DbList*)db.removed())->size() << " element(s):\n";
   for (i = ((DbList*)db.removed())->begin(); i != ((DbList*)db.removed())->end(); i++) {
-    cout << i->line(true) << endl;
+    i->line();
   }
 
   remove("test1/dir space/file space");
@@ -363,11 +363,11 @@ int main(void) {
 
   cout << "Active list: " << ((DbList*)db.active())->size() << " element(s):\n";
   for (i = ((DbList*)db.active())->begin(); i != ((DbList*)db.active())->end(); i++) {
-    cout << i->line(true) << endl;
+    i->line();
   }
   cout << "Removed list: " << ((DbList*)db.removed())->size() << " element(s):\n";
   for (i = ((DbList*)db.removed())->begin(); i != ((DbList*)db.removed())->end(); i++) {
-    cout << i->line(true) << endl;
+    i->line();
   }
 
   db.close();
@@ -382,11 +382,11 @@ int main(void) {
   }
   cout << "Active list: " << ((DbList*)db.active())->size() << " element(s):\n";
   for (i = ((DbList*)db.active())->begin(); i != ((DbList*)db.active())->end(); i++) {
-    cout << i->line(true) << endl;
+    i->line();
   }
   cout << "Removed list: " << ((DbList*)db.removed())->size() << " element(s):\n";
   for (i = ((DbList*)db.removed())->begin(); i != ((DbList*)db.removed())->end(); i++) {
-    cout << i->line(true) << endl;
+    i->line();
   }
 
   remove("test1/testfile");
@@ -394,11 +394,11 @@ int main(void) {
 
   cout << "Active list: " << ((DbList*)db.active())->size() << " element(s):\n";
   for (i = ((DbList*)db.active())->begin(); i != ((DbList*)db.active())->end(); i++) {
-    cout << i->line(true) << endl;
+    i->line();
   }
   cout << "Removed list: " << ((DbList*)db.removed())->size() << " element(s):\n";
   for (i = ((DbList*)db.removed())->begin(); i != ((DbList*)db.removed())->end(); i++) {
-    cout << i->line(true) << endl;
+    i->line();
   }
 
   db.organise("test_db/data", 2);
@@ -415,11 +415,11 @@ int main(void) {
   }
   cout << "Active list: " << ((DbList*)db.active())->size() << " element(s):\n";
   for (i = ((DbList*)db.active())->begin(); i != ((DbList*)db.active())->end(); i++) {
-    cout << i->line(true) << endl;
+    i->line();
   }
   cout << "Removed list: " << ((DbList*)db.removed())->size() << " element(s):\n";
   for (i = ((DbList*)db.removed())->begin(); i != ((DbList*)db.removed())->end(); i++) {
-    cout << i->line(true) << endl;
+    i->line();
   }
 
   db.close();

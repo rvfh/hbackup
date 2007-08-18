@@ -109,15 +109,15 @@ int DbList::load_v1(FILE* readfile, unsigned int offset) {
       int   failed = 0;
       int   fields = 7;
       // Fields
-      time_t    db_time;        // DB time
-      char      type;           // file type ('?' if metadata not available)
-      time_t    mtime;          // time of last modification
-      long long size;           // on-disk size, in bytes
-      uid_t     uid;            // user ID of owner
-      gid_t     gid;            // group ID of owner
-      mode_t    mode;           // permissions
-      string    checksum;       // file checksum
-      string    link;           // what the link points to
+      time_t    db_time;          // DB time
+      char      type;             // file type
+      time_t    mtime;            // time of last modification
+      long long size;             // on-disk size, in bytes
+      uid_t     uid;              // user ID of owner
+      gid_t     gid;              // group ID of owner
+      mode_t    mode;             // permissions
+      char*     checksum = NULL;  // file checksum
+      char*     link = NULL;      // what the link points to
 
       for (int field = 1; field <= fields; field++) {
         // Get tabulation position
@@ -175,9 +175,9 @@ int DbList::load_v1(FILE* readfile, unsigned int offset) {
               break;
             case 8:  /* Checksum or Link */
                 if (type == 'f') {
-                  checksum = value;;
+                  checksum = value;
                 } else if (type == 'l') {
-                  link = value;;
+                  link = value;
                 }
               break;
           }
@@ -189,17 +189,27 @@ int DbList::load_v1(FILE* readfile, unsigned int offset) {
           break;
         }
       }
-      free(value);
       if ((type != '-') && (failed == 0)) {
-        DbData data(File(path, link, type, mtime, size, uid, gid, mode),
-          db_time);
-        data.setPrefix(prefix);
-        data.setChecksum(checksum);
+        Node* node;
+        switch (type) {
+          case 'f':
+            node = new File2(path, type, mtime, size, uid, gid, mode, checksum);
+            break;
+          case 'l':
+            node = new Link(path, type, mtime, size, uid, gid, mode, link);
+            break;
+          default:
+            node = new Node(path, type, mtime, size, uid, gid, mode);
+        }
+        DbData data(prefix, path, node, db_time);
         db_data = add(data);
       }
+      free(value);
     }
   }
   free(buffer);
+  free(prefix);
+  free(path);
 
   if (! end_found) {
     cerr << "dblist: load: file end not found" << endl;
@@ -252,15 +262,15 @@ int DbList::load_v2(FILE* readfile, unsigned int offset) {
       int   failed = 0;
       int   fields = 7;
       // Fields
-      time_t    db_time;        // DB time
-      char      type;           // file type ('?' if metadata not available)
-      time_t    mtime;          // time of last modification
-      long long size;           // on-disk size, in bytes
-      uid_t     uid;            // user ID of owner
-      gid_t     gid;            // group ID of owner
-      mode_t    mode;           // permissions
-      string    checksum;       // file checksum
-      string    link;           // what the link points to
+      time_t    db_time;          // DB time
+      char      type;             // file type
+      time_t    mtime;            // time of last modification
+      long long size;             // on-disk size, in bytes
+      uid_t     uid;              // user ID of owner
+      gid_t     gid;              // group ID of owner
+      mode_t    mode;             // permissions
+      char*     checksum = NULL;  // file checksum
+      char*     link = NULL;      // what the link points to
 
       for (int field = 1; field <= fields; field++) {
         // Get tabulation position
@@ -332,19 +342,29 @@ int DbList::load_v2(FILE* readfile, unsigned int offset) {
           break;
         }
       }
-      free(value);
       if ((type != '-') && (failed == 0)) {
-        DbData data(File(path, link, type, mtime, size, uid, gid, mode),
-          db_time);
-        data.setPrefix(prefix);
-        data.setChecksum(checksum);
+        Node* node;
+        switch (type) {
+          case 'f':
+            node = new File2(path, type, mtime, size, uid, gid, mode, checksum);
+            break;
+          case 'l':
+            node = new Link(path, type, mtime, size, uid, gid, mode, link);
+            break;
+          default:
+            node = new Node(path, type, mtime, size, uid, gid, mode);
+        }
+        DbData data(prefix, path, node, db_time);
         db_data = add(data);
       }
+      free(value);
       // Only take first file data (active)
       path = NULL;
     }
   }
   free(buffer);
+  free(prefix);
+  free(path);
 
   if (! end_found) {
     cerr << "dblist: load: file end not found" << endl;
@@ -370,23 +390,23 @@ int DbList::save(
     char*  last_path   = NULL;
     time_t last_out    = 0;
     for (SortedList<DbData>::iterator i = begin(); i != end(); i++) {
-      if ((last_prefix == NULL) || strcmp(last_prefix, i->prefix().c_str())) {
-        fprintf(writefile, "%s\n", i->prefix().c_str());
+      if ((last_prefix == NULL) || strcmp(last_prefix, i->prefix())) {
+        fprintf(writefile, "%s\n", i->prefix());
         free(last_prefix);
         last_prefix = NULL;
         free(last_path);
         last_path = NULL;
-        asprintf(&last_prefix, "%s", i->prefix().c_str());
+        asprintf(&last_prefix, "%s", i->prefix());
       }
-      if ((last_path == NULL) || strcmp(last_path, i->data()->path().c_str())){
+      if ((last_path == NULL) || strcmp(last_path, i->path())) {
         if (last_out != 0) {
           fprintf(writefile, "\t\t%ld\t-\t\n", last_out);
           last_out = 0;
         }
-        fprintf(writefile, "\t%s\n", i->data()->path().c_str());
+        fprintf(writefile, "\t%s\n", i->path());
         free(last_path);
         last_path = NULL;
-        asprintf(&last_path, "%s", i->data()->path().c_str());
+        asprintf(&last_path, "%s", i->path());
       } else {
         if (last_out != i->in()) {
           fprintf(writefile, "\t\t%ld\t-\t\n", last_out);
@@ -397,10 +417,10 @@ int DbList::save(
         i->in(), i->data()->type(), i->data()->size(), i->data()->mtime(),
         i->data()->uid(), i->data()->gid(), i->data()->mode());
       if (i->data()->type() == 'f') {
-        fprintf(writefile, "%s\t", i->checksum().c_str());
+        fprintf(writefile, "%s\t", ((File2*) (i->data()))->checksum());
       }
       if (i->data()->type() == 'l') {
-        fprintf(writefile, "%s\t", i->data()->link().c_str());
+        fprintf(writefile, "%s\t", ((Link*) (i->data()))->link());
       }
       fprintf(writefile, "\n");
       if (i->out() != 0) {
@@ -431,29 +451,6 @@ int DbList::save(
     if (verbosity() > 3) {
       cerr << "dblist: save: cannot create file" << endl;
     }
-    failed = 2;
-  }
-  return failed;
-}
-
-int DbList::save_journal(
-    const string& path,
-    const string& filename,
-    unsigned int  offset) {
-  FILE          *writefile;
-  int           failed = 0;
-  unsigned int  line = 0;
-
-  string dest_path = path + "/" + filename;
-  if ((writefile = fopen(dest_path.c_str(), "a")) != NULL) {
-    SortedList<DbData>::iterator i;
-    for (i = begin(); i != end(); i++) {
-      if (++line > offset) {
-        fprintf(writefile, "%s\n", i->line().c_str());
-      }
-    }
-    fclose(writefile);
-  } else {
     failed = 2;
   }
   return failed;

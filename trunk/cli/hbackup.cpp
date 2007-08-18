@@ -247,7 +247,7 @@ int main(int argc, char **argv) {
       list<string> params;
 
       line++;
-      if (File::decodeLine(buffer, params)) {
+      if (Stream::decodeLine(buffer, params)) {
         errno = EUCLEAN;
         cerr << "Warning: in file " << config_path << ", line " << line
           << " missing single- or double-quote" << endl;
