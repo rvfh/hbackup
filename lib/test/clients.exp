@@ -165,14 +165,6 @@ Backup client 'testhost' using protocol 'file'
  --> Path: test1
  --> Path: test2
 Backup path 'test1'
- --> D cvs
- --> D cvs/CVS
- --> D cvs/dirbad
 Directory should be under CVS control: test1/cvs/dirbad
- --> D cvs/dirutd
- --> D cvs/dirutd/CVS
- --> D dir space
- --> D testdir
 Backup path 'test2'
- --> D testdir
  --> Database active items part closed (contents: 21 files)
