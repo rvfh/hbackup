@@ -39,53 +39,6 @@ public:
       _in = in;
     }
   }
-  // line gets modified
-  DbData(char* line, size_t size) : _data("", 0), _expired(false) {
-    char* start  = line;
-    char* value  = new char[size];
-    int   failed = 0;
-
-    for (int field = 1; field <= 12; field++) {
-      // Get tabulation position
-      char* delim = strchr(start, '\t');
-      if (delim == NULL) {
-        failed = 1;
-      } else {
-        // Get string portion
-        strncpy(value, start, delim - start);
-        value[delim - start] = '\0';
-        /* Extract data */
-        switch (field) {
-          case 1:   /* Prefix */
-            _prefix = value;
-            break;
-          case 2:   /* File data */
-            _data = File(start, size - (start - line));
-            break;
-          case 10:  /* Checksum */
-            _checksum = value;
-            break;
-          case 11:  /* Date in */
-            if (sscanf(value, "%ld", &_in) != 1) {
-              failed = 2;
-            }
-            break;
-          case 12:  /* Date out */
-            if (sscanf(value, "%ld", &_out) != 1) {
-              failed = 2;
-            }
-        }
-        start = delim + 1;
-      }
-      if (failed) {
-        break;
-      }
-    }
-    free(value);
-    if ((failed != 0) || (_data.type() == 0)) {
-      _in = 0;
-    }
-  }
   bool operator<(const DbData& right) const {
     int cmp = strcmp(_prefix.c_str(), right._prefix.c_str());
     if (cmp < 0)return true;

@@ -465,16 +465,6 @@ int main(void) {
       time->tm_hour, time->tm_min, time->tm_sec);
   }
 
-  cout << "\nline constructor" << endl;
-  {
-    File file_data("test1/testlink");
-    cout << "Line: " << file_data.line(true) << endl;;
-    char* new_line = new char[80];
-    strcpy(new_line, (file_data.line(true) + "\t").c_str());
-    File file_line(new_line, 80);
-    cout << "Line: " << file_line.line() << endl;;
-  }
-
   cout << "\nreadline" << endl;
   list<string> *params;
   list<string>::iterator i;

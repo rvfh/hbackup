@@ -47,10 +47,8 @@ int DbList::load(
     // errno set by load_v*
     if (getline(&buffer, &bsize, readfile) >= 0) {
       if (buffer[0] != '#') {
-        // Version 0
-        rewind(readfile);
-        cout << "Reading version 0 lists" << endl;
-        failed = load_v0(readfile);
+        errno = EUCLEAN;
+        failed = -1;
       } else if (! strcmp(buffer, "# version 1\n")) {
         // Version 1
         cout << "Reading version 1 lists" << endl;
@@ -67,50 +65,6 @@ int DbList::load(
   if (failed != 0) {
     cerr << "dblist: load: " << filename << ": " << strerror(errno) << endl;
   }
-  return failed;
-}
-
-int DbList::load_v0(FILE* readfile, unsigned int offset) {
-  /* Read the file into memory */
-  char          *buffer = NULL;
-  size_t        bsize   = 0;
-  unsigned int  line    = 0;
-  int           failed  = 0;
-
-  errno = 0;
-  while ((getline(&buffer, &bsize, readfile) >= 0) && ! failed) {
-    if (++line <= offset) {
-      continue;
-    }
-
-    DbData db_data(buffer, bsize);
-    if (db_data.in() == 0) {
-      failed = -1;
-      cerr << "dblist: load: file corrupted, line " << line << endl;
-      errno = EUCLEAN;
-    } else {
-      add(db_data);
-    }
-  }
-  free(buffer);
-
-  // Unclutter
-  if (size() > 0) {
-    SortedList<DbData>::iterator prev = begin();
-    SortedList<DbData>::iterator i = prev;
-    i++;
-    while (i != end()) {
-      if ((*i->data() == *prev->data())
-        && (i->checksum() == prev->checksum())) {
-        prev->setOut(i->out());
-        i = erase(i);
-      } else {
-        i++;
-        prev++;
-      }
-    }
-  }
-
   return failed;
 }
 

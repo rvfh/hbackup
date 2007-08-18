@@ -26,9 +26,6 @@ namespace hbackup {
 
 class DbList : public SortedList<DbData> {
   bool _open;
-  int  load_v0(
-    FILE* readfile,
-    unsigned int offset = 0);
   int  load_v1(
     FILE* readfile,
     unsigned int offset = 0);

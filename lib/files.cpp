@@ -218,75 +218,6 @@ File::File(const string& access_path, const string& path) {
   }
 }
 
-File::File(char* line, size_t size) {
-  char      *start = line;
-  char      *delim;
-  char      *value = new char[size];
-  int       failed = 0;
-
-  // Dummy constructor for file reading
-  if (size == 0) return;
-
-  for (int field = 2; field <= 9; field++) {
-    // Get tabulation position
-    delim = strchr(start, '\t');
-    if (delim == NULL) {
-      failed = 1;
-    } else {
-      // Get string portion
-      strncpy(value, start, delim - start);
-      value[delim - start] = '\0';
-      /* Extract data */
-      switch (field) {
-        case 2:   /* Path */
-          _path = value;
-          break;
-        case 3:   /* Type */
-          if (sscanf(value, "%c", &_type) != 1) {
-            failed = 2;
-          }
-          break;
-        case 4:   /* Size */
-          if (sscanf(value, "%lld", &_size) != 1) {
-            failed = 2;
-          }
-          break;
-        case 5:   /* Modification time */
-          if (sscanf(value, "%ld", &_mtime) != 1) {
-            failed = 2;
-          }
-          break;
-        case 6:   /* User */
-          if (sscanf(value, "%u", &_uid) != 1) {
-            failed = 2;
-          }
-          break;
-        case 7:   /* Group */
-          if (sscanf(value, "%u", &_gid) != 1) {
-            failed = 2;
-          }
-          break;
-        case 8:   /* Permissions */
-          if (sscanf(value, "%o", &_mode) != 1) {
-            failed = 2;
-          }
-          break;
-        case 9:   /* Link */
-          _link = value;
-      }
-      start = delim + 1;
-    }
-    if (failed) {
-      break;
-    }
-  }
-  free(value);
-  if (failed != 0) {
-    _type = '?';
-  }
-}
-
-// Tested in db's test
 bool File::metadiffer(const File& right) const {
   return (_mtime != right._mtime)   || (_size != right._size)
       || (_uid != right._uid)       || (_gid != right._gid)
@@ -300,7 +231,18 @@ bool File::operator<(const File& right) const {
         || (_uid < right._uid)      || (_gid < right._gid)
         || (_mode < right._mode)    || (_link < right._link);
   }
-  return (_path < right._path);
+  // This will hopefully go when we use Node, and follow the Directory order
+  string path1 = _path;
+  string path2 = right._path;
+  unsigned int pos = 0;
+  while ((pos = path1.find('/', pos)) != string::npos) {
+    path1.replace(pos, 1, "\31");
+  }
+  pos = 0;
+  while ((pos = path2.find('/', pos)) != string::npos) {
+    path2.replace(pos, 1, "\31");
+  }
+  return (path1 < path2);
 }
 
 bool File::operator!=(const File& right) const {
