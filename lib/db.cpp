@@ -585,11 +585,12 @@ void Database::getList(
     full_path[--length] = '\0';
   }
 
+  // TODO Look for exact match until order is fixed ('.', '-' are before '/')
   // Look for beginning
   SortedList<DbData>::iterator entry = _d->active.begin();
   // Jump irrelevant first records
   while ((entry != _d->active.end())
-      && (strncmp(entry->fullPath().c_str(), full_path, length) < 0)) {
+      && (strncmp(entry->fullPath().c_str(), full_path, length) != 0)) {
     entry++;
   }
   // Copy relevant records

@@ -140,7 +140,7 @@ int Path::recurse(
           }
           db.add(prefix, _path, rel_path, cur_path, *i);
         } else {
-          // Found in DB
+          // Same file name found in DB
           if (**i != **j) {
             // Metadata differ
             if (((*i)->type() == 'f')
@@ -231,7 +231,7 @@ int Path::recurse(
       j = db_list.erase(j);
     }
   } else {
-    cerr << "Failed to parse directory" << endl;
+    cerr << strerror(errno) << ": " << rel_path << endl;
   }
   return 0;
 }

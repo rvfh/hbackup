@@ -96,12 +96,12 @@ int DbList::load_v1(FILE* readfile, unsigned int offset) {
     if (buffer[0] != '\t') {
       free(prefix);
       prefix = NULL;
-      asprintf(&prefix, buffer);
+      asprintf(&prefix, "%s", buffer);
     } else
     if (buffer[1] != '\t') {
       free(path);
       path = NULL;
-      asprintf(&path, &buffer[1]);
+      asprintf(&path, "%s", &buffer[1]);
       db_data = end();
     } else {
       char* start  = &buffer[2];
@@ -239,12 +239,12 @@ int DbList::load_v2(FILE* readfile, unsigned int offset) {
     if (buffer[0] != '\t') {
       free(prefix);
       prefix = NULL;
-      asprintf(&prefix, buffer);
+      asprintf(&prefix, "%s", buffer);
     } else
     if ((prefix != NULL) && (buffer[1] != '\t')) {
       free(path);
       path = NULL;
-      asprintf(&path, &buffer[1]);
+      asprintf(&path, "%s", &buffer[1]);
       db_data = end();
     } else if (path != NULL) {
       char* start  = &buffer[2];
@@ -376,7 +376,7 @@ int DbList::save(
         last_prefix = NULL;
         free(last_path);
         last_path = NULL;
-        asprintf(&last_prefix, i->prefix().c_str());
+        asprintf(&last_prefix, "%s", i->prefix().c_str());
       }
       if ((last_path == NULL) || strcmp(last_path, i->data()->path().c_str())){
         if (last_out != 0) {
@@ -386,7 +386,7 @@ int DbList::save(
         fprintf(writefile, "\t%s\n", i->data()->path().c_str());
         free(last_path);
         last_path = NULL;
-        asprintf(&last_path, i->data()->path().c_str());
+        asprintf(&last_path, "%s", i->data()->path().c_str());
       } else {
         if (last_out != i->in()) {
           fprintf(writefile, "\t\t%ld\t-\t\n", last_out);
