@@ -24,12 +24,10 @@ using namespace std;
 #include <sys/stat.h>
 #include <errno.h>
 
-#include "list.h"
 #include "files.h"
 #include "filters.h"
 #include "parsers.h"
 #include "cvs_parser.h"
-#include "list.h"
 #include "dbdata.h"
 #include "dblist.h"
 #include "db.h"

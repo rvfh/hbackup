@@ -22,7 +22,7 @@ using namespace std;
 #include <string>
 #include <list>
 
-#include "list.h"
+#include "dblist.h"
 
 using namespace hbackup;
 
