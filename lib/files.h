@@ -283,23 +283,23 @@ public:
   }
   // Open file, for read or write (no append), with or without compression
   int open(
-    const char*           req_mode,
-    unsigned int          compression = 0);
+    const char*     req_mode,
+    unsigned int    compression = 0);
   // Close file, for read or write (no append), with or without compression
   int close();
   // Read file sets eof (check with eof()) when all data is read and ready
   ssize_t read(
-    unsigned char*        buffer,
-    size_t                count);
+    void*           buffer,
+    size_t          count);
   // Write to file (signal end of file for compression to end properly)
   ssize_t write(
-    unsigned char*        buffer,
-    size_t                count,
-    bool                  eof);
+    const void*     buffer,
+    size_t          count,
+    bool            eof = false);
   // Compute file checksum
-  int       computeChecksum();
+  int computeChecksum();
   // Copy file into another
-  int       copy(Stream& source);
+  int copy(Stream& source);
   // Data access
   long long dsize() const   { return _dsize; };
   // Read parameters from line
