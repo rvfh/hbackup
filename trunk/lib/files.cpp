@@ -264,7 +264,7 @@ int Stream::close() {
   return rc;
 }
 
-ssize_t Stream::read(unsigned char* buffer, size_t count) {
+ssize_t Stream::read(void* buffer, size_t count) {
   ssize_t length;
 
   if ((_fd == -1) || (_fmode & O_WRONLY)) {
@@ -276,7 +276,7 @@ ssize_t Stream::read(unsigned char* buffer, size_t count) {
   if (count == 0) return 0;
 
   if (_strm == NULL) {
-    _fbuffer = buffer;
+    _fbuffer = (unsigned char*) buffer;
   }
 
   // Read new data
@@ -305,7 +305,7 @@ ssize_t Stream::read(unsigned char* buffer, size_t count) {
 
   // Continue decompression of previous data
   _strm->avail_out = chunk;
-  _strm->next_out  = buffer;
+  _strm->next_out  = (unsigned char*) buffer;
   switch (inflate(_strm, Z_NO_FLUSH)) {
     case Z_NEED_DICT:
     case Z_DATA_ERROR:
@@ -318,7 +318,7 @@ ssize_t Stream::read(unsigned char* buffer, size_t count) {
   return length;
 }
 
-ssize_t Stream::write(unsigned char* buffer, size_t count, bool eof) {
+ssize_t Stream::write(const void* buffer, size_t count, bool eof) {
   static bool finished = true;
   ssize_t length;
 
@@ -361,7 +361,7 @@ ssize_t Stream::write(unsigned char* buffer, size_t count, bool eof) {
   } else {
     // Compress data
     _strm->avail_in = count;
-    _strm->next_in  = buffer;
+    _strm->next_in  = (unsigned char*) buffer;
     count = 0;
 
     do {
