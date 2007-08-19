@@ -5,8 +5,7 @@ LDFLAGS := -lssl -lz
 
 all: test
 
-test:	list.done \
-	files.done \
+test:   files.done \
 	filters.done \
 	parsers.done \
 	cvs_parser.done \

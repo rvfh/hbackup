@@ -59,6 +59,87 @@ int main(void) {
   DbList            journal;
   int               status;
 
+  {// list test here for now
+    SortedList<string> sorted_list;
+    list<string>::iterator i;
+
+    cout << "Fill in list\n";
+    i = sorted_list.find("test");
+    sorted_list.add("test/testfile");
+    cout << "List " << sorted_list.size() << " element(s):\n";
+    for (i = sorted_list.begin(); i != sorted_list.end(); i++) {
+      cout << *i << endl;
+    }
+    i = sorted_list.find("test");
+
+    sorted_list.add("test");
+    cout << "List " << sorted_list.size() << " element(s):\n";
+    for (i = sorted_list.begin(); i != sorted_list.end(); i++) {
+      cout << *i << endl;
+    }
+
+    i = sorted_list.find("test");
+    if (*i != "test") {
+      cout << "test not found???" << endl;
+    }
+
+    sorted_list.add("test/subdir/testfile1");
+    cout << "List " << sorted_list.size() << " element(s):\n";
+    for (i = sorted_list.begin(); i != sorted_list.end(); i++) {
+      cout << *i << endl;
+    }
+
+    sorted_list.add("test/subdir");
+    cout << "List " << sorted_list.size() << " element(s):\n";
+    for (i = sorted_list.begin(); i != sorted_list.end(); i++) {
+      cout << *i << endl;
+    }
+
+    sorted_list.add("test/testfile");
+    cout << "List " << sorted_list.size() << " element(s):\n";
+    for (i = sorted_list.begin(); i != sorted_list.end(); i++) {
+      cout << *i << endl;
+    }
+
+    cout << "Empty list\n";
+    sorted_list.erase(sorted_list.begin());
+    cout << "List " << sorted_list.size() << " element(s):\n";
+    for (i = sorted_list.begin(); i != sorted_list.end(); i++) {
+      cout << *i << endl;
+    }
+
+    i-- = sorted_list.end();
+    sorted_list.erase(i);
+    cout << "List " << sorted_list.size() << " element(s):\n";
+    for (i = sorted_list.begin(); i != sorted_list.end(); i++) {
+      cout << *i << endl;
+    }
+
+    i--;
+    i--;
+    sorted_list.erase(i);
+    cout << "List " << sorted_list.size() << " element(s):\n";
+    for (i = sorted_list.begin(); i != sorted_list.end(); i++) {
+      cout << *i << endl;
+    }
+
+    sorted_list.erase(sorted_list.begin());
+    cout << "List " << sorted_list.size() << " element(s):\n";
+    for (i = sorted_list.begin(); i != sorted_list.end(); i++) {
+      cout << *i << endl;
+    }
+
+    i-- = sorted_list.end();
+    sorted_list.erase(i);
+    cout << "List " << sorted_list.size() << " element(s):\n";
+    for (i = sorted_list.begin(); i != sorted_list.end(); i++) {
+      cout << *i << endl;
+    }
+  }
+
+
+
+
   Database db("test_db");
 
   /* Test database */
