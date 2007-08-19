@@ -28,7 +28,6 @@ using namespace std;
 #include "filters.h"
 #include "parsers.h"
 #include "cvs_parser.h"
-#include "list.h"
 #include "dbdata.h"
 #include "dblist.h"
 #include "db.h"

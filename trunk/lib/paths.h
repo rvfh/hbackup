@@ -19,25 +19,10 @@
 #ifndef PATHS_H
 #define PATHS_H
 
-#ifndef LIST_H
-#error You must include files.h before paths.h
-#endif
-
-#ifndef FILES_H
-#error You must include files.h before paths.h
-#endif
-
-#ifndef FILTERS_H
-#error You must include filters.h before paths.h
-#endif
-
-#ifndef PARSERS_H
-#error You must include parsers.h before paths.h
-#endif
-
-#ifndef DB_H
-#error You must include db.h before paths.h
-#endif
+#include "files.h"
+#include "filters.h"
+#include "parsers.h"
+#include "db.h"
 
 namespace hbackup {
 

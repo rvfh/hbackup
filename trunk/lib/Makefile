@@ -19,11 +19,11 @@ check: all
 # Dependencies
 libhbackup.a: clients.o db.o dblist.o filters.o paths.o files.o cvs_parser.o
 
-clients.o: files.h list.h filters.h parsers.h cvs_parser.h paths.h dbdata.h \
+clients.o: files.h filters.h parsers.h cvs_parser.h paths.h dbdata.h \
 	dblist.h db.h clients.h
 cvs_parser.o: files.h parsers.h cvs_parser.h
-db.o: list.h files.h filters.h parsers.h dbdata.h dblist.h db.h
-dblist.o: list.h files.h dbdata.h dblist.h
+db.o: files.h filters.h parsers.h dbdata.h dblist.h db.h
+dblist.o: files.h dbdata.h dblist.h
 files.o: files.h
 filters.o: filters.h files.h
 paths.o: files.h filters.h parsers.h cvs_parser.h dbdata.h dblist.h db.h paths.h

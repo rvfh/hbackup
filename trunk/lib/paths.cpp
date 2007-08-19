@@ -25,7 +25,6 @@
 
 using namespace std;
 
-#include "list.h"
 #include "files.h"
 #include "filters.h"
 #include "parsers.h"
