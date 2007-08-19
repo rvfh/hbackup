@@ -105,9 +105,9 @@ Reading version 1 lists
  -> Updating database format
  --> Database active items part closed (contents: 20 files)
 Reading version 1 lists
- --> Database removed items part open (contents: 6 files)
+ --> Database removed items part open (contents: 7 files)
  -> Closing database
- --> Database removed items part closed (contents: 6 files)
+ --> Database removed items part closed (contents: 7 files)
 
 # version 1
 file://client
@@ -143,13 +143,13 @@ file://host
 	/home/user/dir space
 		12	d	0	0	1000	1000	755	
 	/home/user/dir space/file space
-		13	f	0	1187315785	1000	1000	644	d41d8cd98f00b204e9800998ecf8427e-0	
+		3	f	0	1187315785	1000	1000	644	d41d8cd98f00b204e9800998ecf8427e-0	
 	/home/user/test space
 		14	f	0	1187315785	1000	1000	644	d41d8cd98f00b204e9800998ecf8427e-0	
 	/home/user/testdir
-		15	d	0	0	1000	1000	755	
+		4	d	0	0	1000	1000	755	
 	/home/user/testfile
-		16	f	13	1161486000	1000	1000	644	59ca0efa9f5633cb0371bbc0355478d8-0	
+		5	f	13	1161486000	1000	1000	644	59ca0efa9f5633cb0371bbc0355478d8-0	
 	/home/user/testlink
 		17	l	8	1187315785	1000	1000	777	testfile	
 #
@@ -157,19 +157,21 @@ file://host
 # version 1
 file://host
 	/home/user/cvs/dirutd/CVS/Entries
-		22	f	42	1187315785	1000	1000	775	5252f242d27b8c2c9fdbdcbb33545d07-0	
-		30	-	
+		1	f	42	1187315785	1000	1000	775	5252f242d27b8c2c9fdbdcbb33545d07-0	
+		2	-	
 	/home/user/cvs/dirutd/fileutd
-		9	f	0	1187315785	1000	1000	644	d41d8cd98f00b204e9800998ecf8427e-0	
-		33	-	
+		1	f	0	1187315785	1000	1000	644	d41d8cd98f00b204e9800998ecf8427e-0	
+		2	-	
 	/home/user/dir space/file space
-		13	f	0	1187315785	1000	1000	644	d41d8cd98f00b204e9800998ecf8427e-0	
-		28	-	
+		1	f	0	1187315785	1000	1000	644	d41d8cd98f00b204e9800998ecf8427e-0	
+		2	-	
 	/home/user/testdir
-		15	d	0	0	1000	1000	755	
-		24	d	0	0	1000	1000	775	
-		32	-	
+		1	d	0	0	1000	1000	755	
+		2	d	0	0	1000	1000	775	
+		3	-	
 	/home/user/testfile
-		16	f	13	1161486000	1000	1000	644		
-		27	-	
+		1	f	13	1161486000	1000	1000	644		
+		2	-	
+		3	f	13	1187315785	1000	1000	644	d41d8cd98f00b204e9800998ecf8427e-0	
+		4	-	
 #
