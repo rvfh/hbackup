@@ -220,12 +220,13 @@ int Stream::open(const char* req_mode, unsigned int compression) {
       /* Compress */
       if (deflateInit2(_strm, compression, Z_DEFLATED, 16 + 15, 9,
           Z_DEFAULT_STRATEGY)) {
-        fprintf(stderr, "stream: deflate init failed\n");
+        cerr << "stream: deflate init failed" << endl;
         compression = 0;
       }
     } else {
       /* De-compress */
       if (inflateInit2(_strm, 32 + 15)) {
+        cerr << "stream: inflate init failed" << endl;
         compression = 0;
       }
     }
@@ -275,14 +276,18 @@ ssize_t Stream::read(void* buffer, size_t count) {
   if (count > chunk) count = chunk;
   if (count == 0) return 0;
 
-  if (_strm == NULL) {
-    _fbuffer = (unsigned char*) buffer;
-  }
-
   // Read new data
   if (_fempty) {
-    // Read chunk
-    length = std::read(_fd, _fbuffer, count);
+    if (_strm == NULL) {
+      // No decompression
+      _fbuffer = (unsigned char*) buffer;
+      length = std::read(_fd, _fbuffer, count);
+    } else {
+      // Decompression
+      length = std::read(_fd, _fbuffer, chunk);
+    }
+
+    // Check result
     if (length < 0) {
       return -1;
     }
@@ -304,7 +309,7 @@ ssize_t Stream::read(void* buffer, size_t count) {
   }
 
   // Continue decompression of previous data
-  _strm->avail_out = chunk;
+  _strm->avail_out = count;
   _strm->next_out  = (unsigned char*) buffer;
   switch (inflate(_strm, Z_NO_FLUSH)) {
     case Z_NEED_DICT:
@@ -313,7 +318,7 @@ ssize_t Stream::read(void* buffer, size_t count) {
       fprintf(stderr, "File::read: inflate failed\n");
   }
   _fempty = (_strm->avail_out != 0);
-  length = chunk - _strm->avail_out;
+  length = count - _strm->avail_out;
   _dsize += length;
   return length;
 }
@@ -386,6 +391,63 @@ ssize_t Stream::write(const void* buffer, size_t count) {
 
   _size += count;
   return count;
+}
+
+ssize_t Stream::getLine(char** buffer, size_t* length) {
+  size_t  chunk_size        = 256;
+  size_t  read_buffer_size  = 0;
+  char*   read_buffer       = NULL;
+  char*   reader            = read_buffer;
+  size_t  read_size         = 0;
+
+  // Find end of line or end of file
+  ssize_t size;
+  do {
+    // Check buffer size and inflate as needed
+    if (read_size == read_buffer_size) {
+      read_buffer_size     += chunk_size;
+      char* new_read_buffer = (char*) realloc(read_buffer, read_buffer_size);
+      if (new_read_buffer == NULL) {
+        read_size = -1;
+        goto end;
+      } else {
+        read_buffer = new_read_buffer;
+      }
+      reader = &read_buffer[read_size];
+    }
+
+    // Read one character at a time
+    size = read(reader, 1);
+    if (size < 0) {
+      read_size = -1;
+      goto end;
+    }
+    read_size += size;
+
+    // End of line found?
+    if (*reader == '\n') {
+      break;
+    } else {
+      reader++;
+    }
+  } while (size != 0);
+
+  if (read_size >= *length) {
+    char* test_buffer = (char*) realloc(*buffer, read_size + 1);
+    if (test_buffer == NULL) {
+      read_size = -1;
+      goto end;
+    } else {
+      *buffer = test_buffer;
+      *length = read_size + 1;
+    }
+  }
+  memcpy(*buffer, read_buffer, *length);
+  (*buffer)[read_size] = '\0';
+
+end:
+  free(read_buffer);
+  return read_size;
 }
 
 int Stream::computeChecksum() {
