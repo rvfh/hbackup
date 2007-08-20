@@ -318,7 +318,7 @@ ssize_t Stream::read(void* buffer, size_t count) {
   return length;
 }
 
-ssize_t Stream::write(const void* buffer, size_t count, bool eof) {
+ssize_t Stream::write(const void* buffer, size_t count) {
   static bool finished = true;
   ssize_t length;
 
@@ -367,7 +367,7 @@ ssize_t Stream::write(const void* buffer, size_t count, bool eof) {
     do {
       _strm->avail_out = chunk;
       _strm->next_out  = _fbuffer;
-      deflate(_strm, eof ? Z_FINISH : Z_NO_FLUSH);
+      deflate(_strm, finished ? Z_FINISH : Z_NO_FLUSH);
       length = chunk - _strm->avail_out;
       count += length;
 
@@ -427,7 +427,7 @@ int Stream::copy(Stream& source) {
     }
     eof = (size == 0);
     read_size += size;
-    size = write(buffer, size, eof);
+    size = write(buffer, size);
     if (size < 0) {
       break;
     }
