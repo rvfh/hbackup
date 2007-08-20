@@ -70,7 +70,31 @@ int main(void) {
 
   // '-' is before '/' in the ASCII table...
   system("touch test1/subdir-file");
+  system("touch test1/subdirfile");
 
+  if (! path->parse(db, "file://localhost", "test1")) {
+//     cout << ">List " << path->nodes() << " file(s):\n";
+  }
+
+  // Display DB contents
+  cout << "Active list:  " << ((DbList*)db.active())->size()
+    << " element(s):\n";
+  for (DbList::iterator i = ((DbList*)db.active())->begin();
+       i != ((DbList*)db.active())->end(); i++) {
+    i->line();
+  }
+  cout << "Removed list: " << ((DbList*)db.removed())->size()
+    << " element(s):\n";
+  for (DbList::iterator i = ((DbList*)db.removed())->begin();
+       i != ((DbList*)db.removed())->end(); i++) {
+    i->line();
+  }
+
+  cout << "as previous with subdir/testfile in ignore list" << endl;
+  if (path->addFilter("type", "file")
+   || path->addFilter("path", "subdir/testfile", true)) {
+    cout << "Failed to add filter" << endl;
+  }
   if (! path->parse(db, "file://localhost", "test1")) {
 //     cout << ">List " << path->nodes() << " file(s):\n";
   }
