@@ -93,10 +93,10 @@ public:
 class DbList : public SortedList<DbData> {
   bool _open;
   int  load_v1(
-    FILE* readfile,
+    FILE*        readfile,
     unsigned int offset = 0);
   int  load_v2(
-    FILE* readfile,
+    FILE*        readfile,
     unsigned int offset = 0);
 public:
   DbList() : _open(false) {}
@@ -121,6 +121,43 @@ public:
   int  close(
     const string& path,
     const string& filename);
+};
+
+#if 0
+class List : public Stream {
+public:
+  int  open();
+  void close();
+  void getList(
+    const char*   prefix,
+    const char*   base_path,
+    const char*   rel_path,
+    list<Node*>&  list);
+  int  merge(
+    const char*   journal_path,
+    const char*   journal_name = "");
+};
+#endif
+
+class Journal : public Stream {
+public:
+  Journal(
+    const char*   dir_path,
+    const char*   name = "") :
+    Stream(dir_path, name) {}
+  int getLine(
+    time_t*   timestamp,
+    char**    prefix,
+    char**    path,
+    Node**    node);
+  int added(
+    const char*   prefix,
+    const char*   path,
+    const Node*   node,
+    bool          notime = false);
+  int removed(
+    const char*   prefix,
+    const char*   path);
 };
 
 }

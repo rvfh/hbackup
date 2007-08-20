@@ -9,6 +9,7 @@ test:   files.done \
 	filters.done \
 	parsers.done \
 	cvs_parser.done \
+	dblist.done \
 	db.done \
 	paths.done \
 	clients.done

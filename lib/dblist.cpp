@@ -241,7 +241,11 @@ int DbList::load_v2(FILE* readfile, unsigned int offset) {
       continue;
     }
     // Remove ending '\n'
-    buffer[strlen(buffer) - 1] = '\0';
+    if (buffer[strlen(buffer) - 1] != '\n') {
+      failed = 1;
+      break;
+    }
+    buffer[strlen(buffer) - 1] = '\t';
     if (buffer[0] == '#') {
       end_found = true;
       break;
@@ -456,6 +460,87 @@ int DbList::save(
   return failed;
 }
 
+int DbList::save_v2(
+    const string& path,
+    const string& filename,
+    bool          backup) {
+  FILE    *writefile;
+  int     failed = 0;
+
+  string dest_path = path + "/" + filename;
+  string temp_path = dest_path + ".part";
+  if ((writefile = fopen(temp_path.c_str(), "w")) != NULL) {
+    fprintf(writefile, "# version 2\n");
+    char*  last_prefix = NULL;
+    char*  last_path   = NULL;
+    time_t last_out    = 0;
+    for (SortedList<DbData>::iterator i = begin(); i != end(); i++) {
+      if ((last_prefix == NULL) || strcmp(last_prefix, i->prefix())) {
+        fprintf(writefile, "%s\n", i->prefix());
+        free(last_prefix);
+        last_prefix = NULL;
+        free(last_path);
+        last_path = NULL;
+        asprintf(&last_prefix, "%s", i->prefix());
+      }
+      if ((last_path == NULL) || strcmp(last_path, i->path())) {
+        if (last_out != 0) {
+          fprintf(writefile, "\t\t%ld\t-\n", last_out);
+          last_out = 0;
+        }
+        fprintf(writefile, "\t%s\n", i->path());
+        free(last_path);
+        last_path = NULL;
+        asprintf(&last_path, "%s", i->path());
+      } else {
+        if ((last_out != 0) && (last_out != i->in())) {
+          fprintf(writefile, "\t\t%ld\t-\n", last_out);
+          last_out = 0;
+        }
+      }
+      fprintf(writefile, "\t\t%ld\t%c\t%lld\t%ld\t%u\t%u\t%o",
+        i->in(), i->data()->type(), i->data()->size(), i->data()->mtime(),
+        i->data()->uid(), i->data()->gid(), i->data()->mode());
+      if (i->data()->type() == 'f') {
+        fprintf(writefile, "\t%s", ((File*) (i->data()))->checksum());
+      }
+      if (i->data()->type() == 'l') {
+        fprintf(writefile, "\t%s", ((Link*) (i->data()))->link());
+      }
+      fprintf(writefile, "\n");
+      if (i->out() != 0) {
+        last_out = i->out();
+      }
+    }
+    // Last one...
+    if (last_out != 0) {
+      fprintf(writefile, "\t\t%ld\t-\n", last_out);
+    }
+    fprintf(writefile, "#\n");
+    fclose(writefile);
+
+    /* All done */
+    if (backup && rename(dest_path.c_str(), (dest_path + "~").c_str())) {
+      if (verbosity() > 3) {
+        cerr << "dblist: save: cannot create backup" << endl;
+      }
+      failed = 2;
+    }
+    if (rename(temp_path.c_str(), dest_path.c_str())) {
+      if (verbosity() > 3) {
+        cerr << "dblist: save: cannot rename file" << endl;
+      }
+      failed = 2;
+    }
+  } else {
+    if (verbosity() > 3) {
+      cerr << "dblist: save: cannot create file" << endl;
+    }
+    failed = 2;
+  }
+  return failed;
+}
+
 int DbList::open(
     const string& path,
     const string& filename) {
@@ -505,5 +590,213 @@ int DbList::close(
     }
     cout << ")" << endl;
   }
+  return 0;
+}
+
+int Journal::getLine(
+    time_t*   timestamp,
+    char**    prefix,
+    char**    path,
+    Node**    node) {
+  char*   line  = NULL;
+  size_t  lsize = 0;
+  size_t  length;
+
+  // Initialise
+  errno   = 0;
+  *prefix = NULL;
+  *path   = NULL;
+  *node   = NULL;
+
+  // Expect prefix
+  length = Stream::getLine(&line, &lsize);
+  if (length == 0) {
+    free(line);
+    return 0;
+  }
+  length--;
+  if ((line[0] == '\t') || (line[length] != '\n')) {
+    errno = EUCLEAN;
+    goto failed;
+  }
+  line[length] = '\0';
+  asprintf(prefix, "%s", line);
+
+  // Expect path
+  length = Stream::getLine(&line, &lsize);
+  if (length == 0) {
+    errno = EUCLEAN;
+    goto failed;
+  }
+  length--;
+  if ((line[1] == '\t') || (line[0] != '\t') || (line[length] != '\n')) {
+    errno = EUCLEAN;
+    goto failed;
+  }
+  line[length] = '\0';
+  asprintf(path, "%s", &line[1]);
+
+  // Expect node
+  length = Stream::getLine(&line, &lsize);
+  if (length == 0) {
+    errno = EUCLEAN;
+    goto failed;
+  }
+  length--;
+  if ((line[0] != '\t') || (line[1] != '\t') || (line[length] != '\n')) {
+    errno = EUCLEAN;
+    goto failed;
+  }
+  line[length] = '\t';
+  {
+    char*     start  = &line[2];
+    int       fields = 7;
+    // Fields
+    char      type;             // file type
+    time_t    mtime;            // time of last modification
+    long long size;             // on-disk size, in bytes
+    uid_t     uid;              // user ID of owner
+    gid_t     gid;              // group ID of owner
+    mode_t    mode;             // permissions
+    char*     checksum = NULL;  // file checksum
+    char*     link     = NULL;  // what the link points to
+
+    for (int field = 1; field <= fields; field++) {
+      // Get tabulation position
+      char* delim = strchr(start, '\t');
+      if (delim == NULL) {
+        errno = EUCLEAN;
+      } else {
+        *delim = '\0';
+        /* Extract data */
+        switch (field) {
+          case 1:   /* DB timestamp */
+            if (sscanf(start, "%ld", timestamp) != 1) {
+              errno = EUCLEAN;
+            }
+            break;
+          case 2:   /* Type */
+            if (sscanf(start, "%c", &type) != 1) {
+              errno = EUCLEAN;;
+            } else if (type == '-') {
+              fields = 2;
+            } else if ((type == 'f') || (type == 'l')) {
+              fields++;
+            }
+            break;
+          case 3:   /* Size */
+            if (sscanf(start, "%lld", &size) != 1) {
+              errno = EUCLEAN;;
+            }
+            break;
+          case 4:   /* Modification time */
+            if (sscanf(start, "%ld", &mtime) != 1) {
+              errno = EUCLEAN;;
+            }
+            break;
+          case 5:   /* User */
+            if (sscanf(start, "%u", &uid) != 1) {
+              errno = EUCLEAN;;
+            }
+            break;
+          case 6:   /* Group */
+            if (sscanf(start, "%u", &gid) != 1) {
+              errno = EUCLEAN;;
+            }
+            break;
+          case 7:   /* Permissions */
+            if (sscanf(start, "%o", &mode) != 1) {
+              errno = EUCLEAN;;
+            }
+            break;
+          case 8:  /* Checksum or Link */
+              if (type == 'f') {
+                checksum = start;
+              } else if (type == 'l') {
+                link = start;
+              }
+            break;
+          default:
+            errno = EUCLEAN;;
+        }
+        start = delim + 1;
+      }
+      if (errno != 0) {
+        cerr << "dblist: file corrupted line " << line << endl;
+        errno = EUCLEAN;
+        goto failed;
+      }
+    }
+    switch (type) {
+      case '-':
+        *node = NULL;
+        break;
+      case 'f':
+        *node = new File(*path, type, mtime, size, uid, gid, mode,
+          checksum);
+        break;
+      case 'l':
+        *node = new Link(*path, type, mtime, size, uid, gid, mode, link);
+        break;
+      default:
+        *node = new Node(*path, type, mtime, size, uid, gid, mode);
+    }
+  }
+  free(line);
+  return 1;
+
+failed:
+  free(*prefix);
+  free(*path);
+  free(*node);
+  free(line);
+  return -1;
+}
+
+int Journal::added(
+    const char* prefix,
+    const char* path,
+    const Node* node,
+    bool        notime) {
+  Stream::write(prefix, strlen(prefix));
+  Stream::write("\n\t", 2);
+  Stream::write(path, strlen(path));
+  Stream::write("\n", 1);
+  char* line = NULL;
+  int size = asprintf(&line, "\t\t%ld\t%c\t%lld\t%ld\t%u\t%u\t%o",
+    notime ? 0 : time(NULL), node->type(), node->size(), node->mtime(),
+    node->uid(), node->gid(), node->mode());
+  Stream::write(line, size);
+  free(line);
+  switch (node->type()) {
+    case 'f':
+      Stream::write("\t", 1);
+      {
+        const char* checksum = ((File*) node)->checksum();
+        Stream::write(checksum, strlen(checksum));
+      }
+      break;
+    case 'l':
+      Stream::write("\t", 1);
+      {
+        const char* link = ((Link*) node)->link();
+        Stream::write(link, strlen(link));
+      }
+  }
+  Stream::write("\n", 1);
+  return 0;
+}
+
+int Journal::removed(
+    const char* prefix,
+    const char* path) {
+  Stream::write(prefix, strlen(prefix));
+  Stream::write("\n\t", 2);
+  Stream::write(path, strlen(path));
+  Stream::write("\n", 1);
+  char* line = NULL;
+  int size = asprintf(&line, "\t\t%ld\t-\n", time(NULL));
+  Stream::write(line, size);
+  free(line);
   return 0;
 }

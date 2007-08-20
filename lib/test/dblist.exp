@@ -1,0 +1,28 @@
+Prefix: prefix
+Path:   path
+TS:     1
+Type:   removed
+
+Prefix: prefix2
+Path:   path2
+TS:     2
+Type:   file
+Name:   path2
+Size:   13
+Chcksm: 59ca0efa9f5633cb0371bbc0355478d8
+
+Prefix: prefix3
+Path:   path3
+TS:     0
+Type:   link
+Name:   path3
+Size:   8
+Link:   testfile
+
+Prefix: prefix4
+Path:   path4
+TS:     0
+Type:   other
+Name:   path4
+Size:   0
+
