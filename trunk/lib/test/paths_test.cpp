@@ -349,6 +349,56 @@ int main(void) {
     i->line();
   }
 
+  db.close();
+  db.open();
+
+  cout << "the biblio case" << endl;
+  system("mkdir -p test1/testdir/biblio");
+  system("touch test1/testdir/biblio/biblio.dbf");
+  system("touch test1/testdir/biblio/biblio.dbt");
+  system("touch test1/testdir/biblio.odb");
+  system("touch test1/testdir/evolocal.odb");
+  if (! path->parse(db, "file://localhost", "test1")) {
+//     cout << ">List " << path->nodes() << " file(s):\n";
+  }
+
+  // Display DB contents
+  cout << "Active list:  " << ((DbList*)db.active())->size()
+    << " element(s):\n";
+  for (DbList::iterator i = ((DbList*)db.active())->begin();
+       i != ((DbList*)db.active())->end(); i++) {
+    i->line();
+  }
+  db.open_removed();
+  cout << "Removed list: " << ((DbList*)db.removed())->size()
+    << " element(s):\n";
+  for (DbList::iterator i = ((DbList*)db.removed())->begin();
+       i != ((DbList*)db.removed())->end(); i++) {
+    i->line();
+  }
+
+  db.close();
+  db.open();
+
+  if (! path->parse(db, "file://localhost", "test1")) {
+//     cout << ">List " << path->nodes() << " file(s):\n";
+  }
+
+  // Display DB contents
+  cout << "Active list:  " << ((DbList*)db.active())->size()
+    << " element(s):\n";
+  for (DbList::iterator i = ((DbList*)db.active())->begin();
+       i != ((DbList*)db.active())->end(); i++) {
+    i->line();
+  }
+  db.open_removed();
+  cout << "Removed list: " << ((DbList*)db.removed())->size()
+    << " element(s):\n";
+  for (DbList::iterator i = ((DbList*)db.removed())->begin();
+       i != ((DbList*)db.removed())->end(); i++) {
+    i->line();
+  }
+
   delete path;
   db.close();
 
