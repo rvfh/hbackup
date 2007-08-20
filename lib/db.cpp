@@ -55,6 +55,7 @@ using namespace hbackup;
 #warning journals gone
 
 struct Database::Private {
+  DbList::iterator entry;
   DbList  active;
   DbList  removed;
 };
@@ -383,6 +384,7 @@ int Database::open() {
       status = 2;
     }
   }
+  _d->entry = _d->active.end();
 
   if (status == 2) {
     unlock();
@@ -432,30 +434,36 @@ void Database::getList(
     full_path[--length] = '\0';
   }
 
-  // TODO Look for exact match until order is fixed ('.', '-' are before '/')
   // Look for beginning
-  SortedList<DbData>::iterator entry = _d->active.begin();
+  if ((_d->entry == _d->active.end()) && (_d->entry != _d->active.begin())) {
+    _d->entry--;
+  }
+  // Jump irrelevant last records
+  while ((_d->entry != _d->active.begin())
+      && (_d->entry->comparePath(full_path) > 0)) {
+    _d->entry--;
+  }
   // Jump irrelevant first records
-  while ((entry != _d->active.end())
-      && (entry->comparePath(full_path, length) != 0)) {
-    entry++;
+  while ((_d->entry != _d->active.end())
+      && (_d->entry->comparePath(full_path) < 0)) {
+    _d->entry++;
   }
   // Copy relevant records
   char* last_dir     = NULL;
   int   last_dir_len = 0;
-  while ((entry != _d->active.end())
-      && (entry->comparePath(full_path, length) == 0)) {
-    if ((last_dir == NULL) || entry->comparePath(last_dir, last_dir_len)) {
+  while ((_d->entry != _d->active.end())
+      && (_d->entry->comparePath(full_path, length) == 0)) {
+    if ((last_dir == NULL) || _d->entry->comparePath(last_dir, last_dir_len)) {
       Node* node;
-      switch (entry->data()->type()) {
+      switch (_d->entry->data()->type()) {
         case 'f':
-          node = new File(*((File*) entry->data()));
+          node = new File(*((File*) _d->entry->data()));
           break;
         case 'l':
-          node = new Link(*((Link*) entry->data()));
+          node = new Link(*((Link*) _d->entry->data()));
           break;
         default:
-          node = new Node(*entry->data());
+          node = new Node(*_d->entry->data());
       }
       if (node->type() == 'd') {
         free(last_dir);
@@ -464,7 +472,7 @@ void Database::getList(
       }
       list.push_back(node);
     }
-    entry++;
+    _d->entry++;
   }
   free(last_dir);
   free(full_path);
@@ -738,7 +746,7 @@ void Database::remove(
     // Mark removed
     entry->setOut();
     // Append to removed list
-    _d->removed.push_back(*entry);
+    _d->removed.add(*entry);
     // Remove from active list / Go on to next
     entry = _d->active.erase(entry);
 
@@ -750,12 +758,13 @@ void Database::remove(
         // Mark removed
         entry->setOut();
         // Append to removed list
-        _d->removed.push_back(*entry);
+        _d->removed.add(*entry);
         // Remove from active list / Go on to next
         entry = _d->active.erase(entry);
       }
     }
   }
+  _d->entry = entry;
   free(full_path);
 }
 
