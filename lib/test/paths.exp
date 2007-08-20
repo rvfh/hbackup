@@ -81,8 +81,8 @@ as previous
  --> D cvs/dirutd/CVS
  --> D dir space
  --> D subdir
-Permission denied: test1/subdir/testfile
  --> ! subdir/testfile
+Permission denied: test1/subdir/testfile
  --> D testdir
 Active list:  30 element(s):
 file://localhost	/home/User/cvs	d	0	0	1000	1000	755			1	0	
