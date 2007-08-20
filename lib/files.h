@@ -131,12 +131,14 @@ public:
       Node(g),
       _checksum(NULL) {
     _parsed = true;
+    asprintf(&_checksum, "%s", "");
   }
   // Constructor for path in the VFS
   File(const char *path, const char* name = "") :
       Node(path, name),
       _checksum(NULL) {
     _parsed = true;
+    asprintf(&_checksum, "%s", "");
   }
   // Constructor for given file metadata
   File(
