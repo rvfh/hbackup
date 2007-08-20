@@ -55,10 +55,10 @@ file://localhost	/home/User/cvs/fileutd.h	f	0	1	1000	1000	644		d41d8cd98f00b204e
 file://localhost	/home/User/dir space	d	0	0	1000	1000	755			17	0	
 file://localhost	/home/User/dir space/file space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	18	0	
 file://localhost	/home/User/subdir	d	0	0	1000	1000	755			19	0	
+file://localhost	/home/User/subdir-file	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	23	0	
 file://localhost	/home/User/subdir/testfile	f	12	1	1000	1000	0			20	0	
 file://localhost	/home/User/subdir/testfile1	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	21	0	
 file://localhost	/home/User/subdir/testfile2	f	12	1	1000	1000	644		285b35198a5e188b3a0df3ed33f93a26-0	22	0	
-file://localhost	/home/User/subdir-file	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	23	0	
 file://localhost	/home/User/subdirfile	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	24	0	
 file://localhost	/home/User/test space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	25	0	
 file://localhost	/home/User/testdir	d	0	0	1000	1000	755			26	0	
@@ -104,10 +104,10 @@ file://localhost	/home/User/cvs/fileutd.h	f	0	1	1000	1000	644		d41d8cd98f00b204e
 file://localhost	/home/User/dir space	d	0	0	1000	1000	755			17	0	
 file://localhost	/home/User/dir space/file space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	18	0	
 file://localhost	/home/User/subdir	d	0	0	1000	1000	755			19	0	
+file://localhost	/home/User/subdir-file	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	23	0	
 file://localhost	/home/User/subdir/testfile	f	12	1	1000	1000	0			20	0	
 file://localhost	/home/User/subdir/testfile1	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	21	0	
 file://localhost	/home/User/subdir/testfile2	f	12	1	1000	1000	644		285b35198a5e188b3a0df3ed33f93a26-0	22	0	
-file://localhost	/home/User/subdir-file	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	23	0	
 file://localhost	/home/User/subdirfile	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	24	0	
 file://localhost	/home/User/test space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	25	0	
 file://localhost	/home/User/testdir	d	0	0	1000	1000	755			26	0	
@@ -153,10 +153,10 @@ file://localhost	/home/User/cvs/fileutd.h	f	0	1	1000	1000	644		d41d8cd98f00b204e
 file://localhost	/home/User/dir space	d	0	0	1000	1000	755			17	0	
 file://localhost	/home/User/dir space/file space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	18	0	
 file://localhost	/home/User/subdir	d	0	0	1000	1000	755			19	0	
+file://localhost	/home/User/subdir-file	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	23	0	
 file://localhost	/home/User/subdir/testfile	f	12	1	1000	1000	644		285b35198a5e188b3a0df3ed33f93a26-0	31	0	
 file://localhost	/home/User/subdir/testfile1	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	21	0	
 file://localhost	/home/User/subdir/testfile2	f	12	1	1000	1000	644		285b35198a5e188b3a0df3ed33f93a26-0	22	0	
-file://localhost	/home/User/subdir-file	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	23	0	
 file://localhost	/home/User/subdirfile	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	24	0	
 file://localhost	/home/User/test space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	25	0	
 file://localhost	/home/User/testdir	d	0	0	1000	1000	755			26	0	
@@ -203,9 +203,9 @@ file://localhost	/home/User/cvs/fileutd.h	f	0	1	1000	1000	644		d41d8cd98f00b204e
 file://localhost	/home/User/dir space	d	0	0	1000	1000	755			17	0	
 file://localhost	/home/User/dir space/file space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	18	0	
 file://localhost	/home/User/subdir	d	0	0	1000	1000	755			19	0	
+file://localhost	/home/User/subdir-file	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	23	0	
 file://localhost	/home/User/subdir/testfile1	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	21	0	
 file://localhost	/home/User/subdir/testfile2	f	12	1	1000	1000	644		285b35198a5e188b3a0df3ed33f93a26-0	22	0	
-file://localhost	/home/User/subdir-file	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	23	0	
 file://localhost	/home/User/subdirfile	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	24	0	
 file://localhost	/home/User/test space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	25	0	
 file://localhost	/home/User/testdir	d	0	0	1000	1000	755			26	0	
@@ -669,19 +669,34 @@ file://localhost	/home/User/testpipe	p	0	1	1000	1000	644			30	49
  --> Database removed items part closed (contents: 19 files)
 Reading version 1 lists
  --> Database active items part open (contents: 15 files)
-the biblio case
+some troublesome past cases
  --> D cvs
  --> D cvs/CVS
  --> D cvs/dirbad
 Directory should be under CVS control: test1/cvs/dirbad
  --> D dir space
+ --> A docbook-xml
+ --> A docbook-xml/3.1.7
+ --> A docbook-xml/3.1.7/dbgenent.ent
+ --> A docbook-xml/4.0
+ --> A docbook-xml/4.0/dbgenent.ent
+ --> A docbook-xml/4.1.2
+ --> A docbook-xml/4.1.2/dbgenent.mod
+ --> A docbook-xml/4.2
+ --> A docbook-xml/4.2/dbgenent.mod
+ --> A docbook-xml/4.3
+ --> A docbook-xml/4.3/dbgenent.mod
+ --> A docbook-xml/4.4
+ --> A docbook-xml/4.4/dbgenent.mod
+ --> A docbook-xml.cat
+ --> A docbook-xml.cat.old
  --> D testdir
  --> A testdir/biblio
  --> A testdir/biblio/biblio.dbf
  --> A testdir/biblio/biblio.dbt
  --> A testdir/biblio.odb
  --> A testdir/evolocal.odb
-Active list:  20 element(s):
+Active list:  35 element(s):
 file://localhost	/home/User/cvs	d	0	0	1000	1000	755			1	0	
 file://localhost	/home/User/cvs/CVS	d	0	0	1000	1000	755			2	0	
 file://localhost	/home/User/cvs/CVS/Entries	f	141	1	1000	1000	644		63b52e85e7a255c09df5cca819b74a88-0	3	0	
@@ -691,15 +706,30 @@ file://localhost	/home/User/cvs/filenew.c	f	5	1	1000	1000	644		0d599f0ec05c3bda8
 file://localhost	/home/User/cvs/fileutd.h	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	16	0	
 file://localhost	/home/User/dir space	d	0	0	1000	1000	755			17	0	
 file://localhost	/home/User/dir space/file space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	18	0	
+file://localhost	/home/User/docbook-xml	d	0	0	1000	1000	755			54	0	
+file://localhost	/home/User/docbook-xml.cat	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	67	0	
+file://localhost	/home/User/docbook-xml.cat.old	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	68	0	
+file://localhost	/home/User/docbook-xml/3.1.7	d	0	0	1000	1000	755			55	0	
+file://localhost	/home/User/docbook-xml/3.1.7/dbgenent.ent	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	56	0	
+file://localhost	/home/User/docbook-xml/4.0	d	0	0	1000	1000	755			57	0	
+file://localhost	/home/User/docbook-xml/4.0/dbgenent.ent	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	58	0	
+file://localhost	/home/User/docbook-xml/4.1.2	d	0	0	1000	1000	755			59	0	
+file://localhost	/home/User/docbook-xml/4.1.2/dbgenent.mod	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	60	0	
+file://localhost	/home/User/docbook-xml/4.2	d	0	0	1000	1000	755			61	0	
+file://localhost	/home/User/docbook-xml/4.2/dbgenent.mod	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	62	0	
+file://localhost	/home/User/docbook-xml/4.3	d	0	0	1000	1000	755			63	0	
+file://localhost	/home/User/docbook-xml/4.3/dbgenent.mod	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	64	0	
+file://localhost	/home/User/docbook-xml/4.4	d	0	0	1000	1000	755			65	0	
+file://localhost	/home/User/docbook-xml/4.4/dbgenent.mod	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	66	0	
 file://localhost	/home/User/subdir-file	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	23	0	
 file://localhost	/home/User/subdirfile	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	24	0	
 file://localhost	/home/User/test space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	25	0	
 file://localhost	/home/User/testdir	d	0	0	1000	1000	755			26	0	
-file://localhost	/home/User/testdir/biblio	d	0	0	1000	1000	755			54	0	
-file://localhost	/home/User/testdir/biblio/biblio.dbf	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	55	0	
-file://localhost	/home/User/testdir/biblio/biblio.dbt	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	56	0	
-file://localhost	/home/User/testdir/biblio.odb	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	57	0	
-file://localhost	/home/User/testdir/evolocal.odb	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	58	0	
+file://localhost	/home/User/testdir/biblio	d	0	0	1000	1000	755			69	0	
+file://localhost	/home/User/testdir/biblio.odb	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	72	0	
+file://localhost	/home/User/testdir/biblio/biblio.dbf	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	70	0	
+file://localhost	/home/User/testdir/biblio/biblio.dbt	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	71	0	
+file://localhost	/home/User/testdir/evolocal.odb	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	73	0	
 file://localhost	/home/User/testfile	f	13	1	1000	1000	660		59ca0efa9f5633cb0371bbc0355478d8-0	50	0	
 file://localhost	/home/User/testfile~	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	28	0	
 Reading version 1 lists
@@ -724,18 +754,25 @@ file://localhost	/home/User/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371b
 file://localhost	/home/User/testlink	l	8	1	1000	1000	777	testfile		29	38	
 file://localhost	/home/User/testlink	l	8	1	1000	1000	777	testnull		37	39	
 file://localhost	/home/User/testpipe	p	0	1	1000	1000	644			30	49	
- --> Database active items part closed (contents: 20 files)
+ --> Database active items part closed (contents: 35 files)
  --> Database removed items part closed (contents: 19 files)
 Reading version 1 lists
- --> Database active items part open (contents: 20 files)
+ --> Database active items part open (contents: 35 files)
  --> D cvs
  --> D cvs/CVS
  --> D cvs/dirbad
 Directory should be under CVS control: test1/cvs/dirbad
  --> D dir space
+ --> D docbook-xml
+ --> D docbook-xml/3.1.7
+ --> D docbook-xml/4.0
+ --> D docbook-xml/4.1.2
+ --> D docbook-xml/4.2
+ --> D docbook-xml/4.3
+ --> D docbook-xml/4.4
  --> D testdir
  --> D testdir/biblio
-Active list:  20 element(s):
+Active list:  35 element(s):
 file://localhost	/home/User/cvs	d	0	0	1000	1000	755			1	0	
 file://localhost	/home/User/cvs/CVS	d	0	0	1000	1000	755			2	0	
 file://localhost	/home/User/cvs/CVS/Entries	f	141	1	1000	1000	644		63b52e85e7a255c09df5cca819b74a88-0	3	0	
@@ -745,15 +782,30 @@ file://localhost	/home/User/cvs/filenew.c	f	5	1	1000	1000	644		0d599f0ec05c3bda8
 file://localhost	/home/User/cvs/fileutd.h	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	16	0	
 file://localhost	/home/User/dir space	d	0	0	1000	1000	755			17	0	
 file://localhost	/home/User/dir space/file space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	18	0	
+file://localhost	/home/User/docbook-xml	d	0	0	1000	1000	755			54	0	
+file://localhost	/home/User/docbook-xml.cat	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	67	0	
+file://localhost	/home/User/docbook-xml.cat.old	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	68	0	
+file://localhost	/home/User/docbook-xml/3.1.7	d	0	0	1000	1000	755			55	0	
+file://localhost	/home/User/docbook-xml/3.1.7/dbgenent.ent	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	56	0	
+file://localhost	/home/User/docbook-xml/4.0	d	0	0	1000	1000	755			57	0	
+file://localhost	/home/User/docbook-xml/4.0/dbgenent.ent	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	58	0	
+file://localhost	/home/User/docbook-xml/4.1.2	d	0	0	1000	1000	755			59	0	
+file://localhost	/home/User/docbook-xml/4.1.2/dbgenent.mod	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	60	0	
+file://localhost	/home/User/docbook-xml/4.2	d	0	0	1000	1000	755			61	0	
+file://localhost	/home/User/docbook-xml/4.2/dbgenent.mod	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	62	0	
+file://localhost	/home/User/docbook-xml/4.3	d	0	0	1000	1000	755			63	0	
+file://localhost	/home/User/docbook-xml/4.3/dbgenent.mod	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	64	0	
+file://localhost	/home/User/docbook-xml/4.4	d	0	0	1000	1000	755			65	0	
+file://localhost	/home/User/docbook-xml/4.4/dbgenent.mod	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	66	0	
 file://localhost	/home/User/subdir-file	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	23	0	
 file://localhost	/home/User/subdirfile	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	24	0	
 file://localhost	/home/User/test space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	25	0	
 file://localhost	/home/User/testdir	d	0	0	1000	1000	755			26	0	
-file://localhost	/home/User/testdir/biblio	d	0	0	1000	1000	755			54	0	
-file://localhost	/home/User/testdir/biblio/biblio.dbf	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	55	0	
-file://localhost	/home/User/testdir/biblio/biblio.dbt	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	56	0	
-file://localhost	/home/User/testdir/biblio.odb	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	57	0	
-file://localhost	/home/User/testdir/evolocal.odb	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	58	0	
+file://localhost	/home/User/testdir/biblio	d	0	0	1000	1000	755			69	0	
+file://localhost	/home/User/testdir/biblio.odb	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	72	0	
+file://localhost	/home/User/testdir/biblio/biblio.dbf	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	70	0	
+file://localhost	/home/User/testdir/biblio/biblio.dbt	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	71	0	
+file://localhost	/home/User/testdir/evolocal.odb	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	73	0	
 file://localhost	/home/User/testfile	f	13	1	1000	1000	660		59ca0efa9f5633cb0371bbc0355478d8-0	50	0	
 file://localhost	/home/User/testfile~	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	28	0	
 Reading version 1 lists
@@ -778,5 +830,5 @@ file://localhost	/home/User/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371b
 file://localhost	/home/User/testlink	l	8	1	1000	1000	777	testfile		29	38	
 file://localhost	/home/User/testlink	l	8	1	1000	1000	777	testnull		37	39	
 file://localhost	/home/User/testpipe	p	0	1	1000	1000	644			30	49	
- --> Database active items part closed (contents: 20 files)
+ --> Database active items part closed (contents: 35 files)
  --> Database removed items part closed (contents: 19 files)
