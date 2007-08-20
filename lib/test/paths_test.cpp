@@ -401,12 +401,29 @@ int main(void) {
   db.close();
   db.open();
 
-  cout << "the biblio case" << endl;
+  cout << "some troublesome past cases" << endl;
+
+  system("mkdir -p test1/docbook-xml/3.1.7");
+  system("touch test1/docbook-xml/3.1.7/dbgenent.ent");
+  system("mkdir test1/docbook-xml/4.0");
+  system("touch test1/docbook-xml/4.0/dbgenent.ent");
+  system("mkdir test1/docbook-xml/4.1.2");
+  system("touch test1/docbook-xml/4.1.2/dbgenent.mod");
+  system("mkdir test1/docbook-xml/4.2");
+  system("touch test1/docbook-xml/4.2/dbgenent.mod");
+  system("mkdir test1/docbook-xml/4.3");
+  system("touch test1/docbook-xml/4.3/dbgenent.mod");
+  system("mkdir test1/docbook-xml/4.4");
+  system("touch test1/docbook-xml/4.4/dbgenent.mod");
+  system("touch test1/docbook-xml.cat");
+  system("touch test1/docbook-xml.cat.old");
+
   system("mkdir -p test1/testdir/biblio");
   system("touch test1/testdir/biblio/biblio.dbf");
   system("touch test1/testdir/biblio/biblio.dbt");
   system("touch test1/testdir/biblio.odb");
   system("touch test1/testdir/evolocal.odb");
+
   if (! path->parse(db, "file://localhost", "test1")) {
 //     cout << ">List " << path->nodes() << " file(s):\n";
   }

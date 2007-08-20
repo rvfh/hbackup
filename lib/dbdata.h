@@ -77,17 +77,7 @@ public:
     else if (cmp > 0) return false;
 
     // This will hopefully go when we just follow the Directory order
-    string path1 = _path;
-    string path2 = right._path;
-    unsigned int pos = 0;
-    while ((pos = path1.find('/', pos)) != string::npos) {
-      path1.replace(pos, 1, "\31");
-    }
-    pos = 0;
-    while ((pos = path2.find('/', pos)) != string::npos) {
-      path2.replace(pos, 1, "\31");
-    }
-    cmp = path1.compare(path2);
+    cmp = strcmp(_path, right._path);
     if (cmp < 0)      return true;
     else if (cmp > 0) return false;
 

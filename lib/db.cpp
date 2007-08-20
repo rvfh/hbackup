@@ -439,12 +439,10 @@ void Database::getList(
     _d->entry--;
   }
   // Jump irrelevant last records
-  full_path[length - 1] = '\31';
   while ((_d->entry != _d->active.begin())
-      && (_d->entry->comparePath(full_path) > 0)) {
+      && (_d->entry->comparePath(full_path, length) >= 0)) {
     _d->entry--;
   }
-  full_path[length - 1] = '/';
   // Jump irrelevant first records
   while ((_d->entry != _d->active.end())
       && (_d->entry->comparePath(full_path) < 0)) {
@@ -762,6 +760,10 @@ void Database::remove(
     if (descend && (node->type() == 'd')) {
       // Now we need the trailing '/'
       full_path[length - 1] = '/';
+      while ((entry != _d->active.end())
+          && (entry->comparePath(full_path, length) < 0)) {
+        entry++;
+      }
       while ((entry != _d->active.end())
           && (entry->comparePath(full_path, length) == 0)) {
         // Mark removed
