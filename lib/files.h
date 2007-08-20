@@ -281,13 +281,17 @@ public:
   ~Stream() {
     free(_path);
   }
+  // Create empty file
+  int create() {
+    return File::create(_path);
+  }
   // Open file, for read or write (no append), with or without compression
   int open(
     const char*     req_mode,
     unsigned int    compression = 0);
   // Close file, for read or write (no append), with or without compression
   int close();
-  // Read file sets eof (check with eof()) when all data is read and ready
+  // Read file
   ssize_t read(
     void*           buffer,
     size_t          count);
@@ -297,6 +301,10 @@ public:
   ssize_t write(
     const void*     buffer,
     size_t          count);
+  // Read a line from file
+  ssize_t getLine(
+    char**          buffer,
+    size_t*         length);
   // Compute file checksum
   int computeChecksum();
   // Copy file into another

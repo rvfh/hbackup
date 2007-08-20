@@ -453,6 +453,101 @@ int main(void) {
   delete writefile;
 
 
+  cout << endl << "Test: getLine" << endl;
+
+  writefile = new Stream("test2/testfile");
+  if (writefile->open("w")) {
+    cout << "Error opening file: " << strerror(errno) << endl;
+  } else {
+    writefile->write(NULL, 0);
+    if (writefile->close()) cout << "Error closing write file" << endl;
+  }
+  delete writefile;
+  readfile = new Stream("test2/testfile");
+  char*   line_test = NULL;
+  size_t  line_size = 0;
+  readfile->open("r", 0);
+  cout << "Reading empty file:" << endl;
+  while (readfile->getLine(&line_test, &line_size) > 0) {
+    cout << "Line: " << line_test << endl;
+  }
+  if (readfile->close()) cout << "Error closing read file" << endl;
+  delete readfile;
+  free(line_test);
+
+  writefile = new Stream("test2/testfile");
+  if (writefile->open("w")) {
+    cout << "Error opening file: " << strerror(errno) << endl;
+  } else {
+    writefile->write("abcdef\nghi\n", 11);
+    writefile->write(NULL, 0);
+    if (writefile->close()) cout << "Error closing write file" << endl;
+  }
+  delete writefile;
+  readfile = new Stream("test2/testfile");
+  line_test = NULL;
+  line_size = 0;
+  if (readfile->open("r")) {
+    cout << "Error opening file: " << strerror(errno) << endl;
+  }
+  cout << "Reading uncompressed file:" << endl;
+  while (readfile->getLine(&line_test, &line_size) > 0) {
+    cout << "Line: " << line_test << endl;
+  }
+  if (readfile->close()) cout << "Error closing read file" << endl;
+  delete readfile;
+  free(line_test);
+
+  writefile = new Stream("test2/testfile");
+  if (writefile->open("w", 5)) {
+    cout << "Error opening file: " << strerror(errno) << endl;
+  } else {
+    writefile->write("abcdef\nghi\n", 11);
+    writefile->write(NULL, 0);
+    if (writefile->close()) cout << "Error closing write file" << endl;
+  }
+  delete writefile;
+  readfile = new Stream("test2/testfile");
+  line_test = NULL;
+  line_size = 0;
+  if (readfile->open("r", 1)) {
+    cout << "Error opening file: " << strerror(errno) << endl;
+  }
+  cout << "Reading compressed file:" << endl;
+  while (readfile->getLine(&line_test, &line_size) > 0) {
+    cout << "Line: " << line_test << endl;
+  }
+  if (readfile->close()) cout << "Error closing read file" << endl;
+  delete readfile;
+  free(line_test);
+
+  writefile = new Stream("test2/testfile");
+  if (writefile->open("w", 5)) {
+    cout << "Error opening file: " << strerror(errno) << endl;
+  } else {
+    for (int i = 0; i < 60; i++) {
+      writefile->write("1234567890", 10);
+    }
+    writefile->write("\n1234567890", 10);
+    writefile->write(NULL, 0);
+    if (writefile->close()) cout << "Error closing write file" << endl;
+  }
+  delete writefile;
+  readfile = new Stream("test2/testfile");
+  line_test = NULL;
+  line_size = 0;
+  if (readfile->open("r", 1)) {
+    cout << "Error opening file: " << strerror(errno) << endl;
+  }
+  cout << "Reading compressed file (line length = 600):" << endl;
+  while (readfile->getLine(&line_test, &line_size) > 0) {
+    cout << "Line: " << line_test << endl;
+  }
+  if (readfile->close()) cout << "Error closing read file" << endl;
+  delete readfile;
+  free(line_test);
+
+
   cout << "\nreadline" << endl;
   list<string> *params;
   list<string>::iterator i;
