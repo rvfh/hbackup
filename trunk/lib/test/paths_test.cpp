@@ -61,6 +61,7 @@ int main(void) {
        i != ((DbList*)db.active())->end(); i++) {
     i->line();
   }
+  db.open_removed();
   cout << "Removed list: " << ((DbList*)db.removed())->size()
     << " element(s):\n";
   for (DbList::iterator i = ((DbList*)db.removed())->begin();
@@ -83,12 +84,16 @@ int main(void) {
        i != ((DbList*)db.active())->end(); i++) {
     i->line();
   }
+  db.open_removed();
   cout << "Removed list: " << ((DbList*)db.removed())->size()
     << " element(s):\n";
   for (DbList::iterator i = ((DbList*)db.removed())->begin();
        i != ((DbList*)db.removed())->end(); i++) {
     i->line();
   }
+
+  db.close();
+  db.open();
 
   cout << "as previous with subdir/testfile in ignore list" << endl;
   if (path->addFilter("type", "file")
@@ -106,12 +111,16 @@ int main(void) {
        i != ((DbList*)db.active())->end(); i++) {
     i->line();
   }
+  db.open_removed();
   cout << "Removed list: " << ((DbList*)db.removed())->size()
     << " element(s):\n";
   for (DbList::iterator i = ((DbList*)db.removed())->begin();
        i != ((DbList*)db.removed())->end(); i++) {
     i->line();
   }
+
+  db.close();
+  db.open();
 
   cout << "as previous with subdir in ignore list" << endl;
   if (path->addFilter("type", "dir")
@@ -129,12 +138,16 @@ int main(void) {
        i != ((DbList*)db.active())->end(); i++) {
     i->line();
   }
+  db.open_removed();
   cout << "Removed list: " << ((DbList*)db.removed())->size()
     << " element(s):\n";
   for (DbList::iterator i = ((DbList*)db.removed())->begin();
        i != ((DbList*)db.removed())->end(); i++) {
     i->line();
   }
+
+  db.close();
+  db.open();
 
   cout << "as previous with testlink modified" << endl;
   system("sleep 1 && ln -sf testnull test1/testlink");
@@ -153,12 +166,16 @@ int main(void) {
        i != ((DbList*)db.active())->end(); i++) {
     i->line();
   }
+  db.open_removed();
   cout << "Removed list: " << ((DbList*)db.removed())->size()
     << " element(s):\n";
   for (DbList::iterator i = ((DbList*)db.removed())->begin();
        i != ((DbList*)db.removed())->end(); i++) {
     i->line();
   }
+
+  db.close();
+  db.open();
 
   cout << "as previous with testlink in ignore list" << endl;
   if (path->addFilter("type", "link")
@@ -176,12 +193,16 @@ int main(void) {
        i != ((DbList*)db.active())->end(); i++) {
     i->line();
   }
+  db.open_removed();
   cout << "Removed list: " << ((DbList*)db.removed())->size()
     << " element(s):\n";
   for (DbList::iterator i = ((DbList*)db.removed())->begin();
        i != ((DbList*)db.removed())->end(); i++) {
     i->line();
   }
+
+  db.close();
+  db.open();
 
   cout << "as previous with CVS parser" << endl;
   if (path->addParser("cvs", "controlled")) {
@@ -198,12 +219,16 @@ int main(void) {
        i != ((DbList*)db.active())->end(); i++) {
     i->line();
   }
+  db.open_removed();
   cout << "Removed list: " << ((DbList*)db.removed())->size()
     << " element(s):\n";
   for (DbList::iterator i = ((DbList*)db.removed())->begin();
        i != ((DbList*)db.removed())->end(); i++) {
     i->line();
   }
+
+  db.close();
+  db.open();
 
   cout << "as previous" << endl;
   if (! path->parse(db, "file://localhost", "test1")) {
@@ -217,12 +242,16 @@ int main(void) {
        i != ((DbList*)db.active())->end(); i++) {
     i->line();
   }
+  db.open_removed();
   cout << "Removed list: " << ((DbList*)db.removed())->size()
     << " element(s):\n";
   for (DbList::iterator i = ((DbList*)db.removed())->begin();
        i != ((DbList*)db.removed())->end(); i++) {
     i->line();
   }
+
+  db.close();
+  db.open();
 
   cout << "as previous with cvs/dirutd in ignore list" << endl;
   if (path->addFilter("type", "dir")
@@ -240,12 +269,16 @@ int main(void) {
        i != ((DbList*)db.active())->end(); i++) {
     i->line();
   }
+  db.open_removed();
   cout << "Removed list: " << ((DbList*)db.removed())->size()
     << " element(s):\n";
   for (DbList::iterator i = ((DbList*)db.removed())->begin();
        i != ((DbList*)db.removed())->end(); i++) {
     i->line();
   }
+
+  db.close();
+  db.open();
 
   cout << "as previous with testpipe gone" << endl;
   remove("test1/testpipe");
@@ -260,12 +293,16 @@ int main(void) {
        i != ((DbList*)db.active())->end(); i++) {
     i->line();
   }
+  db.open_removed();
   cout << "Removed list: " << ((DbList*)db.removed())->size()
     << " element(s):\n";
   for (DbList::iterator i = ((DbList*)db.removed())->begin();
        i != ((DbList*)db.removed())->end(); i++) {
     i->line();
   }
+
+  db.close();
+  db.open();
 
   cout << "as previous with testfile mode changed" << endl;
   system("chmod 660 test1/testfile");
@@ -280,12 +317,16 @@ int main(void) {
        i != ((DbList*)db.active())->end(); i++) {
     i->line();
   }
+  db.open_removed();
   cout << "Removed list: " << ((DbList*)db.removed())->size()
     << " element(s):\n";
   for (DbList::iterator i = ((DbList*)db.removed())->begin();
        i != ((DbList*)db.removed())->end(); i++) {
     i->line();
   }
+
+  db.close();
+  db.open();
 
   cout << "as previous with cvs/filenew.c touched" << endl;
   system("echo blah > test1/cvs/filenew.c");
@@ -300,6 +341,7 @@ int main(void) {
        i != ((DbList*)db.active())->end(); i++) {
     i->line();
   }
+  db.open_removed();
   cout << "Removed list: " << ((DbList*)db.removed())->size()
     << " element(s):\n";
   for (DbList::iterator i = ((DbList*)db.removed())->begin();
