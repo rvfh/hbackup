@@ -643,6 +643,8 @@ int Database::add(
     const char* dir_path,
     const Node* node,
     const char* old_checksum) {
+  bool failed = false;
+
   // Add new record to active list
   if ((node->type() == 'l') && ! node->parsed()) {
     cerr << "Bug in db add: link is not parsed!" << endl;
@@ -665,7 +667,7 @@ int Database::add(
       break;
     case 'f':
       node2 = new File(*node);
-      if (old_checksum != NULL) {
+      if ((old_checksum != NULL) && (old_checksum[0] != '\0')) {
         // Use same checksum
         ((File*)node2)->setChecksum(old_checksum);
       } else {
@@ -676,6 +678,8 @@ int Database::add(
         if (! write(string(local_path), &checksum)) {
           ((File*)node2)->setChecksum(checksum);
           free(checksum);
+        } else {
+          failed = true;
         }
         free(local_path);
       }
@@ -683,11 +687,17 @@ int Database::add(
     default:
       node2 = new Node(*node);
   }
-  DbData data(prefix, full_path, node2);
-  free(full_path);
 
-  // Insert entry
-  _d->active.add(data);
+  if (! failed || (old_checksum == NULL)) {
+    // Insert entry
+    DbData data(prefix, full_path, node2);
+    _d->active.add(data);
+  }
+
+  free(full_path);
+  if (failed) {
+    return -1;
+  }
   return 0;
 }
 
@@ -699,18 +709,15 @@ int Database::modify(
     const Node* old_node,
     const Node* node,
     bool        no_data) {
-  if (! no_data) {
-    if (add(prefix, base_path, rel_path, dir_path, node, NULL)) {
+  if (no_data) {
+    // File is in the list, but could not be copied last time, try again, or
+    // file metadata has changed, but we believe the data to be unchanged
+    const char* checksum = ((File*)old_node)->checksum();
+    if (add(prefix, base_path, rel_path, dir_path, node, checksum)) {
       return -1;
     }
-  } else if (((File*)old_node)->checksum()[0] == '\0') {
-      // File is in the list, but could not be copied last time, try again
-#warning retry not implemented
-    return -1;
   } else {
-    // File metadata has changed, but we believe the data is the same
-    if (add(prefix, base_path, rel_path, dir_path, node,
-            ((File*)old_node)->checksum())) {
+    if (add(prefix, base_path, rel_path, dir_path, node, NULL)) {
       return -1;
     }
   }

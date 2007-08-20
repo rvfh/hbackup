@@ -147,6 +147,7 @@ int Path::recurse(
             && ((*i)->size() == (*j)->size())
             && ((*i)->mtime() == (*j)->mtime())) {
               // If the file data is there, just add new metadata
+              // If the checksum is missing, this shall retry too
               db.modify(prefix, _path, rel_path, cur_path, *j, *i, true);
               if (verbosity() > 2) {
                 cout << " --> ~ ";
@@ -180,7 +181,8 @@ int Path::recurse(
             } else
             // Check that file data is present
             if (((*i)->type() == 'f')
-            && (((File*)(*j))->checksum()[0] == '\0')) {
+             && (((File*)(*j))->checksum()[0] == '\0')) {
+              // Checksum missing: retry
               db.modify(prefix, _path, rel_path, cur_path, *j, *i, true);
               if (verbosity() > 2) {
                 cout << " --> ! ";
