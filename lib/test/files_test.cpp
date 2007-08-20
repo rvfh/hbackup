@@ -245,7 +245,7 @@ int main(void) {
       }
       eof = (size == 0);
       read_size += size;
-      size = writefile->write(buffer, size, eof);
+      size = writefile->write(buffer, size);
       if (size < 0) {
         cout << "broken by write" << endl;
         break;
@@ -284,7 +284,7 @@ int main(void) {
       }
       eof = (size == 0);
       read_size += size;
-      size = writefile->write(buffer, size, eof);
+      size = writefile->write(buffer, size);
       if (size < 0) {
         cout << "broken by write" << endl;
         break;
@@ -323,7 +323,7 @@ int main(void) {
       }
       eof = (size == 0);
       read_size += size;
-      size = writefile->write(buffer, size, eof);
+      size = writefile->write(buffer, size);
       if (size < 0) {
         cout << "broken by write" << endl;
         break;
@@ -363,7 +363,7 @@ int main(void) {
       }
       eof = (size == 0);
       read_size += size;
-      size = writefile->write(buffer, size, eof);
+      size = writefile->write(buffer, size);
       if (size < 0) {
         cout << "broken by write" << endl;
         break;
@@ -404,7 +404,7 @@ int main(void) {
       }
       eof = (size == 0);
       read_size += size;
-      size = writefile->write(buffer, size, eof);
+      size = writefile->write(buffer, size);
       if (size < 0) {
         cout << "broken by write" << endl;
         break;
