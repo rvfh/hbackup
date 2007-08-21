@@ -94,7 +94,7 @@ public:
     const char* base_path,        // Path being backed up
     const char* rel_path,         // Dir (from base_path)
     const Node* node,             // File
-    bool        descend = true);  // Also remove files within directory
+    bool        discard = false);  // Erase the record, do not add to removed
 // For debug only
   void* active();
   void* removed();
