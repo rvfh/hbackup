@@ -103,10 +103,10 @@ Reading version 1 lists
 Reading version 1 lists
  --> Database active items part open (contents: 20 files)
  -> Updating database format
- --> Database active items part closed (contents: 20 files)
 Reading version 1 lists
  --> Database removed items part open (contents: 7 files)
  -> Closing database
+ --> Database active items part closed (contents: 20 files)
  --> Database removed items part closed (contents: 7 files)
 
 # version 1

@@ -41,8 +41,6 @@ public:
   int  open();
   /* Open removed part of database */
   int  open_removed();
-  /* Close active part of database */
-  int  close_active();
   /* Close database */
   int  close();
   // Prepare list for parser

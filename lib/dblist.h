@@ -123,41 +123,41 @@ public:
     const string& filename);
 };
 
-#if 0
 class List : public Stream {
 public:
-  int  open();
-  void close();
-  void getList(
-    const char*   prefix,
-    const char*   base_path,
-    const char*   rel_path,
-    list<Node*>&  list);
-  int  merge(
-    const char*   journal_path,
-    const char*   journal_name = "");
-};
-#endif
-
-class Journal : public Stream {
-public:
-  Journal(
+  List(
     const char*   dir_path,
     const char*   name = "") :
     Stream(dir_path, name) {}
+  // Open file, for read or write (no append)
+  int open(
+    const char*   req_mode);
+  // Close file
+  int close();
+  // Convert one 'line' of data (only works for journal atm)
   int getLine(
-    time_t*   timestamp,
-    char**    prefix,
-    char**    path,
-    Node**    node);
+    time_t*       timestamp,
+    char**        prefix,
+    char**        path,
+    Node**        node);
+  // Add a journal record of added file
   int added(
     const char*   prefix,
     const char*   path,
     const Node*   node,
     bool          notime = false);
+  // Add a journal record of removed file
   int removed(
     const char*   prefix,
     const char*   path);
+  // Get a list of active records for given prefix and paths
+  void getList(
+    const char*   prefix,
+    const char*   base_path,
+    const char*   rel_path,
+    list<Node*>&  list);
+  // Merge list and backup into this list
+  int  merge(List& list, List& journal);
 };
 
 }

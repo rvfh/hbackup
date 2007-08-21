@@ -43,14 +43,17 @@ time_t time(time_t *t) {
 }
 
 int main(void) {
-  Journal journal("test1/journal");
+  List    journal("test1/journal");
   char*   line   = NULL;
   char*   prefix = NULL;
   char*   path   = NULL;
   Node*   node;
   time_t  ts;
 
-  journal.open("w");
+  if (journal.open("w")) {
+    cerr << "Failed to open journal" << endl;
+    return -1;
+  }
   journal.removed("prefix", "path");
   node = new Stream("test1/testfile");
   ((Stream*) node)->computeChecksum();

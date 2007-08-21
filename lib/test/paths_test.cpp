@@ -69,7 +69,7 @@ int main(void) {
   Path* path = new Path("/home/User");
   Database  db("test_db");
   // Journal
-  Journal journal("test_db", "journal");
+  List    journal("test_db", "journal");
   time_t  timestamp;
   char*   prefix;
   char*   fpath;
