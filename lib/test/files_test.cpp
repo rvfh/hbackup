@@ -195,6 +195,29 @@ int main(void) {
   mask = umask(0077);
   printf("Our mask = 0%03o\n", mask);
 
+  cout << endl << "Test: path" << endl;
+  cout << Node::path("a", "b") << endl;
+  cout << Node::path("c", "") << endl;
+  cout << Node::path("", "d") << endl;
+
+  cout << endl << "Test: pathCompare" << endl;
+  cout << "a <> a: " << Node::pathCompare("a", "a") << endl;
+  cout << "a <> b: " << Node::pathCompare("a", "b") << endl;
+  cout << "b <> a: " << Node::pathCompare("b", "a") << endl;
+  cout << "a1 <> b: " << Node::pathCompare("a1", "b") << endl;
+  cout << "b <> a1: " << Node::pathCompare("b", "a1") << endl;
+  cout << "a1 <> a: " << Node::pathCompare("a1", "a") << endl;
+  cout << "a <> a1: " << Node::pathCompare("a", "a1") << endl;
+  cout << "a/ <> a: " << Node::pathCompare("a/", "a") << endl;
+  cout << "a <> a/: " << Node::pathCompare("a", "a/") << endl;
+  cout << "a/ <> a.: " << Node::pathCompare("a/", "a.") << endl;
+  cout << "a. <> a/: " << Node::pathCompare("a.", "a/") << endl;
+  cout << "a/ <> a-: " << Node::pathCompare("a/", "a-") << endl;
+  cout << "a- <> a/: " << Node::pathCompare("a-", "a/") << endl;
+  cout << "a/ <> a/: " << Node::pathCompare("a/", "a/") << endl;
+  cout << "abcd <> abce, 3: " << Node::pathCompare("abcd", "abce", 3) << endl;
+  cout << "abcd <> abce, 4: " << Node::pathCompare("abcd", "abce", 4) << endl;
+  cout << "abcd <> abce, 5: " << Node::pathCompare("abcd", "abce", 5) << endl;
 
   Stream* readfile;
   Stream* writefile;
