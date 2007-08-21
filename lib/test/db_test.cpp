@@ -35,7 +35,7 @@ using namespace std;
 
 using namespace hbackup;
 
-#warning most tests gone in r259, were based on old path behaviour...
+// Most tests are done in paths test
 
 static int verbose = 4;
 

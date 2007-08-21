@@ -241,7 +241,8 @@ int Stream::open(const char* req_mode, unsigned int compression) {
   _dsize  = 0;
   _fempty = true;
   _fd = std::open(_path, _fmode, 0666);
-  if (_fd < 0) {
+  if (! isOpen()) {
+    // errno set by open
     return -1;
   }
 
@@ -260,7 +261,7 @@ int Stream::open(const char* req_mode, unsigned int compression) {
     _strm->opaque   = Z_NULL;
     _strm->avail_in = 0;
     _strm->next_in  = Z_NULL;
-    if (_fmode & O_WRONLY) {
+    if (isWriteable()) {
       /* Compress */
       if (deflateInit2(_strm, compression, Z_DEFLATED, 16 + 15, 9,
           Z_DEFAULT_STRATEGY)) {
@@ -278,11 +279,14 @@ int Stream::open(const char* req_mode, unsigned int compression) {
     _strm = NULL;
   }
 
-  return _fd == -1;
+  return 0;
 }
 
 int Stream::close() {
-  if (_fd == -1) return -1;
+  if (! isOpen()) {
+    errno = EBADF;
+    return -1;
+  }
 
   /* Compute checksum */
   if (_ctx != NULL) {
@@ -296,7 +300,7 @@ int Stream::close() {
 
   /* Destroy zlib resources */
   if (_strm != NULL) {
-    if (_fmode & O_WRONLY) {
+    if (isWriteable()) {
       deflateEnd(_strm);
     } else {
       inflateEnd(_strm);
@@ -312,7 +316,12 @@ int Stream::close() {
 ssize_t Stream::read(void* buffer, size_t count) {
   ssize_t length;
 
-  if ((_fd == -1) || (_fmode & O_WRONLY)) {
+  if (! isOpen()) {
+    errno = EBADF;
+    return -1;
+  }
+
+  if (isWriteable()) {
     errno = EINVAL;
     return -1;
   }
@@ -371,10 +380,17 @@ ssize_t Stream::write(const void* buffer, size_t count) {
   static bool finished = true;
   ssize_t length;
 
-  if ((_fd == -1) || ! (_fmode & O_WRONLY) || (count > chunk)) {
+  if (! isOpen()) {
+    errno = EBADF;
+    return -1;
+  }
+
+  if (! isWriteable()) {
     errno = EINVAL;
     return -1;
   }
+
+  if (count > chunk) count = chunk;
 
   // No compression, nothing to finish
   if (_strm == NULL) {
@@ -519,8 +535,9 @@ int Stream::computeChecksum() {
 }
 
 int Stream::copy(Stream& source) {
-  if ((_fd == -1) || (source._fd == -1)) {
+  if ((! isOpen()) || (! source.isOpen())) {
     errno = EBADF;
+    return -1;
   }
   unsigned char buffer[Stream::chunk];
   size_t read_size = 0;
