@@ -137,6 +137,7 @@ Removed list: 0 element(s):
 List cannot be saved
 Reading version 1 lists
  --> Database active items part open (contents: 0 files)
+Permission denied: failed to open temporary list
 dblist: failed to save active items list
 Error: Permission denied
 List cannot be read

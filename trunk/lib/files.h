@@ -282,7 +282,7 @@ public:
       _fd(-1) {
     _path = path(dir_path, name);
   }
-  ~Stream() {
+  virtual ~Stream() {
     free(_path);
   }
   bool isOpen() const      { return _fd != -1; }

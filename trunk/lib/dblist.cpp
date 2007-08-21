@@ -593,7 +593,60 @@ int DbList::close(
   return 0;
 }
 
-int Journal::getLine(
+int List::open(
+    const char* req_mode) {
+  const char header[] = "# version 2\n";
+  int rc = 0;
+
+  if (Stream::open(req_mode, 0)) {
+    rc = -1;
+  } else
+  if (isWriteable()) {
+    if (Stream::write(header, strlen(header)) < 0) {
+      Stream::close();
+      rc = -1;
+    }
+  } else {
+    char*  line = NULL;
+    size_t size = 0;
+    if (Stream::getLine(&line, &size) < 0) {
+      Stream::close();
+      rc = -1;
+    } else
+    if (strcmp(line, header)) {
+      errno = EUCLEAN;
+      rc = -1;
+    }
+  }
+  return rc;
+}
+
+int List::close() {
+  const char footer[] = "# end\n";
+  int rc = 0;
+
+  if (isWriteable()) {
+    if (Stream::write(footer, strlen(footer)) < 0) {
+      rc = -1;
+    }
+/*  } else {
+    char*  line = NULL;
+    size_t size = 0;
+    if (Stream::getLine(&line, &size) < 0) {
+      rc = -1;
+    } else
+    if (strcmp(line, footer)) {
+      errno = EUCLEAN;
+      rc = -1;
+    }*/
+  }
+  if (Stream::close()) {
+    rc = -1;
+  }
+  return rc;
+}
+
+int List::getLine(
     time_t*   timestamp,
     char**    prefix,
     char**    path,
@@ -753,7 +806,7 @@ failed:
   return -1;
 }
 
-int Journal::added(
+int List::added(
     const char* prefix,
     const char* path,
     const Node* node,
@@ -787,7 +840,7 @@ int Journal::added(
   return 0;
 }
 
-int Journal::removed(
+int List::removed(
     const char* prefix,
     const char* path) {
   Stream::write(prefix, strlen(prefix));
@@ -798,5 +851,31 @@ int Journal::removed(
   int size = asprintf(&line, "\t\t%ld\t-\n", time(NULL));
   Stream::write(line, size);
   free(line);
+  return 0;
+}
+
+int List::merge(List& list, List& journal) {
+  if (! list.isOpen() || ! journal.isOpen()) {
+    errno = EBADF;
+    return -1;
+  }
+
+  if (list.isWriteable() || journal.isWriteable()) {
+    errno = EINVAL;
+    return -1;
+  }
+
+  time_t  timestamp;
+  char*   prefix;
+  char*   fpath;
+  Node*   node;
+  while (journal.getLine(&timestamp, &prefix, &fpath, &node) > 0) {
+    if (write("hello\n", 6) < 0) {
+      cout << strerror(errno) << endl;
+    }
+    free(prefix);
+    free(fpath);
+    free(node);
+  }
   return 0;
 }

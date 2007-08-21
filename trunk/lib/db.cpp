@@ -52,13 +52,14 @@ using namespace std;
 
 using namespace hbackup;
 
-#warning journals gone
+#warning no journal yet
 
 struct Database::Private {
   DbList::iterator  entry;
   DbList            active;
   DbList            removed;
-  Journal*          journal;
+  List*             list;
+  List*             journal;
 };
 
 int Database::organise(const string& path, int number) {
@@ -370,6 +371,10 @@ int Database::open() {
     } else if (verbosity() > 2) {
       cout << " --> Database initialized" << endl;
     }
+    List list(_path.c_str(), "list");
+    if (list.open("w") || list.close()) {
+      cerr << strerror(errno) << ": list" << endl;
+    }
   } else {
     status = 2;
     cerr << "db: open: cannot create data directory" << endl;
@@ -379,10 +384,20 @@ int Database::open() {
   _d->active.clear();
   _d->removed.clear();
 
+  // Open list
+  if (status != 2) {
+    _d->list = new List(_path.c_str(), "list");
+    if (_d->list->open("r")) {
+      cerr << "db: open: cannot open list" << endl;
+      status = 2;
+    }
+  }
+
   // Create journal
   if (status != 2) {
-    _d->journal = new Journal(_path.c_str(), "journal");
+    _d->journal = new List(_path.c_str(), "journal");
     if (_d->journal->open("w")) {
+      cerr << "db: open: cannot open journal" << endl;
       status = 2;
     }
   }
@@ -402,16 +417,41 @@ int Database::open() {
   return 0;
 }
 
-int Database::close_active() {
-  return _d->active.close(_path, "active");
-}
-
 int Database::close() {
-  int status = 0;
+  int rc = 0;
 
-  // Close journal
+  // Close list and re-open for merge
+  _d->list->close();
+  _d->list->open("r");
+
+  // Close journal and re-open for merge
+  _d->journal->close();
+  _d->journal->open("r");
+
+  // Merge with existing list into new one
+  List list(_path.c_str(), "list.part");
+  if (! list.open("w")) {
+    if (list.merge(*_d->list, *_d->journal)) {
+      cerr << "db: close: merge failed" << endl;
+      rc = 2;
+    }
+    list.close();
+    if (rc == 0) {
+      if (rename((_path + "/list").c_str(), (_path + "/list~").c_str())
+       || rename((_path + "/list.part").c_str(), (_path + "/list").c_str())) {
+        cerr << "db: close: cannot rename lists" << endl;
+        rc = 2;
+      }
+    }
+  } else {
+    cerr << strerror(errno) << ": failed to open temporary list" << endl;
+  }
+
   _d->journal->close();
   delete _d->journal;
+
+  _d->list->close();
+  delete _d->list;
 
   // Save active list
   if (_d->active.isOpen()) {
@@ -424,16 +464,16 @@ int Database::close() {
   if (_d->removed.size() != 0) {
     // Load previously removed items into removed list
     if (! _d->removed.isOpen()) {
-      status = _d->removed.open(_path, "removed");
+      rc = _d->removed.open(_path, "removed");
     }
   }
-  if (_d->removed.isOpen() && (status != 2)) {
-    status = _d->removed.close(_path, "removed");
+  if (_d->removed.isOpen() && (rc != 2)) {
+    rc = _d->removed.close(_path, "removed");
   }
 
   // Release lock
   unlock();
-  return status;
+  return rc;
 }
 
 void Database::getList(
@@ -576,7 +616,7 @@ int Database::scan(const string& checksum, bool thorough) {
       if (i->data()->type() == 'f') {
         File* f = (File*) i->data();
         if ((f->checksum()[0] != '\0') && scan(f->checksum(), thorough)) {
-#warning need to signal problem in DB list
+#warning need to signal problem in DB list (remove checksum)
           failed = 1;
           if (! terminating() && verbosity() > 2) {
             struct tm *time;
