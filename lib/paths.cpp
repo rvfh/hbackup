@@ -115,16 +115,7 @@ int Path::recurse(
         int cmp = -1;
         while ((j != db_list.end())
             && ((cmp = strcmp((*j)->name(), (*i)->name())) < 0)) {
-          if (verbosity() > 2) {
-            cout << " --> R ";
-            if (rel_path[0] != '\0') {
-              cout << rel_path << "/";
-            }
-            cout << (*j)->name() << endl;
-          }
-          db.remove(prefix, _path, rel_path, *j);
-          delete *j;
-          j = db_list.erase(j);
+          j++;
         }
 
         // Deal with data
@@ -218,7 +209,8 @@ int Path::recurse(
       i = dir->nodesList().erase(i);
     }
 
-    // Deal with remaining DB records
+    // Deal with removed records
+    j = db_list.begin();
     while (j != db_list.end()) {
       if (! terminating()) {
         if (verbosity() > 2) {
@@ -228,7 +220,7 @@ int Path::recurse(
           }
           cout << (*j)->name() << endl;
         }
-        db.remove(prefix, _path, rel_path, *j);
+        recurse_remove(db, prefix, _path, rel_path, *j);
       }
       delete *j;
       j = db_list.erase(j);
@@ -237,6 +229,30 @@ int Path::recurse(
     cerr << strerror(errno) << ": " << rel_path << endl;
   }
   return 0;
+}
+
+void Path::recurse_remove(
+    Database&   db,
+    const char* prefix,
+    const char* base_path,
+    const char* rel_path,
+    const Node* node) {
+  db.remove(prefix, _path, rel_path, node);
+  // Recurse into directories
+  if (node->type() == 'd') {
+    list<Node*> db_list;
+    char* dir_path = Node::path(rel_path, node->name());
+
+    // Get database info for this directory
+    db.getList(prefix, _path, dir_path, db_list);
+    list<Node*>::iterator j = db_list.begin();
+    while (j != db_list.end()) {
+      recurse_remove(db, prefix, _path, dir_path, *j);
+      delete *j;
+      j = db_list.erase(j);
+    }
+    free(dir_path);
+  }
 }
 
 Path::Path(const char* path) {

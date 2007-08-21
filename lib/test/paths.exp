@@ -230,8 +230,8 @@ as previous with subdir in ignore list
  --> D cvs/dirutd
  --> D cvs/dirutd/CVS
  --> D dir space
- --> R subdir
  --> D testdir
+ --> R subdir
 Active list:  26 element(s):
 file://localhost	/home/User/cvs	d	0	0	1000	1000	755			1	0	
 file://localhost	/home/User/cvs/CVS	d	0	0	1000	1000	755			2	0	
@@ -378,10 +378,10 @@ as previous with CVS parser
 Directory should be under CVS control: test1/cvs/dirbad
  --> R cvs/dirbad/fileoth
  --> R cvs/dirbad/fileutd
- --> R cvs/diroth
  --> D cvs/dirutd
  --> D cvs/dirutd/CVS
  --> R cvs/dirutd/fileoth
+ --> R cvs/diroth
  --> R cvs/fileoth
  --> D dir space
  --> D testdir
@@ -411,8 +411,8 @@ Reading version 1 lists
 Removed list: 12 element(s):
 file://localhost	/home/User/cvs/dirbad/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	5	40	
 file://localhost	/home/User/cvs/dirbad/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	6	41	
-file://localhost	/home/User/cvs/diroth	d	0	0	1000	1000	755			7	42	
-file://localhost	/home/User/cvs/dirutd/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	11	43	
+file://localhost	/home/User/cvs/diroth	d	0	0	1000	1000	755			7	43	
+file://localhost	/home/User/cvs/dirutd/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	11	42	
 file://localhost	/home/User/cvs/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	15	44	
 file://localhost	/home/User/subdir	d	0	0	1000	1000	755			19	34	
 file://localhost	/home/User/subdir/testfile	f	12	1	1000	1000	0			20	32	
@@ -460,8 +460,8 @@ Reading version 1 lists
 Removed list: 12 element(s):
 file://localhost	/home/User/cvs/dirbad/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	5	40	
 file://localhost	/home/User/cvs/dirbad/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	6	41	
-file://localhost	/home/User/cvs/diroth	d	0	0	1000	1000	755			7	42	
-file://localhost	/home/User/cvs/dirutd/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	11	43	
+file://localhost	/home/User/cvs/diroth	d	0	0	1000	1000	755			7	43	
+file://localhost	/home/User/cvs/dirutd/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	11	42	
 file://localhost	/home/User/cvs/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	15	44	
 file://localhost	/home/User/subdir	d	0	0	1000	1000	755			19	34	
 file://localhost	/home/User/subdir/testfile	f	12	1	1000	1000	0			20	32	
@@ -504,11 +504,11 @@ Reading version 1 lists
 Removed list: 16 element(s):
 file://localhost	/home/User/cvs/dirbad/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	5	40	
 file://localhost	/home/User/cvs/dirbad/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	6	41	
-file://localhost	/home/User/cvs/diroth	d	0	0	1000	1000	755			7	42	
+file://localhost	/home/User/cvs/diroth	d	0	0	1000	1000	755			7	43	
 file://localhost	/home/User/cvs/dirutd	d	0	0	1000	1000	755			8	45	
 file://localhost	/home/User/cvs/dirutd/CVS	d	0	0	1000	1000	755			9	46	
 file://localhost	/home/User/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	644		5252f242d27b8c2c9fdbdcbb33545d07-0	10	47	
-file://localhost	/home/User/cvs/dirutd/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	11	43	
+file://localhost	/home/User/cvs/dirutd/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	11	42	
 file://localhost	/home/User/cvs/dirutd/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	12	48	
 file://localhost	/home/User/cvs/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	15	44	
 file://localhost	/home/User/subdir	d	0	0	1000	1000	755			19	34	
@@ -551,11 +551,11 @@ Reading version 1 lists
 Removed list: 17 element(s):
 file://localhost	/home/User/cvs/dirbad/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	5	40	
 file://localhost	/home/User/cvs/dirbad/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	6	41	
-file://localhost	/home/User/cvs/diroth	d	0	0	1000	1000	755			7	42	
+file://localhost	/home/User/cvs/diroth	d	0	0	1000	1000	755			7	43	
 file://localhost	/home/User/cvs/dirutd	d	0	0	1000	1000	755			8	45	
 file://localhost	/home/User/cvs/dirutd/CVS	d	0	0	1000	1000	755			9	46	
 file://localhost	/home/User/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	644		5252f242d27b8c2c9fdbdcbb33545d07-0	10	47	
-file://localhost	/home/User/cvs/dirutd/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	11	43	
+file://localhost	/home/User/cvs/dirutd/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	11	42	
 file://localhost	/home/User/cvs/dirutd/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	12	48	
 file://localhost	/home/User/cvs/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	15	44	
 file://localhost	/home/User/subdir	d	0	0	1000	1000	755			19	34	
@@ -599,11 +599,11 @@ Reading version 1 lists
 Removed list: 18 element(s):
 file://localhost	/home/User/cvs/dirbad/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	5	40	
 file://localhost	/home/User/cvs/dirbad/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	6	41	
-file://localhost	/home/User/cvs/diroth	d	0	0	1000	1000	755			7	42	
+file://localhost	/home/User/cvs/diroth	d	0	0	1000	1000	755			7	43	
 file://localhost	/home/User/cvs/dirutd	d	0	0	1000	1000	755			8	45	
 file://localhost	/home/User/cvs/dirutd/CVS	d	0	0	1000	1000	755			9	46	
 file://localhost	/home/User/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	644		5252f242d27b8c2c9fdbdcbb33545d07-0	10	47	
-file://localhost	/home/User/cvs/dirutd/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	11	43	
+file://localhost	/home/User/cvs/dirutd/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	11	42	
 file://localhost	/home/User/cvs/dirutd/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	12	48	
 file://localhost	/home/User/cvs/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	15	44	
 file://localhost	/home/User/subdir	d	0	0	1000	1000	755			19	34	
@@ -648,11 +648,11 @@ Reading version 1 lists
 Removed list: 19 element(s):
 file://localhost	/home/User/cvs/dirbad/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	5	40	
 file://localhost	/home/User/cvs/dirbad/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	6	41	
-file://localhost	/home/User/cvs/diroth	d	0	0	1000	1000	755			7	42	
+file://localhost	/home/User/cvs/diroth	d	0	0	1000	1000	755			7	43	
 file://localhost	/home/User/cvs/dirutd	d	0	0	1000	1000	755			8	45	
 file://localhost	/home/User/cvs/dirutd/CVS	d	0	0	1000	1000	755			9	46	
 file://localhost	/home/User/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	644		5252f242d27b8c2c9fdbdcbb33545d07-0	10	47	
-file://localhost	/home/User/cvs/dirutd/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	11	43	
+file://localhost	/home/User/cvs/dirutd/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	11	42	
 file://localhost	/home/User/cvs/dirutd/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	12	48	
 file://localhost	/home/User/cvs/filenew.c	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	14	53	
 file://localhost	/home/User/cvs/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	15	44	
@@ -737,11 +737,11 @@ Reading version 1 lists
 Removed list: 19 element(s):
 file://localhost	/home/User/cvs/dirbad/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	5	40	
 file://localhost	/home/User/cvs/dirbad/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	6	41	
-file://localhost	/home/User/cvs/diroth	d	0	0	1000	1000	755			7	42	
+file://localhost	/home/User/cvs/diroth	d	0	0	1000	1000	755			7	43	
 file://localhost	/home/User/cvs/dirutd	d	0	0	1000	1000	755			8	45	
 file://localhost	/home/User/cvs/dirutd/CVS	d	0	0	1000	1000	755			9	46	
 file://localhost	/home/User/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	644		5252f242d27b8c2c9fdbdcbb33545d07-0	10	47	
-file://localhost	/home/User/cvs/dirutd/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	11	43	
+file://localhost	/home/User/cvs/dirutd/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	11	42	
 file://localhost	/home/User/cvs/dirutd/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	12	48	
 file://localhost	/home/User/cvs/filenew.c	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	14	53	
 file://localhost	/home/User/cvs/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	15	44	
@@ -813,11 +813,11 @@ Reading version 1 lists
 Removed list: 19 element(s):
 file://localhost	/home/User/cvs/dirbad/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	5	40	
 file://localhost	/home/User/cvs/dirbad/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	6	41	
-file://localhost	/home/User/cvs/diroth	d	0	0	1000	1000	755			7	42	
+file://localhost	/home/User/cvs/diroth	d	0	0	1000	1000	755			7	43	
 file://localhost	/home/User/cvs/dirutd	d	0	0	1000	1000	755			8	45	
 file://localhost	/home/User/cvs/dirutd/CVS	d	0	0	1000	1000	755			9	46	
 file://localhost	/home/User/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	644		5252f242d27b8c2c9fdbdcbb33545d07-0	10	47	
-file://localhost	/home/User/cvs/dirutd/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	11	43	
+file://localhost	/home/User/cvs/dirutd/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	11	42	
 file://localhost	/home/User/cvs/dirutd/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	12	48	
 file://localhost	/home/User/cvs/filenew.c	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	14	53	
 file://localhost	/home/User/cvs/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	15	44	

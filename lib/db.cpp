@@ -742,40 +742,33 @@ void Database::remove(
   // Do not use trailing '/' for now
   full_path[length - 1] = '\0';
 
-  SortedList<DbData>::iterator entry = _d->active.begin();
+  // Look for beginning
+  if ((_d->entry == _d->active.end()) && (_d->entry != _d->active.begin())) {
+    _d->entry--;
+  }
+  // Jump irrelevant last records, find first occurence of file in DB: the
+  // oldest, as we might have just added a new one!!!
+  while ((_d->entry != _d->active.begin())
+      && (_d->entry->comparePath(full_path) >= 0)) {
+    _d->entry--;
+  }
   // Jump irrelevant first records
   int cmp = -1;
-  while ((entry != _d->active.end())
-      && ((cmp = entry->comparePath(full_path)) < 0)) {
-    entry++;
+  while ((_d->entry != _d->active.end())
+      && ((cmp = _d->entry->comparePath(full_path)) < 0)) {
+    _d->entry++;
   }
-  if ((entry != _d->active.end()) && (cmp == 0)) {
-    // Mark removed
-    entry->setOut();
-    // Append to removed list
-    _d->removed.add(*entry);
-    // Remove from active list / Go on to next
-    entry = _d->active.erase(entry);
 
-    if (descend && (node->type() == 'd')) {
-      // Now we need the trailing '/'
-      full_path[length - 1] = '/';
-      while ((entry != _d->active.end())
-          && (entry->comparePath(full_path, length) < 0)) {
-        entry++;
-      }
-      while ((entry != _d->active.end())
-          && (entry->comparePath(full_path, length) == 0)) {
-        // Mark removed
-        entry->setOut();
-        // Append to removed list
-        _d->removed.add(*entry);
-        // Remove from active list / Go on to next
-        entry = _d->active.erase(entry);
-      }
-    }
+  if ((_d->entry != _d->active.end()) && (cmp == 0)) {
+    // Mark removed
+    _d->entry->setOut();
+    // Append to removed list
+    _d->removed.add(*_d->entry);
+    // Remove from active list / Go on to next
+    _d->entry = _d->active.erase(_d->entry);
+  } else {
+    cerr << "Entry to be removed not found in DB" << endl;
   }
-  _d->entry = entry;
   free(full_path);
 }
 

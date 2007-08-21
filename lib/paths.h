@@ -40,6 +40,12 @@ class Path {
     const char* path,
     Directory*  dir,
     Parser*     parser);
+  void recurse_remove(
+    Database&   db,
+    const char* prefix,
+    const char* base_path,
+    const char* rel_path,
+    const Node* node);
 public:
   Path(const char* path);
   ~Path() {
