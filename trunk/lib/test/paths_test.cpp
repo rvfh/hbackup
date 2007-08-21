@@ -125,6 +125,9 @@ int main(void) {
   if (! journal.open("r")) {
     while (journal.getLine(&timestamp, &prefix, &fpath, &node) > 0) {
       showLine(timestamp, prefix, fpath, node);
+      free(prefix);
+      free(fpath);
+      free(node);
     }
     journal.close();
   } else {
@@ -160,6 +163,9 @@ int main(void) {
   if (! journal.open("r")) {
     while (journal.getLine(&timestamp, &prefix, &fpath, &node) > 0) {
       showLine(timestamp, prefix, fpath, node);
+      free(prefix);
+      free(fpath);
+      free(node);
     }
     journal.close();
   } else {
@@ -196,6 +202,9 @@ int main(void) {
   if (! journal.open("r")) {
     while (journal.getLine(&timestamp, &prefix, &fpath, &node) > 0) {
       showLine(timestamp, prefix, fpath, node);
+      free(prefix);
+      free(fpath);
+      free(node);
     }
     journal.close();
   } else {
@@ -235,6 +244,9 @@ int main(void) {
   if (! journal.open("r")) {
     while (journal.getLine(&timestamp, &prefix, &fpath, &node) > 0) {
       showLine(timestamp, prefix, fpath, node);
+      free(prefix);
+      free(fpath);
+      free(node);
     }
     journal.close();
   } else {
@@ -274,6 +286,9 @@ int main(void) {
   if (! journal.open("r")) {
     while (journal.getLine(&timestamp, &prefix, &fpath, &node) > 0) {
       showLine(timestamp, prefix, fpath, node);
+      free(prefix);
+      free(fpath);
+      free(node);
     }
     journal.close();
   } else {
@@ -314,6 +329,9 @@ int main(void) {
   if (! journal.open("r")) {
     while (journal.getLine(&timestamp, &prefix, &fpath, &node) > 0) {
       showLine(timestamp, prefix, fpath, node);
+      free(prefix);
+      free(fpath);
+      free(node);
     }
     journal.close();
   } else {
@@ -353,6 +371,9 @@ int main(void) {
   if (! journal.open("r")) {
     while (journal.getLine(&timestamp, &prefix, &fpath, &node) > 0) {
       showLine(timestamp, prefix, fpath, node);
+      free(prefix);
+      free(fpath);
+      free(node);
     }
     journal.close();
   } else {
@@ -391,6 +412,9 @@ int main(void) {
   if (! journal.open("r")) {
     while (journal.getLine(&timestamp, &prefix, &fpath, &node) > 0) {
       showLine(timestamp, prefix, fpath, node);
+      free(prefix);
+      free(fpath);
+      free(node);
     }
     journal.close();
   } else {
@@ -426,6 +450,9 @@ int main(void) {
   if (! journal.open("r")) {
     while (journal.getLine(&timestamp, &prefix, &fpath, &node) > 0) {
       showLine(timestamp, prefix, fpath, node);
+      free(prefix);
+      free(fpath);
+      free(node);
     }
     journal.close();
   } else {
@@ -465,6 +492,9 @@ int main(void) {
   if (! journal.open("r")) {
     while (journal.getLine(&timestamp, &prefix, &fpath, &node) > 0) {
       showLine(timestamp, prefix, fpath, node);
+      free(prefix);
+      free(fpath);
+      free(node);
     }
     journal.close();
   } else {
@@ -501,6 +531,9 @@ int main(void) {
   if (! journal.open("r")) {
     while (journal.getLine(&timestamp, &prefix, &fpath, &node) > 0) {
       showLine(timestamp, prefix, fpath, node);
+      free(prefix);
+      free(fpath);
+      free(node);
     }
     journal.close();
   } else {
@@ -537,6 +570,9 @@ int main(void) {
   if (! journal.open("r")) {
     while (journal.getLine(&timestamp, &prefix, &fpath, &node) > 0) {
       showLine(timestamp, prefix, fpath, node);
+      free(prefix);
+      free(fpath);
+      free(node);
     }
     journal.close();
   } else {
@@ -573,6 +609,9 @@ int main(void) {
   if (! journal.open("r")) {
     while (journal.getLine(&timestamp, &prefix, &fpath, &node) > 0) {
       showLine(timestamp, prefix, fpath, node);
+      free(prefix);
+      free(fpath);
+      free(node);
     }
     journal.close();
   } else {
@@ -630,6 +669,9 @@ int main(void) {
   if (! journal.open("r")) {
     while (journal.getLine(&timestamp, &prefix, &fpath, &node) > 0) {
       showLine(timestamp, prefix, fpath, node);
+      free(prefix);
+      free(fpath);
+      free(node);
     }
     journal.close();
   } else {
@@ -665,6 +707,9 @@ int main(void) {
   if (! journal.open("r")) {
     while (journal.getLine(&timestamp, &prefix, &fpath, &node) > 0) {
       showLine(timestamp, prefix, fpath, node);
+      free(prefix);
+      free(fpath);
+      free(node);
     }
     journal.close();
   } else {

@@ -740,7 +740,7 @@ int Database::modify(
       return -1;
     }
   }
-  remove(prefix, base_path, rel_path, old_node, discard);
+  remove(prefix, base_path, rel_path, old_node, discard, true);
   return 0;
 }
 
@@ -749,7 +749,8 @@ void Database::remove(
     const char* base_path,
     const char* rel_path,
     const Node* node,
-    bool        discard) {
+    bool        discard,
+    bool        mod) {
   // Find record in active list, move it to removed list
   char* full_path = NULL;
   int length;
@@ -786,8 +787,10 @@ void Database::remove(
       _d->entry->setOut();
       // Append to removed list
       _d->removed.add(*_d->entry);
-      // Add entry info to journal
-      _d->journal->removed(prefix, full_path);
+      if (! mod) {
+        // Add entry info to journal
+        _d->journal->removed(prefix, &full_path[strlen(prefix) + 1]);
+      }
     }
     // Remove from active list / Go on to next
     _d->entry = _d->active.erase(_d->entry);

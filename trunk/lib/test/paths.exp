@@ -255,7 +255,7 @@ Removed list: 1 element(s):
 file://localhost	/home/User/subdir/testfile	f	12	1	1000	1000	644		285b35198a5e188b3a0df3ed33f93a26-0	3	4	
  --> Database active items part closed (contents: 30 files)
  --> Database removed items part closed (contents: 1 file)
-[ 4] file://localhost file://localhost//home/User/subdir/testfile [rm]
+[ 4] file://localhost /home/User/subdir/testfile         [rm]
 Reading version 1 lists
  --> Database active items part open (contents: 30 files)
 as previous with subdir in ignore list
@@ -305,9 +305,9 @@ file://localhost	/home/User/subdir/testfile1	f	0	1	1000	1000	644		d41d8cd98f00b2
 file://localhost	/home/User/subdir/testfile2	f	12	1	1000	1000	644		285b35198a5e188b3a0df3ed33f93a26-0	1	5	
  --> Database active items part closed (contents: 27 files)
  --> Database removed items part closed (contents: 4 files)
-[ 5] file://localhost file://localhost//home/User/subdir [rm]
-[ 5] file://localhost file://localhost//home/User/subdir/testfile1 [rm]
-[ 5] file://localhost file://localhost//home/User/subdir/testfile2 [rm]
+[ 5] file://localhost /home/User/subdir                  [rm]
+[ 5] file://localhost /home/User/subdir/testfile1        [rm]
+[ 5] file://localhost /home/User/subdir/testfile2        [rm]
 Reading version 1 lists
  --> Database active items part open (contents: 27 files)
 as previous with testlink modified
@@ -359,7 +359,6 @@ file://localhost	/home/User/testlink	l	8	1	1000	1000	777	testfile		1	6
  --> Database active items part closed (contents: 27 files)
  --> Database removed items part closed (contents: 5 files)
 [ 6] file://localhost /home/User/testlink                l     8 777 testnull
-[ 6] file://localhost file://localhost//home/User/testlink [rm]
 Reading version 1 lists
  --> Database active items part open (contents: 27 files)
 as previous with testlink in ignore list
@@ -410,7 +409,7 @@ file://localhost	/home/User/testlink	l	8	1	1000	1000	777	testfile		1	6
 file://localhost	/home/User/testlink	l	8	1	1000	1000	777	testnull		6	7	
  --> Database active items part closed (contents: 26 files)
  --> Database removed items part closed (contents: 6 files)
-[ 7] file://localhost file://localhost//home/User/testlink [rm]
+[ 7] file://localhost /home/User/testlink                [rm]
 Reading version 1 lists
  --> Database active items part open (contents: 26 files)
 as previous with CVS parser
@@ -465,11 +464,11 @@ file://localhost	/home/User/testlink	l	8	1	1000	1000	777	testfile		1	6
 file://localhost	/home/User/testlink	l	8	1	1000	1000	777	testnull		6	7	
  --> Database active items part closed (contents: 21 files)
  --> Database removed items part closed (contents: 11 files)
-[ 8] file://localhost file://localhost//home/User/cvs/dirbad/fileoth [rm]
-[ 8] file://localhost file://localhost//home/User/cvs/dirbad/fileutd [rm]
-[ 8] file://localhost file://localhost//home/User/cvs/dirutd/fileoth [rm]
-[ 8] file://localhost file://localhost//home/User/cvs/diroth [rm]
-[ 8] file://localhost file://localhost//home/User/cvs/fileoth [rm]
+[ 8] file://localhost /home/User/cvs/dirbad/fileoth      [rm]
+[ 8] file://localhost /home/User/cvs/dirbad/fileutd      [rm]
+[ 8] file://localhost /home/User/cvs/dirutd/fileoth      [rm]
+[ 8] file://localhost /home/User/cvs/diroth              [rm]
+[ 8] file://localhost /home/User/cvs/fileoth             [rm]
 Reading version 1 lists
  --> Database active items part open (contents: 21 files)
 as previous
@@ -567,10 +566,10 @@ file://localhost	/home/User/testlink	l	8	1	1000	1000	777	testfile		1	6
 file://localhost	/home/User/testlink	l	8	1	1000	1000	777	testnull		6	7	
  --> Database active items part closed (contents: 17 files)
  --> Database removed items part closed (contents: 15 files)
-[10] file://localhost file://localhost//home/User/cvs/dirutd [rm]
-[10] file://localhost file://localhost//home/User/cvs/dirutd/CVS [rm]
-[10] file://localhost file://localhost//home/User/cvs/dirutd/CVS/Entries [rm]
-[10] file://localhost file://localhost//home/User/cvs/dirutd/fileutd [rm]
+[10] file://localhost /home/User/cvs/dirutd              [rm]
+[10] file://localhost /home/User/cvs/dirutd/CVS          [rm]
+[10] file://localhost /home/User/cvs/dirutd/CVS/Entries  [rm]
+[10] file://localhost /home/User/cvs/dirutd/fileutd      [rm]
 Reading version 1 lists
  --> Database active items part open (contents: 17 files)
 as previous with testpipe gone
@@ -619,7 +618,7 @@ file://localhost	/home/User/testlink	l	8	1	1000	1000	777	testnull		6	7
 file://localhost	/home/User/testpipe	p	0	1	1000	1000	644			1	11	
  --> Database active items part closed (contents: 16 files)
  --> Database removed items part closed (contents: 16 files)
-[11] file://localhost file://localhost//home/User/testpipe [rm]
+[11] file://localhost /home/User/testpipe                [rm]
 Reading version 1 lists
  --> Database active items part open (contents: 16 files)
 as previous with testfile mode changed
@@ -670,7 +669,6 @@ file://localhost	/home/User/testpipe	p	0	1	1000	1000	644			1	11
  --> Database active items part closed (contents: 16 files)
  --> Database removed items part closed (contents: 17 files)
 [12] file://localhost /home/User/testfile                f    13 660 59ca0efa9f5633cb0371bbc0355478d8-0
-[12] file://localhost file://localhost//home/User/testfile [rm]
 Reading version 1 lists
  --> Database active items part open (contents: 16 files)
 as previous with cvs/filenew.c touched
@@ -722,7 +720,6 @@ file://localhost	/home/User/testpipe	p	0	1	1000	1000	644			1	11
  --> Database active items part closed (contents: 16 files)
  --> Database removed items part closed (contents: 18 files)
 [13] file://localhost /home/User/cvs/filenew.c           f     5 644 0d599f0ec05c3bda8c3b8a68c32a1b47-0
-[13] file://localhost file://localhost//home/User/cvs/filenew.c [rm]
 Reading version 1 lists
  --> Database active items part open (contents: 16 files)
 some troublesome past cases
