@@ -77,7 +77,7 @@ public:
     else if (cmp > 0) return false;
 
     // This will hopefully go when we just follow the Directory order
-    cmp = strcmp(_path, right._path);
+    cmp = Node::pathCompare(_path, right._path);
     if (cmp < 0)      return true;
     else if (cmp > 0) return false;
 
@@ -91,15 +91,10 @@ public:
   time_t      out() const        { return _out; }
   void setOut() { _out = time(NULL); }
   void setOut(time_t out) { _out = out; }
-  int comparePath(const char* path, int length = -1) {
+  int pathCompare(const char* path, int length = -1) {
     char* full_path = NULL;
     asprintf(&full_path, "%s/%s", _prefix, _path);
-    int cmp;
-    if (length >= 0) {
-      cmp = strncmp(full_path, path, length);
-    } else {
-      cmp = strcmp(full_path, path);
-    }
+    int cmp = Node::pathCompare(full_path, path, length);
     free(full_path);
     return cmp;
   }

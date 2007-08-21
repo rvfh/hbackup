@@ -164,7 +164,7 @@ int Directory::createList(const char* dir_path, bool is_path) {
   struct dirent *dir_entry;
   while (((dir_entry = readdir(directory)) != NULL) && ! terminating()) {
     /* Ignore . and .. */
-    if (!strcmp(dir_entry->d_name, ".") || !strcmp(dir_entry->d_name, "..")){
+    if (!strcmp(dir_entry->d_name, ".") || !strcmp(dir_entry->d_name, "..")) {
       continue;
     }
     Node *g = new Node(full_path, dir_entry->d_name);
