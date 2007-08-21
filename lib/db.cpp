@@ -440,20 +440,20 @@ void Database::getList(
   }
   // Jump irrelevant last records
   while ((_d->entry != _d->active.begin())
-      && (_d->entry->comparePath(full_path, length) >= 0)) {
+      && (_d->entry->pathCompare(full_path, length) >= 0)) {
     _d->entry--;
   }
   // Jump irrelevant first records
   while ((_d->entry != _d->active.end())
-      && (_d->entry->comparePath(full_path) < 0)) {
+      && (_d->entry->pathCompare(full_path) < 0)) {
     _d->entry++;
   }
   // Copy relevant records
   char* last_dir     = NULL;
   int   last_dir_len = 0;
   while ((_d->entry != _d->active.end())
-      && (_d->entry->comparePath(full_path, length) == 0)) {
-    if ((last_dir == NULL) || _d->entry->comparePath(last_dir, last_dir_len)) {
+      && (_d->entry->pathCompare(full_path, length) == 0)) {
+    if ((last_dir == NULL) || _d->entry->pathCompare(last_dir, last_dir_len)) {
       Node* node;
       switch (_d->entry->data()->type()) {
         case 'f':
@@ -754,13 +754,13 @@ void Database::remove(
   // Jump irrelevant last records, find first occurence of file in DB: the
   // oldest, as we might have just added a new one!!!
   while ((_d->entry != _d->active.begin())
-      && (_d->entry->comparePath(full_path) >= 0)) {
+      && (_d->entry->pathCompare(full_path) >= 0)) {
     _d->entry--;
   }
   // Jump irrelevant first records
   int cmp = -1;
   while ((_d->entry != _d->active.end())
-      && ((cmp = _d->entry->comparePath(full_path)) < 0)) {
+      && ((cmp = _d->entry->pathCompare(full_path)) < 0)) {
     _d->entry++;
   }
 

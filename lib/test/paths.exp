@@ -55,10 +55,10 @@ file://localhost	/home/User/cvs/fileutd.h	f	0	1	1000	1000	644		d41d8cd98f00b204e
 file://localhost	/home/User/dir space	d	0	0	1000	1000	755			17	0	
 file://localhost	/home/User/dir space/file space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	18	0	
 file://localhost	/home/User/subdir	d	0	0	1000	1000	755			19	0	
-file://localhost	/home/User/subdir-file	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	23	0	
 file://localhost	/home/User/subdir/testfile	f	12	1	1000	1000	0			20	0	
 file://localhost	/home/User/subdir/testfile1	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	21	0	
 file://localhost	/home/User/subdir/testfile2	f	12	1	1000	1000	644		285b35198a5e188b3a0df3ed33f93a26-0	22	0	
+file://localhost	/home/User/subdir-file	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	23	0	
 file://localhost	/home/User/subdirfile	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	24	0	
 file://localhost	/home/User/test space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	25	0	
 file://localhost	/home/User/testdir	d	0	0	1000	1000	755			26	0	
@@ -104,10 +104,10 @@ file://localhost	/home/User/cvs/fileutd.h	f	0	1	1000	1000	644		d41d8cd98f00b204e
 file://localhost	/home/User/dir space	d	0	0	1000	1000	755			17	0	
 file://localhost	/home/User/dir space/file space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	18	0	
 file://localhost	/home/User/subdir	d	0	0	1000	1000	755			19	0	
-file://localhost	/home/User/subdir-file	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	23	0	
 file://localhost	/home/User/subdir/testfile	f	12	1	1000	1000	0			20	0	
 file://localhost	/home/User/subdir/testfile1	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	21	0	
 file://localhost	/home/User/subdir/testfile2	f	12	1	1000	1000	644		285b35198a5e188b3a0df3ed33f93a26-0	22	0	
+file://localhost	/home/User/subdir-file	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	23	0	
 file://localhost	/home/User/subdirfile	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	24	0	
 file://localhost	/home/User/test space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	25	0	
 file://localhost	/home/User/testdir	d	0	0	1000	1000	755			26	0	
@@ -153,10 +153,10 @@ file://localhost	/home/User/cvs/fileutd.h	f	0	1	1000	1000	644		d41d8cd98f00b204e
 file://localhost	/home/User/dir space	d	0	0	1000	1000	755			17	0	
 file://localhost	/home/User/dir space/file space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	18	0	
 file://localhost	/home/User/subdir	d	0	0	1000	1000	755			19	0	
-file://localhost	/home/User/subdir-file	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	23	0	
 file://localhost	/home/User/subdir/testfile	f	12	1	1000	1000	644		285b35198a5e188b3a0df3ed33f93a26-0	31	0	
 file://localhost	/home/User/subdir/testfile1	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	21	0	
 file://localhost	/home/User/subdir/testfile2	f	12	1	1000	1000	644		285b35198a5e188b3a0df3ed33f93a26-0	22	0	
+file://localhost	/home/User/subdir-file	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	23	0	
 file://localhost	/home/User/subdirfile	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	24	0	
 file://localhost	/home/User/test space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	25	0	
 file://localhost	/home/User/testdir	d	0	0	1000	1000	755			26	0	
@@ -202,9 +202,9 @@ file://localhost	/home/User/cvs/fileutd.h	f	0	1	1000	1000	644		d41d8cd98f00b204e
 file://localhost	/home/User/dir space	d	0	0	1000	1000	755			17	0	
 file://localhost	/home/User/dir space/file space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	18	0	
 file://localhost	/home/User/subdir	d	0	0	1000	1000	755			19	0	
-file://localhost	/home/User/subdir-file	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	23	0	
 file://localhost	/home/User/subdir/testfile1	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	21	0	
 file://localhost	/home/User/subdir/testfile2	f	12	1	1000	1000	644		285b35198a5e188b3a0df3ed33f93a26-0	22	0	
+file://localhost	/home/User/subdir-file	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	23	0	
 file://localhost	/home/User/subdirfile	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	24	0	
 file://localhost	/home/User/test space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	25	0	
 file://localhost	/home/User/testdir	d	0	0	1000	1000	755			26	0	
@@ -696,8 +696,6 @@ file://localhost	/home/User/cvs/fileutd.h	f	0	1	1000	1000	644		d41d8cd98f00b204e
 file://localhost	/home/User/dir space	d	0	0	1000	1000	755			17	0	
 file://localhost	/home/User/dir space/file space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	18	0	
 file://localhost	/home/User/docbook-xml	d	0	0	1000	1000	755			53	0	
-file://localhost	/home/User/docbook-xml.cat	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	66	0	
-file://localhost	/home/User/docbook-xml.cat.old	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	67	0	
 file://localhost	/home/User/docbook-xml/3.1.7	d	0	0	1000	1000	755			54	0	
 file://localhost	/home/User/docbook-xml/3.1.7/dbgenent.ent	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	55	0	
 file://localhost	/home/User/docbook-xml/4.0	d	0	0	1000	1000	755			56	0	
@@ -710,14 +708,16 @@ file://localhost	/home/User/docbook-xml/4.3	d	0	0	1000	1000	755			62	0
 file://localhost	/home/User/docbook-xml/4.3/dbgenent.mod	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	63	0	
 file://localhost	/home/User/docbook-xml/4.4	d	0	0	1000	1000	755			64	0	
 file://localhost	/home/User/docbook-xml/4.4/dbgenent.mod	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	65	0	
+file://localhost	/home/User/docbook-xml.cat	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	66	0	
+file://localhost	/home/User/docbook-xml.cat.old	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	67	0	
 file://localhost	/home/User/subdir-file	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	23	0	
 file://localhost	/home/User/subdirfile	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	24	0	
 file://localhost	/home/User/test space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	25	0	
 file://localhost	/home/User/testdir	d	0	0	1000	1000	755			26	0	
 file://localhost	/home/User/testdir/biblio	d	0	0	1000	1000	755			68	0	
-file://localhost	/home/User/testdir/biblio.odb	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	71	0	
 file://localhost	/home/User/testdir/biblio/biblio.dbf	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	69	0	
 file://localhost	/home/User/testdir/biblio/biblio.dbt	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	70	0	
+file://localhost	/home/User/testdir/biblio.odb	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	71	0	
 file://localhost	/home/User/testdir/evolocal.odb	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	72	0	
 file://localhost	/home/User/testfile	f	13	1	1000	1000	660		59ca0efa9f5633cb0371bbc0355478d8-0	49	0	
 file://localhost	/home/User/testfile~	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	28	0	
@@ -771,8 +771,6 @@ file://localhost	/home/User/cvs/fileutd.h	f	0	1	1000	1000	644		d41d8cd98f00b204e
 file://localhost	/home/User/dir space	d	0	0	1000	1000	755			17	0	
 file://localhost	/home/User/dir space/file space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	18	0	
 file://localhost	/home/User/docbook-xml	d	0	0	1000	1000	755			53	0	
-file://localhost	/home/User/docbook-xml.cat	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	66	0	
-file://localhost	/home/User/docbook-xml.cat.old	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	67	0	
 file://localhost	/home/User/docbook-xml/3.1.7	d	0	0	1000	1000	755			54	0	
 file://localhost	/home/User/docbook-xml/3.1.7/dbgenent.ent	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	55	0	
 file://localhost	/home/User/docbook-xml/4.0	d	0	0	1000	1000	755			56	0	
@@ -785,14 +783,16 @@ file://localhost	/home/User/docbook-xml/4.3	d	0	0	1000	1000	755			62	0
 file://localhost	/home/User/docbook-xml/4.3/dbgenent.mod	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	63	0	
 file://localhost	/home/User/docbook-xml/4.4	d	0	0	1000	1000	755			64	0	
 file://localhost	/home/User/docbook-xml/4.4/dbgenent.mod	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	65	0	
+file://localhost	/home/User/docbook-xml.cat	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	66	0	
+file://localhost	/home/User/docbook-xml.cat.old	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	67	0	
 file://localhost	/home/User/subdir-file	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	23	0	
 file://localhost	/home/User/subdirfile	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	24	0	
 file://localhost	/home/User/test space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	25	0	
 file://localhost	/home/User/testdir	d	0	0	1000	1000	755			26	0	
 file://localhost	/home/User/testdir/biblio	d	0	0	1000	1000	755			68	0	
-file://localhost	/home/User/testdir/biblio.odb	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	71	0	
 file://localhost	/home/User/testdir/biblio/biblio.dbf	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	69	0	
 file://localhost	/home/User/testdir/biblio/biblio.dbt	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	70	0	
+file://localhost	/home/User/testdir/biblio.odb	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	71	0	
 file://localhost	/home/User/testdir/evolocal.odb	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	72	0	
 file://localhost	/home/User/testfile	f	13	1	1000	1000	660		59ca0efa9f5633cb0371bbc0355478d8-0	49	0	
 file://localhost	/home/User/testfile~	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	28	0	

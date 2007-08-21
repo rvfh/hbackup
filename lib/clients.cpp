@@ -179,7 +179,7 @@ int Client::readListFile(const string& list_path) {
             }
             list<Path*>::iterator i = _d->paths.begin();
             while ((i != _d->paths.end())
-                && (strcmp((*i)->path(), path->path()) < 0)) {
+                && (Node::pathCompare((*i)->path(), path->path()) < 0)) {
               i++;
             }
             _d->paths.insert(i, path);
