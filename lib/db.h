@@ -94,7 +94,8 @@ public:
     const char* base_path,        // Path being backed up
     const char* rel_path,         // Dir (from base_path)
     const Node* node,             // File
-    bool        discard = false);  // Erase the record, do not add to removed
+    bool        discard = false,  // Erase the record, do not add to removed
+    bool        mod = false);     // Temp: do not journal, modified
 // For debug only
   void* active();
   void* removed();
