@@ -196,5 +196,46 @@ int main(void) {
   clients.clear();
   db.close();
 
+  client = new Client("testhost");
+  clients.push_back(client);
+  client->setProtocol("file");
+  client->setListfile("etc/localhost.list");
+  system("echo path test1/subdir >> etc/localhost.list");
+  printf(">List %u client(s):\n", clients.size());
+  for (list<Client*>::iterator i = clients.begin(); i != clients.end(); i++) {
+    (*i)->show();
+  }
+  db.open();
+  for (list<Client*>::iterator i = clients.begin(); i != clients.end(); i++) {
+    (*i)->setMountPoint("test_db/mount");
+    (*i)->backup(db, 0);
+  }
+  for (list<Client*>::iterator i = clients.begin(); i != clients.end(); i++) {
+    delete *i;
+  }
+  clients.clear();
+  db.close();
+
+  client = new Client("testhost");
+  clients.push_back(client);
+  client->setProtocol("file");
+  system("echo path test2/subdir > etc/localhost.list2");
+  system("cat etc/localhost.list >> etc/localhost.list2");
+  client->setListfile("etc/localhost.list2");
+  printf(">List %u client(s):\n", clients.size());
+  for (list<Client*>::iterator i = clients.begin(); i != clients.end(); i++) {
+    (*i)->show();
+  }
+  db.open();
+  for (list<Client*>::iterator i = clients.begin(); i != clients.end(); i++) {
+    (*i)->setMountPoint("test_db/mount");
+    (*i)->backup(db, 0);
+  }
+  for (list<Client*>::iterator i = clients.begin(); i != clients.end(); i++) {
+    delete *i;
+  }
+  clients.clear();
+  db.close();
+
   return 0;
 }

@@ -168,3 +168,28 @@ Backup path 'test1'
 Directory should be under CVS control: test1/cvs/dirbad
 Backup path 'test2'
  --> Database active items part closed (contents: 21 files)
+ --> Client: testhost
+>List 1 client(s):
+Client: testhost
+-> file://testhost etc/localhost.list
+Reading version 1 lists
+ --> Database active items part open (contents: 21 files)
+Backup client 'testhost' using protocol 'file'
+ -> Reading backup list file
+ --> Path: test2
+ --> Path: test1
+ --> Path: test1/subdir
+Path inside another. This is not supported yet
+ --> Database active items part closed (contents: 21 files)
+ --> Client: testhost
+>List 1 client(s):
+Client: testhost
+-> file://testhost etc/localhost.list2
+Reading version 1 lists
+ --> Database active items part open (contents: 21 files)
+Backup client 'testhost' using protocol 'file'
+ -> Reading backup list file
+ --> Path: test2/subdir
+ --> Path: test2
+Path inside another. This is not supported yet
+ --> Database active items part closed (contents: 21 files)
