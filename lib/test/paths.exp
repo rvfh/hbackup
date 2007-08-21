@@ -165,11 +165,10 @@ file://localhost	/home/User/testfile~	f	0	1	1000	1000	644		d41d8cd98f00b204e9800
 file://localhost	/home/User/testlink	l	8	1	1000	1000	777	testfile		29	0	
 file://localhost	/home/User/testpipe	p	0	1	1000	1000	644			30	0	
 Reading version 1 lists
- --> Database removed items part open (contents: 1 file)
-Removed list: 1 element(s):
-file://localhost	/home/User/subdir/testfile	f	12	1	1000	1000	0			20	32	
+ --> Database removed items part open (contents: 0 files)
+Removed list: 0 element(s):
  --> Database active items part closed (contents: 30 files)
- --> Database removed items part closed (contents: 1 file)
+ --> Database removed items part closed (contents: 0 files)
 Reading version 1 lists
  --> Database active items part open (contents: 30 files)
 as previous with subdir/testfile in ignore list
@@ -214,12 +213,11 @@ file://localhost	/home/User/testfile~	f	0	1	1000	1000	644		d41d8cd98f00b204e9800
 file://localhost	/home/User/testlink	l	8	1	1000	1000	777	testfile		29	0	
 file://localhost	/home/User/testpipe	p	0	1	1000	1000	644			30	0	
 Reading version 1 lists
- --> Database removed items part open (contents: 2 files)
-Removed list: 2 element(s):
-file://localhost	/home/User/subdir/testfile	f	12	1	1000	1000	0			20	32	
-file://localhost	/home/User/subdir/testfile	f	12	1	1000	1000	644		285b35198a5e188b3a0df3ed33f93a26-0	31	33	
+ --> Database removed items part open (contents: 1 file)
+Removed list: 1 element(s):
+file://localhost	/home/User/subdir/testfile	f	12	1	1000	1000	644		285b35198a5e188b3a0df3ed33f93a26-0	31	32	
  --> Database active items part closed (contents: 29 files)
- --> Database removed items part closed (contents: 2 files)
+ --> Database removed items part closed (contents: 1 file)
 Reading version 1 lists
  --> Database active items part open (contents: 29 files)
 as previous with subdir in ignore list
@@ -260,15 +258,14 @@ file://localhost	/home/User/testfile~	f	0	1	1000	1000	644		d41d8cd98f00b204e9800
 file://localhost	/home/User/testlink	l	8	1	1000	1000	777	testfile		29	0	
 file://localhost	/home/User/testpipe	p	0	1	1000	1000	644			30	0	
 Reading version 1 lists
- --> Database removed items part open (contents: 5 files)
-Removed list: 5 element(s):
-file://localhost	/home/User/subdir	d	0	0	1000	1000	755			19	34	
-file://localhost	/home/User/subdir/testfile	f	12	1	1000	1000	0			20	32	
-file://localhost	/home/User/subdir/testfile	f	12	1	1000	1000	644		285b35198a5e188b3a0df3ed33f93a26-0	31	33	
-file://localhost	/home/User/subdir/testfile1	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	21	35	
-file://localhost	/home/User/subdir/testfile2	f	12	1	1000	1000	644		285b35198a5e188b3a0df3ed33f93a26-0	22	36	
+ --> Database removed items part open (contents: 4 files)
+Removed list: 4 element(s):
+file://localhost	/home/User/subdir	d	0	0	1000	1000	755			19	33	
+file://localhost	/home/User/subdir/testfile	f	12	1	1000	1000	644		285b35198a5e188b3a0df3ed33f93a26-0	31	32	
+file://localhost	/home/User/subdir/testfile1	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	21	34	
+file://localhost	/home/User/subdir/testfile2	f	12	1	1000	1000	644		285b35198a5e188b3a0df3ed33f93a26-0	22	35	
  --> Database active items part closed (contents: 26 files)
- --> Database removed items part closed (contents: 5 files)
+ --> Database removed items part closed (contents: 4 files)
 Reading version 1 lists
  --> Database active items part open (contents: 26 files)
 as previous with testlink modified
@@ -306,19 +303,18 @@ file://localhost	/home/User/test space	f	0	1	1000	1000	644		d41d8cd98f00b204e980
 file://localhost	/home/User/testdir	d	0	0	1000	1000	755			26	0	
 file://localhost	/home/User/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371bbc0355478d8-0	27	0	
 file://localhost	/home/User/testfile~	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	28	0	
-file://localhost	/home/User/testlink	l	8	1	1000	1000	777	testnull		37	0	
+file://localhost	/home/User/testlink	l	8	1	1000	1000	777	testnull		36	0	
 file://localhost	/home/User/testpipe	p	0	1	1000	1000	644			30	0	
 Reading version 1 lists
- --> Database removed items part open (contents: 6 files)
-Removed list: 6 element(s):
-file://localhost	/home/User/subdir	d	0	0	1000	1000	755			19	34	
-file://localhost	/home/User/subdir/testfile	f	12	1	1000	1000	0			20	32	
-file://localhost	/home/User/subdir/testfile	f	12	1	1000	1000	644		285b35198a5e188b3a0df3ed33f93a26-0	31	33	
-file://localhost	/home/User/subdir/testfile1	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	21	35	
-file://localhost	/home/User/subdir/testfile2	f	12	1	1000	1000	644		285b35198a5e188b3a0df3ed33f93a26-0	22	36	
-file://localhost	/home/User/testlink	l	8	1	1000	1000	777	testfile		29	38	
+ --> Database removed items part open (contents: 5 files)
+Removed list: 5 element(s):
+file://localhost	/home/User/subdir	d	0	0	1000	1000	755			19	33	
+file://localhost	/home/User/subdir/testfile	f	12	1	1000	1000	644		285b35198a5e188b3a0df3ed33f93a26-0	31	32	
+file://localhost	/home/User/subdir/testfile1	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	21	34	
+file://localhost	/home/User/subdir/testfile2	f	12	1	1000	1000	644		285b35198a5e188b3a0df3ed33f93a26-0	22	35	
+file://localhost	/home/User/testlink	l	8	1	1000	1000	777	testfile		29	37	
  --> Database active items part closed (contents: 26 files)
- --> Database removed items part closed (contents: 6 files)
+ --> Database removed items part closed (contents: 5 files)
 Reading version 1 lists
  --> Database active items part open (contents: 26 files)
 as previous with testlink in ignore list
@@ -358,17 +354,16 @@ file://localhost	/home/User/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371b
 file://localhost	/home/User/testfile~	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	28	0	
 file://localhost	/home/User/testpipe	p	0	1	1000	1000	644			30	0	
 Reading version 1 lists
- --> Database removed items part open (contents: 7 files)
-Removed list: 7 element(s):
-file://localhost	/home/User/subdir	d	0	0	1000	1000	755			19	34	
-file://localhost	/home/User/subdir/testfile	f	12	1	1000	1000	0			20	32	
-file://localhost	/home/User/subdir/testfile	f	12	1	1000	1000	644		285b35198a5e188b3a0df3ed33f93a26-0	31	33	
-file://localhost	/home/User/subdir/testfile1	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	21	35	
-file://localhost	/home/User/subdir/testfile2	f	12	1	1000	1000	644		285b35198a5e188b3a0df3ed33f93a26-0	22	36	
-file://localhost	/home/User/testlink	l	8	1	1000	1000	777	testfile		29	38	
-file://localhost	/home/User/testlink	l	8	1	1000	1000	777	testnull		37	39	
+ --> Database removed items part open (contents: 6 files)
+Removed list: 6 element(s):
+file://localhost	/home/User/subdir	d	0	0	1000	1000	755			19	33	
+file://localhost	/home/User/subdir/testfile	f	12	1	1000	1000	644		285b35198a5e188b3a0df3ed33f93a26-0	31	32	
+file://localhost	/home/User/subdir/testfile1	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	21	34	
+file://localhost	/home/User/subdir/testfile2	f	12	1	1000	1000	644		285b35198a5e188b3a0df3ed33f93a26-0	22	35	
+file://localhost	/home/User/testlink	l	8	1	1000	1000	777	testfile		29	37	
+file://localhost	/home/User/testlink	l	8	1	1000	1000	777	testnull		36	38	
  --> Database active items part closed (contents: 25 files)
- --> Database removed items part closed (contents: 7 files)
+ --> Database removed items part closed (contents: 6 files)
 Reading version 1 lists
  --> Database active items part open (contents: 25 files)
 as previous with CVS parser
@@ -407,22 +402,21 @@ file://localhost	/home/User/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371b
 file://localhost	/home/User/testfile~	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	28	0	
 file://localhost	/home/User/testpipe	p	0	1	1000	1000	644			30	0	
 Reading version 1 lists
- --> Database removed items part open (contents: 12 files)
-Removed list: 12 element(s):
-file://localhost	/home/User/cvs/dirbad/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	5	40	
-file://localhost	/home/User/cvs/dirbad/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	6	41	
-file://localhost	/home/User/cvs/diroth	d	0	0	1000	1000	755			7	43	
-file://localhost	/home/User/cvs/dirutd/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	11	42	
-file://localhost	/home/User/cvs/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	15	44	
-file://localhost	/home/User/subdir	d	0	0	1000	1000	755			19	34	
-file://localhost	/home/User/subdir/testfile	f	12	1	1000	1000	0			20	32	
-file://localhost	/home/User/subdir/testfile	f	12	1	1000	1000	644		285b35198a5e188b3a0df3ed33f93a26-0	31	33	
-file://localhost	/home/User/subdir/testfile1	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	21	35	
-file://localhost	/home/User/subdir/testfile2	f	12	1	1000	1000	644		285b35198a5e188b3a0df3ed33f93a26-0	22	36	
-file://localhost	/home/User/testlink	l	8	1	1000	1000	777	testfile		29	38	
-file://localhost	/home/User/testlink	l	8	1	1000	1000	777	testnull		37	39	
+ --> Database removed items part open (contents: 11 files)
+Removed list: 11 element(s):
+file://localhost	/home/User/cvs/dirbad/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	5	39	
+file://localhost	/home/User/cvs/dirbad/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	6	40	
+file://localhost	/home/User/cvs/diroth	d	0	0	1000	1000	755			7	42	
+file://localhost	/home/User/cvs/dirutd/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	11	41	
+file://localhost	/home/User/cvs/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	15	43	
+file://localhost	/home/User/subdir	d	0	0	1000	1000	755			19	33	
+file://localhost	/home/User/subdir/testfile	f	12	1	1000	1000	644		285b35198a5e188b3a0df3ed33f93a26-0	31	32	
+file://localhost	/home/User/subdir/testfile1	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	21	34	
+file://localhost	/home/User/subdir/testfile2	f	12	1	1000	1000	644		285b35198a5e188b3a0df3ed33f93a26-0	22	35	
+file://localhost	/home/User/testlink	l	8	1	1000	1000	777	testfile		29	37	
+file://localhost	/home/User/testlink	l	8	1	1000	1000	777	testnull		36	38	
  --> Database active items part closed (contents: 20 files)
- --> Database removed items part closed (contents: 12 files)
+ --> Database removed items part closed (contents: 11 files)
 Reading version 1 lists
  --> Database active items part open (contents: 20 files)
 as previous
@@ -456,22 +450,21 @@ file://localhost	/home/User/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371b
 file://localhost	/home/User/testfile~	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	28	0	
 file://localhost	/home/User/testpipe	p	0	1	1000	1000	644			30	0	
 Reading version 1 lists
- --> Database removed items part open (contents: 12 files)
-Removed list: 12 element(s):
-file://localhost	/home/User/cvs/dirbad/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	5	40	
-file://localhost	/home/User/cvs/dirbad/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	6	41	
-file://localhost	/home/User/cvs/diroth	d	0	0	1000	1000	755			7	43	
-file://localhost	/home/User/cvs/dirutd/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	11	42	
-file://localhost	/home/User/cvs/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	15	44	
-file://localhost	/home/User/subdir	d	0	0	1000	1000	755			19	34	
-file://localhost	/home/User/subdir/testfile	f	12	1	1000	1000	0			20	32	
-file://localhost	/home/User/subdir/testfile	f	12	1	1000	1000	644		285b35198a5e188b3a0df3ed33f93a26-0	31	33	
-file://localhost	/home/User/subdir/testfile1	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	21	35	
-file://localhost	/home/User/subdir/testfile2	f	12	1	1000	1000	644		285b35198a5e188b3a0df3ed33f93a26-0	22	36	
-file://localhost	/home/User/testlink	l	8	1	1000	1000	777	testfile		29	38	
-file://localhost	/home/User/testlink	l	8	1	1000	1000	777	testnull		37	39	
+ --> Database removed items part open (contents: 11 files)
+Removed list: 11 element(s):
+file://localhost	/home/User/cvs/dirbad/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	5	39	
+file://localhost	/home/User/cvs/dirbad/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	6	40	
+file://localhost	/home/User/cvs/diroth	d	0	0	1000	1000	755			7	42	
+file://localhost	/home/User/cvs/dirutd/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	11	41	
+file://localhost	/home/User/cvs/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	15	43	
+file://localhost	/home/User/subdir	d	0	0	1000	1000	755			19	33	
+file://localhost	/home/User/subdir/testfile	f	12	1	1000	1000	644		285b35198a5e188b3a0df3ed33f93a26-0	31	32	
+file://localhost	/home/User/subdir/testfile1	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	21	34	
+file://localhost	/home/User/subdir/testfile2	f	12	1	1000	1000	644		285b35198a5e188b3a0df3ed33f93a26-0	22	35	
+file://localhost	/home/User/testlink	l	8	1	1000	1000	777	testfile		29	37	
+file://localhost	/home/User/testlink	l	8	1	1000	1000	777	testnull		36	38	
  --> Database active items part closed (contents: 20 files)
- --> Database removed items part closed (contents: 12 files)
+ --> Database removed items part closed (contents: 11 files)
 Reading version 1 lists
  --> Database active items part open (contents: 20 files)
 as previous with cvs/dirutd in ignore list
@@ -500,26 +493,25 @@ file://localhost	/home/User/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371b
 file://localhost	/home/User/testfile~	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	28	0	
 file://localhost	/home/User/testpipe	p	0	1	1000	1000	644			30	0	
 Reading version 1 lists
- --> Database removed items part open (contents: 16 files)
-Removed list: 16 element(s):
-file://localhost	/home/User/cvs/dirbad/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	5	40	
-file://localhost	/home/User/cvs/dirbad/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	6	41	
-file://localhost	/home/User/cvs/diroth	d	0	0	1000	1000	755			7	43	
-file://localhost	/home/User/cvs/dirutd	d	0	0	1000	1000	755			8	45	
-file://localhost	/home/User/cvs/dirutd/CVS	d	0	0	1000	1000	755			9	46	
-file://localhost	/home/User/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	644		5252f242d27b8c2c9fdbdcbb33545d07-0	10	47	
-file://localhost	/home/User/cvs/dirutd/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	11	42	
-file://localhost	/home/User/cvs/dirutd/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	12	48	
-file://localhost	/home/User/cvs/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	15	44	
-file://localhost	/home/User/subdir	d	0	0	1000	1000	755			19	34	
-file://localhost	/home/User/subdir/testfile	f	12	1	1000	1000	0			20	32	
-file://localhost	/home/User/subdir/testfile	f	12	1	1000	1000	644		285b35198a5e188b3a0df3ed33f93a26-0	31	33	
-file://localhost	/home/User/subdir/testfile1	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	21	35	
-file://localhost	/home/User/subdir/testfile2	f	12	1	1000	1000	644		285b35198a5e188b3a0df3ed33f93a26-0	22	36	
-file://localhost	/home/User/testlink	l	8	1	1000	1000	777	testfile		29	38	
-file://localhost	/home/User/testlink	l	8	1	1000	1000	777	testnull		37	39	
+ --> Database removed items part open (contents: 15 files)
+Removed list: 15 element(s):
+file://localhost	/home/User/cvs/dirbad/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	5	39	
+file://localhost	/home/User/cvs/dirbad/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	6	40	
+file://localhost	/home/User/cvs/diroth	d	0	0	1000	1000	755			7	42	
+file://localhost	/home/User/cvs/dirutd	d	0	0	1000	1000	755			8	44	
+file://localhost	/home/User/cvs/dirutd/CVS	d	0	0	1000	1000	755			9	45	
+file://localhost	/home/User/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	644		5252f242d27b8c2c9fdbdcbb33545d07-0	10	46	
+file://localhost	/home/User/cvs/dirutd/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	11	41	
+file://localhost	/home/User/cvs/dirutd/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	12	47	
+file://localhost	/home/User/cvs/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	15	43	
+file://localhost	/home/User/subdir	d	0	0	1000	1000	755			19	33	
+file://localhost	/home/User/subdir/testfile	f	12	1	1000	1000	644		285b35198a5e188b3a0df3ed33f93a26-0	31	32	
+file://localhost	/home/User/subdir/testfile1	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	21	34	
+file://localhost	/home/User/subdir/testfile2	f	12	1	1000	1000	644		285b35198a5e188b3a0df3ed33f93a26-0	22	35	
+file://localhost	/home/User/testlink	l	8	1	1000	1000	777	testfile		29	37	
+file://localhost	/home/User/testlink	l	8	1	1000	1000	777	testnull		36	38	
  --> Database active items part closed (contents: 16 files)
- --> Database removed items part closed (contents: 16 files)
+ --> Database removed items part closed (contents: 15 files)
 Reading version 1 lists
  --> Database active items part open (contents: 16 files)
 as previous with testpipe gone
@@ -547,27 +539,26 @@ file://localhost	/home/User/testdir	d	0	0	1000	1000	755			26	0
 file://localhost	/home/User/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371bbc0355478d8-0	27	0	
 file://localhost	/home/User/testfile~	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	28	0	
 Reading version 1 lists
- --> Database removed items part open (contents: 17 files)
-Removed list: 17 element(s):
-file://localhost	/home/User/cvs/dirbad/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	5	40	
-file://localhost	/home/User/cvs/dirbad/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	6	41	
-file://localhost	/home/User/cvs/diroth	d	0	0	1000	1000	755			7	43	
-file://localhost	/home/User/cvs/dirutd	d	0	0	1000	1000	755			8	45	
-file://localhost	/home/User/cvs/dirutd/CVS	d	0	0	1000	1000	755			9	46	
-file://localhost	/home/User/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	644		5252f242d27b8c2c9fdbdcbb33545d07-0	10	47	
-file://localhost	/home/User/cvs/dirutd/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	11	42	
-file://localhost	/home/User/cvs/dirutd/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	12	48	
-file://localhost	/home/User/cvs/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	15	44	
-file://localhost	/home/User/subdir	d	0	0	1000	1000	755			19	34	
-file://localhost	/home/User/subdir/testfile	f	12	1	1000	1000	0			20	32	
-file://localhost	/home/User/subdir/testfile	f	12	1	1000	1000	644		285b35198a5e188b3a0df3ed33f93a26-0	31	33	
-file://localhost	/home/User/subdir/testfile1	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	21	35	
-file://localhost	/home/User/subdir/testfile2	f	12	1	1000	1000	644		285b35198a5e188b3a0df3ed33f93a26-0	22	36	
-file://localhost	/home/User/testlink	l	8	1	1000	1000	777	testfile		29	38	
-file://localhost	/home/User/testlink	l	8	1	1000	1000	777	testnull		37	39	
-file://localhost	/home/User/testpipe	p	0	1	1000	1000	644			30	49	
+ --> Database removed items part open (contents: 16 files)
+Removed list: 16 element(s):
+file://localhost	/home/User/cvs/dirbad/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	5	39	
+file://localhost	/home/User/cvs/dirbad/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	6	40	
+file://localhost	/home/User/cvs/diroth	d	0	0	1000	1000	755			7	42	
+file://localhost	/home/User/cvs/dirutd	d	0	0	1000	1000	755			8	44	
+file://localhost	/home/User/cvs/dirutd/CVS	d	0	0	1000	1000	755			9	45	
+file://localhost	/home/User/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	644		5252f242d27b8c2c9fdbdcbb33545d07-0	10	46	
+file://localhost	/home/User/cvs/dirutd/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	11	41	
+file://localhost	/home/User/cvs/dirutd/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	12	47	
+file://localhost	/home/User/cvs/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	15	43	
+file://localhost	/home/User/subdir	d	0	0	1000	1000	755			19	33	
+file://localhost	/home/User/subdir/testfile	f	12	1	1000	1000	644		285b35198a5e188b3a0df3ed33f93a26-0	31	32	
+file://localhost	/home/User/subdir/testfile1	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	21	34	
+file://localhost	/home/User/subdir/testfile2	f	12	1	1000	1000	644		285b35198a5e188b3a0df3ed33f93a26-0	22	35	
+file://localhost	/home/User/testlink	l	8	1	1000	1000	777	testfile		29	37	
+file://localhost	/home/User/testlink	l	8	1	1000	1000	777	testnull		36	38	
+file://localhost	/home/User/testpipe	p	0	1	1000	1000	644			30	48	
  --> Database active items part closed (contents: 15 files)
- --> Database removed items part closed (contents: 17 files)
+ --> Database removed items part closed (contents: 16 files)
 Reading version 1 lists
  --> Database active items part open (contents: 15 files)
 as previous with testfile mode changed
@@ -592,31 +583,30 @@ file://localhost	/home/User/subdir-file	f	0	1	1000	1000	644		d41d8cd98f00b204e98
 file://localhost	/home/User/subdirfile	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	24	0	
 file://localhost	/home/User/test space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	25	0	
 file://localhost	/home/User/testdir	d	0	0	1000	1000	755			26	0	
-file://localhost	/home/User/testfile	f	13	1	1000	1000	660		59ca0efa9f5633cb0371bbc0355478d8-0	50	0	
+file://localhost	/home/User/testfile	f	13	1	1000	1000	660		59ca0efa9f5633cb0371bbc0355478d8-0	49	0	
 file://localhost	/home/User/testfile~	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	28	0	
 Reading version 1 lists
- --> Database removed items part open (contents: 18 files)
-Removed list: 18 element(s):
-file://localhost	/home/User/cvs/dirbad/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	5	40	
-file://localhost	/home/User/cvs/dirbad/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	6	41	
-file://localhost	/home/User/cvs/diroth	d	0	0	1000	1000	755			7	43	
-file://localhost	/home/User/cvs/dirutd	d	0	0	1000	1000	755			8	45	
-file://localhost	/home/User/cvs/dirutd/CVS	d	0	0	1000	1000	755			9	46	
-file://localhost	/home/User/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	644		5252f242d27b8c2c9fdbdcbb33545d07-0	10	47	
-file://localhost	/home/User/cvs/dirutd/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	11	42	
-file://localhost	/home/User/cvs/dirutd/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	12	48	
-file://localhost	/home/User/cvs/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	15	44	
-file://localhost	/home/User/subdir	d	0	0	1000	1000	755			19	34	
-file://localhost	/home/User/subdir/testfile	f	12	1	1000	1000	0			20	32	
-file://localhost	/home/User/subdir/testfile	f	12	1	1000	1000	644		285b35198a5e188b3a0df3ed33f93a26-0	31	33	
-file://localhost	/home/User/subdir/testfile1	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	21	35	
-file://localhost	/home/User/subdir/testfile2	f	12	1	1000	1000	644		285b35198a5e188b3a0df3ed33f93a26-0	22	36	
-file://localhost	/home/User/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371bbc0355478d8-0	27	51	
-file://localhost	/home/User/testlink	l	8	1	1000	1000	777	testfile		29	38	
-file://localhost	/home/User/testlink	l	8	1	1000	1000	777	testnull		37	39	
-file://localhost	/home/User/testpipe	p	0	1	1000	1000	644			30	49	
+ --> Database removed items part open (contents: 17 files)
+Removed list: 17 element(s):
+file://localhost	/home/User/cvs/dirbad/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	5	39	
+file://localhost	/home/User/cvs/dirbad/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	6	40	
+file://localhost	/home/User/cvs/diroth	d	0	0	1000	1000	755			7	42	
+file://localhost	/home/User/cvs/dirutd	d	0	0	1000	1000	755			8	44	
+file://localhost	/home/User/cvs/dirutd/CVS	d	0	0	1000	1000	755			9	45	
+file://localhost	/home/User/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	644		5252f242d27b8c2c9fdbdcbb33545d07-0	10	46	
+file://localhost	/home/User/cvs/dirutd/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	11	41	
+file://localhost	/home/User/cvs/dirutd/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	12	47	
+file://localhost	/home/User/cvs/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	15	43	
+file://localhost	/home/User/subdir	d	0	0	1000	1000	755			19	33	
+file://localhost	/home/User/subdir/testfile	f	12	1	1000	1000	644		285b35198a5e188b3a0df3ed33f93a26-0	31	32	
+file://localhost	/home/User/subdir/testfile1	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	21	34	
+file://localhost	/home/User/subdir/testfile2	f	12	1	1000	1000	644		285b35198a5e188b3a0df3ed33f93a26-0	22	35	
+file://localhost	/home/User/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371bbc0355478d8-0	27	50	
+file://localhost	/home/User/testlink	l	8	1	1000	1000	777	testfile		29	37	
+file://localhost	/home/User/testlink	l	8	1	1000	1000	777	testnull		36	38	
+file://localhost	/home/User/testpipe	p	0	1	1000	1000	644			30	48	
  --> Database active items part closed (contents: 15 files)
- --> Database removed items part closed (contents: 18 files)
+ --> Database removed items part closed (contents: 17 files)
 Reading version 1 lists
  --> Database active items part open (contents: 15 files)
 as previous with cvs/filenew.c touched
@@ -633,7 +623,7 @@ file://localhost	/home/User/cvs/CVS	d	0	0	1000	1000	755			2	0
 file://localhost	/home/User/cvs/CVS/Entries	f	141	1	1000	1000	644		63b52e85e7a255c09df5cca819b74a88-0	3	0	
 file://localhost	/home/User/cvs/dirbad	d	0	0	1000	1000	755			4	0	
 file://localhost	/home/User/cvs/filemod.o	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	13	0	
-file://localhost	/home/User/cvs/filenew.c	f	5	1	1000	1000	644		0d599f0ec05c3bda8c3b8a68c32a1b47-0	52	0	
+file://localhost	/home/User/cvs/filenew.c	f	5	1	1000	1000	644		0d599f0ec05c3bda8c3b8a68c32a1b47-0	51	0	
 file://localhost	/home/User/cvs/fileutd.h	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	16	0	
 file://localhost	/home/User/dir space	d	0	0	1000	1000	755			17	0	
 file://localhost	/home/User/dir space/file space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	18	0	
@@ -641,32 +631,31 @@ file://localhost	/home/User/subdir-file	f	0	1	1000	1000	644		d41d8cd98f00b204e98
 file://localhost	/home/User/subdirfile	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	24	0	
 file://localhost	/home/User/test space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	25	0	
 file://localhost	/home/User/testdir	d	0	0	1000	1000	755			26	0	
-file://localhost	/home/User/testfile	f	13	1	1000	1000	660		59ca0efa9f5633cb0371bbc0355478d8-0	50	0	
+file://localhost	/home/User/testfile	f	13	1	1000	1000	660		59ca0efa9f5633cb0371bbc0355478d8-0	49	0	
 file://localhost	/home/User/testfile~	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	28	0	
 Reading version 1 lists
- --> Database removed items part open (contents: 19 files)
-Removed list: 19 element(s):
-file://localhost	/home/User/cvs/dirbad/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	5	40	
-file://localhost	/home/User/cvs/dirbad/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	6	41	
-file://localhost	/home/User/cvs/diroth	d	0	0	1000	1000	755			7	43	
-file://localhost	/home/User/cvs/dirutd	d	0	0	1000	1000	755			8	45	
-file://localhost	/home/User/cvs/dirutd/CVS	d	0	0	1000	1000	755			9	46	
-file://localhost	/home/User/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	644		5252f242d27b8c2c9fdbdcbb33545d07-0	10	47	
-file://localhost	/home/User/cvs/dirutd/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	11	42	
-file://localhost	/home/User/cvs/dirutd/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	12	48	
-file://localhost	/home/User/cvs/filenew.c	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	14	53	
-file://localhost	/home/User/cvs/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	15	44	
-file://localhost	/home/User/subdir	d	0	0	1000	1000	755			19	34	
-file://localhost	/home/User/subdir/testfile	f	12	1	1000	1000	0			20	32	
-file://localhost	/home/User/subdir/testfile	f	12	1	1000	1000	644		285b35198a5e188b3a0df3ed33f93a26-0	31	33	
-file://localhost	/home/User/subdir/testfile1	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	21	35	
-file://localhost	/home/User/subdir/testfile2	f	12	1	1000	1000	644		285b35198a5e188b3a0df3ed33f93a26-0	22	36	
-file://localhost	/home/User/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371bbc0355478d8-0	27	51	
-file://localhost	/home/User/testlink	l	8	1	1000	1000	777	testfile		29	38	
-file://localhost	/home/User/testlink	l	8	1	1000	1000	777	testnull		37	39	
-file://localhost	/home/User/testpipe	p	0	1	1000	1000	644			30	49	
+ --> Database removed items part open (contents: 18 files)
+Removed list: 18 element(s):
+file://localhost	/home/User/cvs/dirbad/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	5	39	
+file://localhost	/home/User/cvs/dirbad/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	6	40	
+file://localhost	/home/User/cvs/diroth	d	0	0	1000	1000	755			7	42	
+file://localhost	/home/User/cvs/dirutd	d	0	0	1000	1000	755			8	44	
+file://localhost	/home/User/cvs/dirutd/CVS	d	0	0	1000	1000	755			9	45	
+file://localhost	/home/User/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	644		5252f242d27b8c2c9fdbdcbb33545d07-0	10	46	
+file://localhost	/home/User/cvs/dirutd/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	11	41	
+file://localhost	/home/User/cvs/dirutd/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	12	47	
+file://localhost	/home/User/cvs/filenew.c	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	14	52	
+file://localhost	/home/User/cvs/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	15	43	
+file://localhost	/home/User/subdir	d	0	0	1000	1000	755			19	33	
+file://localhost	/home/User/subdir/testfile	f	12	1	1000	1000	644		285b35198a5e188b3a0df3ed33f93a26-0	31	32	
+file://localhost	/home/User/subdir/testfile1	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	21	34	
+file://localhost	/home/User/subdir/testfile2	f	12	1	1000	1000	644		285b35198a5e188b3a0df3ed33f93a26-0	22	35	
+file://localhost	/home/User/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371bbc0355478d8-0	27	50	
+file://localhost	/home/User/testlink	l	8	1	1000	1000	777	testfile		29	37	
+file://localhost	/home/User/testlink	l	8	1	1000	1000	777	testnull		36	38	
+file://localhost	/home/User/testpipe	p	0	1	1000	1000	644			30	48	
  --> Database active items part closed (contents: 15 files)
- --> Database removed items part closed (contents: 19 files)
+ --> Database removed items part closed (contents: 18 files)
 Reading version 1 lists
  --> Database active items part open (contents: 15 files)
 some troublesome past cases
@@ -702,60 +691,59 @@ file://localhost	/home/User/cvs/CVS	d	0	0	1000	1000	755			2	0
 file://localhost	/home/User/cvs/CVS/Entries	f	141	1	1000	1000	644		63b52e85e7a255c09df5cca819b74a88-0	3	0	
 file://localhost	/home/User/cvs/dirbad	d	0	0	1000	1000	755			4	0	
 file://localhost	/home/User/cvs/filemod.o	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	13	0	
-file://localhost	/home/User/cvs/filenew.c	f	5	1	1000	1000	644		0d599f0ec05c3bda8c3b8a68c32a1b47-0	52	0	
+file://localhost	/home/User/cvs/filenew.c	f	5	1	1000	1000	644		0d599f0ec05c3bda8c3b8a68c32a1b47-0	51	0	
 file://localhost	/home/User/cvs/fileutd.h	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	16	0	
 file://localhost	/home/User/dir space	d	0	0	1000	1000	755			17	0	
 file://localhost	/home/User/dir space/file space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	18	0	
-file://localhost	/home/User/docbook-xml	d	0	0	1000	1000	755			54	0	
-file://localhost	/home/User/docbook-xml.cat	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	67	0	
-file://localhost	/home/User/docbook-xml.cat.old	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	68	0	
-file://localhost	/home/User/docbook-xml/3.1.7	d	0	0	1000	1000	755			55	0	
-file://localhost	/home/User/docbook-xml/3.1.7/dbgenent.ent	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	56	0	
-file://localhost	/home/User/docbook-xml/4.0	d	0	0	1000	1000	755			57	0	
-file://localhost	/home/User/docbook-xml/4.0/dbgenent.ent	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	58	0	
-file://localhost	/home/User/docbook-xml/4.1.2	d	0	0	1000	1000	755			59	0	
-file://localhost	/home/User/docbook-xml/4.1.2/dbgenent.mod	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	60	0	
-file://localhost	/home/User/docbook-xml/4.2	d	0	0	1000	1000	755			61	0	
-file://localhost	/home/User/docbook-xml/4.2/dbgenent.mod	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	62	0	
-file://localhost	/home/User/docbook-xml/4.3	d	0	0	1000	1000	755			63	0	
-file://localhost	/home/User/docbook-xml/4.3/dbgenent.mod	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	64	0	
-file://localhost	/home/User/docbook-xml/4.4	d	0	0	1000	1000	755			65	0	
-file://localhost	/home/User/docbook-xml/4.4/dbgenent.mod	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	66	0	
+file://localhost	/home/User/docbook-xml	d	0	0	1000	1000	755			53	0	
+file://localhost	/home/User/docbook-xml.cat	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	66	0	
+file://localhost	/home/User/docbook-xml.cat.old	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	67	0	
+file://localhost	/home/User/docbook-xml/3.1.7	d	0	0	1000	1000	755			54	0	
+file://localhost	/home/User/docbook-xml/3.1.7/dbgenent.ent	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	55	0	
+file://localhost	/home/User/docbook-xml/4.0	d	0	0	1000	1000	755			56	0	
+file://localhost	/home/User/docbook-xml/4.0/dbgenent.ent	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	57	0	
+file://localhost	/home/User/docbook-xml/4.1.2	d	0	0	1000	1000	755			58	0	
+file://localhost	/home/User/docbook-xml/4.1.2/dbgenent.mod	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	59	0	
+file://localhost	/home/User/docbook-xml/4.2	d	0	0	1000	1000	755			60	0	
+file://localhost	/home/User/docbook-xml/4.2/dbgenent.mod	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	61	0	
+file://localhost	/home/User/docbook-xml/4.3	d	0	0	1000	1000	755			62	0	
+file://localhost	/home/User/docbook-xml/4.3/dbgenent.mod	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	63	0	
+file://localhost	/home/User/docbook-xml/4.4	d	0	0	1000	1000	755			64	0	
+file://localhost	/home/User/docbook-xml/4.4/dbgenent.mod	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	65	0	
 file://localhost	/home/User/subdir-file	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	23	0	
 file://localhost	/home/User/subdirfile	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	24	0	
 file://localhost	/home/User/test space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	25	0	
 file://localhost	/home/User/testdir	d	0	0	1000	1000	755			26	0	
-file://localhost	/home/User/testdir/biblio	d	0	0	1000	1000	755			69	0	
-file://localhost	/home/User/testdir/biblio.odb	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	72	0	
-file://localhost	/home/User/testdir/biblio/biblio.dbf	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	70	0	
-file://localhost	/home/User/testdir/biblio/biblio.dbt	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	71	0	
-file://localhost	/home/User/testdir/evolocal.odb	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	73	0	
-file://localhost	/home/User/testfile	f	13	1	1000	1000	660		59ca0efa9f5633cb0371bbc0355478d8-0	50	0	
+file://localhost	/home/User/testdir/biblio	d	0	0	1000	1000	755			68	0	
+file://localhost	/home/User/testdir/biblio.odb	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	71	0	
+file://localhost	/home/User/testdir/biblio/biblio.dbf	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	69	0	
+file://localhost	/home/User/testdir/biblio/biblio.dbt	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	70	0	
+file://localhost	/home/User/testdir/evolocal.odb	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	72	0	
+file://localhost	/home/User/testfile	f	13	1	1000	1000	660		59ca0efa9f5633cb0371bbc0355478d8-0	49	0	
 file://localhost	/home/User/testfile~	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	28	0	
 Reading version 1 lists
- --> Database removed items part open (contents: 19 files)
-Removed list: 19 element(s):
-file://localhost	/home/User/cvs/dirbad/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	5	40	
-file://localhost	/home/User/cvs/dirbad/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	6	41	
-file://localhost	/home/User/cvs/diroth	d	0	0	1000	1000	755			7	43	
-file://localhost	/home/User/cvs/dirutd	d	0	0	1000	1000	755			8	45	
-file://localhost	/home/User/cvs/dirutd/CVS	d	0	0	1000	1000	755			9	46	
-file://localhost	/home/User/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	644		5252f242d27b8c2c9fdbdcbb33545d07-0	10	47	
-file://localhost	/home/User/cvs/dirutd/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	11	42	
-file://localhost	/home/User/cvs/dirutd/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	12	48	
-file://localhost	/home/User/cvs/filenew.c	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	14	53	
-file://localhost	/home/User/cvs/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	15	44	
-file://localhost	/home/User/subdir	d	0	0	1000	1000	755			19	34	
-file://localhost	/home/User/subdir/testfile	f	12	1	1000	1000	0			20	32	
-file://localhost	/home/User/subdir/testfile	f	12	1	1000	1000	644		285b35198a5e188b3a0df3ed33f93a26-0	31	33	
-file://localhost	/home/User/subdir/testfile1	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	21	35	
-file://localhost	/home/User/subdir/testfile2	f	12	1	1000	1000	644		285b35198a5e188b3a0df3ed33f93a26-0	22	36	
-file://localhost	/home/User/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371bbc0355478d8-0	27	51	
-file://localhost	/home/User/testlink	l	8	1	1000	1000	777	testfile		29	38	
-file://localhost	/home/User/testlink	l	8	1	1000	1000	777	testnull		37	39	
-file://localhost	/home/User/testpipe	p	0	1	1000	1000	644			30	49	
+ --> Database removed items part open (contents: 18 files)
+Removed list: 18 element(s):
+file://localhost	/home/User/cvs/dirbad/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	5	39	
+file://localhost	/home/User/cvs/dirbad/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	6	40	
+file://localhost	/home/User/cvs/diroth	d	0	0	1000	1000	755			7	42	
+file://localhost	/home/User/cvs/dirutd	d	0	0	1000	1000	755			8	44	
+file://localhost	/home/User/cvs/dirutd/CVS	d	0	0	1000	1000	755			9	45	
+file://localhost	/home/User/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	644		5252f242d27b8c2c9fdbdcbb33545d07-0	10	46	
+file://localhost	/home/User/cvs/dirutd/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	11	41	
+file://localhost	/home/User/cvs/dirutd/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	12	47	
+file://localhost	/home/User/cvs/filenew.c	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	14	52	
+file://localhost	/home/User/cvs/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	15	43	
+file://localhost	/home/User/subdir	d	0	0	1000	1000	755			19	33	
+file://localhost	/home/User/subdir/testfile	f	12	1	1000	1000	644		285b35198a5e188b3a0df3ed33f93a26-0	31	32	
+file://localhost	/home/User/subdir/testfile1	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	21	34	
+file://localhost	/home/User/subdir/testfile2	f	12	1	1000	1000	644		285b35198a5e188b3a0df3ed33f93a26-0	22	35	
+file://localhost	/home/User/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371bbc0355478d8-0	27	50	
+file://localhost	/home/User/testlink	l	8	1	1000	1000	777	testfile		29	37	
+file://localhost	/home/User/testlink	l	8	1	1000	1000	777	testnull		36	38	
+file://localhost	/home/User/testpipe	p	0	1	1000	1000	644			30	48	
  --> Database active items part closed (contents: 35 files)
- --> Database removed items part closed (contents: 19 files)
+ --> Database removed items part closed (contents: 18 files)
 Reading version 1 lists
  --> Database active items part open (contents: 35 files)
  --> D cvs
@@ -778,57 +766,56 @@ file://localhost	/home/User/cvs/CVS	d	0	0	1000	1000	755			2	0
 file://localhost	/home/User/cvs/CVS/Entries	f	141	1	1000	1000	644		63b52e85e7a255c09df5cca819b74a88-0	3	0	
 file://localhost	/home/User/cvs/dirbad	d	0	0	1000	1000	755			4	0	
 file://localhost	/home/User/cvs/filemod.o	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	13	0	
-file://localhost	/home/User/cvs/filenew.c	f	5	1	1000	1000	644		0d599f0ec05c3bda8c3b8a68c32a1b47-0	52	0	
+file://localhost	/home/User/cvs/filenew.c	f	5	1	1000	1000	644		0d599f0ec05c3bda8c3b8a68c32a1b47-0	51	0	
 file://localhost	/home/User/cvs/fileutd.h	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	16	0	
 file://localhost	/home/User/dir space	d	0	0	1000	1000	755			17	0	
 file://localhost	/home/User/dir space/file space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	18	0	
-file://localhost	/home/User/docbook-xml	d	0	0	1000	1000	755			54	0	
-file://localhost	/home/User/docbook-xml.cat	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	67	0	
-file://localhost	/home/User/docbook-xml.cat.old	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	68	0	
-file://localhost	/home/User/docbook-xml/3.1.7	d	0	0	1000	1000	755			55	0	
-file://localhost	/home/User/docbook-xml/3.1.7/dbgenent.ent	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	56	0	
-file://localhost	/home/User/docbook-xml/4.0	d	0	0	1000	1000	755			57	0	
-file://localhost	/home/User/docbook-xml/4.0/dbgenent.ent	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	58	0	
-file://localhost	/home/User/docbook-xml/4.1.2	d	0	0	1000	1000	755			59	0	
-file://localhost	/home/User/docbook-xml/4.1.2/dbgenent.mod	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	60	0	
-file://localhost	/home/User/docbook-xml/4.2	d	0	0	1000	1000	755			61	0	
-file://localhost	/home/User/docbook-xml/4.2/dbgenent.mod	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	62	0	
-file://localhost	/home/User/docbook-xml/4.3	d	0	0	1000	1000	755			63	0	
-file://localhost	/home/User/docbook-xml/4.3/dbgenent.mod	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	64	0	
-file://localhost	/home/User/docbook-xml/4.4	d	0	0	1000	1000	755			65	0	
-file://localhost	/home/User/docbook-xml/4.4/dbgenent.mod	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	66	0	
+file://localhost	/home/User/docbook-xml	d	0	0	1000	1000	755			53	0	
+file://localhost	/home/User/docbook-xml.cat	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	66	0	
+file://localhost	/home/User/docbook-xml.cat.old	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	67	0	
+file://localhost	/home/User/docbook-xml/3.1.7	d	0	0	1000	1000	755			54	0	
+file://localhost	/home/User/docbook-xml/3.1.7/dbgenent.ent	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	55	0	
+file://localhost	/home/User/docbook-xml/4.0	d	0	0	1000	1000	755			56	0	
+file://localhost	/home/User/docbook-xml/4.0/dbgenent.ent	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	57	0	
+file://localhost	/home/User/docbook-xml/4.1.2	d	0	0	1000	1000	755			58	0	
+file://localhost	/home/User/docbook-xml/4.1.2/dbgenent.mod	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	59	0	
+file://localhost	/home/User/docbook-xml/4.2	d	0	0	1000	1000	755			60	0	
+file://localhost	/home/User/docbook-xml/4.2/dbgenent.mod	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	61	0	
+file://localhost	/home/User/docbook-xml/4.3	d	0	0	1000	1000	755			62	0	
+file://localhost	/home/User/docbook-xml/4.3/dbgenent.mod	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	63	0	
+file://localhost	/home/User/docbook-xml/4.4	d	0	0	1000	1000	755			64	0	
+file://localhost	/home/User/docbook-xml/4.4/dbgenent.mod	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	65	0	
 file://localhost	/home/User/subdir-file	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	23	0	
 file://localhost	/home/User/subdirfile	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	24	0	
 file://localhost	/home/User/test space	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	25	0	
 file://localhost	/home/User/testdir	d	0	0	1000	1000	755			26	0	
-file://localhost	/home/User/testdir/biblio	d	0	0	1000	1000	755			69	0	
-file://localhost	/home/User/testdir/biblio.odb	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	72	0	
-file://localhost	/home/User/testdir/biblio/biblio.dbf	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	70	0	
-file://localhost	/home/User/testdir/biblio/biblio.dbt	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	71	0	
-file://localhost	/home/User/testdir/evolocal.odb	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	73	0	
-file://localhost	/home/User/testfile	f	13	1	1000	1000	660		59ca0efa9f5633cb0371bbc0355478d8-0	50	0	
+file://localhost	/home/User/testdir/biblio	d	0	0	1000	1000	755			68	0	
+file://localhost	/home/User/testdir/biblio.odb	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	71	0	
+file://localhost	/home/User/testdir/biblio/biblio.dbf	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	69	0	
+file://localhost	/home/User/testdir/biblio/biblio.dbt	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	70	0	
+file://localhost	/home/User/testdir/evolocal.odb	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	72	0	
+file://localhost	/home/User/testfile	f	13	1	1000	1000	660		59ca0efa9f5633cb0371bbc0355478d8-0	49	0	
 file://localhost	/home/User/testfile~	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	28	0	
 Reading version 1 lists
- --> Database removed items part open (contents: 19 files)
-Removed list: 19 element(s):
-file://localhost	/home/User/cvs/dirbad/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	5	40	
-file://localhost	/home/User/cvs/dirbad/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	6	41	
-file://localhost	/home/User/cvs/diroth	d	0	0	1000	1000	755			7	43	
-file://localhost	/home/User/cvs/dirutd	d	0	0	1000	1000	755			8	45	
-file://localhost	/home/User/cvs/dirutd/CVS	d	0	0	1000	1000	755			9	46	
-file://localhost	/home/User/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	644		5252f242d27b8c2c9fdbdcbb33545d07-0	10	47	
-file://localhost	/home/User/cvs/dirutd/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	11	42	
-file://localhost	/home/User/cvs/dirutd/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	12	48	
-file://localhost	/home/User/cvs/filenew.c	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	14	53	
-file://localhost	/home/User/cvs/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	15	44	
-file://localhost	/home/User/subdir	d	0	0	1000	1000	755			19	34	
-file://localhost	/home/User/subdir/testfile	f	12	1	1000	1000	0			20	32	
-file://localhost	/home/User/subdir/testfile	f	12	1	1000	1000	644		285b35198a5e188b3a0df3ed33f93a26-0	31	33	
-file://localhost	/home/User/subdir/testfile1	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	21	35	
-file://localhost	/home/User/subdir/testfile2	f	12	1	1000	1000	644		285b35198a5e188b3a0df3ed33f93a26-0	22	36	
-file://localhost	/home/User/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371bbc0355478d8-0	27	51	
-file://localhost	/home/User/testlink	l	8	1	1000	1000	777	testfile		29	38	
-file://localhost	/home/User/testlink	l	8	1	1000	1000	777	testnull		37	39	
-file://localhost	/home/User/testpipe	p	0	1	1000	1000	644			30	49	
+ --> Database removed items part open (contents: 18 files)
+Removed list: 18 element(s):
+file://localhost	/home/User/cvs/dirbad/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	5	39	
+file://localhost	/home/User/cvs/dirbad/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	6	40	
+file://localhost	/home/User/cvs/diroth	d	0	0	1000	1000	755			7	42	
+file://localhost	/home/User/cvs/dirutd	d	0	0	1000	1000	755			8	44	
+file://localhost	/home/User/cvs/dirutd/CVS	d	0	0	1000	1000	755			9	45	
+file://localhost	/home/User/cvs/dirutd/CVS/Entries	f	42	1	1000	1000	644		5252f242d27b8c2c9fdbdcbb33545d07-0	10	46	
+file://localhost	/home/User/cvs/dirutd/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	11	41	
+file://localhost	/home/User/cvs/dirutd/fileutd	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	12	47	
+file://localhost	/home/User/cvs/filenew.c	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	14	52	
+file://localhost	/home/User/cvs/fileoth	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	15	43	
+file://localhost	/home/User/subdir	d	0	0	1000	1000	755			19	33	
+file://localhost	/home/User/subdir/testfile	f	12	1	1000	1000	644		285b35198a5e188b3a0df3ed33f93a26-0	31	32	
+file://localhost	/home/User/subdir/testfile1	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	21	34	
+file://localhost	/home/User/subdir/testfile2	f	12	1	1000	1000	644		285b35198a5e188b3a0df3ed33f93a26-0	22	35	
+file://localhost	/home/User/testfile	f	13	1	1000	1000	644		59ca0efa9f5633cb0371bbc0355478d8-0	27	50	
+file://localhost	/home/User/testlink	l	8	1	1000	1000	777	testfile		29	37	
+file://localhost	/home/User/testlink	l	8	1	1000	1000	777	testnull		36	38	
+file://localhost	/home/User/testpipe	p	0	1	1000	1000	644			30	48	
  --> Database active items part closed (contents: 35 files)
- --> Database removed items part closed (contents: 19 files)
+ --> Database removed items part closed (contents: 18 files)

@@ -707,6 +707,7 @@ int Database::modify(
     const Node* old_node,
     const Node* node,
     bool        no_data) {
+  bool discard = false;
   if (no_data) {
     // File is in the list, but could not be copied last time, try again, or
     // file metadata has changed, but we believe the data to be unchanged
@@ -714,12 +715,16 @@ int Database::modify(
     if (add(prefix, base_path, rel_path, dir_path, node, checksum)) {
       return -1;
     }
+    // Same file that failed copy last time, do not add to removed records
+    if (checksum[0] == '\0') {
+      discard = true;
+    }
   } else {
     if (add(prefix, base_path, rel_path, dir_path, node, NULL)) {
       return -1;
     }
   }
-  remove(prefix, base_path, rel_path, old_node, false);
+  remove(prefix, base_path, rel_path, old_node, discard);
   return 0;
 }
 
@@ -728,7 +733,7 @@ void Database::remove(
     const char* base_path,
     const char* rel_path,
     const Node* node,
-    bool        descend) {
+    bool        discard) {
   // Find record in active list, move it to removed list
   char* full_path = NULL;
   int length;
@@ -760,10 +765,12 @@ void Database::remove(
   }
 
   if ((_d->entry != _d->active.end()) && (cmp == 0)) {
-    // Mark removed
-    _d->entry->setOut();
-    // Append to removed list
-    _d->removed.add(*_d->entry);
+    if (! discard) {
+      // Mark removed
+      _d->entry->setOut();
+      // Append to removed list
+      _d->removed.add(*_d->entry);
+    }
     // Remove from active list / Go on to next
     _d->entry = _d->active.erase(_d->entry);
   } else {
