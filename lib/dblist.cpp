@@ -412,7 +412,7 @@ int DbList::save(
         last_path = NULL;
         asprintf(&last_path, "%s", i->path());
       } else {
-        if (last_out != i->in()) {
+        if ((last_out != 0) && (last_out != i->in())) {
           fprintf(writefile, "\t\t%ld\t-\t\n", last_out);
           last_out = 0;
         }
