@@ -24,6 +24,7 @@
 
 using namespace std;
 
+#include <fcntl.h>
 #include <openssl/md5.h>
 #include <openssl/evp.h>
 #include <zlib.h>
@@ -284,6 +285,8 @@ public:
   ~Stream() {
     free(_path);
   }
+  bool isOpen() const      { return _fd != -1; }
+  bool isWriteable() const { return (_fmode & O_WRONLY) != 0; }
   // Create empty file
   int create() {
     return File::create(_path);
