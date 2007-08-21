@@ -43,15 +43,40 @@ int terminating(void) {
   return 0;
 }
 
+static time_t my_time = 0;
+
 time_t time(time_t *t) {
-  static time_t my_time = 0;
-  return ++my_time;
+  return my_time;
+}
+
+void showLine(time_t timestamp, char* prefix, char* path, Node* node) {
+  printf("[%2ld] %-16s %-34s", timestamp, prefix, path);
+  if (node != NULL) {
+    printf(" %c %5llu %03o", node->type(), node->size(), node->mode());
+    if (node->type() == 'f') {
+      printf(" %s", ((File*) node)->checksum());
+    }
+    if (node->type() == 'l') {
+      printf(" %s", ((Link*) node)->link());
+    }
+  } else {
+    printf(" [rm]");
+  }
+  cout << endl;
 }
 
 int main(void) {
   Path* path = new Path("/home/User");
   Database  db("test_db");
+  // Journal
+  Journal journal("test_db", "journal");
+  time_t  timestamp;
+  char*   prefix;
+  char*   fpath;
+  Node*   node;
 
+  // Initialisation
+  my_time++;
   db.open();
 
   // Display DB contents
@@ -96,6 +121,18 @@ int main(void) {
   }
 
   db.close();
+  // Show journal contents
+  if (! journal.open("r")) {
+    while (journal.getLine(&timestamp, &prefix, &fpath, &node) > 0) {
+      showLine(timestamp, prefix, fpath, node);
+    }
+    journal.close();
+  } else {
+    cerr << "Failed to open journal" << endl;
+  }
+
+  // Next test
+  my_time++;
   db.open();
 
   cout << "as previous" << endl;
@@ -119,6 +156,18 @@ int main(void) {
   }
 
   db.close();
+  // Show journal contents
+  if (! journal.open("r")) {
+    while (journal.getLine(&timestamp, &prefix, &fpath, &node) > 0) {
+      showLine(timestamp, prefix, fpath, node);
+    }
+    journal.close();
+  } else {
+    cerr << "Failed to open journal" << endl;
+  }
+
+  // Next test
+  my_time++;
   db.open();
 
   cout << "as previous with subdir/testfile readable" << endl;
@@ -143,6 +192,18 @@ int main(void) {
   }
 
   db.close();
+  // Show journal contents
+  if (! journal.open("r")) {
+    while (journal.getLine(&timestamp, &prefix, &fpath, &node) > 0) {
+      showLine(timestamp, prefix, fpath, node);
+    }
+    journal.close();
+  } else {
+    cerr << "Failed to open journal" << endl;
+  }
+
+  // Next test
+  my_time++;
   db.open();
 
   cout << "as previous with subdir/testfile in ignore list" << endl;
@@ -170,6 +231,18 @@ int main(void) {
   }
 
   db.close();
+  // Show journal contents
+  if (! journal.open("r")) {
+    while (journal.getLine(&timestamp, &prefix, &fpath, &node) > 0) {
+      showLine(timestamp, prefix, fpath, node);
+    }
+    journal.close();
+  } else {
+    cerr << "Failed to open journal" << endl;
+  }
+
+  // Next test
+  my_time++;
   db.open();
 
   cout << "as previous with subdir in ignore list" << endl;
@@ -197,6 +270,18 @@ int main(void) {
   }
 
   db.close();
+  // Show journal contents
+  if (! journal.open("r")) {
+    while (journal.getLine(&timestamp, &prefix, &fpath, &node) > 0) {
+      showLine(timestamp, prefix, fpath, node);
+    }
+    journal.close();
+  } else {
+    cerr << "Failed to open journal" << endl;
+  }
+
+  // Next test
+  my_time++;
   db.open();
 
   cout << "as previous with testlink modified" << endl;
@@ -225,6 +310,18 @@ int main(void) {
   }
 
   db.close();
+  // Show journal contents
+  if (! journal.open("r")) {
+    while (journal.getLine(&timestamp, &prefix, &fpath, &node) > 0) {
+      showLine(timestamp, prefix, fpath, node);
+    }
+    journal.close();
+  } else {
+    cerr << "Failed to open journal" << endl;
+  }
+
+  // Next test
+  my_time++;
   db.open();
 
   cout << "as previous with testlink in ignore list" << endl;
@@ -252,6 +349,18 @@ int main(void) {
   }
 
   db.close();
+  // Show journal contents
+  if (! journal.open("r")) {
+    while (journal.getLine(&timestamp, &prefix, &fpath, &node) > 0) {
+      showLine(timestamp, prefix, fpath, node);
+    }
+    journal.close();
+  } else {
+    cerr << "Failed to open journal" << endl;
+  }
+
+  // Next test
+  my_time++;
   db.open();
 
   cout << "as previous with CVS parser" << endl;
@@ -278,6 +387,18 @@ int main(void) {
   }
 
   db.close();
+  // Show journal contents
+  if (! journal.open("r")) {
+    while (journal.getLine(&timestamp, &prefix, &fpath, &node) > 0) {
+      showLine(timestamp, prefix, fpath, node);
+    }
+    journal.close();
+  } else {
+    cerr << "Failed to open journal" << endl;
+  }
+
+  // Next test
+  my_time++;
   db.open();
 
   cout << "as previous" << endl;
@@ -301,6 +422,18 @@ int main(void) {
   }
 
   db.close();
+  // Show journal contents
+  if (! journal.open("r")) {
+    while (journal.getLine(&timestamp, &prefix, &fpath, &node) > 0) {
+      showLine(timestamp, prefix, fpath, node);
+    }
+    journal.close();
+  } else {
+    cerr << "Failed to open journal" << endl;
+  }
+
+  // Next test
+  my_time++;
   db.open();
 
   cout << "as previous with cvs/dirutd in ignore list" << endl;
@@ -328,6 +461,18 @@ int main(void) {
   }
 
   db.close();
+  // Show journal contents
+  if (! journal.open("r")) {
+    while (journal.getLine(&timestamp, &prefix, &fpath, &node) > 0) {
+      showLine(timestamp, prefix, fpath, node);
+    }
+    journal.close();
+  } else {
+    cerr << "Failed to open journal" << endl;
+  }
+
+  // Next test
+  my_time++;
   db.open();
 
   cout << "as previous with testpipe gone" << endl;
@@ -352,6 +497,18 @@ int main(void) {
   }
 
   db.close();
+  // Show journal contents
+  if (! journal.open("r")) {
+    while (journal.getLine(&timestamp, &prefix, &fpath, &node) > 0) {
+      showLine(timestamp, prefix, fpath, node);
+    }
+    journal.close();
+  } else {
+    cerr << "Failed to open journal" << endl;
+  }
+
+  // Next test
+  my_time++;
   db.open();
 
   cout << "as previous with testfile mode changed" << endl;
@@ -376,6 +533,18 @@ int main(void) {
   }
 
   db.close();
+  // Show journal contents
+  if (! journal.open("r")) {
+    while (journal.getLine(&timestamp, &prefix, &fpath, &node) > 0) {
+      showLine(timestamp, prefix, fpath, node);
+    }
+    journal.close();
+  } else {
+    cerr << "Failed to open journal" << endl;
+  }
+
+  // Next test
+  my_time++;
   db.open();
 
   cout << "as previous with cvs/filenew.c touched" << endl;
@@ -400,6 +569,18 @@ int main(void) {
   }
 
   db.close();
+  // Show journal contents
+  if (! journal.open("r")) {
+    while (journal.getLine(&timestamp, &prefix, &fpath, &node) > 0) {
+      showLine(timestamp, prefix, fpath, node);
+    }
+    journal.close();
+  } else {
+    cerr << "Failed to open journal" << endl;
+  }
+
+  // Next test
+  my_time++;
   db.open();
 
   cout << "some troublesome past cases" << endl;
@@ -445,6 +626,18 @@ int main(void) {
   }
 
   db.close();
+  // Show journal contents
+  if (! journal.open("r")) {
+    while (journal.getLine(&timestamp, &prefix, &fpath, &node) > 0) {
+      showLine(timestamp, prefix, fpath, node);
+    }
+    journal.close();
+  } else {
+    cerr << "Failed to open journal" << endl;
+  }
+
+  // Next test
+  my_time++;
   db.open();
 
   if (! path->parse(db, "file://localhost", "test1")) {
@@ -468,6 +661,15 @@ int main(void) {
 
   delete path;
   db.close();
+  // Show journal contents
+  if (! journal.open("r")) {
+    while (journal.getLine(&timestamp, &prefix, &fpath, &node) > 0) {
+      showLine(timestamp, prefix, fpath, node);
+    }
+    journal.close();
+  } else {
+    cerr << "Failed to open journal" << endl;
+  }
 
   return 0;
 }
