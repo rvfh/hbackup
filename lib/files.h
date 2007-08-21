@@ -90,7 +90,7 @@ public:
   // Operators
   bool operator<(const Node& right) const {
     // Only compare names
-    return strcmp(_name, right._name) < 0;
+    return pathCompare(_name, right._name) < 0;
   }
   virtual bool operator!=(const Node&) const;
   // Data read access

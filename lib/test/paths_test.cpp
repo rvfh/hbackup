@@ -72,6 +72,7 @@ int main(void) {
   // '-' is before '/' in the ASCII table...
   system("touch test1/subdir-file");
   system("touch test1/subdirfile");
+  system("touch test1/àccénts_test");
 
   cout << "first with subdir/testfile NOT readable" << endl;
   system("chmod 000 test1/subdir/testfile");
