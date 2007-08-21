@@ -55,9 +55,10 @@ using namespace hbackup;
 #warning journals gone
 
 struct Database::Private {
-  DbList::iterator entry;
-  DbList  active;
-  DbList  removed;
+  DbList::iterator  entry;
+  DbList            active;
+  DbList            removed;
+  Journal*          journal;
 };
 
 int Database::organise(const string& path, int number) {
@@ -378,6 +379,14 @@ int Database::open() {
   _d->active.clear();
   _d->removed.clear();
 
+  // Create journal
+  if (status != 2) {
+    _d->journal = new Journal(_path.c_str(), "journal");
+    if (_d->journal->open("w")) {
+      status = 2;
+    }
+  }
+
   // Read database active items list
   if (status != 2) {
     if (_d->active.open(_path, "active") == 2) {
@@ -399,6 +408,10 @@ int Database::close_active() {
 
 int Database::close() {
   int status = 0;
+
+  // Close journal
+  _d->journal->close();
+  delete _d->journal;
 
   // Save active list
   if (_d->active.isOpen()) {
@@ -690,6 +703,9 @@ int Database::add(
     // Insert entry
     DbData data(prefix, full_path, node2);
     _d->active.add(data);
+    // Add entry info to journal
+    _d->journal->added(prefix, full_path, node2,
+      (old_checksum != NULL) && (old_checksum[0] == '\0'));
   }
 
   free(full_path);
@@ -770,6 +786,8 @@ void Database::remove(
       _d->entry->setOut();
       // Append to removed list
       _d->removed.add(*_d->entry);
+      // Add entry info to journal
+      _d->journal->removed(prefix, full_path);
     }
     // Remove from active list / Go on to next
     _d->entry = _d->active.erase(_d->entry);
