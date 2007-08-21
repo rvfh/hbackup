@@ -114,7 +114,7 @@ int Path::recurse(
         // Synchronize with DB records
         int cmp = -1;
         while ((j != db_list.end())
-            && ((cmp = strcmp((*j)->name(), (*i)->name())) < 0)) {
+            && ((cmp = Node::pathCompare((*j)->name(), (*i)->name())) < 0)) {
           j++;
         }
 
