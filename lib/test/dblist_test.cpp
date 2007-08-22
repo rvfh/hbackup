@@ -43,32 +43,46 @@ time_t time(time_t *t) {
 }
 
 int main(void) {
-  List    journal("test1/journal");
+  List    list("test_db/list");
+  List    journal("test_db/journal");
+  List    merge("test_db/merge");
   char*   line   = NULL;
   char*   prefix = NULL;
   char*   path   = NULL;
   Node*   node;
   time_t  ts;
 
+  cout << "Test: DB lists" << endl;
+
+  if (list.open("w")) {
+    cerr << "Failed to open list" << endl;
+    return 0;
+  }
+  list.close();
+
+  cout << endl << "Test: journal write" << endl;
+
   if (journal.open("w")) {
     cerr << "Failed to open journal" << endl;
-    return -1;
+    return 0;
   }
-  journal.removed("prefix", "path");
+  journal.removed("prefix", "file_gone");
   node = new Stream("test1/testfile");
   ((Stream*) node)->computeChecksum();
-  journal.added("prefix2", "path2", node, false);
+  journal.added("prefix2", "file_new", node);
   free(node);
   node = new Link("test1/testlink");
-  journal.added("prefix3", "path3", node, true);
+  journal.added("prefix3", "link", node, 0);
   free(node);
   node = new Directory("test1/testdir");
-  journal.added("prefix4", "path4", node, true);
+  journal.added("prefix4", "path", node, 0);
   free(node);
   journal.close();
 
+  cout << endl << "Test: journal read" << endl;
+
   journal.open("r");
-  while (journal.getLine(&ts, &prefix, &path, &node) > 0) {
+  while (journal.getEntry(&ts, &prefix, &path, &node) > 0) {
     cout << "Prefix: " << prefix << endl;
     cout << "Path:   " << path << endl;
     cout << "TS:     " << ts << endl;
@@ -100,6 +114,181 @@ int main(void) {
   }
   journal.close();
   free(line);
+
+  cout << endl << "Test: journal merge into empty list" << endl;
+
+  if (list.open("r")) {
+    cerr << "Failed to open list" << endl;
+    return 0;
+  }
+  if (journal.open("r")) {
+    cerr << "Failed to open journal" << endl;
+    return 0;
+  }
+  if (merge.open("w")) {
+    cerr << "Failed to open merge" << endl;
+    return 0;
+  }
+  if (merge.merge(list, journal)) {
+    cerr << "Failed to merge" << endl;
+    return 0;
+  }
+  merge.close();
+  journal.close();
+  list.close();
+
+  cout << endl << "Test: merge read" << endl;
+
+  journal.open("r");
+  while (journal.getEntry(&ts, &prefix, &path, &node) > 0) {
+    cout << "Prefix: " << prefix << endl;
+    cout << "Path:   " << path << endl;
+    cout << "TS:     " << ts << endl;
+    if (node == NULL) {
+      cout << "Type:   removed" << endl;
+    } else {
+      switch (node->type()) {
+        case 'f':
+          cout << "Type:   file" << endl;
+          break;
+        case 'l':
+          cout << "Type:   link" << endl;
+          break;
+        default:
+          cout << "Type:   other" << endl;
+      }
+      cout << "Name:   " << node->name() << endl;
+      cout << "Size:   " << node->size() << endl;
+      switch (node->type()) {
+        case 'f':
+          cout << "Chcksm: " << ((File*) node)->checksum() << endl;
+          break;
+        case 'l':
+          cout << "Link:   " << ((Link*) node)->link() << endl;
+      }
+      free(node);
+    }
+    cout << endl;
+  }
+  journal.close();
+  free(line);
+
+  if (rename("test_db/merge", "test_db/list")) {
+    cerr << "Failed to rename merge into list" << endl;
+  }
+
+  cout << endl << "Test: journal write again" << endl;
+
+  if (journal.open("w")) {
+    cerr << "Failed to open journal" << endl;
+    return 0;
+  }
+  system("echo \"this is my new test\" > test1/testfile");
+  node = new Stream("test1/testfile");
+  ((Stream*) node)->computeChecksum();
+  journal.added("prefix", "file_new", node);
+  journal.added("prefix2", "file_new", node);
+  free(node);
+  journal.close();
+
+  cout << endl << "Test: journal read" << endl;
+
+  journal.open("r");
+  while (journal.getEntry(&ts, &prefix, &path, &node) > 0) {
+    cout << "Prefix: " << prefix << endl;
+    cout << "Path:   " << path << endl;
+    cout << "TS:     " << ts << endl;
+    if (node == NULL) {
+      cout << "Type:   removed" << endl;
+    } else {
+      switch (node->type()) {
+        case 'f':
+          cout << "Type:   file" << endl;
+          break;
+        case 'l':
+          cout << "Type:   link" << endl;
+          break;
+        default:
+          cout << "Type:   other" << endl;
+      }
+      cout << "Name:   " << node->name() << endl;
+      cout << "Size:   " << node->size() << endl;
+      switch (node->type()) {
+        case 'f':
+          cout << "Chcksm: " << ((File*) node)->checksum() << endl;
+          break;
+        case 'l':
+          cout << "Link:   " << ((Link*) node)->link() << endl;
+      }
+      free(node);
+    }
+    cout << endl;
+  }
+  journal.close();
+  free(line);
+
+return 0;
+  cout << endl << "Test: journal merge into list" << endl;
+
+  if (list.open("r")) {
+    cerr << "Failed to open list" << endl;
+    return 0;
+  }
+  if (journal.open("r")) {
+    cerr << "Failed to open journal" << endl;
+    return 0;
+  }
+  if (merge.open("w")) {
+    cerr << "Failed to open merge" << endl;
+    return 0;
+  }
+  if (merge.merge(list, journal)) {
+    cerr << "Failed to merge" << endl;
+    return 0;
+  }
+  merge.close();
+  journal.close();
+  list.close();
+
+  cout << endl << "Test: merge read" << endl;
+
+  journal.open("r");
+  while (journal.getEntry(&ts, &prefix, &path, &node) > 0) {
+    cout << "Prefix: " << prefix << endl;
+    cout << "Path:   " << path << endl;
+    cout << "TS:     " << ts << endl;
+    if (node == NULL) {
+      cout << "Type:   removed" << endl;
+    } else {
+      switch (node->type()) {
+        case 'f':
+          cout << "Type:   file" << endl;
+          break;
+        case 'l':
+          cout << "Type:   link" << endl;
+          break;
+        default:
+          cout << "Type:   other" << endl;
+      }
+      cout << "Name:   " << node->name() << endl;
+      cout << "Size:   " << node->size() << endl;
+      switch (node->type()) {
+        case 'f':
+          cout << "Chcksm: " << ((File*) node)->checksum() << endl;
+          break;
+        case 'l':
+          cout << "Link:   " << ((Link*) node)->link() << endl;
+      }
+      free(node);
+    }
+    cout << endl;
+  }
+  journal.close();
+  free(line);
+
+  if (rename("test_db/merge", "test_db/list")) {
+    cerr << "Failed to rename merge into list" << endl;
+  }
 
   return 0;
 }

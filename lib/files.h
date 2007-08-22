@@ -87,6 +87,7 @@ public:
   }
   virtual ~Node() {
     free(_name);
+    _name = NULL;
   }
   // Operators
   bool operator<(const Node& right) const {
@@ -159,6 +160,7 @@ public:
   }
   ~File() {
     free(_checksum);
+    _checksum = NULL;
   }
   // Create empty file
   int create(const char* dir_path);
@@ -252,6 +254,7 @@ public:
   }
   ~Link() {
     free(_link);
+    _link = NULL;
   }
   // Operators
   bool operator!=(const Link&) const;
@@ -282,9 +285,7 @@ public:
       _fd(-1) {
     _path = path(dir_path, name);
   }
-  virtual ~Stream() {
-    free(_path);
-  }
+  virtual ~Stream();
   bool isOpen() const      { return _fd != -1; }
   bool isWriteable() const { return (_fmode & O_WRONLY) != 0; }
   // Create empty file

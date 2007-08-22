@@ -222,6 +222,14 @@ void Stream::md5sum(char* out, const unsigned char* in, int bytes) {
   *out = '\0';
 }
 
+Stream::~Stream() {
+  if (isOpen()) {
+    close();
+  }
+  free(_path);
+  _path = NULL;
+}
+
 int Stream::open(const char* req_mode, unsigned int compression) {
   _fmode = O_NOATIME | O_LARGEFILE;
 
@@ -254,7 +262,7 @@ int Stream::open(const char* req_mode, unsigned int compression) {
 
   /* Create zlib resources */
   if (compression != 0) {
-    _fbuffer        = new unsigned char[chunk];
+    _fbuffer        = (unsigned char*) malloc(chunk);
     _strm           = new z_stream;
     _strm->zalloc   = Z_NULL;
     _strm->zfree    = Z_NULL;
@@ -296,6 +304,8 @@ int Stream::close() {
     EVP_DigestFinal(_ctx, checksum, &length);
     _checksum = (char*) malloc(2 * length + 1);
     md5sum(_checksum, checksum, length);
+    delete _ctx;
+    _ctx = NULL;
   }
 
   /* Destroy zlib resources */
@@ -305,6 +315,10 @@ int Stream::close() {
     } else {
       inflateEnd(_strm);
     }
+    delete _strm;
+    _strm = NULL;
+    free(_fbuffer);
+    _fbuffer = NULL;
   }
 
   int rc = std::close(_fd);
@@ -342,6 +356,7 @@ ssize_t Stream::read(void* buffer, size_t count) {
 
     // Check result
     if (length < 0) {
+      // errno set by read
       return -1;
     }
 
@@ -421,6 +436,10 @@ ssize_t Stream::write(const void* buffer, size_t count) {
 
     do {
       wlength = std::write(_fd, buffer, length);
+      if (wlength < 0) {
+        // errno set by write
+        return -1;
+      }
       length -= wlength;
     } while ((length != 0) && (wlength != 0));
   } else {
@@ -444,6 +463,10 @@ ssize_t Stream::write(const void* buffer, size_t count) {
       ssize_t wlength;
       do {
         wlength = std::write(_fd, _fbuffer, length);
+        if (wlength < 0) {
+          // errno set by write
+          return -1;
+        }
         length -= wlength;
       } while ((length != 0) && (wlength != 0));
     } while (_strm->avail_out == 0);
@@ -468,6 +491,7 @@ ssize_t Stream::getLine(char** buffer, size_t* length) {
       read_buffer_size     += chunk_size;
       char* new_read_buffer = (char*) realloc(read_buffer, read_buffer_size);
       if (new_read_buffer == NULL) {
+        errno = ENOMEM;
         read_size = -1;
         goto end;
       } else {
@@ -479,6 +503,7 @@ ssize_t Stream::getLine(char** buffer, size_t* length) {
     // Read one character at a time
     size = read(reader, 1);
     if (size < 0) {
+      // errno set by read
       read_size = -1;
       goto end;
     }
@@ -495,6 +520,7 @@ ssize_t Stream::getLine(char** buffer, size_t* length) {
   if (read_size >= *length) {
     char* test_buffer = (char*) realloc(*buffer, read_size + 1);
     if (test_buffer == NULL) {
+      errno = ENOMEM;
       read_size = -1;
       goto end;
     } else {

@@ -602,14 +602,14 @@ int List::open(
     rc = -1;
   } else
   if (isWriteable()) {
-    if (Stream::write(header, strlen(header)) < 0) {
+    if (write(header, strlen(header)) < 0) {
       Stream::close();
       rc = -1;
     }
   } else {
     char*  line = NULL;
     size_t size = 0;
-    if (Stream::getLine(&line, &size) < 0) {
+    if (getLine(&line, &size) < 0) {
       Stream::close();
       rc = -1;
     } else
@@ -646,11 +646,12 @@ int List::close() {
   return rc;
 }
 
-int List::getLine(
+int List::getEntry(
     time_t*   timestamp,
     char**    prefix,
     char**    path,
     Node**    node) {
+  int     rc    = 0;
   char*   line  = NULL;
   size_t  lsize = 0;
   size_t  length;
@@ -664,8 +665,9 @@ int List::getLine(
   // Expect prefix
   length = Stream::getLine(&line, &lsize);
   if (length == 0) {
-    free(line);
-    return 0;
+    cerr << "unexpected end of file" << endl;
+    rc = -1;
+    goto end;
   }
   length--;
   if ((line[0] == '\t') || (line[length] != '\n')) {
@@ -673,6 +675,10 @@ int List::getLine(
     goto failed;
   }
   line[length] = '\0';
+  if (line[0] == '#') {
+    // End of file
+    goto end;
+  }
   asprintf(prefix, "%s", line);
 
   // Expect path
@@ -799,26 +805,28 @@ int List::getLine(
   return 1;
 
 failed:
+  rc = -1;
   free(*prefix);
   free(*path);
   free(*node);
+end:
   free(line);
-  return -1;
+  return rc;
 }
 
 int List::added(
     const char* prefix,
     const char* path,
     const Node* node,
-    bool        notime) {
+    time_t      timestamp) {
   Stream::write(prefix, strlen(prefix));
   Stream::write("\n\t", 2);
   Stream::write(path, strlen(path));
   Stream::write("\n", 1);
   char* line = NULL;
   int size = asprintf(&line, "\t\t%ld\t%c\t%lld\t%ld\t%u\t%u\t%o",
-    notime ? 0 : time(NULL), node->type(), node->size(), node->mtime(),
-    node->uid(), node->gid(), node->mode());
+    (timestamp >= 0) ? timestamp : time(NULL), node->type(), node->size(),
+    node->mtime(), node->uid(), node->gid(), node->mode());
   Stream::write(line, size);
   free(line);
   switch (node->type()) {
@@ -841,14 +849,16 @@ int List::added(
 }
 
 int List::removed(
-    const char* prefix,
-    const char* path) {
+    const char*   prefix,
+    const char*   path,
+    time_t        timestamp) {
   Stream::write(prefix, strlen(prefix));
   Stream::write("\n\t", 2);
   Stream::write(path, strlen(path));
   Stream::write("\n", 1);
   char* line = NULL;
-  int size = asprintf(&line, "\t\t%ld\t-\n", time(NULL));
+  int size = asprintf(&line, "\t\t%ld\t-\n",
+    (timestamp >= 0) ? timestamp : time(NULL));
   Stream::write(line, size);
   free(line);
   return 0;
@@ -865,17 +875,113 @@ int List::merge(List& list, List& journal) {
     return -1;
   }
 
-  time_t  timestamp;
-  char*   prefix;
-  char*   fpath;
-  Node*   node;
-  while (journal.getLine(&timestamp, &prefix, &fpath, &node) > 0) {
-    if (write("hello\n", 6) < 0) {
-      cout << strerror(errno) << endl;
+  int     rc        = 0;
+  int     rc_get    = 1;
+  int     rc_copy   = 1;
+  while ((rc_get > 0) || (rc_copy > 0)) {
+    time_t  timestamp;
+    char*   prefix      = NULL;
+    char*   path        = NULL;
+//     char*   prefix_list = NULL;
+//     char*   path_list   = NULL;
+    Node*   node;
+
+    // Get next journal entry
+    if (rc_get > 0) {
+      // Read next journal entry
+      rc_get = journal.getEntry(&timestamp, &prefix, &path, &node);
     }
+
+    // Failed to read journal?
+    if (rc_get < 0) {
+      rc = -1;
+      goto free;
+    }
+
+    // Go to matching list entry
+    if (rc_copy > 0) {
+      char*   prefix_line = NULL;
+      char*   path_line   = NULL;
+
+      // Copy lines from where we were to what we look for, excluded
+      if (prefix != NULL) {
+        asprintf(&prefix_line, "%s\n", prefix);
+      }
+
+      if (path != NULL) {
+        asprintf(&path_line, "\t%s\n", path);
+      }
+
+      char*   line        = NULL;
+      size_t  size        = 0;
+      while (true) {
+        bool    prefix_match = false;
+        bool    path_match = false;
+        ssize_t length = list.getLine(&line, &size);
+        // Read line
+        if (length < 0) {
+          // errno set by getLine
+          rc_copy = -1;
+          break;
+        }
+        // Unexpected end of file
+        if (length == 0) {
+          errno = EPIPE;
+          rc_copy = -1;
+          break;
+        }
+        // End of file?
+        if (line[0] == '#') {
+          rc_copy = 0;
+          break;
+        }
+        // Write line
+        if (write(line, length)) {
+          // errno set by write
+          rc_copy = -1;
+          break;
+        }
+        if (prefix != NULL) {
+          // Prefix?
+          if (line[0] != '\t') {
+            prefix_match = strcmp(line, prefix_line) == 0;
+          } else
+          // Path?
+          if (line[1] != '\t') {
+            path_match = strcmp(line, path_line) == 0;
+          }
+          // Match
+          if (path_match && prefix_match) {
+            break;
+          }
+        }
+      }
+      free(prefix_line);
+      free(path_line);
+    }
+
+    // Failed to copy list?
+    if (rc_copy < 0) {
+      rc = -1;
+      goto free;
+    }
+
+    if ((rc_copy == 0) && (rc_get != 0)) {
+      // The list is finished, so we need to copy our stuff
+      if (node == NULL) {
+        removed(prefix, path, timestamp);
+      } else {
+        added(prefix, path, node, timestamp);
+      }
+    }
+  free:
     free(prefix);
-    free(fpath);
+    prefix = NULL;
+    free(path);
+    path   = NULL;
     free(node);
   }
+#warning merge cannot fail, for now
   return 0;
+  return rc;
 }
