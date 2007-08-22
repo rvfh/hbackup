@@ -745,7 +745,7 @@ int Database::add(
     _d->active.add(data);
     // Add entry info to journal
     _d->journal->added(prefix, full_path, node2,
-      (old_checksum != NULL) && (old_checksum[0] == '\0'));
+      (old_checksum != NULL) && (old_checksum[0] == '\0') ? 0 : -1);
   }
 
   free(full_path);

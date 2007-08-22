@@ -123,7 +123,7 @@ int main(void) {
   db.close();
   // Show journal contents
   if (! journal.open("r")) {
-    while (journal.getLine(&timestamp, &prefix, &fpath, &node) > 0) {
+    while (journal.getEntry(&timestamp, &prefix, &fpath, &node) > 0) {
       showLine(timestamp, prefix, fpath, node);
       free(prefix);
       free(fpath);
@@ -161,7 +161,7 @@ int main(void) {
   db.close();
   // Show journal contents
   if (! journal.open("r")) {
-    while (journal.getLine(&timestamp, &prefix, &fpath, &node) > 0) {
+    while (journal.getEntry(&timestamp, &prefix, &fpath, &node) > 0) {
       showLine(timestamp, prefix, fpath, node);
       free(prefix);
       free(fpath);
@@ -200,7 +200,7 @@ int main(void) {
   db.close();
   // Show journal contents
   if (! journal.open("r")) {
-    while (journal.getLine(&timestamp, &prefix, &fpath, &node) > 0) {
+    while (journal.getEntry(&timestamp, &prefix, &fpath, &node) > 0) {
       showLine(timestamp, prefix, fpath, node);
       free(prefix);
       free(fpath);
@@ -242,7 +242,7 @@ int main(void) {
   db.close();
   // Show journal contents
   if (! journal.open("r")) {
-    while (journal.getLine(&timestamp, &prefix, &fpath, &node) > 0) {
+    while (journal.getEntry(&timestamp, &prefix, &fpath, &node) > 0) {
       showLine(timestamp, prefix, fpath, node);
       free(prefix);
       free(fpath);
@@ -284,7 +284,7 @@ int main(void) {
   db.close();
   // Show journal contents
   if (! journal.open("r")) {
-    while (journal.getLine(&timestamp, &prefix, &fpath, &node) > 0) {
+    while (journal.getEntry(&timestamp, &prefix, &fpath, &node) > 0) {
       showLine(timestamp, prefix, fpath, node);
       free(prefix);
       free(fpath);
@@ -327,7 +327,7 @@ int main(void) {
   db.close();
   // Show journal contents
   if (! journal.open("r")) {
-    while (journal.getLine(&timestamp, &prefix, &fpath, &node) > 0) {
+    while (journal.getEntry(&timestamp, &prefix, &fpath, &node) > 0) {
       showLine(timestamp, prefix, fpath, node);
       free(prefix);
       free(fpath);
@@ -369,7 +369,7 @@ int main(void) {
   db.close();
   // Show journal contents
   if (! journal.open("r")) {
-    while (journal.getLine(&timestamp, &prefix, &fpath, &node) > 0) {
+    while (journal.getEntry(&timestamp, &prefix, &fpath, &node) > 0) {
       showLine(timestamp, prefix, fpath, node);
       free(prefix);
       free(fpath);
@@ -410,7 +410,7 @@ int main(void) {
   db.close();
   // Show journal contents
   if (! journal.open("r")) {
-    while (journal.getLine(&timestamp, &prefix, &fpath, &node) > 0) {
+    while (journal.getEntry(&timestamp, &prefix, &fpath, &node) > 0) {
       showLine(timestamp, prefix, fpath, node);
       free(prefix);
       free(fpath);
@@ -448,7 +448,7 @@ int main(void) {
   db.close();
   // Show journal contents
   if (! journal.open("r")) {
-    while (journal.getLine(&timestamp, &prefix, &fpath, &node) > 0) {
+    while (journal.getEntry(&timestamp, &prefix, &fpath, &node) > 0) {
       showLine(timestamp, prefix, fpath, node);
       free(prefix);
       free(fpath);
@@ -490,7 +490,7 @@ int main(void) {
   db.close();
   // Show journal contents
   if (! journal.open("r")) {
-    while (journal.getLine(&timestamp, &prefix, &fpath, &node) > 0) {
+    while (journal.getEntry(&timestamp, &prefix, &fpath, &node) > 0) {
       showLine(timestamp, prefix, fpath, node);
       free(prefix);
       free(fpath);
@@ -529,7 +529,7 @@ int main(void) {
   db.close();
   // Show journal contents
   if (! journal.open("r")) {
-    while (journal.getLine(&timestamp, &prefix, &fpath, &node) > 0) {
+    while (journal.getEntry(&timestamp, &prefix, &fpath, &node) > 0) {
       showLine(timestamp, prefix, fpath, node);
       free(prefix);
       free(fpath);
@@ -568,7 +568,7 @@ int main(void) {
   db.close();
   // Show journal contents
   if (! journal.open("r")) {
-    while (journal.getLine(&timestamp, &prefix, &fpath, &node) > 0) {
+    while (journal.getEntry(&timestamp, &prefix, &fpath, &node) > 0) {
       showLine(timestamp, prefix, fpath, node);
       free(prefix);
       free(fpath);
@@ -607,7 +607,7 @@ int main(void) {
   db.close();
   // Show journal contents
   if (! journal.open("r")) {
-    while (journal.getLine(&timestamp, &prefix, &fpath, &node) > 0) {
+    while (journal.getEntry(&timestamp, &prefix, &fpath, &node) > 0) {
       showLine(timestamp, prefix, fpath, node);
       free(prefix);
       free(fpath);
@@ -667,7 +667,7 @@ int main(void) {
   db.close();
   // Show journal contents
   if (! journal.open("r")) {
-    while (journal.getLine(&timestamp, &prefix, &fpath, &node) > 0) {
+    while (journal.getEntry(&timestamp, &prefix, &fpath, &node) > 0) {
       showLine(timestamp, prefix, fpath, node);
       free(prefix);
       free(fpath);
@@ -705,7 +705,7 @@ int main(void) {
   db.close();
   // Show journal contents
   if (! journal.open("r")) {
-    while (journal.getLine(&timestamp, &prefix, &fpath, &node) > 0) {
+    while (journal.getEntry(&timestamp, &prefix, &fpath, &node) > 0) {
       showLine(timestamp, prefix, fpath, node);
       free(prefix);
       free(fpath);

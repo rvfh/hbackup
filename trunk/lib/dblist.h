@@ -135,7 +135,7 @@ public:
   // Close file
   int close();
   // Convert one 'line' of data (only works for journal atm)
-  int getLine(
+  int getEntry(
     time_t*       timestamp,
     char**        prefix,
     char**        path,
@@ -145,11 +145,12 @@ public:
     const char*   prefix,
     const char*   path,
     const Node*   node,
-    bool          notime = false);
+    time_t        timestamp = -1);
   // Add a journal record of removed file
   int removed(
     const char*   prefix,
-    const char*   path);
+    const char*   path,
+    time_t        timestamp = -1);
   // Get a list of active records for given prefix and paths
   void getList(
     const char*   prefix,
@@ -157,7 +158,9 @@ public:
     const char*   rel_path,
     list<Node*>&  list);
   // Merge list and backup into this list
-  int  merge(List& list, List& journal);
+  int  merge(
+    List&         list,
+    List&         journal);
 };
 
 }
