@@ -29,11 +29,13 @@
 
 /* I want to use the C file functions */
 #undef open
+#undef open64
 #undef close
 #undef read
 #undef write
 namespace std {
   using ::open;
+  using ::open64;
   using ::close;
   using ::read;
   using ::write;
@@ -248,7 +250,7 @@ int Stream::open(const char* req_mode, unsigned int compression) {
 
   _dsize  = 0;
   _fempty = true;
-  _fd = std::open(_path, _fmode, 0666);
+  _fd = std::open64(_path, _fmode, 0666);
   if (! isOpen()) {
     // errno set by open
     return -1;
@@ -541,8 +543,8 @@ int Stream::computeChecksum() {
     return -1;
   }
   unsigned char buffer[Stream::chunk];
-  size_t read_size = 0;
-  ssize_t size;
+  long long     read_size = 0;
+  ssize_t       size;
   do {
     size = read(buffer, Stream::chunk);
     if (size < 0) {
@@ -566,9 +568,9 @@ int Stream::copy(Stream& source) {
     return -1;
   }
   unsigned char buffer[Stream::chunk];
-  size_t read_size = 0;
-  size_t write_size = 0;
-  bool eof = false;
+  long long read_size  = 0;
+  long long write_size = 0;
+  bool      eof        = false;
   do {
     ssize_t size = source.read(buffer, Stream::chunk);
     if (size < 0) {
