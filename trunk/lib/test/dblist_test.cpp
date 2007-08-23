@@ -139,8 +139,8 @@ int main(void) {
 
   cout << endl << "Test: merge read" << endl;
 
-  journal.open("r");
-  while (journal.getEntry(&ts, &prefix, &path, &node) > 0) {
+  merge.open("r");
+  while (merge.getEntry(&ts, &prefix, &path, &node) > 0) {
     cout << "Prefix: " << prefix << endl;
     cout << "Path:   " << path << endl;
     cout << "TS:     " << ts << endl;
@@ -170,7 +170,7 @@ int main(void) {
     }
     cout << endl;
   }
-  journal.close();
+  merge.close();
   free(line);
 
   if (rename("test_db/merge", "test_db/list")) {
@@ -227,7 +227,6 @@ int main(void) {
   journal.close();
   free(line);
 
-return 0;
   cout << endl << "Test: journal merge into list" << endl;
 
   if (list.open("r")) {
@@ -252,8 +251,8 @@ return 0;
 
   cout << endl << "Test: merge read" << endl;
 
-  journal.open("r");
-  while (journal.getEntry(&ts, &prefix, &path, &node) > 0) {
+  merge.open("r");
+  while (merge.getEntry(&ts, &prefix, &path, &node) > 0) {
     cout << "Prefix: " << prefix << endl;
     cout << "Path:   " << path << endl;
     cout << "TS:     " << ts << endl;
@@ -283,7 +282,7 @@ return 0;
     }
     cout << endl;
   }
-  journal.close();
+  merge.close();
   free(line);
 
   if (rename("test_db/merge", "test_db/list")) {
