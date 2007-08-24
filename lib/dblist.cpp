@@ -1010,14 +1010,15 @@ int List::merge(List& list, List& journal) {
   int rc_list = 1;
 
   // Line read from journal
-  char*   line      = NULL;
-  size_t  length    = 0;
+  char*   j_line    = NULL;
+  size_t  j_length  = 0;
+  int     j_line_no = 0;
 
   // List read from list
   char*   l_line    = NULL;
   size_t  l_length  = 0;
 
-  // Journal prefix, path and data from journal
+  // Current prefix, path and data (from journal)
   char*   prefix      = NULL;
   char*   path        = NULL;
   char*   data        = NULL;
@@ -1027,27 +1028,29 @@ int List::merge(List& list, List& journal) {
 
   // Parse journal
   while (rc > 0) {
-    int rc_journal = journal.getLine(&line, &length);
+    int rc_journal = journal.getLine(&j_line, &j_length);
+    j_line_no++;
 
     // Failed
     if (rc <= 0) {
-      // Unexpected end of file TODO report with errno
-      cerr << "Unexpected end of journal" << endl;
+      // Unexpected end of file
+      cerr << "Unexpected end of journal, line " << j_line_no << endl;
+      errno = EUCLEAN;
       rc = -1;
       break;
     }
 
     // Check line
-    if ((rc_journal < 2) || (line[rc_journal - 1] != '\n')) {
-      // Corrupted line TODO fail and report
-      cerr << "Corrupted line in journal" << endl;
+    if ((rc_journal < 2) || (j_line[rc_journal - 1] != '\n')) {
+      // Corrupted line
+      cerr << "Corruption in journal, line " << j_line_no << endl;
       errno = EUCLEAN;
       rc = -1;
       break;
     }
 
     // End of file
-    if (line[0] == '#') {
+    if (j_line[0] == '#') {
       if (rc_list > 0) {
         rc_list = copyUntil(list, NULL, NULL, &l_line, &l_length, &status);
         if (rc_list < 0) {
@@ -1061,16 +1064,16 @@ int List::merge(List& list, List& journal) {
     } else
 
     // Got a prefix
-    if (line[0] != '\t') {
-      // If same prefix, ignore it
-      if ((prefix != NULL) && (strcmp(prefix, line) == 0)) {
-        continue;
-      }
-      // Check path order
+    if (j_line[0] != '\t') {
       if (prefix != NULL) {
-        if (Node::pathCompare(line, prefix) < 0) {
+        // If same prefix, ignore it
+        if (strcmp(prefix, j_line) == 0) {
+          continue;
+        }
+        // Check path order
+        if (Node::pathCompare(j_line, prefix) < 0) {
           // Cannot go back
-          cerr << "Prefix out of order in journal" << endl;
+          cerr << "Prefix out of order in journal, line " << j_line_no << endl;
           errno = EUCLEAN;
           rc = -1;
           break;
@@ -1079,7 +1082,7 @@ int List::merge(List& list, List& journal) {
       // Copy new prefix
       free(prefix);
       prefix = NULL;
-      asprintf(&prefix, "%s", line);
+      asprintf(&prefix, "%s", j_line);
       // No path for this entry yet
       free(path);
       path = NULL;
@@ -1094,7 +1097,7 @@ int List::merge(List& list, List& journal) {
         }
       }
       // Copy journal prefix
-      if (write(line, rc_journal) < 0) {
+      if (write(j_line, rc_journal) < 0) {
         // Could not write
         cerr << "Prefix write failed" << endl;
         rc = -1;
@@ -1103,20 +1106,20 @@ int List::merge(List& list, List& journal) {
     } else
 
     // Got a path
-    if (line[1] != '\t') {
+    if (j_line[1] != '\t') {
       // Must have a prefix by now
       if (prefix == NULL) {
         // Did not get a prefix first thing
-        cerr << "Prefix missing in journal" << endl;
+        cerr << "Prefix missing in journal, line " << j_line_no << endl;
         errno = EUCLEAN;
         rc = -1;
         break;
       }
       // Check path order
       if (path != NULL) {
-        if (Node::pathCompare(line, path) < 0) {
+        if (Node::pathCompare(j_line, path) < 0) {
           // Cannot go back
-          cerr << "Path out of order in journal" << endl;
+          cerr << "Path out of order in journal, line " << j_line_no << endl;
           errno = EUCLEAN;
           rc = -1;
           break;
@@ -1125,7 +1128,7 @@ int List::merge(List& list, List& journal) {
       // Copy new path
       free(path);
       path = NULL;
-      asprintf(&path, "%s", line);
+      asprintf(&path, "%s", j_line);
       // Not data for this entry yet
       free(data);
       data = NULL;
@@ -1140,7 +1143,7 @@ int List::merge(List& list, List& journal) {
         }
       }
       // Copy journal path
-      if (write(line, rc_journal) < 0) {
+      if (write(j_line, rc_journal) < 0) {
         // Could not write
         cerr << "Path write failed" << endl;
         rc = -1;
@@ -1153,16 +1156,16 @@ int List::merge(List& list, List& journal) {
       // Must have a path before then
       if ((prefix == NULL) || (path == NULL)) {
         // Did not get anything before data
-        cerr << "Data out of order in journal" << endl;
+        cerr << "Data out of order in journal, line " << j_line_no << endl;
         errno = EUCLEAN;
         rc = -1;
         break;
       }
       free(data);
       data = NULL;
-      asprintf(&data, "%s", line);
+      asprintf(&data, "%s", j_line);
       // Copy journal data
-      if (write(line, rc_journal) < 0) {
+      if (write(j_line, rc_journal) < 0) {
         // Could not write
         cerr << "Path write failed" << endl;
         rc = -1;
@@ -1172,7 +1175,7 @@ int List::merge(List& list, List& journal) {
   }
 
   // Free resources and leave
-  free(line);
+  free(j_line);
   free(l_line);
   free(prefix);
   free(path);
