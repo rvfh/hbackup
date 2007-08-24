@@ -115,7 +115,18 @@ int Path::recurse(
         int cmp = -1;
         while ((j != db_list.end())
             && ((cmp = Node::pathCompare((*j)->name(), (*i)->name())) < 0)) {
-          j++;
+          if (! terminating()) {
+            if (verbosity() > 2) {
+              cout << " --> R ";
+              if (rel_path[0] != '\0') {
+                cout << rel_path << "/";
+              }
+              cout << (*j)->name() << endl;
+            }
+            recurse_remove(db, prefix, _path, rel_path, *j);
+          }
+          delete *j;
+          j = db_list.erase(j);
         }
 
         // Deal with data
@@ -210,7 +221,6 @@ int Path::recurse(
     }
 
     // Deal with removed records
-    j = db_list.begin();
     while (j != db_list.end()) {
       if (! terminating()) {
         if (verbosity() > 2) {

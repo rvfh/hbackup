@@ -52,7 +52,7 @@ using namespace std;
 
 using namespace hbackup;
 
-#warning no journal yet
+#warning journal not used yet
 
 struct Database::Private {
   DbList::iterator  entry;
@@ -431,11 +431,10 @@ int Database::close() {
   // Merge with existing list into new one
   List list(_path.c_str(), "list.part");
   if (! list.open("w")) {
-//     if (list.merge(*_d->list, *_d->journal)) {
-//       cerr << "db: close: merge failed" << endl;
-#warning merge is not run
-//       rc = 2;
-//     }
+    if (list.merge(*_d->list, *_d->journal)) {
+      cerr << "db: close: merge failed" << endl;
+      rc = 2;
+    }
     list.close();
     if (rc == 0) {
       if (rename((_path + "/list").c_str(), (_path + "/list~").c_str())
