@@ -35,34 +35,6 @@ Size:   0
 Test: journal merge into empty list
 
 Test: merge read
-Prefix: prefix
-Path:   file_gone
-TS:     1
-Type:   removed
-
-Prefix: prefix2
-Path:   file_new
-TS:     2
-Type:   file
-Name:   file_new
-Size:   13
-Chcksm: 59ca0efa9f5633cb0371bbc0355478d8
-
-Prefix: prefix3
-Path:   link
-TS:     0
-Type:   link
-Name:   link
-Size:   8
-Link:   testfile
-
-Prefix: prefix4
-Path:   path
-TS:     0
-Type:   other
-Name:   path
-Size:   0
-
 
 Test: journal write again
 

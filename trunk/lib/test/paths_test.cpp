@@ -71,9 +71,9 @@ int main(void) {
   // Journal
   List    journal("test_db", "journal");
   time_t  timestamp;
-  char*   prefix;
-  char*   fpath;
-  Node*   node;
+  char*   prefix  = NULL;
+  char*   fpath   = NULL;
+  Node*   node    = NULL;
 
   // Initialisation
   my_time++;
@@ -126,8 +126,11 @@ int main(void) {
     while (journal.getEntry(&timestamp, &prefix, &fpath, &node) > 0) {
       showLine(timestamp, prefix, fpath, node);
       free(prefix);
+      prefix = NULL;
       free(fpath);
+      fpath = NULL;
       free(node);
+      node = NULL;
     }
     journal.close();
   } else {
@@ -164,8 +167,11 @@ int main(void) {
     while (journal.getEntry(&timestamp, &prefix, &fpath, &node) > 0) {
       showLine(timestamp, prefix, fpath, node);
       free(prefix);
+      prefix = NULL;
       free(fpath);
+      fpath = NULL;
       free(node);
+      node = NULL;
     }
     journal.close();
   } else {
@@ -203,8 +209,11 @@ int main(void) {
     while (journal.getEntry(&timestamp, &prefix, &fpath, &node) > 0) {
       showLine(timestamp, prefix, fpath, node);
       free(prefix);
+      prefix = NULL;
       free(fpath);
+      fpath = NULL;
       free(node);
+      node = NULL;
     }
     journal.close();
   } else {
@@ -245,8 +254,11 @@ int main(void) {
     while (journal.getEntry(&timestamp, &prefix, &fpath, &node) > 0) {
       showLine(timestamp, prefix, fpath, node);
       free(prefix);
+      prefix = NULL;
       free(fpath);
+      fpath = NULL;
       free(node);
+      node = NULL;
     }
     journal.close();
   } else {
@@ -287,8 +299,11 @@ int main(void) {
     while (journal.getEntry(&timestamp, &prefix, &fpath, &node) > 0) {
       showLine(timestamp, prefix, fpath, node);
       free(prefix);
+      prefix = NULL;
       free(fpath);
+      fpath = NULL;
       free(node);
+      node = NULL;
     }
     journal.close();
   } else {
@@ -330,8 +345,11 @@ int main(void) {
     while (journal.getEntry(&timestamp, &prefix, &fpath, &node) > 0) {
       showLine(timestamp, prefix, fpath, node);
       free(prefix);
+      prefix = NULL;
       free(fpath);
+      fpath = NULL;
       free(node);
+      node = NULL;
     }
     journal.close();
   } else {
@@ -372,8 +390,11 @@ int main(void) {
     while (journal.getEntry(&timestamp, &prefix, &fpath, &node) > 0) {
       showLine(timestamp, prefix, fpath, node);
       free(prefix);
+      prefix = NULL;
       free(fpath);
+      fpath = NULL;
       free(node);
+      node = NULL;
     }
     journal.close();
   } else {
@@ -413,8 +434,11 @@ int main(void) {
     while (journal.getEntry(&timestamp, &prefix, &fpath, &node) > 0) {
       showLine(timestamp, prefix, fpath, node);
       free(prefix);
+      prefix = NULL;
       free(fpath);
+      fpath = NULL;
       free(node);
+      node = NULL;
     }
     journal.close();
   } else {
@@ -451,8 +475,11 @@ int main(void) {
     while (journal.getEntry(&timestamp, &prefix, &fpath, &node) > 0) {
       showLine(timestamp, prefix, fpath, node);
       free(prefix);
+      prefix = NULL;
       free(fpath);
+      fpath = NULL;
       free(node);
+      node = NULL;
     }
     journal.close();
   } else {
@@ -493,8 +520,11 @@ int main(void) {
     while (journal.getEntry(&timestamp, &prefix, &fpath, &node) > 0) {
       showLine(timestamp, prefix, fpath, node);
       free(prefix);
+      prefix = NULL;
       free(fpath);
+      fpath = NULL;
       free(node);
+      node = NULL;
     }
     journal.close();
   } else {
@@ -532,8 +562,11 @@ int main(void) {
     while (journal.getEntry(&timestamp, &prefix, &fpath, &node) > 0) {
       showLine(timestamp, prefix, fpath, node);
       free(prefix);
+      prefix = NULL;
       free(fpath);
+      fpath = NULL;
       free(node);
+      node = NULL;
     }
     journal.close();
   } else {
@@ -571,8 +604,11 @@ int main(void) {
     while (journal.getEntry(&timestamp, &prefix, &fpath, &node) > 0) {
       showLine(timestamp, prefix, fpath, node);
       free(prefix);
+      prefix = NULL;
       free(fpath);
+      fpath = NULL;
       free(node);
+      node = NULL;
     }
     journal.close();
   } else {
@@ -610,8 +646,11 @@ int main(void) {
     while (journal.getEntry(&timestamp, &prefix, &fpath, &node) > 0) {
       showLine(timestamp, prefix, fpath, node);
       free(prefix);
+      prefix = NULL;
       free(fpath);
+      fpath = NULL;
       free(node);
+      node = NULL;
     }
     journal.close();
   } else {
@@ -670,8 +709,11 @@ int main(void) {
     while (journal.getEntry(&timestamp, &prefix, &fpath, &node) > 0) {
       showLine(timestamp, prefix, fpath, node);
       free(prefix);
+      prefix = NULL;
       free(fpath);
+      fpath = NULL;
       free(node);
+      node = NULL;
     }
     journal.close();
   } else {
@@ -708,8 +750,11 @@ int main(void) {
     while (journal.getEntry(&timestamp, &prefix, &fpath, &node) > 0) {
       showLine(timestamp, prefix, fpath, node);
       free(prefix);
+      prefix = NULL;
       free(fpath);
+      fpath = NULL;
       free(node);
+      node = NULL;
     }
     journal.close();
   } else {
