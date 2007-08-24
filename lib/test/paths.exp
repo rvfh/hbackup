@@ -266,8 +266,8 @@ as previous with subdir in ignore list
  --> D cvs/dirutd
  --> D cvs/dirutd/CVS
  --> D dir space
- --> D testdir
  --> R subdir
+ --> D testdir
 Active list:  27 element(s):
 file://localhost	/home/User/àccénts_test	f	0	1	1000	1000	644		d41d8cd98f00b204e9800998ecf8427e-0	1	0	
 file://localhost	/home/User/cvs	d	0	0	1000	1000	755			1	0	
@@ -419,10 +419,10 @@ as previous with CVS parser
 Directory should be under CVS control: test1/cvs/dirbad
  --> R cvs/dirbad/fileoth
  --> R cvs/dirbad/fileutd
+ --> R cvs/diroth
  --> D cvs/dirutd
  --> D cvs/dirutd/CVS
  --> R cvs/dirutd/fileoth
- --> R cvs/diroth
  --> R cvs/fileoth
  --> D dir space
  --> D testdir
@@ -466,8 +466,8 @@ file://localhost	/home/User/testlink	l	8	1	1000	1000	777	testnull		6	7
  --> Database removed items part closed (contents: 11 files)
 [ 8] file://localhost /home/User/cvs/dirbad/fileoth      [rm]
 [ 8] file://localhost /home/User/cvs/dirbad/fileutd      [rm]
-[ 8] file://localhost /home/User/cvs/dirutd/fileoth      [rm]
 [ 8] file://localhost /home/User/cvs/diroth              [rm]
+[ 8] file://localhost /home/User/cvs/dirutd/fileoth      [rm]
 [ 8] file://localhost /home/User/cvs/fileoth             [rm]
 Reading version 1 lists
  --> Database active items part open (contents: 21 files)
