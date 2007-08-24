@@ -210,6 +210,12 @@ int main(void) {
   cout << "a <> a1: " << Node::pathCompare("a", "a1") << endl;
   cout << "a/ <> a: " << Node::pathCompare("a/", "a") << endl;
   cout << "a <> a/: " << Node::pathCompare("a", "a/") << endl;
+  cout << "a\t <> a/: " << Node::pathCompare("a\t", "a/") << endl;
+  cout << "a/ <> a\t " << Node::pathCompare("a/", "a\t") << endl;
+  cout << "a\t <> a\t " << Node::pathCompare("a\t", "a\t") << endl;
+  cout << "a\n <> a/: " << Node::pathCompare("a\n", "a/") << endl;
+  cout << "a/ <> a\n " << Node::pathCompare("a/", "a\n") << endl;
+  cout << "a\n <> a\n " << Node::pathCompare("a\n", "a\n") << endl;
   cout << "a/ <> a.: " << Node::pathCompare("a/", "a.") << endl;
   cout << "a. <> a/: " << Node::pathCompare("a.", "a/") << endl;
   cout << "a/ <> a-: " << Node::pathCompare("a/", "a-") << endl;
