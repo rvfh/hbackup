@@ -124,6 +124,13 @@ public:
 };
 
 class List : public Stream {
+  int copyUntil(
+    List&         list,
+    const char*   prefix_l,
+    const char*   path_l,
+    char**        prefix_r,
+    char**        path_r,
+    int*          status);
 public:
   List(
     const char*   dir_path,

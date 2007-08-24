@@ -75,7 +75,7 @@ int main(void) {
   journal.added("prefix3", "link", node, 0);
   free(node);
   node = new Directory("test1/testdir");
-  journal.added("prefix4", "path", node, 0);
+  journal.added("prefix5", "path", node, 0);
   free(node);
   journal.close();
 
@@ -130,7 +130,7 @@ int main(void) {
     return 0;
   }
   if (merge.merge(list, journal)) {
-    cerr << "Failed to merge" << endl;
+    cerr << "Failed to merge: " << strerror(errno) << endl;
     return 0;
   }
   merge.close();
@@ -189,6 +189,7 @@ int main(void) {
   ((Stream*) node)->computeChecksum();
   journal.added("prefix", "file_new", node);
   journal.added("prefix2", "file_new", node);
+  journal.added("prefix4", "file_new", node);
   free(node);
   journal.close();
 
@@ -243,7 +244,7 @@ int main(void) {
     return 0;
   }
   if (merge.merge(list, journal)) {
-    cerr << "Failed to merge" << endl;
+    cerr << "Failed to merge: " << strerror(errno) << endl;
     return 0;
   }
   merge.close();
@@ -287,9 +288,9 @@ int main(void) {
   merge.close();
   free(line);
 
-  if (rename("test_db/merge", "test_db/list")) {
-    cerr << "Failed to rename merge into list" << endl;
-  }
+//   if (rename("test_db/merge", "test_db/list")) {
+//     cerr << "Failed to rename merge into list" << endl;
+//   }
 
   return 0;
 }
