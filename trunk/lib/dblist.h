@@ -126,10 +126,10 @@ public:
 class List : public Stream {
   int copyUntil(
     List&         list,
-    const char*   prefix_l,
-    const char*   path_l,
-    char**        prefix_r,
-    char**        path_r,
+    const char*   prefix,
+    const char*   path,
+    char**        line,
+    size_t*       length,
     int*          status);
 public:
   List(
