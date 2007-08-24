@@ -49,7 +49,7 @@ int main(void) {
   char*   line   = NULL;
   char*   prefix = NULL;
   char*   path   = NULL;
-  Node*   node;
+  Node*   node   = NULL;
   time_t  ts;
 
   cout << "Test: DB lists" << endl;
@@ -81,6 +81,7 @@ int main(void) {
 
   cout << endl << "Test: journal read" << endl;
 
+  node = NULL;
   journal.open("r");
   while (journal.getEntry(&ts, &prefix, &path, &node) > 0) {
     cout << "Prefix: " << prefix << endl;
@@ -108,7 +109,6 @@ int main(void) {
         case 'l':
           cout << "Link:   " << ((Link*) node)->link() << endl;
       }
-      free(node);
     }
     cout << endl;
   }
@@ -167,6 +167,7 @@ int main(void) {
           cout << "Link:   " << ((Link*) node)->link() << endl;
       }
       free(node);
+      node = NULL;
     }
     cout << endl;
   }
@@ -193,6 +194,7 @@ int main(void) {
 
   cout << endl << "Test: journal read" << endl;
 
+  node = NULL;
   journal.open("r");
   while (journal.getEntry(&ts, &prefix, &path, &node) > 0) {
     cout << "Prefix: " << prefix << endl;
@@ -220,7 +222,6 @@ int main(void) {
         case 'l':
           cout << "Link:   " << ((Link*) node)->link() << endl;
       }
-      free(node);
     }
     cout << endl;
   }
@@ -279,6 +280,7 @@ int main(void) {
           cout << "Link:   " << ((Link*) node)->link() << endl;
       }
       free(node);
+      node = NULL;
     }
     cout << endl;
   }
