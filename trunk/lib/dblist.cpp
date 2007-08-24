@@ -862,124 +862,347 @@ int List::removed(
   return 0;
 }
 
+int List::copyUntil(
+    List&         list,
+    const char*   prefix_l,
+    const char*   path_l,
+    char**        prefix_r,
+    char**        path_r,
+    int*          status) {
+  int rc = 0;
+
+// status values:
+// - 0: never ran
+// - 1: prefix found
+// - 2: prefix not found
+// - 3: prefix and path found
+// - 4: prefix found but not path
+
+  int prefix_cmp;
+  int path_cmp;
+
+  // Re-compute cmp's
+  if ((prefix_l == NULL) || (*prefix_r == NULL)) {
+    prefix_cmp = 1;
+  } else {
+    prefix_cmp = Node::pathCompare(prefix_l, *prefix_r);
+  }
+  if ((path_l == NULL) || (*path_r == NULL)) {
+    path_cmp = 1;
+  } else {
+    path_cmp = Node::pathCompare(path_l, *path_r);
+  }
+
+  // Line to read from journal
+  char*   line      = NULL;
+  size_t  length    = 0;
+
+  while (true) {
+    // Read list or get last data
+    if (*status == 2) {
+      // Stuck on prefix
+      rc = length = asprintf(&line, "%s", *prefix_r);
+    } else
+    if (*status == 4) {
+      // Stuck on path
+      rc = length = asprintf(&line, "%s", *path_r);
+    } else {
+      rc = list.getLine(&line, &length);
+    }
+    *status = 0;
+
+    // Failed
+    if (rc <= 0) {
+      // Unexpected end of file TODO report with errno
+      cerr << "Unexpected end of list" << endl;
+      rc = -1;
+      break;
+    }
+
+    // End of file
+    if (line[0] == '#') {
+      rc = 0;
+      break;
+    }
+
+    // Check line
+    if ((rc < 2) || (line[rc - 1] != '\n')) {
+      // Corrupted line TODO fail and report
+      cerr << "Corrupted line in list" << endl;
+      rc = -1;
+      break;
+    }
+
+    // Full copy
+    if (prefix_l == NULL) {
+      if (write(line, rc) < 0) {
+        // Could not write
+        rc = -1;
+        break;
+      }
+    } else
+
+    // Got a prefix
+    if (line[0] != '\t') {
+      // Copy new prefix
+      free(*prefix_r);
+      *prefix_r = NULL;
+      asprintf(prefix_r, "%s", line);
+
+      // Compare prefixes
+      prefix_cmp = Node::pathCompare(prefix_l, *prefix_r);
+      if (prefix_cmp > 0)  {
+        // Our prefix is here or after, so let's copy
+        if (write(line, rc) < 0) {
+          // Could not write
+          rc = -1;
+          break;
+        }
+      } else {
+        if (prefix_cmp < 0) {
+          // Prefix not found
+          *status = 2;
+          break;
+        } else
+        if (path_l == NULL) {
+          // Looking for prefix, found
+          *status = 1;
+          break;
+        }
+      }
+    } else
+
+    // Looking for prefix
+    if ((path_l == NULL) || (prefix_cmp > 0)) {
+      if (write(line, rc) < 0) {
+        // Could not write
+        rc = -1;
+        break;
+      }
+    } else
+
+    // Got a path
+    if (line[1] != '\t') {
+      // Copy new path
+      free(*path_r);
+      *path_r = NULL;
+      asprintf(path_r, "%s", line);
+
+      // Compare paths
+      path_cmp = Node::pathCompare(path_l, *path_r);
+      if (path_cmp > 0) {
+        // Our path is here or after, so let's copy
+        if (write(line, rc) < 0) {
+          // Could not write
+          rc = -1;
+          break;
+        }
+      } else {
+        if (path_cmp < 0) {
+          // Path not found
+          *status = 4;
+          break;
+        } else {
+          // Looking for path, found
+          *status = 3;
+          break;
+        }
+      }
+    } else
+
+    // Got data
+    {
+      // Our prefix and path are after, so let's copy
+      if (write(line, rc) < 0) {
+        // Could not write
+        rc = -1;
+        break;
+      }
+    }
+  }
+  return rc;
+}
+
 int List::merge(List& list, List& journal) {
-  if (! list.isOpen() || ! journal.isOpen()) {
+  // Check that all files are open
+  if (! isOpen() || ! list.isOpen() || ! journal.isOpen()) {
     errno = EBADF;
     return -1;
   }
 
-  if (list.isWriteable() || journal.isWriteable()) {
+  // Check open mode
+  if (! isWriteable() || list.isWriteable() || journal.isWriteable()) {
     errno = EINVAL;
     return -1;
   }
-#warning merge does nothing, for now
-  return 0;
 
-  int     rc        = 0;
-  int     rc_get    = 1;
-  int     rc_copy   = 1;
-  while ((rc_get > 0) || (rc_copy > 0)) {
-    time_t  timestamp;
-    char*   prefix      = NULL;
-    char*   path        = NULL;
-//     char*   prefix_list = NULL;
-//     char*   path_list   = NULL;
-    Node*   node;
+  int rc      = 1;
+  int rc_list = 1;
 
-    // Get next journal entry
-    if (rc_get > 0) {
-      // Read next journal entry
-      rc_get = journal.getEntry(&timestamp, &prefix, &path, &node);
-    }
+  // Line to read from journal
+  char*   line      = NULL;
+  size_t  length    = 0;
 
-    // Failed to read journal?
-    if (rc_get < 0) {
+  // Journal prefix, path and data from journal
+  char*   prefix      = NULL;
+  char*   path        = NULL;
+  char*   data        = NULL;
+
+  // List prefix and path
+  char*   prefix_list = NULL;
+  char*   path_list   = NULL;
+
+  // Last copyUntil status
+  int     status      = 0;
+
+  // Parse journal
+  while (rc > 0) {
+    int rc_journal = journal.getLine(&line, &length);
+
+    // Failed
+    if (rc <= 0) {
+      // Unexpected end of file TODO report with errno
+      cerr << "Unexpected end of journal" << endl;
       rc = -1;
-      goto free;
+      break;
     }
 
-    // Go to matching list entry
-    if (rc_copy > 0) {
-      char*   prefix_line = NULL;
-      char*   path_line   = NULL;
-
-      // Copy lines from where we were to what we look for, excluded
-      if (prefix != NULL) {
-        asprintf(&prefix_line, "%s\n", prefix);
-      }
-
-      if (path != NULL) {
-        asprintf(&path_line, "\t%s\n", path);
-      }
-
-      char*   line        = NULL;
-      size_t  size        = 0;
-      while (true) {
-        bool    prefix_match = false;
-        bool    path_match = false;
-        ssize_t length = list.getLine(&line, &size);
-        // Read line
-        if (length < 0) {
-          // errno set by getLine
-          rc_copy = -1;
-          break;
-        }
-        // Unexpected end of file
-        if (length == 0) {
-          errno = EPIPE;
-          rc_copy = -1;
-          break;
-        }
-        // End of file?
-        if (line[0] == '#') {
-          rc_copy = 0;
-          break;
-        }
-        // Write line
-        if (write(line, length)) {
-          // errno set by write
-          rc_copy = -1;
-          break;
-        }
-        if (prefix != NULL) {
-          // Prefix?
-          if (line[0] != '\t') {
-            prefix_match = strcmp(line, prefix_line) == 0;
-          } else
-          // Path?
-          if (line[1] != '\t') {
-            path_match = strcmp(line, path_line) == 0;
-          }
-          // Match
-          if (path_match && prefix_match) {
-            break;
-          }
-        }
-      }
-      free(prefix_line);
-      free(path_line);
-    }
-
-    // Failed to copy list?
-    if (rc_copy < 0) {
+    // Check line
+    if ((rc_journal < 2) || (line[rc_journal - 1] != '\n')) {
+      // Corrupted line TODO fail and report
+      cerr << "Corrupted line in journal" << endl;
       rc = -1;
-      goto free;
+      break;
     }
 
-    if ((rc_copy == 0) && (rc_get != 0)) {
-      // The list is finished, so we need to copy our stuff
-      if (node == NULL) {
-        removed(prefix, path, timestamp);
-      } else {
-        added(prefix, path, node, timestamp);
+    // End of file
+    if (line[0] == '#') {
+      if (rc_list > 0) {
+        rc_list = copyUntil(list, NULL, NULL, &prefix_list, &path_list,
+          &status);
+        if (rc_list < 0) {
+          // Error copying list
+          cerr << "End of list copy failed" << endl;
+          rc = -1;
+          break;
+        }
+      }
+      rc = 0;
+    } else
+
+    // Got a prefix
+    if (line[0] != '\t') {
+      // If same prefix, ignore it
+      if ((prefix != NULL) && (strcmp(prefix, line) == 0)) {
+        continue;
+      }
+      // Copy new prefix
+      free(prefix);
+      prefix = NULL;
+      asprintf(&prefix, "%s", line);
+      if (prefix_list != NULL) {
+        if (Node::pathCompare(prefix, prefix_list) < 0) {
+          // Cannot go back
+          cerr << "Prefix out of order in journal" << endl;
+          rc = -1;
+          break;
+        }
+      }
+      // No path for this entry yet
+      free(path);
+      path = NULL;
+      // Search/copy list
+      if (rc_list > 0) {
+        rc_list = copyUntil(list, prefix, NULL, &prefix_list, &path_list,
+          &status);
+        if (rc_list < 0) {
+          // Error copying list
+          cerr << "Prefix search failed" << endl;
+          rc = -1;
+          break;
+        }
+      }
+      // Copy journal prefix
+      if (write(line, rc_journal) < 0) {
+        // Could not write
+        cerr << "Prefix write failed" << endl;
+        rc = -1;
+        break;
+      }
+    } else
+
+    // Got a path
+    if (line[1] != '\t') {
+      // Must have a prefix by now
+      if (prefix == NULL) {
+        // Did not get a prefix first thing TODO do not fail all, but report
+        cerr << "Prefix missing in journal" << endl;
+        rc = -1;
+        break;
+      }
+      // Copy new path
+      free(path);
+      path = NULL;
+      asprintf(&path, "%s", line);
+      if (path_list != NULL) {
+        if (Node::pathCompare(path, path_list) < 0) {
+          // Cannot go back
+          cerr << "Path out of order in journal" << endl;
+          rc = -1;
+          break;
+        }
+      }
+      // Not data for this entry yet
+      free(data);
+      data = NULL;
+      // Search/copy list
+      if (rc_list > 0) {
+        rc_list = copyUntil(list, prefix, path, &prefix_list, &path_list,
+          &status);
+        if (rc_list < 0) {
+          // Error copying list
+          cerr << "Path search failed" << endl;
+          rc = -1;
+          break;
+        }
+      }
+      // Copy journal path
+      if (write(line, rc_journal) < 0) {
+        // Could not write
+        cerr << "Path write failed" << endl;
+        rc = -1;
+        break;
+      }
+    } else
+
+    // Got data
+    {
+      // Must have a path before then
+      if ((prefix == NULL) || (path == NULL)) {
+        // Did not get anything before data TODO do not fail all, but report
+        cerr << "Data out of order in journal" << endl;
+        rc = -1;
+        break;
+      }
+      free(data);
+      data = NULL;
+      asprintf(&data, "%s", line);
+      // Copy journal data
+      if (write(line, rc_journal) < 0) {
+        // Could not write
+        cerr << "Path write failed" << endl;
+        rc = -1;
+        break;
       }
     }
-  free:
-    free(prefix);
-    prefix = NULL;
-    free(path);
-    path   = NULL;
-    free(node);
   }
+
+  // Free resources and leave
+  free(line);
+  free(prefix);
+  free(path);
+  free(data);
+  free(prefix_list);
+  free(path_list);
   return rc;
 }
