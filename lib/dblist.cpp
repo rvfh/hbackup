@@ -17,7 +17,7 @@
 */
 
 #include <iostream>
-#include <string>
+#include <string.h>
 #include <errno.h>
 
 using namespace std;
@@ -869,16 +869,16 @@ int List::copyUntil(
     char**        line,
     size_t*       length,
     int*          status) {
-  int rc = 0;
-
 // status values:
 // - 0: never ran
 // - 1: prefix not found
 // - 2: prefix found but not path
 // - 3: prefix and/or path found
 
-  int prefix_cmp = (*status >= 2) ? 0 : 1;
-  int path_cmp;
+  int   rc             = 0;
+  char* exception_line = NULL;
+  int   prefix_cmp     = (*status >= 2) ? 0 : 1;
+  int   path_cmp;
 
   while (true) {
     // Read list or get last data
@@ -894,7 +894,7 @@ int List::copyUntil(
       // Unexpected end of file
       cerr << "Unexpected end of list" << endl;
       errno = EUCLEAN;
-      rc = -1;
+      rc    = -1;
       break;
     }
 
@@ -909,7 +909,7 @@ int List::copyUntil(
       // Corrupted line
       cerr << "Corrupted line in list" << endl;
       errno = EUCLEAN;
-      rc = -1;
+      rc    = -1;
       break;
     }
 
@@ -982,6 +982,35 @@ int List::copyUntil(
 
     // Got data
     {
+      // Deal with exception
+      if (exception_line != NULL) {
+        // Copy start of line (timestamp)
+        char* pos = strchr(&(*line)[2], '\t');
+        if (pos == NULL) {
+          errno = EUCLEAN;
+          rc    = -1;
+          break;
+        }
+        // Write first part from second line
+        if (write(*line, pos - *line + 1) < 0) {
+          // Could not write
+          rc = -1;
+          break;
+        }
+        // Write end of fisrt line
+        if (write(exception_line, strlen(exception_line)) < 0) {
+          // Could not write
+          rc = -1;
+          break;
+        }
+        free(exception_line);
+        exception_line = NULL;
+      } else
+      // Check for exception
+      if (strncmp(*line, "\t\t0\t", 4) == 0) {
+        // Get only end of line
+        asprintf(&exception_line, "%s", &(*line)[4]);
+      } else
       // Our prefix and path are after, so let's copy
       if (write(*line, rc) < 0) {
         // Could not write
@@ -990,6 +1019,7 @@ int List::copyUntil(
       }
     }
   }
+  free(exception_line);
   return rc;
 }
 
