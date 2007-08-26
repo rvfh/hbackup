@@ -93,7 +93,7 @@ Client: Client4
 -> smb://Client c:/home/BlaH/Backup.list
 Options: username= password=
  --> Database initialized
- --> Database active items part open (contents: 0 files)
+ --> Database list open (contents: 0 files)
 Backup client 'myClient' using protocol 'nfs'
  -> Reading backup list file
  --> Path: /home/User/test
@@ -120,13 +120,11 @@ Unmounted test_db/mount
 Backup client 'Client4' using protocol 'smb'
 List file not found test_db/mount/home/BlaH/Backup.list
 Unmounted test_db/mount
- --> Database active items part closed (contents: 2 files)
  --> Client: testhost
 >List 1 client(s):
 Client: testhost
 -> file://localhost etc/localhost.list
-Reading version 1 lists
- --> Database active items part open (contents: 2 files)
+ --> Database list open (contents: 2 files)
 Backup client 'testhost' using protocol 'file'
  -> Reading backup list file
  --> Path: test2
@@ -153,13 +151,11 @@ Backup path 'test2'
  --> A testfile2
  --> A testfile~
  --> A testlink
- --> Database active items part closed (contents: 21 files)
  --> Client: testhost
 >List 1 client(s):
 Client: testhost
 -> file://testhost etc/localhost.list
-Reading version 1 lists
- --> Database active items part open (contents: 21 files)
+ --> Database list open (contents: 21 files)
 Backup client 'testhost' using protocol 'file'
  -> Reading backup list file
  --> Path: test2
@@ -167,29 +163,24 @@ Backup client 'testhost' using protocol 'file'
 Backup path 'test1'
 Directory should be under CVS control: test1/cvs/dirbad
 Backup path 'test2'
- --> Database active items part closed (contents: 21 files)
  --> Client: testhost
 >List 1 client(s):
 Client: testhost
 -> file://testhost etc/localhost.list
-Reading version 1 lists
- --> Database active items part open (contents: 21 files)
+ --> Database list open (contents: 21 files)
 Backup client 'testhost' using protocol 'file'
  -> Reading backup list file
  --> Path: test2
  --> Path: test1
  --> Path: test1/subdir
 Path inside another. This is not supported yet
- --> Database active items part closed (contents: 21 files)
  --> Client: testhost
 >List 1 client(s):
 Client: testhost
 -> file://testhost etc/localhost.list2
-Reading version 1 lists
- --> Database active items part open (contents: 21 files)
+ --> Database list open (contents: 21 files)
 Backup client 'testhost' using protocol 'file'
  -> Reading backup list file
  --> Path: test2/subdir
  --> Path: test2
 Path inside another. This is not supported yet
- --> Database active items part closed (contents: 21 files)

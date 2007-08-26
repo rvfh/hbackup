@@ -57,7 +57,6 @@ using namespace hbackup;
 struct Database::Private {
   DbList::iterator  entry;
   DbList            active;
-  DbList            removed;
   List*             list;
   List*             journal;
 };
@@ -308,10 +307,6 @@ int Database::getDir(
   return ! Directory(path.c_str()).isValid();
 }
 
-int Database::open_removed() {
-  return _d->removed.open(_path, "removed");
-}
-
 Database::Database(const string& path) {
   _path          = path;
   _expire_inited = false;
@@ -323,8 +318,12 @@ Database::~Database() {
 }
 
 int Database::open() {
-  int status;
+  bool failed = false;
 
+  if (! Directory(_path.c_str()).isValid() && mkdir(_path.c_str(), 0755)) {
+    cerr << "db: cannot create base directory" << endl;
+    return 2;
+  }
   // Try to take lock
   int lock_status = lock();
   if (lock_status == 2) {
@@ -332,85 +331,88 @@ int Database::open() {
     return 2;
   }
 
-  File active(_path.c_str(), "active");
-  File removed(_path.c_str(), "removed");
+  List list(_path.c_str(), "list");
 
-  // Check that data dir exists, if not create it
-  if (Directory(_path.c_str(), "data").isValid()) {
-    status = 0;
-    // Check files presence
-    if (! active.isValid()) {
-      cerr << "db: open: active files list not accessible: ";
-      Stream backup(_path.c_str(), "active~");
-      if (backup.isValid()) {
-        cerr << "using backup" << endl;
-        rename((_path + "/active~").c_str(), (_path + "/active").c_str());
-      } else {
-        cerr << "no backup accessible, aborting" << endl;
-        status = 2;
-      }
-    }
-
-    if ((status != 2) && ! removed.isValid()) {
-      cerr << "db: open: removed files list not accessible: ";
-      Stream backup(_path.c_str(), "removed~");
-      if (backup.isValid()) {
-        cerr << "using backup" << endl;
-        rename((_path + "/removed~").c_str(), (_path + "/removed").c_str());
-      } else {
-        cerr << "no backup accessible, ignoring" << endl;
-      }
-    }
-  } else if (! Directory(_path.c_str(), "data").create(_path.c_str())) {
-    status = 1;
-    // Create files
-    if ((! active.isValid() && active.create(_path.c_str()))
-     || (! removed.isValid() && removed.create(_path.c_str()))) {
-      cerr << "db: open: cannot create list files" << endl;
-      status = 2;
-    } else if (verbosity() > 2) {
+  // Check DB dir
+  if (! Directory((_path + "/data").c_str()).isValid()) {
+    if (Directory(_path.c_str(), "data").create(_path.c_str())) {
+      cerr << "db: cannot create data directory" << endl;
+      failed = true;
+    } else
+    if (list.open("w") || list.close()) {
+      cerr << "db: cannot create list file" << endl;
+      failed = true;
+    } else
+    if (verbosity() > 2) {
       cout << " --> Database initialized" << endl;
     }
-    List list(_path.c_str(), "list");
-    if (list.open("w") || list.close()) {
-      cerr << strerror(errno) << ": list" << endl;
-    }
   } else {
-    status = 2;
-    cerr << "db: open: cannot create data directory" << endl;
+    if (! list.isValid()) {
+      Stream backup(_path.c_str(), "list~");
+
+      cerr << "db: list not accessible...";
+      if (backup.isValid()) {
+        cerr << "using backup" << endl;
+        rename((_path + "/list~").c_str(), (_path + "/list").c_str());
+      } else {
+        cerr << "no backup accessible, tring v1...";
+
+        File active(_path.c_str(), "active");
+        File removed(_path.c_str(), "removed");
+        DbList db_list;
+
+        // Convert to v2
+        if (! active.isValid()) {
+          cerr << "active list not accessible" << endl;
+          failed = true;
+        } else
+        if (! removed.isValid()) {
+          cerr << "removed list not accessible" << endl;
+          failed = true;
+        } else if (db_list.load(_path, "active")) {
+          cerr << "cannot load active list" << endl;
+          failed = true;
+        } else if (db_list.load(_path, "removed")) {
+          cerr << "cannot load removed list" << endl;
+          failed = true;
+        } else if (db_list.save_v2(_path, "list")) {
+          cerr << "cannot save list" << endl;
+          failed = true;
+        }
+      }
+    }
   }
 
-  // Make sure we start clean
-  _d->active.clear();
-  _d->removed.clear();
-
   // Open list
-  if (status != 2) {
+  if (! failed) {
     _d->list = new List(_path.c_str(), "list");
     if (_d->list->open("r")) {
       cerr << "db: open: cannot open list" << endl;
-      status = 2;
+      failed = true;
     }
   }
 
   // Create journal
-  if (status != 2) {
+  if (! failed) {
     _d->journal = new List(_path.c_str(), "journal");
     if (_d->journal->open("w")) {
       cerr << "db: open: cannot open journal" << endl;
-      status = 2;
+      failed = true;
     }
   }
 
   // Read database active items list
-  if (status != 2) {
-    if (_d->active.open(_path, "active") == 2) {
-      status = 2;
+  if (! failed) {
+    _d->active.clear();
+    if (_d->active.open(_path, "list")) {
+      failed = true;
     }
   }
   _d->entry = _d->active.end();
 
-  if (status == 2) {
+  if (failed) {
+    _d->list->close();
+    _d->journal->close();
     unlock();
     return 2;
   }
@@ -452,24 +454,6 @@ int Database::close() {
 
   _d->list->close();
   delete _d->list;
-
-  // Save active list
-  if (_d->active.isOpen()) {
-    if (_d->active.close(_path, "active") != 0) {
-      return 2;
-    }
-  }
-
-  // Save removed list
-  if (_d->removed.size() != 0) {
-    // Load previously removed items into removed list
-    if (! _d->removed.isOpen()) {
-      rc = _d->removed.open(_path, "removed");
-    }
-  }
-  if (_d->removed.isOpen() && (rc != 2)) {
-    rc = _d->removed.close(_path, "removed");
-  }
 
   // Release lock
   unlock();
@@ -740,9 +724,6 @@ int Database::add(
   }
 
   if (! failed || (old_checksum == NULL)) {
-    // Insert entry
-    DbData data(prefix, full_path, node2);
-    _d->active.add(data);
     // Add entry info to journal
     _d->journal->added(prefix, full_path, node2,
       (old_checksum != NULL) && (old_checksum[0] == '\0') ? 0 : -1);
@@ -763,7 +744,6 @@ int Database::modify(
     const Node* old_node,
     const Node* node,
     bool        no_data) {
-  bool discard = false;
   if (no_data) {
     // File is in the list, but could not be copied last time, try again, or
     // file metadata has changed, but we believe the data to be unchanged
@@ -771,16 +751,11 @@ int Database::modify(
     if (add(prefix, base_path, rel_path, dir_path, node, checksum)) {
       return -1;
     }
-    // Same file that failed copy last time, do not add to removed records
-    if (checksum[0] == '\0') {
-      discard = true;
-    }
   } else {
     if (add(prefix, base_path, rel_path, dir_path, node, NULL)) {
       return -1;
     }
   }
-  remove(prefix, base_path, rel_path, old_node, discard, true);
   return 0;
 }
 
@@ -788,63 +763,21 @@ void Database::remove(
     const char* prefix,
     const char* base_path,
     const char* rel_path,
-    const Node* node,
-    bool        discard,
-    bool        mod) {
-  // Find record in active list, move it to removed list
+    const Node* node) {
   char* full_path = NULL;
-  int length;
   if (rel_path[0] != '\0') {
-    length = asprintf(&full_path, "%s/%s/%s/%s/", prefix, base_path, rel_path,
-      node->name());
+    asprintf(&full_path, "%s/%s/%s", base_path, rel_path, node->name());
   } else {
-    length = asprintf(&full_path, "%s/%s/%s/", prefix, base_path,
-      node->name());
-  }
-  // Do not use trailing '/' for now
-  full_path[length - 1] = '\0';
-
-  // Look for beginning
-  if ((_d->entry == _d->active.end()) && (_d->entry != _d->active.begin())) {
-    _d->entry--;
-  }
-  // Jump irrelevant last records, find first occurence of file in DB: the
-  // oldest, as we might have just added a new one!!!
-  while ((_d->entry != _d->active.begin())
-      && (_d->entry->pathCompare(full_path) >= 0)) {
-    _d->entry--;
-  }
-  // Jump irrelevant first records
-  int cmp = -1;
-  while ((_d->entry != _d->active.end())
-      && ((cmp = _d->entry->pathCompare(full_path)) < 0)) {
-    _d->entry++;
+    asprintf(&full_path, "%s/%s", base_path, node->name());
   }
 
-  if ((_d->entry != _d->active.end()) && (cmp == 0)) {
-    if (! discard) {
-      // Mark removed
-      _d->entry->setOut();
-      // Append to removed list
-      _d->removed.add(*_d->entry);
-      if (! mod) {
-        // Add entry info to journal
-        _d->journal->removed(prefix, &full_path[strlen(prefix) + 1]);
-      }
-    }
-    // Remove from active list / Go on to next
-    _d->entry = _d->active.erase(_d->entry);
-  } else {
-    cerr << "Entry to be removed not found in DB" << endl;
-  }
+  // Add entry info to journal
+  _d->journal->removed(prefix, full_path);
+
   free(full_path);
 }
 
 // For debug only
 void* Database::active() {
   return &_d->active;
-}
-
-void* Database::removed() {
-  return &_d->removed;
 }

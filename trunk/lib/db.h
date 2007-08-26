@@ -39,8 +39,6 @@ public:
   ~Database();
   /* Open database */
   int  open();
-  /* Open removed part of database */
-  int  open_removed();
   /* Close database */
   int  close();
   // Prepare list for parser
@@ -91,12 +89,9 @@ public:
     const char* prefix,           // Client
     const char* base_path,        // Path being backed up
     const char* rel_path,         // Dir (from base_path)
-    const Node* node,             // File
-    bool        discard = false,  // Erase the record, do not add to removed
-    bool        mod = false);     // Temp: do not journal, modified
+    const Node* node);            // File
 // For debug only
   void* active();
-  void* removed();
 };
 
 }

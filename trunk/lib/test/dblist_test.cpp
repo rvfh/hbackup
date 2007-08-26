@@ -53,6 +53,7 @@ int main(void) {
   time_t  ts;
 
   cout << "Test: DB lists" << endl;
+  mkdir("test_db", 0755);
 
   if (list.open("w")) {
     cerr << "Failed to open list" << endl;

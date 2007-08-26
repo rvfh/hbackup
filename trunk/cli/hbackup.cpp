@@ -342,7 +342,6 @@ int main(int argc, char **argv) {
           if (verbosity() > 1) {
             cout << " -> Updating database format" << endl;
           }
-          db.open_removed();
         } else
         if (check) {
           if (verbosity() > 1) {

@@ -233,19 +233,20 @@ int DbList::load_v2(FILE* readfile, unsigned int offset) {
 
 
   SortedList<DbData>::iterator db_data;
-  bool          end_found = false;
+  bool                         end_found = false;
 
   errno = 0;
   while (((size = getline(&buffer, &bsize, readfile)) >= 0) && ! failed) {
     if (++line <= offset) {
       continue;
     }
+    char* buffer_last = &buffer[strlen(buffer) - 1];
     // Remove ending '\n'
-    if (buffer[strlen(buffer) - 1] != '\n') {
+    if (*buffer_last != '\n') {
       failed = 1;
       break;
     }
-    buffer[strlen(buffer) - 1] = '\t';
+    *buffer_last = '\0';
     if (buffer[0] == '#') {
       end_found = true;
       break;
@@ -261,6 +262,7 @@ int DbList::load_v2(FILE* readfile, unsigned int offset) {
       asprintf(&path, "%s", &buffer[1]);
       db_data = end();
     } else if (path != NULL) {
+      *buffer_last = '\t';
       char* start  = &buffer[2];
       char* value  = (char *) malloc(size + 1);
       int   failed = 0;
@@ -379,87 +381,6 @@ int DbList::load_v2(FILE* readfile, unsigned int offset) {
   return failed;
 }
 
-int DbList::save(
-    const string& path,
-    const string& filename,
-    bool          backup) {
-  FILE    *writefile;
-  int     failed = 0;
-
-  string dest_path = path + "/" + filename;
-  string temp_path = dest_path + ".part";
-  if ((writefile = fopen(temp_path.c_str(), "w")) != NULL) {
-    fprintf(writefile, "# version 1\n");
-    char*  last_prefix = NULL;
-    char*  last_path   = NULL;
-    time_t last_out    = 0;
-    for (SortedList<DbData>::iterator i = begin(); i != end(); i++) {
-      if ((last_prefix == NULL) || strcmp(last_prefix, i->prefix())) {
-        fprintf(writefile, "%s\n", i->prefix());
-        free(last_prefix);
-        last_prefix = NULL;
-        free(last_path);
-        last_path = NULL;
-        asprintf(&last_prefix, "%s", i->prefix());
-      }
-      if ((last_path == NULL) || strcmp(last_path, i->path())) {
-        if (last_out != 0) {
-          fprintf(writefile, "\t\t%ld\t-\t\n", last_out);
-          last_out = 0;
-        }
-        fprintf(writefile, "\t%s\n", i->path());
-        free(last_path);
-        last_path = NULL;
-        asprintf(&last_path, "%s", i->path());
-      } else {
-        if ((last_out != 0) && (last_out != i->in())) {
-          fprintf(writefile, "\t\t%ld\t-\t\n", last_out);
-          last_out = 0;
-        }
-      }
-      fprintf(writefile, "\t\t%ld\t%c\t%lld\t%ld\t%u\t%u\t%o\t",
-        i->in(), i->data()->type(), i->data()->size(), i->data()->mtime(),
-        i->data()->uid(), i->data()->gid(), i->data()->mode());
-      if (i->data()->type() == 'f') {
-        fprintf(writefile, "%s\t", ((File*) (i->data()))->checksum());
-      }
-      if (i->data()->type() == 'l') {
-        fprintf(writefile, "%s\t", ((Link*) (i->data()))->link());
-      }
-      fprintf(writefile, "\n");
-      if (i->out() != 0) {
-        last_out = i->out();
-      }
-    }
-    // Last one...
-    if (last_out != 0) {
-      fprintf(writefile, "\t\t%ld\t-\t\n", last_out);
-    }
-    fprintf(writefile, "#\n");
-    fclose(writefile);
-
-    /* All done */
-    if (backup && rename(dest_path.c_str(), (dest_path + "~").c_str())) {
-      if (verbosity() > 3) {
-        cerr << "dblist: save: cannot create backup" << endl;
-      }
-      failed = 2;
-    }
-    if (rename(temp_path.c_str(), dest_path.c_str())) {
-      if (verbosity() > 3) {
-        cerr << "dblist: save: cannot rename file" << endl;
-      }
-      failed = 2;
-    }
-  } else {
-    if (verbosity() > 3) {
-      cerr << "dblist: save: cannot create file" << endl;
-    }
-    failed = 2;
-  }
-  return failed;
-}
-
 int DbList::save_v2(
     const string& path,
     const string& filename,
@@ -546,46 +467,14 @@ int DbList::open(
     const string& filename) {
   if (load(path, filename)) {
     // This should not fail
-    cerr << "dblist: failed to load " << filename << " items list" << endl;
-    return 2;
+    cerr << "dblist: failed to load " << filename << endl;
+    return -1;
   }
-  _open = true;
 
   if (verbosity() > 2) {
-    cout << " --> Database " << filename << " items part open (contents: "
+    cout << " --> Database " << filename << " open (contents: "
       << size() << " file";
     if (size() != 1) {
-      cout << "s";
-    }
-    cout << ")" << endl;
-  }
-
-  if (size() == 0) {
-    return 1;
-  }
-  return 0;
-}
-
-int DbList::close(
-    const string& path,
-    const string& filename) {
-  if (! _open) {
-    cerr << "dblist: cannot close " << filename << " items list, not open"
-      << endl;
-    return 2;
-  }
-  if (save(path, filename, true)) {
-    cerr << "dblist: failed to save " << filename << " items list" << endl;
-    return 2;
-  }
-  int list_size = size();
-  clear();
-  _open = false;
-
-  if (verbosity() > 2) {
-    cout << " --> Database " << filename << " items part closed (contents: "
-      << list_size << " file";
-    if (list_size != 1) {
       cout << "s";
     }
     cout << ")" << endl;
