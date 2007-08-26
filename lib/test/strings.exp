@@ -1,0 +1,10 @@
+3: abc
+3: def
+3: abc
+3: abc
+abc and def differ
+abc and abc are equal
+abc and def differ
+def and def are equal
+6: abcdef
+9: abcdefghi
