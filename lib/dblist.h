@@ -91,7 +91,6 @@ public:
 };
 
 class DbList : public SortedList<DbData> {
-  bool _open;
   int  load_v1(
     FILE*        readfile,
     unsigned int offset = 0);
@@ -99,26 +98,17 @@ class DbList : public SortedList<DbData> {
     FILE*        readfile,
     unsigned int offset = 0);
 public:
-  DbList() : _open(false) {}
-  bool isOpen() { return _open; }
   // Load list, skipping offset elements
   int  load(
     const string& path,
     const string& filename,
     unsigned int  offset = 0);
   // Save list, creating a backup of the old one first
-  int  save(
-    const string& path,
-    const string& filename,
-    bool          backup = false);
   int  save_v2(
     const string& path,
     const string& filename,
     bool          backup = false);
   int  open(
-    const string& path,
-    const string& filename);
-  int  close(
     const string& path,
     const string& filename);
 };

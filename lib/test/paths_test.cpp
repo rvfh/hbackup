@@ -87,13 +87,6 @@ int main(void) {
        i != ((DbList*)db.active())->end(); i++) {
     i->line();
   }
-  db.open_removed();
-  cout << "Removed list: " << ((DbList*)db.removed())->size()
-    << " element(s):\n";
-  for (DbList::iterator i = ((DbList*)db.removed())->begin();
-       i != ((DbList*)db.removed())->end(); i++) {
-    i->line();
-  }
 
   // '-' is before '/' in the ASCII table...
   system("touch test1/subdir-file");
@@ -111,13 +104,6 @@ int main(void) {
     << " element(s):\n";
   for (DbList::iterator i = ((DbList*)db.active())->begin();
        i != ((DbList*)db.active())->end(); i++) {
-    i->line();
-  }
-  db.open_removed();
-  cout << "Removed list: " << ((DbList*)db.removed())->size()
-    << " element(s):\n";
-  for (DbList::iterator i = ((DbList*)db.removed())->begin();
-       i != ((DbList*)db.removed())->end(); i++) {
     i->line();
   }
 
@@ -171,13 +157,6 @@ int main(void) {
        i != ((DbList*)db.active())->end(); i++) {
     i->line();
   }
-  db.open_removed();
-  cout << "Removed list: " << ((DbList*)db.removed())->size()
-    << " element(s):\n";
-  for (DbList::iterator i = ((DbList*)db.removed())->begin();
-       i != ((DbList*)db.removed())->end(); i++) {
-    i->line();
-  }
 
   db.close();
   // Show list contents
@@ -228,13 +207,6 @@ int main(void) {
     << " element(s):\n";
   for (DbList::iterator i = ((DbList*)db.active())->begin();
        i != ((DbList*)db.active())->end(); i++) {
-    i->line();
-  }
-  db.open_removed();
-  cout << "Removed list: " << ((DbList*)db.removed())->size()
-    << " element(s):\n";
-  for (DbList::iterator i = ((DbList*)db.removed())->begin();
-       i != ((DbList*)db.removed())->end(); i++) {
     i->line();
   }
 
@@ -292,14 +264,6 @@ int main(void) {
        i != ((DbList*)db.active())->end(); i++) {
     i->line();
   }
-  db.open_removed();
-  cout << "Removed list: " << ((DbList*)db.removed())->size()
-    << " element(s):\n";
-  for (DbList::iterator i = ((DbList*)db.removed())->begin();
-       i != ((DbList*)db.removed())->end(); i++) {
-    i->line();
-  }
-
   db.close();
   // Show list contents
   cout << endl << "List:" << endl;
@@ -352,13 +316,6 @@ int main(void) {
     << " element(s):\n";
   for (DbList::iterator i = ((DbList*)db.active())->begin();
        i != ((DbList*)db.active())->end(); i++) {
-    i->line();
-  }
-  db.open_removed();
-  cout << "Removed list: " << ((DbList*)db.removed())->size()
-    << " element(s):\n";
-  for (DbList::iterator i = ((DbList*)db.removed())->begin();
-       i != ((DbList*)db.removed())->end(); i++) {
     i->line();
   }
 
@@ -417,13 +374,6 @@ int main(void) {
        i != ((DbList*)db.active())->end(); i++) {
     i->line();
   }
-  db.open_removed();
-  cout << "Removed list: " << ((DbList*)db.removed())->size()
-    << " element(s):\n";
-  for (DbList::iterator i = ((DbList*)db.removed())->begin();
-       i != ((DbList*)db.removed())->end(); i++) {
-    i->line();
-  }
 
   db.close();
   // Show list contents
@@ -477,13 +427,6 @@ int main(void) {
     << " element(s):\n";
   for (DbList::iterator i = ((DbList*)db.active())->begin();
        i != ((DbList*)db.active())->end(); i++) {
-    i->line();
-  }
-  db.open_removed();
-  cout << "Removed list: " << ((DbList*)db.removed())->size()
-    << " element(s):\n";
-  for (DbList::iterator i = ((DbList*)db.removed())->begin();
-       i != ((DbList*)db.removed())->end(); i++) {
     i->line();
   }
 
@@ -540,13 +483,6 @@ int main(void) {
        i != ((DbList*)db.active())->end(); i++) {
     i->line();
   }
-  db.open_removed();
-  cout << "Removed list: " << ((DbList*)db.removed())->size()
-    << " element(s):\n";
-  for (DbList::iterator i = ((DbList*)db.removed())->begin();
-       i != ((DbList*)db.removed())->end(); i++) {
-    i->line();
-  }
 
   db.close();
   // Show list contents
@@ -596,13 +532,6 @@ int main(void) {
     << " element(s):\n";
   for (DbList::iterator i = ((DbList*)db.active())->begin();
        i != ((DbList*)db.active())->end(); i++) {
-    i->line();
-  }
-  db.open_removed();
-  cout << "Removed list: " << ((DbList*)db.removed())->size()
-    << " element(s):\n";
-  for (DbList::iterator i = ((DbList*)db.removed())->begin();
-       i != ((DbList*)db.removed())->end(); i++) {
     i->line();
   }
 
@@ -660,13 +589,6 @@ int main(void) {
        i != ((DbList*)db.active())->end(); i++) {
     i->line();
   }
-  db.open_removed();
-  cout << "Removed list: " << ((DbList*)db.removed())->size()
-    << " element(s):\n";
-  for (DbList::iterator i = ((DbList*)db.removed())->begin();
-       i != ((DbList*)db.removed())->end(); i++) {
-    i->line();
-  }
 
   db.close();
   // Show list contents
@@ -717,13 +639,6 @@ int main(void) {
     << " element(s):\n";
   for (DbList::iterator i = ((DbList*)db.active())->begin();
        i != ((DbList*)db.active())->end(); i++) {
-    i->line();
-  }
-  db.open_removed();
-  cout << "Removed list: " << ((DbList*)db.removed())->size()
-    << " element(s):\n";
-  for (DbList::iterator i = ((DbList*)db.removed())->begin();
-       i != ((DbList*)db.removed())->end(); i++) {
     i->line();
   }
 
@@ -778,13 +693,6 @@ int main(void) {
        i != ((DbList*)db.active())->end(); i++) {
     i->line();
   }
-  db.open_removed();
-  cout << "Removed list: " << ((DbList*)db.removed())->size()
-    << " element(s):\n";
-  for (DbList::iterator i = ((DbList*)db.removed())->begin();
-       i != ((DbList*)db.removed())->end(); i++) {
-    i->line();
-  }
 
   db.close();
   // Show list contents
@@ -835,13 +743,6 @@ int main(void) {
     << " element(s):\n";
   for (DbList::iterator i = ((DbList*)db.active())->begin();
        i != ((DbList*)db.active())->end(); i++) {
-    i->line();
-  }
-  db.open_removed();
-  cout << "Removed list: " << ((DbList*)db.removed())->size()
-    << " element(s):\n";
-  for (DbList::iterator i = ((DbList*)db.removed())->begin();
-       i != ((DbList*)db.removed())->end(); i++) {
     i->line();
   }
 
@@ -917,13 +818,6 @@ int main(void) {
        i != ((DbList*)db.active())->end(); i++) {
     i->line();
   }
-  db.open_removed();
-  cout << "Removed list: " << ((DbList*)db.removed())->size()
-    << " element(s):\n";
-  for (DbList::iterator i = ((DbList*)db.removed())->begin();
-       i != ((DbList*)db.removed())->end(); i++) {
-    i->line();
-  }
 
   db.close();
   // Show list contents
@@ -972,13 +866,6 @@ int main(void) {
     << " element(s):\n";
   for (DbList::iterator i = ((DbList*)db.active())->begin();
        i != ((DbList*)db.active())->end(); i++) {
-    i->line();
-  }
-  db.open_removed();
-  cout << "Removed list: " << ((DbList*)db.removed())->size()
-    << " element(s):\n";
-  for (DbList::iterator i = ((DbList*)db.removed())->begin();
-       i != ((DbList*)db.removed())->end(); i++) {
     i->line();
   }
 

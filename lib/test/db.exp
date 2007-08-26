@@ -36,7 +36,7 @@ List 1 element(s):
 test/testfile
 List 0 element(s):
  --> Database initialized
- --> Database active items part open (contents: 0 files)
+ --> Database list open (contents: 0 files)
 
 Test: getdir
 Check test_db/data dir: 0
@@ -71,83 +71,3 @@ test_db/data/zz/00/00/02
 test_db/data/zz/00/00/03
 test_db/data/zz/00/.nofiles
 test_db/data/zz/.nofiles
-Active list: 0 element(s):
-Removed list: 0 element(s):
- --> Database active items part closed (contents: 0 files)
-Reading version 1 lists
- --> Database active items part open (contents: 0 files)
-Active list: 0 element(s):
-Removed list: 0 element(s):
-List select test
-Got 0 elements
-Got 0 elements
-Active list: 0 element(s):
-Removed list: 0 element(s):
- --> Database active items part closed (contents: 0 files)
-Reading version 1 lists
- --> Database active items part open (contents: 0 files)
- --> Scanning database contents: 0 files
- --> Database active items part closed (contents: 0 files)
-Reading version 1 lists
- --> Database active items part open (contents: 0 files)
- --> Scanning database contents thoroughly: 0 files
- --> Database active items part closed (contents: 0 files)
-Reading version 1 lists
- --> Database active items part open (contents: 0 files)
- --> Scanning database contents: 0 files
- --> Database active items part closed (contents: 0 files)
-Reading version 1 lists
- --> Database active items part open (contents: 0 files)
- --> Scanning database contents thoroughly: 0 files
- --> Database active items part closed (contents: 0 files)
-Reading version 1 lists
- --> Database active items part open (contents: 0 files)
- --> Scanning database contents thoroughly: 0 files
- --> Database active items part closed (contents: 0 files)
-Reading version 1 lists
- --> Database active items part open (contents: 0 files)
-Active list: 0 element(s):
-Removed list: 0 element(s):
-Active list: 0 element(s):
-Removed list: 0 element(s):
-Active list: 0 element(s):
-Removed list: 0 element(s):
- --> Database active items part closed (contents: 0 files)
-Reading version 1 lists
- --> Database active items part open (contents: 0 files)
-Active list: 0 element(s):
-Removed list: 0 element(s):
-Active list: 0 element(s):
-Removed list: 0 element(s):
-Active list: 0 element(s):
-Removed list: 0 element(s):
- --> Database active items part closed (contents: 0 files)
-Reading version 1 lists
- --> Database active items part open (contents: 0 files)
-Active list: 0 element(s):
-Removed list: 0 element(s):
-Active list: 0 element(s):
-Removed list: 0 element(s):
- --> Database active items part closed (contents: 0 files)
-Reading version 1 lists
- --> Database active items part open (contents: 0 files)
-Active list: 0 element(s):
-Removed list: 0 element(s):
- --> Database active items part closed (contents: 0 files)
-List cannot be saved
-Reading version 1 lists
- --> Database active items part open (contents: 0 files)
-Permission denied: failed to open temporary list
-dblist: failed to save active items list
-Error: Permission denied
-List cannot be read
-dblist: load: active: Permission denied
-dblist: failed to load active items list
-Error: Permission denied
-List is garbaged
-Reading version 1 lists
- --> Database active items part open (contents: 0 files)
- --> Database active items part closed (contents: 0 files)
-List is gone
-db: open: active files list not accessible: no backup accessible, aborting
-Error: No such file or directory
