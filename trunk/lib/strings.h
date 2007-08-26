@@ -23,33 +23,65 @@ namespace hbackup {
 
 class String {
 protected:
-  char* _string;
-  int   _length;
-  int   _size;
+  char*   _string;
+  int     _length;
+  size_t  _size;
+  void alloc(size_t size);
 public:
-  String() :
-    _string(NULL),
-    _length(0),
-    _size(0) {}
-  String(const String& string);
+  String();
   String(const char* string);
-  ~String() {
+  String(const String& string);
+  virtual ~String() {
     free(_string);
   }
   int length() const        { return _length; }
   const char* c_str() const { return _string; }
-  String& operator=(const String& string);
   String& operator=(const char* string);
-  bool    operator==(const String& string) const;
-  bool    operator==(const char* string) const;
+  String& operator=(const String& string);
+  virtual int compare(const char* string) const;
+  virtual int compare(const String& string) const {
+    return compare(string._string);
+  }
+  bool    operator<(const char* string) const {
+    return compare(string) < 0;
+  }
+  bool    operator<(const String& string) const {
+    return compare(string) < 0;
+  }
+  bool    operator>(const char* string) const {
+    return compare(string) > 0;
+  }
+  bool    operator>(const String& string) const {
+    return compare(string) > 0;
+  }
+  bool    operator==(const char* string) const {
+    return compare(string) == 0;
+  }
+  bool    operator==(const String& string) const {
+    return compare(string) == 0;
+  }
+  bool    operator!=(const char* string) const {
+    return compare(string) != 0;
+  }
   bool    operator!=(const String& string) const {
-    return ! (*this != string);
+    return compare(string) != 0;
   }
-  bool    operator!=(const char* string) const  {
-    return ! (*this != string);
-  }
-  String& operator+(const String& string);
   String& operator+(const char* string);
+  String& operator+(const String& string);
+};
+
+class StrPath : public String {
+public:
+  StrPath()                     : String::String() {}
+  StrPath(const char* string)   : String::String(string) {}
+  StrPath(const String& string) : String::String(string) {}
+  int compare(const char* string, size_t length = -1) const;
+  int compare(const String& string, size_t length = -1) const {
+    return compare(string.c_str(), length);
+  }
+  int compare(const StrPath& string, size_t length = -1) const {
+    return compare(string._string, length);
+  }
 };
 
 }

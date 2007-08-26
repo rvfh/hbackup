@@ -24,24 +24,47 @@
 
 using namespace hbackup;
 
-String::String(const String& string) {
+void String::alloc(size_t size) {
+  if (size < 64) {
+    size = 64;
+  } else {
+    size = (size + 63) >> 6;
+  }
+  if (size > _size) {
+    _size = size;
+    _string = (char*) realloc(_string, size);
+  }
+}
+
+String::String() {
+  _length = 0;
+  _size   = 0;
   _string = NULL;
-  _length = asprintf(&_string, "%s", string._string);
-  _size = _length + 1;
+  alloc(_length + 1);
+  _string[0] = '\0';
+}
+
+String::String(const String& string) {
+  _length = string._length;
+  _size   = 0;
+  _string = NULL;
+  alloc(_length + 1);
+  strcpy(_string, string._string);
 }
 
 String::String(const char* string) {
+  _length = strlen(string);
+  _size   = 0;
   _string = NULL;
-  _length = asprintf(&_string, "%s", string);
-  _size = _length + 1;
+  alloc(_length + 1);
+  strcpy(_string, string);
 }
 
 String& String::operator=(const String& string) {
   if (string._length > _length) {
-    _size   = string._length + 1;
-    _length = _size -1;
-    _string = (char*) realloc(_string, _size);
+    alloc(_length + 1);
   }
+  _length = string._length;
   strcpy(_string, string._string);
   return *this;
 }
@@ -57,16 +80,12 @@ String& String::operator=(const char* string) {
   return *this;
 }
 
-bool String::operator==(const String& string) const {
-  return strcmp(_string, string._string) == 0;
-}
-
-bool String::operator==(const char* string) const {
-  return strcmp(_string, string) == 0;
+int String::compare(const char* string) const {
+  return strcmp(_string, string);
 }
 
 String& String::operator+(const String& string) {
-  int length = _length + string._length;
+  size_t length = _length + string._length;
   if (_size < length + 1) {
     _size = length + 1;
     _string = (char*) realloc(_string, _size);
@@ -77,7 +96,7 @@ String& String::operator+(const String& string) {
 }
 
 String& String::operator+(const char* string) {
-  int length = _length + strlen(string);
+  size_t length = _length + strlen(string);
   if (_size < length + 1) {
     _size = length + 1;
     _string = (char*) realloc(_string, _size);
@@ -85,4 +104,58 @@ String& String::operator+(const char* string) {
   strcpy(&_string[_length], string);
   _length = length;
   return *this;
+}
+
+int StrPath::compare(const char* string, size_t length) const {
+  const char* s1 = _string;
+  const char* s2 = string;
+  while (true) {
+    if (length == 0) {
+      return 0;
+    }
+    if (*s1 == '\0') {
+      if (*s2 == '\0') {
+        return 0;
+      } else {
+        return -1;
+      }
+    } else {
+      if (*s2 == '\0') {
+        return 1;
+      } else {
+        if (*s1 == '/') {
+          if (*s2 == '/') {
+            s1++;
+            s2++;
+          } else {
+            if (*s2 < ' ') {
+              return 1;
+            } else {
+              return -1;
+            }
+          }
+        } else {
+          if (*s2 == '/') {
+            if (*s1 < ' ') {
+              return -1;
+            } else {
+              return 1;
+            }
+          } else {
+            if (*s1 < *s2) {
+              return -1;
+            } else if (*s1 > *s2) {
+              return 1;
+            } else {
+              s1++;
+              s2++;
+            }
+          }
+        }
+      }
+    }
+    if (length > 0) {
+      length--;
+    }
+  }
 }

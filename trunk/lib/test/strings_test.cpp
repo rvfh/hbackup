@@ -28,9 +28,11 @@ using namespace std;
 using namespace hbackup;
 
 int main(void) {
+  cout << endl << "1:" << endl;
   String str1("abc");
   cout << str1.length() << ": " << str1.c_str() << endl;
 
+  cout << endl << "2:" << endl;
   String str2;
   const char* chr = "def";
   str2 = chr;
@@ -39,6 +41,7 @@ int main(void) {
     cout << "Bug: copied the pointer!!!" << endl;
   }
 
+  cout << endl << "3:" << endl;
   String str3;
   str3 = str1;
   cout << str3.length() << ": " << str3.c_str() << endl;
@@ -46,12 +49,70 @@ int main(void) {
     cout << "Bug: copied the pointer!!!" << endl;
   }
 
+  cout << endl << "4:" << endl;
   String str4(str1);
   cout << str4.length() << ": " << str4.c_str() << endl;
   if (str1.c_str() == str4.c_str()) {
     cout << "Bug: copied the pointer!!!" << endl;
   }
 
+  cout << endl << "5:" << endl;
+  switch (str1.compare(str2)) {
+    case 1:
+      cout << str1.c_str() << " > " << str2.c_str() << endl;
+      break;
+    case -1:
+      cout << str1.c_str() << " < " << str2.c_str() << endl;
+      break;
+    default:
+      cout << str1.c_str() << " == " << str2.c_str() << endl;
+  }
+
+  switch (str1.compare(str3)) {
+    case 1:
+      cout << str1.c_str() << " > " << str3.c_str() << endl;
+      break;
+    case -1:
+      cout << str1.c_str() << " < " << str3.c_str() << endl;
+      break;
+    default:
+      cout << str1.c_str() << " == " << str3.c_str() << endl;
+  }
+
+  switch (str2.compare(str1)) {
+    case 1:
+      cout << str2.c_str() << " > " << str1.c_str() << endl;
+      break;
+    case -1:
+      cout << str2.c_str() << " < " << str1.c_str() << endl;
+      break;
+    default:
+      cout << str2.c_str() << " == " << str1.c_str() << endl;
+  }
+
+  switch (str1.compare(chr)) {
+    case 1:
+      cout << str1.c_str() << " > " << chr << endl;
+      break;
+    case -1:
+      cout << str1.c_str() << " < " << chr << endl;
+      break;
+    default:
+      cout << str1.c_str() << " == " << chr << endl;
+  }
+
+  switch (str2.compare(chr)) {
+    case 1:
+      cout << str2.c_str() << " > " << chr << endl;
+      break;
+    case -1:
+      cout << str2.c_str() << " < " << chr << endl;
+      break;
+    default:
+      cout << str2.c_str() << " == " << chr << endl;
+  }
+
+  cout << endl << "6:" << endl;
   if (str1 == str2) {
     cout << str1.c_str() << " and " << str2.c_str() << " are equal" << endl;
   } else {
@@ -76,11 +137,37 @@ int main(void) {
     cout << str2.c_str() << " and " << chr << " differ" << endl;
   }
 
+  cout << endl << "7:" << endl;
   String str5 = str1 + str2;
   cout << str5.length() << ": " << str5.c_str() << endl;
 
   String str6 = str1 + "ghi";
   cout << str6.length() << ": " << str6.c_str() << endl;
+
+  cout << endl << "Test: pathCompare" << endl;
+  cout << "a <> a: " << StrPath("a").compare("a") << endl;
+  cout << "a <> b: " << StrPath("a").compare("b") << endl;
+  cout << "b <> a: " << StrPath("b").compare("a") << endl;
+  cout << "a1 <> b: " << StrPath("a1").compare("b") << endl;
+  cout << "b <> a1: " << StrPath("b").compare("a1") << endl;
+  cout << "a1 <> a: " << StrPath("a1").compare("a") << endl;
+  cout << "a <> a1: " << StrPath("a").compare("a1") << endl;
+  cout << "a/ <> a: " << StrPath("a/").compare("a") << endl;
+  cout << "a <> a/: " << StrPath("a").compare("a/") << endl;
+  cout << "a\t <> a/: " << StrPath("a\t").compare("a/") << endl;
+  cout << "a/ <> a\t " << StrPath("a/").compare("a\t") << endl;
+  cout << "a\t <> a\t " << StrPath("a\t").compare("a\t") << endl;
+  cout << "a\n <> a/: " << StrPath("a\n").compare("a/") << endl;
+  cout << "a/ <> a\n " << StrPath("a/").compare("a\n") << endl;
+  cout << "a\n <> a\n " << StrPath("a\n").compare("a\n") << endl;
+  cout << "a/ <> a.: " << StrPath("a/").compare("a.") << endl;
+  cout << "a. <> a/: " << StrPath("a.").compare("a/") << endl;
+  cout << "a/ <> a-: " << StrPath("a/").compare("a-") << endl;
+  cout << "a- <> a/: " << StrPath("a-").compare("a/") << endl;
+  cout << "a/ <> a/: " << StrPath("a/").compare("a/") << endl;
+  cout << "abcd <> abce, 3: " << StrPath("abcd").compare("abce", 3) << endl;
+  cout << "abcd <> abce, 4: " << StrPath("abcd").compare("abce", 4) << endl;
+  cout << "abcd <> abce, 5: " << StrPath("abcd").compare("abce", 5) << endl;
 
   return 0;
 }
