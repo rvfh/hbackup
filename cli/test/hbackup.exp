@@ -3,7 +3,7 @@
  --> Client: other
  --> Client: myhost
  --> Client: client
- -> Backing up
+Backing up
  --> Database initialized
  --> Database list open (contents: 0 files)
 Backup client 'myhost' using protocol 'file'
@@ -51,7 +51,7 @@ Protocol not supported: ssh
  --> Client: other
  --> Client: myhost
  --> Client: client
- -> Backing up
+Backing up
  --> Database list open (contents: 21 files)
 Backup client 'myhost' using protocol 'file'
  -> Reading backup list file
@@ -70,16 +70,14 @@ Unmounted test_db/mount
  --> Client: other
  --> Client: myhost
  --> Client: client
- -> Scanning database
+Scanning database
  --> Database list open (contents: 21 files)
- -> Scanning database
- --> Scanning database contents: 21 files
+ --> Scanning database contents: 4 files
  -> Reading configuration file
  --> Client: myClient
  --> Client: other
  --> Client: myhost
  --> Client: client
- -> Checking database
+Checking database
  --> Database list open (contents: 21 files)
- -> Checking database
- --> Scanning database contents thoroughly: 21 files
+ --> Scanning database contents thoroughly: 4 files

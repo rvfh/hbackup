@@ -199,13 +199,6 @@ int HBackup::check(bool thorough) {
   if (! _d->db->open()) {
     bool failed = false;
 
-    if (verbosity() > 1) {
-      if (thorough) {
-        cout << " -> Checking database" << endl;
-      } else {
-        cout << " -> Scanning database" << endl;
-      }
-    }
     if (_d->db->scan("", thorough)) {
       failed = true;
     }

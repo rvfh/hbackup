@@ -551,72 +551,63 @@ int Database::read(const string& path, const string& checksum) {
   return failed;
 }
 
-int Database::scan(const string& checksum, bool thorough) {
-#warning need to re-implement using List class instead
+int Database::scan(const String& checksum, bool thorough) {
+#warning need to report in journal, somehow...
   int failed = 0;
 
   if (checksum == "") {
-    int files = _d->active.size();
+    list<String> sums;
+    char*       path   = NULL;
+    Node*       node   = NULL;
 
+    // Get list of checksums
+    while (_d->list->getEntry(NULL, NULL, &path, &node) > 0) {
+      if (node->type() == 'f') {
+        File *f = (File*) node;
+        if (f->checksum()[0] != '\0') {
+          sums.push_back(f->checksum());
+        }
+      }
+      if (terminating()) {
+        errno = EINTR;
+        return -1;
+      }
+    }
+    sums.sort();
+    sums.unique();
     if (verbosity() > 2) {
       cout << " --> Scanning database contents";
       if (thorough) {
         cout << " thoroughly";
       }
-      cout << ": " << _d->active.size() << " file";
-      if (_d->active.size() != 1) {
+      cout << ": " << sums.size() << " file";
+      if (sums.size() != 1) {
         cout << "s";
       }
       cout << endl;
     }
-
-    list<DbData>::iterator i;
-    for (i = _d->active.begin(); i != _d->active.end(); i++) {
-      if ((verbosity() > 2) && ((files & 0xFF) == 0)) {
-        printf(" --> Files left to go: %u\n", files);
-      }
-      files--;
-      if (i->data()->type() == 'f') {
-        File* f = (File*) i->data();
-        if ((f->checksum()[0] != '\0') && scan(f->checksum(), thorough)) {
-          failed = 1;
-          if (! terminating() && verbosity() > 2) {
-            struct tm *time;
-            cout << " --> Client:      " << i->prefix() << endl;
-            cout << " --> File:        " << i->path() << endl;
-            if (verbosity() > 3) {
-              time_t file_mtime = i->data()->mtime();
-              time = localtime(&file_mtime);
-              printf(" --> Modified:    %04u-%02u-%02u %2u:%02u:%02u %s\n",
-                time->tm_year + 1900, time->tm_mon + 1, time->tm_mday,
-                time->tm_hour, time->tm_min, time->tm_sec, time->tm_zone);
-/*                time_t local = i->in();
-                time = localtime(&local);
-              printf(" --> Seen first: %04u-%02u-%02u %2u:%02u:%02u %s\n",
-                time->tm_year + 1900, time->tm_mon + 1, time->tm_mday,
-                time->tm_hour, time->tm_min, time->tm_sec, time->tm_zone);*/
-            }
-          }
-        }
-      }
+    for (list<String>::iterator i = sums.begin(); i != sums.end(); i++) {
+      scan(i->c_str(), thorough);
       if (terminating()) {
-        failed = 3;
-        break;
+        errno = EINTR;
+        return -1;
       }
     }
   } else {
     string  path;
     bool    filefailed = false;
 
-    if (getDir(checksum, path, false)) {
+    if (getDir(checksum.c_str(), path, false)) {
       errno = ENODATA;
       filefailed = true;
-      cerr << "db: scan: failed to get directory for checksum " << checksum << endl;
+      cerr << "db: scan: failed to get directory for checksum "
+        << checksum.c_str() << endl;
     } else
     if (! File(path.c_str(), "data").isValid()) {
       errno = ENOENT;
       filefailed = true;
-      cerr << "db: scan: file data missing for checksum " << checksum << endl;
+      cerr << "db: scan: file data missing for checksum "
+        << checksum.c_str() << endl;
     } else
     if (thorough) {
       string check_path = path + "/data";
@@ -626,14 +617,16 @@ int Database::scan(const string& checksum, bool thorough) {
       if (s.computeChecksum()) {
         errno = ENOENT;
         filefailed = true;
-        cerr << "db: scan: file data missing for checksum " << checksum << endl;
+        cerr << "db: scan: file data missing for checksum "
+          << checksum.c_str() << endl;
       } else
       if (strncmp(checksum.c_str(), s.checksum(), strlen(s.checksum()))) {
         errno = EILSEQ;
         filefailed = true;
         if (! terminating()) {
-          cerr << "db: scan: file data corrupted for checksum " << checksum
-            << " (found to be " << s.checksum() << ")" << endl;
+          cerr << "db: scan: file data corrupted for checksum "
+            << checksum.c_str() << " (found to be " << s.checksum() << ")"
+            << endl;
         }
       }
 
