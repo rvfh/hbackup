@@ -70,14 +70,12 @@ int HBackup::addClient(const char* name) {
 }
 
 int HBackup::readConfig(const char* config_path) {
-  bool failed = false;
-
   /* Open configuration file */
   ifstream config_file(config_path);
 
   if (! config_file.is_open()) {
     cerr << strerror(errno) << ": " << config_path << endl;
-    failed = true;
+    return -1;
   } else {
     /* Read configuration file */
     string  buffer;
@@ -88,7 +86,7 @@ int HBackup::readConfig(const char* config_path) {
     }
 
     Client* client = NULL;
-    while (! config_file.eof() && ! failed) {
+    while (! config_file.eof()) {
       getline(config_file, buffer);
       unsigned int pos = buffer.find("\r");
       if (pos != string::npos) {
@@ -106,7 +104,7 @@ int HBackup::readConfig(const char* config_path) {
         errno = EUCLEAN;
         cerr << "Error: in file " << config_path << ", line " << line
           << " unexpected lonely keyword: " << *params.begin() << endl;
-        failed = true;
+        return -1;
       } else if (params.size() > 1) {
         list<string>::iterator current = params.begin();
         string                 keyword = *current++;
@@ -115,12 +113,12 @@ int HBackup::readConfig(const char* config_path) {
           if (params.size() > 2) {
             cerr << "Error: in file " << config_path << ", line " << line
               << " '" << keyword << "' takes exactly one argument" << endl;
-            failed = true;
+            return -1;
           } else
           if (_d->db != NULL) {
             cerr << "Error: in file " << config_path << ", line " << line
               << " '" << keyword << "' seen twice" << endl;
-            failed = true;
+            return -1;
           } else {
             _d->db = new Database(*current);
           }
@@ -128,7 +126,7 @@ int HBackup::readConfig(const char* config_path) {
           if (params.size() != 3) {
             cerr << "Error: in file " << config_path << ", line " << line
               << " '" << keyword << "' takes exactly two arguments" << endl;
-            failed = true;
+            return -1;
           }
           string protocol = *current++;
           client = new Client(*current);
@@ -150,7 +148,7 @@ int HBackup::readConfig(const char* config_path) {
             if (params.size() > 2) {
               cerr << "Error: in file " << config_path << ", line " << line
                 << " '" << keyword << "' takes exactly one argument" << endl;
-              failed = true;
+              return -1;
             }
             client->setHostOrIp(*current);
           } else
@@ -158,7 +156,7 @@ int HBackup::readConfig(const char* config_path) {
             if (params.size() > 3) {
               cerr << "Error: in file " << config_path << ", line " << line
                 << " '" << keyword << "' takes one or two arguments" << endl;
-              failed = true;
+              return -1;
             }
             if (params.size() == 2) {
               client->addOption(*current);
@@ -171,32 +169,28 @@ int HBackup::readConfig(const char* config_path) {
             if (params.size() > 2) {
               cerr << "Error: in file " << config_path << ", line " << line
                 << " '" << keyword << "' takes exactly one argument" << endl;
-              failed = true;
+              return -1;
             }
             client->setListfile(*current);
           } else {
             cerr << "Unrecognised keyword '" << keyword
               << "' in configuration file, line " << line
               << endl;
-            failed = true;
+            return -1;
           }
         } else {
           cerr << "Error: in file " << config_path << ", line " << line
             << " keyword before client" << endl;
-          failed = true;
+          return -1;
         }
       }
     }
     config_file.close();
   }
 
-  if (failed) {
-    return -1;
-  } else {
-    // Use default DB path if none specified
-    if (_d->db == NULL) {
-      _d->db = new Database(_d->default_db_path);
-    }
+  // Use default DB path if none specified
+  if (_d->db == NULL) {
+    _d->db = new Database(_d->default_db_path);
   }
   return 0;
 }
