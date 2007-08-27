@@ -19,10 +19,29 @@
 #ifndef HBACKUP_H
 #define HBACKUP_H
 
+namespace hbackup {
+
 /* Verbosity level */
 extern int verbosity(void);
 
 /* Termination required */
 extern int terminating(void);
 
+class HBackup {
+  struct            Private;
+  Private*          _d;
+public:
+  HBackup();
+  ~HBackup();
+  // Added specific client to backup (excludes all non added clients)
+  int addClient(const char* client);
+  // Read configuration file
+  int readConfig(const char* path);
+  // Check database
+  int check(bool thorough = false);
+  // Backup
+  int backup(bool config_check = false);
+};
+
+}
 #endif

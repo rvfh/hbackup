@@ -18,21 +18,22 @@
 
 // TODO test file type filter
 
-using namespace std;
-
 #include <iostream>
 #include <sys/stat.h>
 
+using namespace std;
+
 #include "files.h"
 #include "filters.h"
+#include "hbackup.h"
 
 using namespace hbackup;
 
-int verbosity(void) {
+int hbackup::verbosity(void) {
   return 0;
 }
 
-int terminating(void) {
+int hbackup::terminating(void) {
   return 0;
 }
 

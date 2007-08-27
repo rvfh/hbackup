@@ -100,28 +100,24 @@ mkdir "$CONFIGDIR"
 cat << EOF > "$CONFIGDIR/hbackup.conf"
 db "$TESTDBDIR"
 
-client myhost
-protocol file
-hostname myhost.mynetwork.lan
-listfile "$CONFIGDIR/localhost.list"
-
-client myClient
-protocol nfs
+client nfs myClient
 hostname myClient
 listfile $ROOTDIRNFS/hbackup.list
 
-client client
-protocol smb
+client ssh other
+hostname otherClient
+listfile /home/backup/Backup.list
+
+client file myhost
+hostname myhost.mynetwork.lan
+listfile "$CONFIGDIR/localhost.list"
+
+client smb client
 option username Myself
 option password flesyM
 option nocase
 hostname myClient
 listfile "C:\Backup\Backup.LST"
-
-client other
-protocol ssh
-hostname otherClient
-listfile /home/backup/Backup.list
 EOF
 
 cat << EOF > "$CONFIGDIR/localhost.list"

@@ -52,7 +52,7 @@ using namespace std;
 
 using namespace hbackup;
 
-#warning journal not used yet
+#warning journal not used for recovery yet
 
 struct Database::Private {
   DbList::iterator  entry;
@@ -355,30 +355,8 @@ int Database::open() {
         cerr << "using backup" << endl;
         rename((_path + "/list~").c_str(), (_path + "/list").c_str());
       } else {
-        cerr << "no backup accessible, tring v1...";
-
-        File active(_path.c_str(), "active");
-        File removed(_path.c_str(), "removed");
-        DbList db_list;
-
-        // Convert to v2
-        if (! active.isValid()) {
-          cerr << "active list not accessible" << endl;
-          failed = true;
-        } else
-        if (! removed.isValid()) {
-          cerr << "removed list not accessible" << endl;
-          failed = true;
-        } else if (db_list.load(_path, "active")) {
-          cerr << "cannot load active list" << endl;
-          failed = true;
-        } else if (db_list.load(_path, "removed")) {
-          cerr << "cannot load removed list" << endl;
-          failed = true;
-        } else if (db_list.save_v2(_path, "list")) {
-          cerr << "cannot save list" << endl;
-          failed = true;
-        }
+        cerr << "no backup accessible, aborting.";
+        failed = true;
       }
     }
   }
@@ -591,7 +569,7 @@ int Database::scan(const string& checksum, bool thorough) {
       cout << endl;
     }
 
-    SortedList<DbData>::iterator i;
+    list<DbData>::iterator i;
     for (i = _d->active.begin(); i != _d->active.end(); i++) {
       if ((verbosity() > 2) && ((files & 0xFF) == 0)) {
         printf(" --> Files left to go: %u\n", files);

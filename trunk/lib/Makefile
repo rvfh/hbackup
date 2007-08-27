@@ -17,8 +17,8 @@ check: all
 	@${MAKE} -C test
 
 # Dependencies
-libhbackup.a: clients.o db.o dblist.o filters.o paths.o files.o cvs_parser.o \
-	strings.o
+libhbackup.a: interface.o clients.o db.o dblist.o filters.o paths.o files.o \
+	cvs_parser.o strings.o
 
 clients.o: files.h filters.h parsers.h cvs_parser.h paths.h dbdata.h \
 	dblist.h db.h clients.h
@@ -29,6 +29,7 @@ strings.o: strings.h
 files.o: files.h
 filters.o: filters.h files.h
 paths.o: files.h filters.h parsers.h cvs_parser.h dbdata.h dblist.h db.h paths.h
+interface.o: hbackup.h clients.h db.h
 
 # Rules
 %o: %cpp

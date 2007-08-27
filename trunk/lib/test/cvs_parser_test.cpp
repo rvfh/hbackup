@@ -16,23 +16,24 @@
      Boston, MA 02111-1307, USA.
 */
 
-using namespace std;
-
 #include <iostream>
 #include <list>
 #include <sys/stat.h>
 
+using namespace std;
+
 #include "files.h"
 #include "parsers.h"
 #include "cvs_parser.h"
+#include "hbackup.h"
 
 using namespace hbackup;
 
-int verbosity(void) {
+int hbackup::verbosity(void) {
   return 0;
 }
 
-int terminating(void) {
+int hbackup::terminating(void) {
   return 0;
 }
 

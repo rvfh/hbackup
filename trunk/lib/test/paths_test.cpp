@@ -32,14 +32,15 @@ using namespace std;
 #include "dblist.h"
 #include "db.h"
 #include "paths.h"
+#include "hbackup.h"
 
 using namespace hbackup;
 
-int verbosity(void) {
+int hbackup::verbosity(void) {
   return 4;
 }
 
-int terminating(void) {
+int hbackup::terminating(void) {
   return 0;
 }
 
