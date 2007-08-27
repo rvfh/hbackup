@@ -1,9 +1,9 @@
  -> Reading configuration file
- --> Client: myhost
  --> Client: myClient
- --> Client: client
  --> Client: other
- -> Opening database
+ --> Client: myhost
+ --> Client: client
+ -> Backing up
  --> Database initialized
  --> Database list open (contents: 0 files)
 Backup client 'myhost' using protocol 'file'
@@ -46,13 +46,12 @@ Backup path 'C:/Test'
  --> A File.TXT
 Unmounted test_db/mount
 Protocol not supported: ssh
- -> Closing database
  -> Reading configuration file
- --> Client: myhost
  --> Client: myClient
- --> Client: client
  --> Client: other
- -> Opening database
+ --> Client: myhost
+ --> Client: client
+ -> Backing up
  --> Database list open (contents: 21 files)
 Backup client 'myhost' using protocol 'file'
  -> Reading backup list file
@@ -66,93 +65,21 @@ Backup client 'client' using protocol 'smb'
  --> Path: C:/Test
 Backup path 'C:/Test'
 Unmounted test_db/mount
- -> Closing database
  -> Reading configuration file
- --> Client: myhost
  --> Client: myClient
- --> Client: client
  --> Client: other
- -> Opening database
+ --> Client: myhost
+ --> Client: client
+ -> Scanning database
  --> Database list open (contents: 21 files)
  -> Scanning database
  --> Scanning database contents: 21 files
- -> Closing database
  -> Reading configuration file
- --> Client: myhost
  --> Client: myClient
- --> Client: client
  --> Client: other
- -> Opening database
+ --> Client: myhost
+ --> Client: client
+ -> Checking database
  --> Database list open (contents: 21 files)
  -> Checking database
  --> Scanning database contents thoroughly: 21 files
- -> Closing database
- -> Reading configuration file
- --> Client: myhost
- --> Client: myClient
- --> Client: client
- --> Client: other
- -> Opening database
-db: list not accessible...no backup accessible, tring v1...Reading version 1 lists
-Reading version 1 lists
- --> Database list open (contents: 20 files)
- -> Updating database format
- -> Closing database
-
-# version 2
-file://client
-	/home/user2/testdir
-		18	d	0	0	1000	1000	755
-	/home/user2/testfile
-		19	f	145408	1161527696	1000	1000	644	3d546a1ce46c6ae10ad34ab8a81c542e-0
-	/home/user2/testfile2
-		20	f	259072	1187315785	1000	1000	644	fb00cd74a5f35e89a7fbdd3c1d05375a-0
-	/home/user2/testlink
-		21	l	8	1187315785	1000	1000	777	testfile
-file://host
-	/home/user/cvs
-		2	d	0	0	1000	1000	755
-	/home/user/cvs/CVS
-		3	d	0	0	1000	1000	755
-	/home/user/cvs/CVS/Entries
-		4	f	141	1187315785	1000	1000	644	63b52e85e7a255c09df5cca819b74a88-0
-	/home/user/cvs/dirbad
-		5	d	0	0	1000	1000	755
-	/home/user/cvs/dirutd
-		6	d	0	0	1000	1000	755
-	/home/user/cvs/dirutd/CVS
-		7	d	0	0	1000	1000	755
-	/home/user/cvs/dirutd/CVS/Entries
-		1	f	42	1187315785	1000	1000	775	5252f242d27b8c2c9fdbdcbb33545d07-0
-		2	-
-		8	f	42	1187315785	1000	1000	644	5252f242d27b8c2c9fdbdcbb33545d07-0
-	/home/user/cvs/dirutd/fileutd
-		1	f	0	1187315785	1000	1000	644	d41d8cd98f00b204e9800998ecf8427e-0
-		2	-
-		9	f	0	1187315785	1000	1000	644	d41d8cd98f00b204e9800998ecf8427e-0
-	/home/user/cvs/filenew.c
-		10	f	0	1187315785	1000	1000	644	d41d8cd98f00b204e9800998ecf8427e-0
-	/home/user/cvs/fileutd.h
-		11	f	0	1187315785	1000	1000	644	d41d8cd98f00b204e9800998ecf8427e-0
-	/home/user/dir space
-		12	d	0	0	1000	1000	755
-	/home/user/dir space/file space
-		1	f	0	1187315785	1000	1000	644	d41d8cd98f00b204e9800998ecf8427e-0
-		2	-
-		3	f	0	1187315785	1000	1000	644	d41d8cd98f00b204e9800998ecf8427e-0
-	/home/user/test space
-		14	f	0	1187315785	1000	1000	644	d41d8cd98f00b204e9800998ecf8427e-0
-	/home/user/testdir
-		1	d	0	0	1000	1000	755
-		2	d	0	0	1000	1000	775
-		3	-
-		4	d	0	0	1000	1000	755
-	/home/user/testfile
-		1	f	13	1161486000	1000	1000	644	
-		2	-
-		3	f	13	1187315785	1000	1000	644	d41d8cd98f00b204e9800998ecf8427e-0
-		4	-
-		5	f	13	1161486000	1000	1000	644	59ca0efa9f5633cb0371bbc0355478d8-0
-	/home/user/testlink
-		17	l	8	1187315785	1000	1000	777	testfile
-# end

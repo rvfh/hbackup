@@ -19,10 +19,6 @@
 #ifndef CLIENT_H
 #define CLIENT_H
 
-#ifndef HBACKUP_H
-#error You must include hbackup.h before clients.h
-#endif
-
 namespace hbackup {
 
 class Option {

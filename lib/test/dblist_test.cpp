@@ -24,16 +24,17 @@ using namespace std;
 #include "files.h"
 #include "dbdata.h"
 #include "dblist.h"
+#include "hbackup.h"
 
 using namespace hbackup;
 
 static int verbose = 4;
 
-int verbosity(void) {
+int hbackup::verbosity(void) {
   return verbose;
 }
 
-int terminating(void) {
+int hbackup::terminating(void) {
   return 0;
 }
 

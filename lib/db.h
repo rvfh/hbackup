@@ -37,6 +37,7 @@ class Database {
 public:
   Database(const string& path);
   ~Database();
+  string path() const { return _path; }
   /* Open database */
   int  open();
   /* Close database */
