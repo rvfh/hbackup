@@ -27,15 +27,11 @@ class DbData {
   char*   _prefix;
   char*   _path;
   Node*   _node;
-  time_t  _in;
-  time_t  _out;
 public:
   DbData(const DbData& data) :
       _prefix(NULL),
       _path(NULL),
-      _node(NULL),
-      _in(data._in),
-      _out(data._out) {
+      _node(NULL) {
     asprintf(&_prefix, "%s", data._prefix);
     asprintf(&_path, "%s", data._path);
     switch (data._node->type()) {
@@ -52,45 +48,21 @@ public:
   DbData(
       const char* prefix,
       const char* path,
-      Node*       data,
-      time_t      in = 0) :
+      Node*       data) :
       _prefix(NULL),
       _path(NULL),
-      _node(data),
-      _out(0) {
+      _node(data) {
     asprintf(&_prefix, "%s", prefix);
     asprintf(&_path, "%s", path);
-    if (in == 0) {
-      _in = time(NULL);
-    } else {
-      _in = in;
-    }
   }
   ~DbData() {
     free(_prefix);
     free(_path);
     free(_node);
   }
-  bool operator<(const DbData& right) const {
-    int cmp = strcmp(_prefix, right._prefix);
-    if (cmp < 0)      return true;
-    else if (cmp > 0) return false;
-
-    // This will hopefully go when we just follow the Directory order
-    cmp = Node::pathCompare(_path, right._path);
-    if (cmp < 0)      return true;
-    else if (cmp > 0) return false;
-
-    // Equal then...
-    return _in < right._in;
-  }
   const Node* data()            { return _node; }
   const char* prefix() const    { return _prefix; }
   const char* path() const      { return _path; }
-  time_t      in() const        { return _in; }
-  time_t      out() const        { return _out; }
-  void setOut() { _out = time(NULL); }
-  void setOut(time_t out) { _out = out; }
   int pathCompare(const char* path, int length = -1) {
     char* full_path = NULL;
     asprintf(&full_path, "%s/%s", _prefix, _path);
@@ -99,17 +71,18 @@ public:
     return cmp;
   }
   void line() {
-    printf("%s\t%s\t%c\t%lld\t%d\t%u\t%u\t%o\t",
+    printf("%s\t%s\t%c\t%lld\t%d\t%u\t%u\t%o",
       _prefix, _path, _node->type(), _node->size(), _node->mtime() != 0,
       _node->uid(), _node->gid(), _node->mode());
     if (_node->type() == 'l') {
+      printf("\t");
       printf(((Link*)_node)->link());
     }
-    printf("\t");
     if (_node->type() == 'f') {
+      printf("\t");
       printf(((File*)_node)->checksum());
     }
-    printf("\t%ld\t%ld\t\n", _in, _out);
+    printf("\n");
   }
 };
 

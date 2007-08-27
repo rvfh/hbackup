@@ -552,6 +552,7 @@ int Database::read(const string& path, const string& checksum) {
 }
 
 int Database::scan(const string& checksum, bool thorough) {
+#warning need to re-implement using List class instead
   int failed = 0;
 
   if (checksum == "") {
@@ -578,7 +579,6 @@ int Database::scan(const string& checksum, bool thorough) {
       if (i->data()->type() == 'f') {
         File* f = (File*) i->data();
         if ((f->checksum()[0] != '\0') && scan(f->checksum(), thorough)) {
-#warning need to signal problem in DB list (remove checksum)
           failed = 1;
           if (! terminating() && verbosity() > 2) {
             struct tm *time;
@@ -590,11 +590,11 @@ int Database::scan(const string& checksum, bool thorough) {
               printf(" --> Modified:    %04u-%02u-%02u %2u:%02u:%02u %s\n",
                 time->tm_year + 1900, time->tm_mon + 1, time->tm_mday,
                 time->tm_hour, time->tm_min, time->tm_sec, time->tm_zone);
-                time_t local = i->in();
+/*                time_t local = i->in();
                 time = localtime(&local);
               printf(" --> Seen first: %04u-%02u-%02u %2u:%02u:%02u %s\n",
                 time->tm_year + 1900, time->tm_mon + 1, time->tm_mday,
-                time->tm_hour, time->tm_min, time->tm_sec, time->tm_zone);
+                time->tm_hour, time->tm_min, time->tm_sec, time->tm_zone);*/
             }
           }
         }
