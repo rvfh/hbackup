@@ -16,13 +16,10 @@ overriden using the -c option. The following keywords are acceptable there:
   Syntax:  db "<path to backup database>"
   Example: db "/backup"
 * client gives the client name.
-  Syntax:  client "<client desired name>"
-  Example: client "montblanc"
+  Syntax:  client "protocol" "<client desired name>"
+  Example: client file "montblanc"
 
 The client keyword can be followed by the following keywords:
-* protocol is mandatory and can be file, smb or nfs.
-  Syntax:  protocol "<protocol name>"
-  Example: protocol "smb"
 * listfile is mandatory as it gives the path to the backup list file.
   Syntax:             listfile "<path to file>"
   Example (smb):      listfile "C:/Backup/hbackup.list"

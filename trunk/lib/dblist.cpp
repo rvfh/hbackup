@@ -107,10 +107,6 @@ int DbList::load_v2(FILE* readfile) {
               } else if ((type == 'f') || (type == 'l')) {
                 fields++;
               }
-              if (db_data != end()) {
-                db_data->setOut(db_time);
-                db_data = end();
-              }
               break;
             case 3:   /* Size */
               if (sscanf(value, "%lld", &size) != 1) {
@@ -165,8 +161,7 @@ int DbList::load_v2(FILE* readfile) {
           default:
             node = new Node(path, type, mtime, size, uid, gid, mode);
         }
-        DbData data(prefix, path, node, db_time);
-       db_data = insert(end(), data);
+        push_back(DbData(prefix, path, node));
       }
       free(value);
       // Only take first file data (active)
