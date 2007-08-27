@@ -210,8 +210,8 @@ int main(int argc, char **argv) {
   }
   // Check that data referenced in DB exists
   if (scan) {
-    if (hbackup::verbosity() > 1) {
-      cout << " -> Scanning database" << endl;
+    if (hbackup::verbosity() > 0) {
+      cout << "Scanning database" << endl;
     }
     if (hbackup.check()) {
       return 3;
@@ -219,8 +219,8 @@ int main(int argc, char **argv) {
   } else
   // Check that data referenced in DB exists and is not corrupted
   if (check) {
-    if (hbackup::verbosity() > 1) {
-      cout << " -> Checking database" << endl;
+    if (hbackup::verbosity() > 0) {
+      cout << "Checking database" << endl;
     }
     if (hbackup.check(true)) {
       return 3;
@@ -228,8 +228,8 @@ int main(int argc, char **argv) {
   } else
   // Backup
   {
-    if (hbackup::verbosity() > 1) {
-      cout << " -> Backing up" << endl;
+    if (hbackup::verbosity() > 0) {
+      cout << "Backing up" << endl;
     }
     if (hbackup.backup()) {
       return 3;

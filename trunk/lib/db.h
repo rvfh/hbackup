@@ -19,6 +19,7 @@
 #ifndef DB_H
 #define DB_H
 
+#include "strings.h"
 // TODO remove this one by moving parsing into paths.cpp
 #include "files.h"
 // TODO remove this one by doing the data writing part in paths.cpp
@@ -44,53 +45,53 @@ public:
   int  close();
   // Prepare list for parser
   void getList(
-    const char*  prefix,
-    const char*  base_path,
-    const char*  rel_path,
-    list<Node*>& list);
+    const char*     prefix,
+    const char*     base_path,
+    const char*     rel_path,
+    list<Node*>&    list);
   /* Read file with given checksum, extract it to path */
   int  read(
-    const string& path,
-    const string& checksum);
+    const string&   path,
+    const string&   checksum);
   /* Check database for missing/corrupted data */
   /* If local_db_path is empty, use already open database */
   /* If checksum is empty, scan all contents */
   /* If thorough is true, check for corruption */
   int  scan(
-    const string& checksum = "",
-    bool thorough = false);
+    const String&   checksum = "",
+    bool            thorough = false);
 // So I can test them/use them in tests
   int getDir(
-    const string& checksum,
-    string&       path,
-    bool          create);
+    const string&   checksum,
+    string&         path,
+    bool            create);
   int  organise(
-    const string& path,
-    int           number);
+    const string&   path,
+    int             number);
   int  write(
     const string&   path,
     char**          checksum,
     int             compress = 0);
   int add(
-    const char* prefix,           // Client
-    const char* base_path,        // Path being backed up
-    const char* rel_path,         // Dir (from base_path)
-    const char* dir_path,         // Local dir below file
-    const Node* node,             // File
-    const char* checksum = NULL); // Do not copy file data, use given checksum
+    const char*     prefix,           // Client
+    const char*     base_path,        // Path being backed up
+    const char*     rel_path,         // Dir (from base_path)
+    const char*     dir_path,         // Local dir below file
+    const Node*     node,             // File
+    const char*     checksum = NULL); // Do not copy data, use given checksum
   int modify(
-    const char* prefix,           // Client
-    const char* base_path,        // Path being backed up
-    const char* rel_path,         // Dir (from base_path)
-    const char* dir_path,         // Local dir below file
-    const Node* old_node,         // Old file
-    const Node* node,             // File
-    bool        no_data = false); // File data unchanged or failed write
+    const char*     prefix,           // Client
+    const char*     base_path,        // Path being backed up
+    const char*     rel_path,         // Dir (from base_path)
+    const char*     dir_path,         // Local dir below file
+    const Node*     old_node,         // Old file
+    const Node*     node,             // File
+    bool            no_data = false); // File data unchanged or failed write
   void remove(                    // Should not fail
-    const char* prefix,           // Client
-    const char* base_path,        // Path being backed up
-    const char* rel_path,         // Dir (from base_path)
-    const Node* node);            // File
+    const char*     prefix,           // Client
+    const char*     base_path,        // Path being backed up
+    const char*     rel_path,         // Dir (from base_path)
+    const Node*     node);            // File
 // For debug only
   void* active();
 };

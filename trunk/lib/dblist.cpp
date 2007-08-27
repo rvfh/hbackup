@@ -261,16 +261,6 @@ int List::close() {
     if (Stream::write(footer, strlen(footer)) < 0) {
       rc = -1;
     }
-/*  } else {
-    char*  line = NULL;
-    size_t size = 0;
-    if (Stream::getLine(&line, &size) < 0) {
-      rc = -1;
-    } else
-    if (strcmp(line, footer)) {
-      errno = EUCLEAN;
-      rc = -1;
-    }*/
   }
   if (Stream::close()) {
     rc = -1;
@@ -318,114 +308,119 @@ int List::getEntry(
 
     // Prefix
     if (line[0] != '\t') {
-      free(*prefix);
-      *prefix = NULL;
-      asprintf(prefix, "%s", &line[0]);
-// cout << "prefix " << *prefix << endl;
+      if (prefix != NULL) {
+        free(*prefix);
+        *prefix = NULL;
+        asprintf(prefix, "%s", &line[0]);
+      }
     } else
 
     // Path
     if (line[1] != '\t') {
-      free(*path);
-      *path = NULL;
-      asprintf(path, "%s", &line[1]);
-// cout << "path " << *path << endl;
+      if (path != NULL) {
+        free(*path);
+        *path = NULL;
+        asprintf(path, "%s", &line[1]);
+      }
     } else
 
     // Data
     {
-      line[length] = '\t';
-      char*     start  = &line[2];
-      int       fields = 7;
-      // Fields
-      char      type;             // file type
-      time_t    mtime;            // time of last modification
-      long long size;             // on-disk size, in bytes
-      uid_t     uid;              // user ID of owner
-      gid_t     gid;              // group ID of owner
-      mode_t    mode;             // permissions
-      char*     checksum = NULL;  // file checksum
-      char*     link     = NULL;  // what the link points to
+      if (node != NULL) {
+        line[length] = '\t';
+        char*     start  = &line[2];
+        int       fields = 7;
+        // Fields
+        char      type;             // file type
+        time_t    mtime;            // time of last modification
+        long long size;             // on-disk size, in bytes
+        uid_t     uid;              // user ID of owner
+        gid_t     gid;              // group ID of owner
+        mode_t    mode;             // permissions
+        char*     checksum = NULL;  // file checksum
+        char*     link     = NULL;  // what the link points to
 
-      for (int field = 1; field <= fields; field++) {
-        // Get tabulation position
-        char* delim = strchr(start, '\t');
-        if (delim == NULL) {
-          errno = EUCLEAN;
-        } else {
-          *delim = '\0';
-          /* Extract data */
-          switch (field) {
-            case 1:   /* DB timestamp */
-              if (sscanf(start, "%ld", timestamp) != 1) {
-                errno = EUCLEAN;
-              }
-              break;
-            case 2:   /* Type */
-              if (sscanf(start, "%c", &type) != 1) {
-                errno = EUCLEAN;;
-              } else if (type == '-') {
-                fields = 2;
-              } else if ((type == 'f') || (type == 'l')) {
-                fields++;
-              }
-              break;
-            case 3:   /* Size */
-              if (sscanf(start, "%lld", &size) != 1) {
-                errno = EUCLEAN;;
-              }
-              break;
-            case 4:   /* Modification time */
-              if (sscanf(start, "%ld", &mtime) != 1) {
-                errno = EUCLEAN;;
-              }
-              break;
-            case 5:   /* User */
-              if (sscanf(start, "%u", &uid) != 1) {
-                errno = EUCLEAN;;
-              }
-              break;
-            case 6:   /* Group */
-              if (sscanf(start, "%u", &gid) != 1) {
-                errno = EUCLEAN;;
-              }
-              break;
-            case 7:   /* Permissions */
-              if (sscanf(start, "%o", &mode) != 1) {
-                errno = EUCLEAN;;
-              }
-              break;
-            case 8:  /* Checksum or Link */
-                if (type == 'f') {
-                  checksum = start;
-                } else if (type == 'l') {
-                  link = start;
+        for (int field = 1; field <= fields; field++) {
+          // Get tabulation position
+          char* delim = strchr(start, '\t');
+          if (delim == NULL) {
+            errno = EUCLEAN;
+          } else {
+            *delim = '\0';
+            /* Extract data */
+            switch (field) {
+              case 1:   /* DB timestamp */
+                if ((timestamp != NULL)
+                 && sscanf(start, "%ld", timestamp) != 1) {
+                  errno = EUCLEAN;
                 }
-              break;
-            default:
-              errno = EUCLEAN;;
+                break;
+              case 2:   /* Type */
+                if (sscanf(start, "%c", &type) != 1) {
+                  errno = EUCLEAN;;
+                } else if (type == '-') {
+                  fields = 2;
+                } else if ((type == 'f') || (type == 'l')) {
+                  fields++;
+                }
+                break;
+              case 3:   /* Size */
+                if (sscanf(start, "%lld", &size) != 1) {
+                  errno = EUCLEAN;;
+                }
+                break;
+              case 4:   /* Modification time */
+                if (sscanf(start, "%ld", &mtime) != 1) {
+                  errno = EUCLEAN;;
+                }
+                break;
+              case 5:   /* User */
+                if (sscanf(start, "%u", &uid) != 1) {
+                  errno = EUCLEAN;;
+                }
+                break;
+              case 6:   /* Group */
+                if (sscanf(start, "%u", &gid) != 1) {
+                  errno = EUCLEAN;;
+                }
+                break;
+              case 7:   /* Permissions */
+                if (sscanf(start, "%o", &mode) != 1) {
+                  errno = EUCLEAN;;
+                }
+                break;
+              case 8:  /* Checksum or Link */
+                  if (type == 'f') {
+                    checksum = start;
+                  } else if (type == 'l') {
+                    link = start;
+                  }
+                break;
+              default:
+                errno = EUCLEAN;;
+            }
+            start = delim + 1;
           }
-          start = delim + 1;
+          if (errno != 0) {
+            cerr << "dblist: file corrupted line " << line << endl;
+            errno = EUCLEAN;
+            break;
+          }
         }
-        if (errno != 0) {
-          cerr << "dblist: file corrupted line " << line << endl;
-          errno = EUCLEAN;
-          break;
+        switch (type) {
+          case '-':
+            *node = NULL;
+            break;
+          case 'f':
+            *node = new File(*path, type, mtime, size, uid, gid, mode,
+              checksum);
+            break;
+          case 'l':
+            *node = new Link(*path, type, mtime, size, uid, gid, mode, link);
+            break;
+          default:
+            *node = new Node(*path, type, mtime, size, uid, gid, mode);
         }
-      }
-      switch (type) {
-        case '-':
-          *node = NULL;
-          break;
-        case 'f':
-          *node = new File(*path, type, mtime, size, uid, gid, mode,
-            checksum);
-          break;
-        case 'l':
-          *node = new Link(*path, type, mtime, size, uid, gid, mode, link);
-          break;
-        default:
-          *node = new Node(*path, type, mtime, size, uid, gid, mode);
       }
       done = true;
     }
@@ -433,12 +428,18 @@ int List::getEntry(
 
   free(line);
   if (errno != 0) {
-    free(*prefix);
-    *prefix = NULL;
-    free(*path);
-    *path = NULL;
-    free(*node);
-    *node = NULL;
+    if (prefix != NULL) {
+      free(*prefix);
+      *prefix = NULL;
+    }
+    if (path != NULL) {
+      free(*path);
+      *path = NULL;
+    }
+    if (node != NULL) {
+      free(*node);
+      *node = NULL;
+    }
     return -1;
   }
   return 1;
