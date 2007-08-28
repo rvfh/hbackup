@@ -70,7 +70,7 @@ int Path::recurse(
   if (dir->isValid() && ! dir->createList(cur_path)) {
     list<Node*> db_list;
     // Get database info for this directory
-    db.getList(prefix, _path, rel_path, db_list);
+    db.getList(prefix, _path.c_str(), rel_path, db_list);
 
     list<Node*>::iterator i = dir->nodesList().begin();
     list<Node*>::iterator j = db_list.begin();
@@ -139,7 +139,7 @@ int Path::recurse(
             }
             cout << (*i)->name() << endl;
           }
-          db.add(prefix, _path, rel_path, cur_path, *i);
+          db.add(prefix, _path.c_str(), rel_path, cur_path, *i);
         } else {
           // Same file name found in DB
           if (**i != **j) {
@@ -167,7 +167,7 @@ int Path::recurse(
               }
               cout << (*i)->name() << endl;
             }
-            db.add(prefix, _path, rel_path, cur_path, *i, checksum);
+            db.add(prefix, _path.c_str(), rel_path, cur_path, *i, checksum);
           } else {
             // i and j have same metadata, hence same type...
             // Compare linked data
@@ -180,7 +180,7 @@ int Path::recurse(
                 }
                 cout << (*i)->name() << endl;
               }
-              db.add(prefix, _path, rel_path, cur_path, *i);
+              db.add(prefix, _path.c_str(), rel_path, cur_path, *i);
             } else
             // Check that file data is present
             if (((*i)->type() == 'f')
@@ -194,7 +194,7 @@ int Path::recurse(
                 cout << (*i)->name() << endl;
               }
               const char* checksum = ((File*)(*j))->checksum();
-              db.add(prefix, _path, rel_path, cur_path, *i, checksum);
+              db.add(prefix, _path.c_str(), rel_path, cur_path, *i, checksum);
             } else if ((*i)->type() == 'd') {
               if (verbosity() > 3) {
                 cout << " --> D ";
@@ -242,22 +242,22 @@ int Path::recurse(
 }
 
 void Path::recurse_remove(
-    Database&   db,
-    const char* prefix,
-    const char* base_path,
-    const char* rel_path,
-    const Node* node) {
-  db.remove(prefix, _path, rel_path, node);
+    Database&     db,
+    const char*   prefix,
+    const StrPath base_path,
+    const char*   rel_path,
+    const Node*   node) {
+  db.remove(prefix, base_path.c_str(), rel_path, node);
   // Recurse into directories
   if (node->type() == 'd') {
     list<Node*> db_list;
     char* dir_path = Node::path(rel_path, node->name());
 
     // Get database info for this directory
-    db.getList(prefix, _path, dir_path, db_list);
+    db.getList(prefix, base_path.c_str(), dir_path, db_list);
     list<Node*>::iterator j = db_list.begin();
     while (j != db_list.end()) {
-      recurse_remove(db, prefix, _path, dir_path, *j);
+      recurse_remove(db, prefix, base_path.c_str(), dir_path, *j);
       delete *j;
       j = db_list.erase(j);
     }
@@ -266,25 +266,18 @@ void Path::recurse_remove(
 }
 
 Path::Path(const char* path) {
-  _path               = NULL;
   _dir                = NULL;
   _expiration         = 0;
   _backup_path_length = 0;
 
   // Copy path accross
-  asprintf(&_path, "%s", path);
+  _path = path;
 
   // Change '\' into '/'
-  char* pos;
-  while ((pos = strchr(_path, '\\')) != NULL) {
-    *pos = '/';
-  }
+  _path.toUnix();
 
   // Remove trailing '/'s
-  pos = &_path[strlen(_path)];
-  while ((--pos >= _path) && (*pos == '/')) {
-    *pos = '\0';
-  }
+  _path.noEndingSlash();
 }
 
 int Path::addFilter(

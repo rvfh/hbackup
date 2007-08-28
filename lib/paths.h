@@ -19,6 +19,7 @@
 #ifndef PATHS_H
 #define PATHS_H
 
+#include "strings.h"
 #include "files.h"
 #include "filters.h"
 #include "parsers.h"
@@ -27,7 +28,7 @@
 namespace hbackup {
 
 class Path {
-  char*         _path;
+  StrPath       _path;
   int           _backup_path_length;
   Directory*    _dir;
   Parsers       _parsers;
@@ -35,27 +36,26 @@ class Path {
   int           _expiration;
   int           _nodes;
   int recurse(
-    Database&   db,
-    const char* prefix,
-    const char* path,
-    Directory*  dir,
-    Parser*     parser);
+    Database&     db,
+    const char*   prefix,
+    const char*   path,
+    Directory*    dir,
+    Parser*       parser);
   void recurse_remove(
-    Database&   db,
-    const char* prefix,
-    const char* base_path,
-    const char* rel_path,
-    const Node* node);
+    Database&     db,
+    const char*   prefix,
+    const StrPath base_path,
+    const char*   rel_path,
+    const Node*   node);
 public:
   Path(const char* path);
   ~Path() {
-    free(_path);
     delete _dir;
   }
-  const char* path() const     { return _path;       }
-  const Directory* dir() const { return _dir;        }
-  int expiration() const       { return _expiration; }
-  int nodes() const            { return _nodes;      }
+  const char* path() const     { return _path.c_str(); }
+  const Directory* dir() const { return _dir;          }
+  int expiration() const       { return _expiration;   }
+  int nodes() const            { return _nodes;        }
   void setExpiration(int expiration) { _expiration = expiration; }
   // Set append to true to add as condition to last added filter
   int addFilter(
