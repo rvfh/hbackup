@@ -998,6 +998,9 @@ int main(void) {
   node = NULL;
   db.close();
 
+  db.open();
+  db.close();
+
   delete path;
   return 0;
 }
