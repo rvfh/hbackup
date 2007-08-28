@@ -352,7 +352,7 @@ int Client::backup(
   if (list_path.size() != 0) {
     list_path += "/";
   }
-  list_path += _listfile.basename();
+  list_path += _listfile.basename().c_str();
 
   if (verbosity() > 0) {
     cout << "Backup client '" << _name

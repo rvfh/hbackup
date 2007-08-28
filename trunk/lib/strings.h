@@ -29,8 +29,8 @@ protected:
   void alloc(size_t size);
 public:
   String();
-  String(const char* string, int length = -1);
   String(const String& string);
+  String(const char* string, int length = -1);
   virtual ~String() {
     free(_string);
   }
@@ -87,8 +87,8 @@ public:
   }
   const StrPath& toUnix();
   const StrPath& noEndingSlash();
-  const char* basename();
-  const StrPath dirname();
+  const StrPath  basename();
+  const StrPath  dirname();
 };
 
 }
