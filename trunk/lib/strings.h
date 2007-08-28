@@ -29,7 +29,7 @@ protected:
   void alloc(size_t size);
 public:
   String();
-  String(const char* string);
+  String(const char* string, int length = -1);
   String(const String& string);
   virtual ~String() {
     free(_string);
@@ -72,9 +72,12 @@ public:
 
 class StrPath : public String {
 public:
-  StrPath()                     : String::String() {}
-  StrPath(const char* string)   : String::String(string) {}
-  StrPath(const String& string) : String::String(string) {}
+  StrPath() :
+    String::String() {}
+  StrPath(const char* string, int length = -1) :
+    String::String(string, length) {}
+  StrPath(const String& string) :
+    String::String(string) {}
   int compare(const char* string, size_t length = -1) const;
   int compare(const String& string, size_t length = -1) const {
     return compare(string.c_str(), length);

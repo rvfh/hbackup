@@ -29,7 +29,7 @@ using namespace hbackup;
 
 int main(void) {
   cout << endl << "1:" << endl;
-  String str1("abc");
+  String str1("abcdefghi", 3);
   cout << str1.length() << ": " << str1.c_str() << endl;
 
   cout << endl << "2:" << endl;
