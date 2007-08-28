@@ -19,6 +19,8 @@
 #ifndef CLIENT_H
 #define CLIENT_H
 
+#include "strings.h"
+
 namespace hbackup {
 
 class Option {
@@ -27,8 +29,8 @@ class Option {
 public:
   Option(const string& name, const string& value) :
     _name(name), _value(value) {}
-  string name() { return _name; }
-  string value() { return _value; }
+  string name()   { return _name;  }
+  string value()  { return _value; }
   string option() {
     if (_name.empty())
       return _value;
@@ -42,8 +44,8 @@ class Client {
   Private*      _d;
   string        _name;
   string        _host_or_ip;
-  string        _listfilename;
-  string        _listfiledir;
+  StrPath       _listfilename;
+  StrPath       _listfiledir;
   string        _protocol;
   list<Option>  _options;
   //
@@ -66,9 +68,9 @@ public:
   }
   void setHostOrIp(string value);
   void setProtocol(string value);
-  void setListfile(string value);
+  void setListfile(StrPath value);
   //
-  bool initialised() { return _initialised; }
+  bool initialised() const { return _initialised; }
   void setInitialised() { _initialised = true; }
   void setMountPoint(const string& mount_point) {
     _mount_point = mount_point;
