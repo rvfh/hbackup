@@ -182,5 +182,28 @@ int main(void) {
   cout << pth1.c_str() << " -> ";
   cout << pth1.noEndingSlash().c_str() << endl;
 
+  cout << endl << "Test: basename and dirname" << endl;
+  StrPath pth2 = "this/is a path/to a/file";
+  cout << pth2.c_str();
+  cout << " -> base: ";
+  cout << pth2.basename();
+  cout << ", dir: ";
+  cout << pth2.dirname().c_str();
+  cout << endl;
+  StrPath pth3 = "this is a file";
+  cout << pth3.c_str();
+  cout << " -> base: ";
+  cout << pth3.basename();
+  cout << ", dir: ";
+  cout << pth3.dirname().c_str();
+  cout << endl;
+  StrPath pth4 = "this is a path/";
+  cout << pth4.c_str();
+  cout << " -> base: ";
+  cout << pth4.basename();
+  cout << ", dir: ";
+  cout << pth4.dirname().c_str();
+  cout << endl;
+
   return 0;
 }
