@@ -35,6 +35,7 @@ class Database {
   bool          _expire_inited;
   int  lock();
   void unlock();
+  int  merge();
 public:
   Database(const string& path);
   ~Database();

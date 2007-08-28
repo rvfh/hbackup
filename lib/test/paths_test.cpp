@@ -71,7 +71,7 @@ int main(void) {
   Path* path = new Path("/home/User");
   Database  db("test_db");
   // Journal
-  List    journal("test_db", "journal");
+  List    journal("test_db", "journal~");
   List    list("test_db", "list");
   time_t  timestamp;
   char*   prefix  = NULL;
@@ -98,7 +98,7 @@ int main(void) {
   cout << "first with subdir/testfile NOT readable" << endl;
   system("chmod 000 test1/subdir/testfile");
   if (! path->parse(db, "file://localhost", "test1")) {
-//     cout << ">List " << path->nodes() << " file(s):\n";
+    cout << "Parsed " << path->nodes() << " file(s)\n";
   }
 
   // Display DB contents
@@ -149,7 +149,7 @@ int main(void) {
 
   cout << "as previous" << endl;
   if (! path->parse(db, "file://localhost", "test1")) {
-//     cout << ">List " << path->nodes() << " file(s):\n";
+    cout << "Parsed " << path->nodes() << " file(s)\n";
   }
 
   // Display DB contents
@@ -201,7 +201,7 @@ int main(void) {
   cout << "as previous with subdir/testfile readable" << endl;
   system("chmod 644 test1/subdir/testfile");
   if (! path->parse(db, "file://localhost", "test1")) {
-//     cout << ">List " << path->nodes() << " file(s):\n";
+    cout << "Parsed " << path->nodes() << " file(s)\n";
   }
 
   // Display DB contents
@@ -256,7 +256,7 @@ int main(void) {
     cout << "Failed to add filter" << endl;
   }
   if (! path->parse(db, "file://localhost", "test1")) {
-//     cout << ">List " << path->nodes() << " file(s):\n";
+    cout << "Parsed " << path->nodes() << " file(s)\n";
   }
 
   // Display DB contents
@@ -310,7 +310,7 @@ int main(void) {
     cout << "Failed to add filter" << endl;
   }
   if (! path->parse(db, "file://localhost", "test1")) {
-//     cout << ">List " << path->nodes() << " file(s):\n";
+    cout << "Parsed " << path->nodes() << " file(s)\n";
   }
 
   // Display DB contents
@@ -366,7 +366,7 @@ int main(void) {
     cout << "Failed to add filter" << endl;
   }
   if (! path->parse(db, "file://localhost", "test1")) {
-//     cout << ">List " << path->nodes() << " file(s):\n";
+    cout << "Parsed " << path->nodes() << " file(s)\n";
   }
 
   // Display DB contents
@@ -421,7 +421,7 @@ int main(void) {
     cout << "Failed to add filter" << endl;
   }
   if (! path->parse(db, "file://localhost", "test1")) {
-//     cout << ">List " << path->nodes() << " file(s):\n";
+    cout << "Parsed " << path->nodes() << " file(s)\n";
   }
 
   // Display DB contents
@@ -475,7 +475,7 @@ int main(void) {
     cout << "Failed to add parser" << endl;
   }
   if (! path->parse(db, "file://localhost", "test1")) {
-//     cout << ">List " << path->nodes() << " file(s):\n";
+    cout << "Parsed " << path->nodes() << " file(s)\n";
   }
 
   // Display DB contents
@@ -526,7 +526,7 @@ int main(void) {
 
   cout << "as previous" << endl;
   if (! path->parse(db, "file://localhost", "test1")) {
-//     cout << ">List " << path->nodes() << " file(s):\n";
+    cout << "Parsed " << path->nodes() << " file(s)\n";
   }
 
   // Display DB contents
@@ -581,7 +581,7 @@ int main(void) {
     cout << "Failed to add filter" << endl;
   }
   if (! path->parse(db, "file://localhost", "test1")) {
-//     cout << ">List " << path->nodes() << " file(s):\n";
+    cout << "Parsed " << path->nodes() << " file(s)\n";
   }
 
   // Display DB contents
@@ -633,7 +633,7 @@ int main(void) {
   cout << "as previous with testpipe gone" << endl;
   remove("test1/testpipe");
   if (! path->parse(db, "file://localhost", "test1")) {
-//     cout << ">List " << path->nodes() << " file(s):\n";
+    cout << "Parsed " << path->nodes() << " file(s)\n";
   }
 
   // Display DB contents
@@ -685,7 +685,7 @@ int main(void) {
   cout << "as previous with testfile mode changed" << endl;
   system("chmod 660 test1/testfile");
   if (! path->parse(db, "file://localhost", "test1")) {
-//     cout << ">List " << path->nodes() << " file(s):\n";
+    cout << "Parsed " << path->nodes() << " file(s)\n";
   }
 
   // Display DB contents
@@ -737,7 +737,7 @@ int main(void) {
   cout << "as previous with cvs/filenew.c touched" << endl;
   system("echo blah > test1/cvs/filenew.c");
   if (! path->parse(db, "file://localhost", "test1")) {
-//     cout << ">List " << path->nodes() << " file(s):\n";
+    cout << "Parsed " << path->nodes() << " file(s)\n";
   }
 
   // Display DB contents
@@ -810,7 +810,7 @@ int main(void) {
   system("touch test1/testdir/evolocal.odb");
 
   if (! path->parse(db, "file://localhost", "test1")) {
-//     cout << ">List " << path->nodes() << " file(s):\n";
+    cout << "Parsed " << path->nodes() << " file(s)\n";
   }
 
   // Display DB contents
@@ -860,7 +860,7 @@ int main(void) {
   db.open();
 
   if (! path->parse(db, "file://localhost", "test1")) {
-//     cout << ">List " << path->nodes() << " file(s):\n";
+    cout << "Parsed " << path->nodes() << " file(s)\n";
   }
 
   // Display DB contents
@@ -871,7 +871,6 @@ int main(void) {
     i->line();
   }
 
-  delete path;
   db.close();
   // Show list contents
   cout << endl << "List:" << endl;
@@ -906,5 +905,99 @@ int main(void) {
   free(node);
   node = NULL;
 
+  // Next test
+  my_time++;
+  cout << endl << "List recovery after crash" << endl;
+  system("touch \"test1/test space\"");
+  system("mkdir test1/crash");
+  system("touch test1/crash/file");
+  system("rm -rf test1/testdir");
+  db.open();
+
+  if (! path->parse(db, "file://localhost", "test1")) {
+    cout << "Parsed " << path->nodes() << " file(s)\n";
+  }
+
+  // Display DB contents
+  cout << "Active list:  " << ((DbList*)db.active())->size()
+    << " element(s):\n";
+  for (DbList::iterator i = ((DbList*)db.active())->begin();
+       i != ((DbList*)db.active())->end(); i++) {
+    i->line();
+  }
+
+  // NOT closing the database!
+  remove("test_db/lock");
+  // Show list contents
+  cout << endl << "List:" << endl;
+  if (! list.open("r")) {
+    while (list.getEntry(&timestamp, &prefix, &fpath, &node) > 0) {
+      showLine(timestamp, prefix, fpath, node);
+    }
+    list.close();
+  } else {
+    cerr << "Failed to open journal" << endl;
+  }
+  free(prefix);
+  prefix = NULL;
+  free(fpath);
+  fpath = NULL;
+  free(node);
+  node = NULL;
+  // Show journal contents
+  cout << endl << "Journal:" << endl;
+  List real_journal("test_db", "journal");
+  if (! real_journal.open("r")) {
+    while (real_journal.getEntry(&timestamp, &prefix, &fpath, &node) > 0) {
+      showLine(timestamp, prefix, fpath, node);
+    }
+    real_journal.close();
+  } else {
+    cerr << "Failed to open real journal" << endl;
+  }
+  free(prefix);
+  prefix = NULL;
+  free(fpath);
+  fpath = NULL;
+  free(node);
+  node = NULL;
+
+  // Recover now
+  db.open();
+  // Show list contents
+  cout << endl << "List:" << endl;
+  if (! list.open("r")) {
+    while (list.getEntry(&timestamp, &prefix, &fpath, &node) > 0) {
+      showLine(timestamp, prefix, fpath, node);
+    }
+    list.close();
+  } else {
+    cerr << "Failed to open journal" << endl;
+  }
+  free(prefix);
+  prefix = NULL;
+  free(fpath);
+  fpath = NULL;
+  free(node);
+  node = NULL;
+  // Show journal contents
+  cout << endl << "Journal:" << endl;
+  if (! journal.open("r")) {
+    while (journal.getEntry(&timestamp, &prefix, &fpath, &node) > 0) {
+      showLine(timestamp, prefix, fpath, node);
+    }
+    journal.close();
+  } else {
+    cerr << "Failed to open journal" << endl;
+  }
+  free(prefix);
+  prefix = NULL;
+  free(fpath);
+  fpath = NULL;
+  free(node);
+  node = NULL;
+  db.close();
+
+  delete path;
   return 0;
 }

@@ -54,8 +54,6 @@ using namespace std;
 
 using namespace hbackup;
 
-#warning journal not used for recovery yet
-
 struct Database::Private {
   DbList::iterator  entry;
   DbList            active;
@@ -309,6 +307,46 @@ int Database::getDir(
   return ! Directory(path.c_str()).isValid();
 }
 
+int Database::merge() {
+  bool failed = false;
+
+  if (_d->list->open("r")) {
+    failed = true;
+  } else
+  if (_d->journal->open("r")) {
+    failed = true;
+  } else
+  {
+    // Merge with existing list into new one
+    List list(_path.c_str(), "list.part");
+    if (! list.open("w")) {
+      if (list.merge(*_d->list, *_d->journal) && (errno != EBUSY)) {
+        cerr << "db: close: merge failed" << endl;
+        failed = true;
+      }
+      list.close();
+      if (! failed) {
+        if (rename((_path + "/list").c_str(), (_path + "/list~").c_str())
+        || rename((_path + "/list.part").c_str(), (_path + "/list").c_str())) {
+          cerr << "db: close: cannot rename lists" << endl;
+          failed = true;
+        }
+      }
+    } else {
+      cerr << strerror(errno) << ": failed to open temporary list" << endl;
+      failed = true;
+    }
+  }
+  _d->journal->close();
+  _d->list->close();
+  if (failed) {
+    return -1;
+  } else {
+    rename((_path + "/journal").c_str(), (_path + "/journal~").c_str());
+  }
+  return 0;
+}
+
 Database::Database(const string& path) {
   _path          = path;
   _expire_inited = false;
@@ -372,9 +410,21 @@ int Database::open() {
     }
   }
 
-  // Create journal
+  // Deal with journal
   if (! failed) {
     _d->journal = new List(_path.c_str(), "journal");
+
+    // Check previous crash
+    if (! _d->journal->open("r")) {
+      cout << "Previous crash detected, attempting recovery" << endl;
+      if (merge()) {
+        cerr << "db: open: cannot recover from previous crash" << endl;
+        failed = true;
+      }
+      _d->journal->close();
+    }
+
+    // Create journal
     if (_d->journal->open("w")) {
       cerr << "db: open: cannot open journal" << endl;
       failed = true;
@@ -400,44 +450,27 @@ int Database::open() {
 }
 
 int Database::close() {
-  int rc = 0;
+  bool failed = false;
 
-  // Close list and re-open for merge
-  _d->list->close();
-  _d->list->open("r");
-
-  // Close journal and re-open for merge
+  // Close lists
   _d->journal->close();
-  _d->journal->open("r");
+  _d->list->close();
 
-  // Merge with existing list into new one
-  List list(_path.c_str(), "list.part");
-  if (! list.open("w")) {
-    if (list.merge(*_d->list, *_d->journal)) {
-      cerr << "db: close: merge failed" << endl;
-      rc = 2;
-    }
-    list.close();
-    if (rc == 0) {
-      if (rename((_path + "/list").c_str(), (_path + "/list~").c_str())
-       || rename((_path + "/list.part").c_str(), (_path + "/list").c_str())) {
-        cerr << "db: close: cannot rename lists" << endl;
-        rc = 2;
-      }
-    }
-  } else {
-    cerr << strerror(errno) << ": failed to open temporary list" << endl;
+  // Merge journal into list
+  if (merge()) {
+    failed = true;
   }
 
-  _d->journal->close();
+  // Delete lists
   delete _d->journal;
-
-  _d->list->close();
   delete _d->list;
 
   // Release lock
   unlock();
-  return rc;
+  if (failed) {
+    return -1;
+  }
+  return 0;
 }
 
 void Database::getList(
