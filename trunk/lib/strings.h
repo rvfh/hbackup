@@ -38,6 +38,11 @@ public:
   const char* c_str() const { return _string; }
   String& operator=(const char* string);
   String& operator=(const String& string);
+  String& operator+(const char* string);
+  String& operator+(const String& string);
+  String& operator+=(const char* string);
+  String& operator+=(const String& string);
+  char& operator[](int position) const { return _string[position]; }
   virtual int compare(const char* string) const;
   virtual int compare(const String& string) const {
     return compare(string._string);
@@ -78,8 +83,6 @@ public:
   virtual bool operator!=(const String& string) const {
     return compare(string) != 0;
   }
-  String& operator+(const char* string);
-  String& operator+(const String& string);
 };
 
 class StrPath : public String {

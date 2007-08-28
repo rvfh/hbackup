@@ -35,8 +35,7 @@ class List : public Stream {
     List&         list,
     StrPath&      prefix,
     StrPath&      path,
-    char**        line,
-    size_t*       length,
+    String&       line,
     int*          status);
 public:
   List(

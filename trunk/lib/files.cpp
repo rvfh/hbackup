@@ -43,6 +43,7 @@ namespace std {
 
 using namespace std;
 
+#include "strings.h"
 #include "files.h"
 #include "hbackup.h"
 
@@ -486,64 +487,32 @@ ssize_t Stream::write(const void* buffer, size_t count) {
   return count;
 }
 
-ssize_t Stream::getLine(char** buffer, size_t* length) {
-  size_t  chunk_size        = 256;
-  size_t  read_buffer_size  = 0;
-  char*   read_buffer       = NULL;
-  char*   reader            = read_buffer;
+ssize_t Stream::getLine(String& buffer) {
+  buffer = "";
+  char    reader[2];
   size_t  read_size         = 0;
 
   // Find end of line or end of file
-  ssize_t size;
+  reader[1] = '\0';
   do {
-    // Check buffer size and inflate as needed
-    if (read_size == read_buffer_size) {
-      read_buffer_size     += chunk_size;
-      char* new_read_buffer = (char*) realloc(read_buffer, read_buffer_size);
-      if (new_read_buffer == NULL) {
-        errno = ENOMEM;
-        read_size = -1;
-        goto end;
-      } else {
-        read_buffer = new_read_buffer;
-      }
-      reader = &read_buffer[read_size];
-    }
-
     // Read one character at a time
-    size = read(reader, 1);
+    ssize_t size = read(reader, 1);
     if (size < 0) {
       // errno set by read
       read_size = -1;
-      goto end;
+      return -1;
     }
-    read_size += size;
-
+    if (size == 0) {
+      break;
+    }
+    buffer += reader;
     // End of line found?
     if (*reader == '\n') {
       break;
-    } else {
-      reader++;
     }
-  } while (size != 0);
+  } while (true);
 
-  if (read_size >= *length) {
-    char* test_buffer = (char*) realloc(*buffer, read_size + 1);
-    if (test_buffer == NULL) {
-      errno = ENOMEM;
-      read_size = -1;
-      goto end;
-    } else {
-      *buffer = test_buffer;
-      *length = read_size + 1;
-    }
-  }
-  memcpy(*buffer, read_buffer, *length);
-  (*buffer)[read_size] = '\0';
-
-end:
-  free(read_buffer);
-  return read_size;
+  return buffer.length();
 }
 
 int Stream::computeChecksum() {

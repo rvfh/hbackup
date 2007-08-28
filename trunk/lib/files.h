@@ -310,8 +310,7 @@ public:
     size_t          count);
   // Read a line from file
   ssize_t getLine(
-    char**          buffer,
-    size_t*         length);
+    String&         buffer);
   // Compute file checksum
   int computeChecksum();
   // Copy file into another

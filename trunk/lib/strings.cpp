@@ -77,8 +77,12 @@ String& String::operator=(const char* string) {
   return *this;
 }
 
-int String::compare(const char* string) const {
-  return strcmp(_string, string);
+String& String::operator+(const char* string) {
+  size_t length = _length + strlen(string);
+  alloc(length + 1);
+  strcpy(&_string[_length], string);
+  _length = length;
+  return *this;
 }
 
 String& String::operator+(const String& string) {
@@ -89,12 +93,24 @@ String& String::operator+(const String& string) {
   return *this;
 }
 
-String& String::operator+(const char* string) {
+String& String::operator+=(const char* string) {
   size_t length = _length + strlen(string);
   alloc(length + 1);
   strcpy(&_string[_length], string);
   _length = length;
   return *this;
+}
+
+String& String::operator+=(const String& string) {
+  size_t length = _length + string._length;
+  alloc(length + 1);
+  strcpy(&_string[_length], string._string);
+  _length = length;
+  return *this;
+}
+
+int String::compare(const char* string) const {
+  return strcmp(_string, string);
 }
 
 int StrPath::compare(const char* string, size_t length) const {
