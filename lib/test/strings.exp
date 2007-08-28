@@ -27,8 +27,16 @@ abc and def differ
 def and def are equal
 
 7:
+before:
+3: abc
+3: def
+after:
+3: abc
+3: def
 6: abcdef
-9: abcdefghi
+after:
+3: abc
+6: abcghi
 
 Test: pathCompare
 a <> a: 0
