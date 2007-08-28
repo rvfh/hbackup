@@ -160,7 +160,7 @@ int StrPath::compare(const char* string, size_t length) const {
   }
 }
 
-StrPath& StrPath::toUnix() {
+const StrPath& StrPath::toUnix() {
   char* pos = &_string[_length];
   while (--pos >= _string) {
     if (*pos == '\\') {
@@ -170,11 +170,30 @@ StrPath& StrPath::toUnix() {
   return *this;
 }
 
-StrPath& StrPath::noEndingSlash() {
+const StrPath& StrPath::noEndingSlash() {
   char* pos = &_string[_length];
   while ((--pos >= _string) && (*pos == '/')) {
     *pos = '\0';
     _length--;
   }
   return *this;
+}
+
+const char* StrPath::basename() {
+  const char* pos = strrchr(_string, '/');
+  if (pos == NULL) {
+    return _string;
+  }
+  return ++pos;
+}
+
+const StrPath StrPath::dirname() {
+  StrPath* dir = new StrPath(*this);
+  char* pos = strrchr(dir->_string, '/');
+  if (pos != NULL) {
+    *pos = '\0';
+  } else {
+    *dir = ".";
+  }
+  return *dir;
 }

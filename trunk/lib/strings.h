@@ -82,8 +82,10 @@ public:
   int compare(const StrPath& string, size_t length = -1) const {
     return compare(string._string, length);
   }
-  StrPath& toUnix();
-  StrPath& noEndingSlash();
+  const StrPath& toUnix();
+  const StrPath& noEndingSlash();
+  const char* basename();
+  const StrPath dirname();
 };
 
 }
