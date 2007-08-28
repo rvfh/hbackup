@@ -44,20 +44,25 @@ String::String() {
   _string[0] = '\0';
 }
 
+String::String(const char* string, int length) {
+  if (length >= 0) {
+    _length = length;
+  } else {
+    _length = strlen(string);
+  }
+  _size   = 0;
+  _string = NULL;
+  alloc(_length + 1);
+  strncpy(_string, string, _length);
+  _string[_length] = '\0';
+}
+
 String::String(const String& string) {
   _length = string._length;
   _size   = 0;
   _string = NULL;
   alloc(_length + 1);
   strcpy(_string, string._string);
-}
-
-String::String(const char* string) {
-  _length = strlen(string);
-  _size   = 0;
-  _string = NULL;
-  alloc(_length + 1);
-  strcpy(_string, string);
 }
 
 String& String::operator=(const String& string) {
@@ -188,12 +193,10 @@ const char* StrPath::basename() {
 }
 
 const StrPath StrPath::dirname() {
-  StrPath* dir = new StrPath(*this);
-  char* pos = strrchr(dir->_string, '/');
+  const char* pos = strrchr(_string, '/');
   if (pos != NULL) {
-    *pos = '\0';
+    return StrPath(_string, pos - _string);
   } else {
-    *dir = ".";
+    return StrPath(".");
   }
-  return *dir;
 }
