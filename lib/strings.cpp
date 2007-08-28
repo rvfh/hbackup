@@ -25,14 +25,12 @@
 using namespace hbackup;
 
 void String::alloc(size_t size) {
-  if (size < 64) {
-    size = 64;
-  } else {
-    size = (size + 63) >> 6;
-  }
+  size >>= 6;
+  size++;
+  size <<= 6;
   if (size > _size) {
     _size = size;
-    _string = (char*) realloc(_string, size);
+    _string = (char*) realloc(_string, _size);
   }
 }
 
@@ -66,21 +64,15 @@ String::String(const char* string, int length) {
 }
 
 String& String::operator=(const String& string) {
-  if (string._length > _length) {
-    alloc(_length + 1);
-  }
   _length = string._length;
+  alloc(_length + 1);
   strcpy(_string, string._string);
   return *this;
 }
 
 String& String::operator=(const char* string) {
-  int length = strlen(string);
-  if (length > _length) {
-    _size   = length + 1;
-    _length = _size -1;
-    _string = (char*) realloc(_string, _size);
-  }
+  _length = strlen(string);
+  alloc(_length + 1);
   strcpy(_string, string);
   return *this;
 }
@@ -91,10 +83,7 @@ int String::compare(const char* string) const {
 
 String& String::operator+(const String& string) {
   size_t length = _length + string._length;
-  if (_size < length + 1) {
-    _size = length + 1;
-    _string = (char*) realloc(_string, _size);
-  }
+  alloc(length + 1);
   strcpy(&_string[_length], string._string);
   _length = length;
   return *this;
@@ -102,10 +91,7 @@ String& String::operator+(const String& string) {
 
 String& String::operator+(const char* string) {
   size_t length = _length + strlen(string);
-  if (_size < length + 1) {
-    _size = length + 1;
-    _string = (char*) realloc(_string, _size);
-  }
+  alloc(length + 1);
   strcpy(&_string[_length], string);
   _length = length;
   return *this;

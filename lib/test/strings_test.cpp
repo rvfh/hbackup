@@ -31,6 +31,10 @@ int main(void) {
   cout << endl << "1:" << endl;
   String str1("abcdefghi", 3);
   cout << str1.length() << ": " << str1.c_str() << endl;
+  str1 = "1234567890123456789012345678901234567890123456789012345678901234567890";
+  cout << str1.length() << ": " << str1.c_str() << endl;
+  str1 = "abc";
+  cout << str1.length() << ": " << str1.c_str() << endl;
 
   cout << endl << "2:" << endl;
   String str2;
@@ -183,27 +187,57 @@ int main(void) {
   cout << pth1.noEndingSlash().c_str() << endl;
 
   cout << endl << "Test: basename and dirname" << endl;
-  StrPath pth2 = "this/is a path/to a/file";
-  cout << pth2.c_str();
+  pth1 = "this/is a path/to a/file";
+  cout << pth1.c_str();
   cout << " -> base: ";
-  cout << pth2.basename().c_str();
+  cout << pth1.basename().c_str();
   cout << ", dir: ";
-  cout << pth2.dirname().c_str();
+  cout << pth1.dirname().c_str();
   cout << endl;
-  StrPath pth3 = "this is a file";
-  cout << pth3.c_str();
+  pth1 = "this is a file";
+  cout << pth1.c_str();
   cout << " -> base: ";
-  cout << pth3.basename().c_str();
+  cout << pth1.basename().c_str();
   cout << ", dir: ";
-  cout << pth3.dirname().c_str();
+  cout << pth1.dirname().c_str();
   cout << endl;
-  StrPath pth4 = "this is a path/";
-  cout << pth4.c_str();
+  pth1 = "this is a path/";
+  cout << pth1.c_str();
   cout << " -> base: ";
-  cout << pth4.basename().c_str();
+  cout << pth1.basename().c_str();
   cout << ", dir: ";
-  cout << pth4.dirname().c_str();
+  cout << pth1.dirname().c_str();
   cout << endl;
+
+  cout << endl << "Test: comparators" << endl;
+  pth1 = "this is a path/";
+  StrPath pth2 = "this is a path.";
+  cout << pth1.c_str() << " == " << pth2.c_str() << ": " << int(pth1 == pth2)
+    << endl;
+  cout << pth1.c_str() << " != " << pth2.c_str() << ": " << int(pth1 != pth2)
+    << endl;
+  cout << pth1.c_str() << " < " << pth2.c_str() << ": " << int(pth1 < pth2)
+    << endl;
+  cout << pth1.c_str() << " > " << pth2.c_str() << ": " << int(pth1 > pth2)
+    << endl;
+  str2 = "this is a path#";
+  cout << pth1.c_str() << " < " << str2.c_str() << ": " << int(pth1 < str2)
+    << endl;
+  cout << pth1.c_str() << " > " << str2.c_str() << ": " << int(pth1 > str2)
+    << endl;
+  cout << pth1.c_str() << " < " << "this is a path-" << ": "
+    << int(pth1 < "this is a path-") << endl;
+  cout << pth1.c_str() << " > " << "this is a path-" << ": "
+    << int(pth1 > "this is a path-") << endl;
+  pth2 = "this is a path to somewhere";
+  cout << pth1.c_str() << " == " << pth2.c_str() << ": " << int(pth1 == pth2)
+    << endl;
+  cout << pth1.c_str() << " != " << pth2.c_str() << ": " << int(pth1 != pth2)
+    << endl;
+  cout << pth1.c_str() << " <= " << pth2.c_str() << ": " << int(pth1 <= pth2)
+    << endl;
+  cout << pth1.c_str() << " >= " << pth2.c_str() << ": " << int(pth1 >= pth2)
+    << endl;
 
   return 0;
 }

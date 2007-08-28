@@ -42,28 +42,40 @@ public:
   virtual int compare(const String& string) const {
     return compare(string._string);
   }
-  bool    operator<(const char* string) const {
+  virtual bool operator<(const char* string) const {
     return compare(string) < 0;
   }
-  bool    operator<(const String& string) const {
+  virtual bool operator<(const String& string) const {
     return compare(string) < 0;
   }
-  bool    operator>(const char* string) const {
+  virtual bool operator>(const char* string) const {
     return compare(string) > 0;
   }
-  bool    operator>(const String& string) const {
+  virtual bool operator>(const String& string) const {
     return compare(string) > 0;
   }
-  bool    operator==(const char* string) const {
+  virtual bool operator<=(const char* string) const {
+    return compare(string) <= 0;
+  }
+  virtual bool operator<=(const String& string) const {
+    return compare(string) <= 0;
+  }
+  virtual bool operator>=(const char* string) const {
+    return compare(string) >= 0;
+  }
+  virtual bool operator>=(const String& string) const {
+    return compare(string) >= 0;
+  }
+  virtual bool operator==(const char* string) const {
     return compare(string) == 0;
   }
-  bool    operator==(const String& string) const {
+  virtual bool operator==(const String& string) const {
     return compare(string) == 0;
   }
-  bool    operator!=(const char* string) const {
+  virtual bool operator!=(const char* string) const {
     return compare(string) != 0;
   }
-  bool    operator!=(const String& string) const {
+  virtual bool operator!=(const String& string) const {
     return compare(string) != 0;
   }
   String& operator+(const char* string);
@@ -72,6 +84,7 @@ public:
 
 class StrPath : public String {
 public:
+  using String::operator=;
   StrPath() :
     String::String() {}
   StrPath(const char* string, int length = -1) :
@@ -84,6 +97,60 @@ public:
   }
   int compare(const StrPath& string, size_t length = -1) const {
     return compare(string._string, length);
+  }
+  bool    operator<(const char* string) const {
+    return compare(string) < 0;
+  }
+  bool    operator>(const char* string) const {
+    return compare(string) > 0;
+  }
+  bool    operator<=(const char* string) const {
+    return compare(string) <= 0;
+  }
+  bool    operator>=(const char* string) const {
+    return compare(string) >= 0;
+  }
+  bool    operator==(const char* string) const {
+    return compare(string) == 0;
+  }
+  bool    operator!=(const char* string) const {
+    return compare(string) != 0;
+  }
+  bool    operator<(const String& string) const {
+    return compare(string) < 0;
+  }
+  bool    operator>(const String& string) const {
+    return compare(string) > 0;
+  }
+  bool    operator<=(const String& string) const {
+    return compare(string) <= 0;
+  }
+  bool    operator>=(const String& string) const {
+    return compare(string) >= 0;
+  }
+  bool    operator==(const String& string) const {
+    return compare(string) == 0;
+  }
+  bool    operator!=(const String& string) const {
+    return compare(string) != 0;
+  }
+  bool    operator<(const StrPath& string) const {
+    return compare(string) < 0;
+  }
+  bool    operator>(const StrPath& string) const {
+    return compare(string) > 0;
+  }
+  bool    operator<=(const StrPath& string) const {
+    return compare(string) <= 0;
+  }
+  bool    operator>=(const StrPath& string) const {
+    return compare(string) >= 0;
+  }
+  bool    operator==(const StrPath& string) const {
+    return compare(string) == 0;
+  }
+  bool    operator!=(const StrPath& string) const {
+    return compare(string) != 0;
   }
   const StrPath& toUnix();
   const StrPath& noEndingSlash();
