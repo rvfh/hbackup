@@ -707,29 +707,6 @@ int Database::add(
   return 0;
 }
 
-int Database::modify(
-    const char* prefix,
-    const char* base_path,
-    const char* rel_path,
-    const char* dir_path,
-    const Node* old_node,
-    const Node* node,
-    bool        no_data) {
-  if (no_data) {
-    // File is in the list, but could not be copied last time, try again, or
-    // file metadata has changed, but we believe the data to be unchanged
-    const char* checksum = ((File*)old_node)->checksum();
-    if (add(prefix, base_path, rel_path, dir_path, node, checksum)) {
-      return -1;
-    }
-  } else {
-    if (add(prefix, base_path, rel_path, dir_path, node, NULL)) {
-      return -1;
-    }
-  }
-  return 0;
-}
-
 void Database::remove(
     const char* prefix,
     const char* base_path,

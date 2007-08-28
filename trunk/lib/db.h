@@ -79,14 +79,6 @@ public:
     const char*     dir_path,         // Local dir below file
     const Node*     node,             // File
     const char*     checksum = NULL); // Do not copy data, use given checksum
-  int modify(
-    const char*     prefix,           // Client
-    const char*     base_path,        // Path being backed up
-    const char*     rel_path,         // Dir (from base_path)
-    const char*     dir_path,         // Local dir below file
-    const Node*     old_node,         // Old file
-    const Node*     node,             // File
-    bool            no_data = false); // File data unchanged or failed write
   void remove(                    // Should not fail
     const char*     prefix,           // Client
     const char*     base_path,        // Path being backed up
