@@ -696,16 +696,15 @@ int List::merge(List& list, List& journal) {
     j_line_no++;
 
     // Failed
-    if (rc <= 0) {
-      // Unexpected end of file
-      cerr << "Unexpected end of journal, line " << j_line_no << endl;
-      errno = EUCLEAN;
+    if (rc_journal < 0) {
+      cerr << "Error reading journal, line " << j_line_no << endl;
       rc = -1;
       break;
     }
 
     // Check line
-    if ((rc_journal < 2) || (j_line[rc_journal - 1] != '\n')) {
+    if ((rc_journal != 0)
+     && ((rc_journal < 2) || (j_line[rc_journal - 1] != '\n'))) {
       // Corrupted line
       cerr << "Corruption in journal, line " << j_line_no << endl;
       errno = EUCLEAN;
@@ -714,7 +713,7 @@ int List::merge(List& list, List& journal) {
     }
 
     // End of file
-    if (j_line[0] == '#') {
+    if ((j_line[0] == '#') || (rc_journal == 0)) {
       prefix = "";
       path   = "";
       if (rc_list > 0) {
@@ -725,6 +724,11 @@ int List::merge(List& list, List& journal) {
           rc = -1;
           break;
         }
+      }
+      if (rc_journal == 0) {
+        cerr << "Unexpected end of journal, line " << j_line_no << endl;
+        errno = EBUSY;
+        rc = -1;
       }
       rc = 0;
       break;
