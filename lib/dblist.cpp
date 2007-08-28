@@ -240,13 +240,12 @@ int List::open(
       rc = -1;
     }
   } else {
-    char*  line = NULL;
-    size_t size = 0;
-    if (getLine(&line, &size) < 0) {
+    String line;
+    if (getLine(line) < 0) {
       Stream::close();
       rc = -1;
     } else
-    if (strcmp(line, header)) {
+    if (line != header) {
       errno = EUCLEAN;
       rc = -1;
     }
@@ -274,8 +273,7 @@ int List::getEntry(
     char**    prefix,
     char**    path,
     Node**    node) {
-  char*   line  = NULL;
-  size_t  lsize = 0;
+  String  line;
   ssize_t length;
 
   // Initialise
@@ -287,7 +285,7 @@ int List::getEntry(
 
   while (! done) {
     // Get line
-    length = getLine(&line, &lsize);
+    length = getLine(line);
     if (length == 0) {
       errno = EUCLEAN;
       cerr << "unexpected end of file" << endl;
@@ -403,7 +401,7 @@ int List::getEntry(
             start = delim + 1;
           }
           if (errno != 0) {
-            cerr << "dblist: file corrupted line " << line << endl;
+            cerr << "dblist: file corrupted line " << line.c_str() << endl;
             errno = EUCLEAN;
             break;
           }
@@ -427,7 +425,6 @@ int List::getEntry(
     }
   }
 
-  free(line);
   if (errno != 0) {
     if (prefix != NULL) {
       free(*prefix);
@@ -500,8 +497,7 @@ int List::copyUntil(
     List&         list,
     StrPath&      prefix_l,
     StrPath&      path_l,
-    char**        line,
-    size_t*       length,
+    String&       line,
     int*          status) {
 // status values:
 // - 0: never ran
@@ -517,9 +513,9 @@ int List::copyUntil(
   while (true) {
     // Read list or get last data
     if ((*status == 1) || (*status == 2)) {
-      rc= strlen(*line);
+      rc = line.length();
     } else {
-      rc = list.getLine(line, length);
+      rc = list.getLine(line);
     }
     *status = 0;
 
@@ -533,13 +529,13 @@ int List::copyUntil(
     }
 
     // End of file
-    if ((*line)[0] == '#') {
+    if (line[0] == '#') {
       rc = 0;
       break;
     }
 
     // Check line
-    if ((rc < 2) || ((*line)[rc - 1] != '\n')) {
+    if ((rc < 2) || (line[rc - 1] != '\n')) {
       // Corrupted line
       cerr << "Corrupted line in list" << endl;
       errno = EUCLEAN;
@@ -549,7 +545,7 @@ int List::copyUntil(
 
     // Full copy
     if (prefix_l.length() == 0) {
-      if (write(*line, rc) < 0) {
+      if (write(line.c_str(), line.length()) < 0) {
         // Could not write
         rc = -1;
         break;
@@ -557,12 +553,12 @@ int List::copyUntil(
     } else
 
     // Got a prefix
-    if ((*line)[0] != '\t') {
+    if (line[0] != '\t') {
       // Compare prefixes
-      prefix_cmp = prefix_l.compare(*line);
+      prefix_cmp = prefix_l.compare(line);
       if (prefix_cmp > 0)  {
         // Our prefix is here or after, so let's copy
-        if (write(*line, rc) < 0) {
+        if (write(line.c_str(), line.length()) < 0) {
           // Could not write
           rc = -1;
           break;
@@ -583,7 +579,7 @@ int List::copyUntil(
 
     // Looking for prefix
     if ((path_l.length() == 0) || (prefix_cmp > 0)) {
-      if (write(*line, rc) < 0) {
+      if (write(line.c_str(), line.length()) < 0) {
         // Could not write
         rc = -1;
         break;
@@ -591,12 +587,12 @@ int List::copyUntil(
     } else
 
     // Got a path
-    if ((*line)[1] != '\t') {
+    if (line[1] != '\t') {
       // Compare paths
-      path_cmp = path_l.compare(*line);
+      path_cmp = path_l.compare(line);
       if (path_cmp > 0) {
         // Our path is here or after, so let's copy
-        if (write(*line, rc) < 0) {
+        if (write(line.c_str(), line.length()) < 0) {
           // Could not write
           rc = -1;
           break;
@@ -619,14 +615,14 @@ int List::copyUntil(
       // Deal with exception
       if (exception_line != NULL) {
         // Copy start of line (timestamp)
-        char* pos = strchr(&(*line)[2], '\t');
+        char* pos = strchr(&line[2], '\t');
         if (pos == NULL) {
           errno = EUCLEAN;
           rc    = -1;
           break;
         }
         // Write first part from second line
-        if (write(*line, pos - *line + 1) < 0) {
+        if (write(line.c_str(), pos - line.c_str() + 1) < 0) {
           // Could not write
           rc = -1;
           break;
@@ -641,12 +637,12 @@ int List::copyUntil(
         exception_line = NULL;
       } else
       // Check for exception
-      if (strncmp(*line, "\t\t0\t", 4) == 0) {
+      if (strncmp(line.c_str(), "\t\t0\t", 4) == 0) {
         // Get only end of line
-        asprintf(&exception_line, "%s", &(*line)[4]);
+        asprintf(&exception_line, "%s", &line[4]);
       } else
       // Our prefix and path are after, so let's copy
-      if (write(*line, rc) < 0) {
+      if (write(line.c_str(), line.length() ) < 0) {
         // Could not write
         rc = -1;
         break;
@@ -674,13 +670,11 @@ int List::merge(List& list, List& journal) {
   int rc_list = 1;
 
   // Line read from journal
-  char*   j_line    = NULL;
-  size_t  j_length  = 0;
+  String  j_line;
   int     j_line_no = 0;
 
   // List read from list
-  char*   l_line    = NULL;
-  size_t  l_length  = 0;
+  String  l_line;
 
   // Current prefix, path and data (from journal)
   StrPath prefix;
@@ -692,7 +686,7 @@ int List::merge(List& list, List& journal) {
 
   // Parse journal
   while (rc > 0) {
-    int rc_journal = journal.getLine(&j_line, &j_length);
+    int rc_journal = journal.getLine(j_line);
     j_line_no++;
 
     // Failed
@@ -717,7 +711,7 @@ int List::merge(List& list, List& journal) {
       prefix = "";
       path   = "";
       if (rc_list > 0) {
-        rc_list = copyUntil(list, prefix, path, &l_line, &l_length, &status);
+        rc_list = copyUntil(list, prefix, path, l_line, &status);
         if (rc_list < 0) {
           // Error copying list
           cerr << "End of list copy failed" << endl;
@@ -757,7 +751,7 @@ int List::merge(List& list, List& journal) {
       path = "";
       // Search/copy list
       if (rc_list > 0) {
-        rc_list = copyUntil(list, prefix, path, &l_line, &l_length, &status);
+        rc_list = copyUntil(list, prefix, path, l_line, &status);
         if (rc_list < 0) {
           // Error copying list
           cerr << "Prefix search failed" << endl;
@@ -793,7 +787,7 @@ int List::merge(List& list, List& journal) {
       data = "";
       // Search/copy list
       if (rc_list > 0) {
-        rc_list = copyUntil(list, prefix, path, &l_line, &l_length, &status);
+        rc_list = copyUntil(list, prefix, path, l_line, &status);
         if (rc_list < 0) {
           // Error copying list
           cerr << "Path search failed" << endl;
@@ -817,7 +811,7 @@ int List::merge(List& list, List& journal) {
     }
 
     // Copy journal line
-    if (write(j_line, rc_journal) < 0) {
+    if (write(j_line.c_str(), j_line.length()) < 0) {
       // Could not write
       cerr << "Journal copy failed" << endl;
       rc = -1;
@@ -825,8 +819,5 @@ int List::merge(List& list, List& journal) {
     }
   }
 
-  // Free resources and leave
-  free(j_line);
-  free(l_line);
   return rc;
 }
