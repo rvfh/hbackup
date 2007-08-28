@@ -169,5 +169,18 @@ int main(void) {
   cout << "abcd <> abce, 4: " << StrPath("abcd").compare("abce", 4) << endl;
   cout << "abcd <> abce, 5: " << StrPath("abcd").compare("abce", 5) << endl;
 
+  cout << endl << "Test: toUnix" << endl;
+  StrPath pth1 = "this\\is a path/ Unix\\ cannot cope with/\\";
+  cout << pth1.c_str() << " -> ";
+  cout << pth1.toUnix().c_str() << endl;
+  cout << pth1.c_str() << " -> ";
+  cout << pth1.toUnix().c_str() << endl;
+
+  cout << endl << "Test: noEndingSlash" << endl;
+  cout << pth1.c_str() << " -> ";
+  cout << pth1.noEndingSlash().c_str() << endl;
+  cout << pth1.c_str() << " -> ";
+  cout << pth1.noEndingSlash().c_str() << endl;
+
   return 0;
 }

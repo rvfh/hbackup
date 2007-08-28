@@ -159,3 +159,22 @@ int StrPath::compare(const char* string, size_t length) const {
     }
   }
 }
+
+StrPath& StrPath::toUnix() {
+  char* pos = &_string[_length];
+  while (--pos >= _string) {
+    if (*pos == '\\') {
+      *pos = '/';
+    }
+  }
+  return *this;
+}
+
+StrPath& StrPath::noEndingSlash() {
+  char* pos = &_string[_length];
+  while ((--pos >= _string) && (*pos == '/')) {
+    *pos = '\0';
+    _length--;
+  }
+  return *this;
+}
