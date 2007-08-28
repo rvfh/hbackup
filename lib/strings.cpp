@@ -44,6 +44,14 @@ String::String() {
   _string[0] = '\0';
 }
 
+String::String(const String& string) {
+  _length = string._length;
+  _size   = 0;
+  _string = NULL;
+  alloc(_length + 1);
+  strcpy(_string, string._string);
+}
+
 String::String(const char* string, int length) {
   if (length >= 0) {
     _length = length;
@@ -55,14 +63,6 @@ String::String(const char* string, int length) {
   alloc(_length + 1);
   strncpy(_string, string, _length);
   _string[_length] = '\0';
-}
-
-String::String(const String& string) {
-  _length = string._length;
-  _size   = 0;
-  _string = NULL;
-  alloc(_length + 1);
-  strcpy(_string, string._string);
 }
 
 String& String::operator=(const String& string) {
@@ -184,12 +184,13 @@ const StrPath& StrPath::noEndingSlash() {
   return *this;
 }
 
-const char* StrPath::basename() {
+const StrPath StrPath::basename() {
   const char* pos = strrchr(_string, '/');
   if (pos == NULL) {
-    return _string;
+    return StrPath(*this);
+  } else {
+    return StrPath(++pos);
   }
-  return ++pos;
 }
 
 const StrPath StrPath::dirname() {
