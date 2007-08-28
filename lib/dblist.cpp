@@ -727,7 +727,8 @@ int List::merge(List& list, List& journal) {
         }
       }
       rc = 0;
-    } else
+      break;
+    }
 
     // Got a prefix
     if (j_line[0] != '\t') {
@@ -759,13 +760,6 @@ int List::merge(List& list, List& journal) {
           rc = -1;
           break;
         }
-      }
-      // Copy journal prefix
-      if (write(j_line, rc_journal) < 0) {
-        // Could not write
-        cerr << "Prefix write failed" << endl;
-        rc = -1;
-        break;
       }
     } else
 
@@ -803,13 +797,6 @@ int List::merge(List& list, List& journal) {
           break;
         }
       }
-      // Copy journal path
-      if (write(j_line, rc_journal) < 0) {
-        // Could not write
-        cerr << "Path write failed" << endl;
-        rc = -1;
-        break;
-      }
     } else
 
     // Got data
@@ -823,13 +810,14 @@ int List::merge(List& list, List& journal) {
         break;
       }
       data = j_line;
-      // Copy journal data
-      if (write(j_line, rc_journal) < 0) {
-        // Could not write
-        cerr << "Path write failed" << endl;
-        rc = -1;
-        break;
-      }
+    }
+
+    // Copy journal line
+    if (write(j_line, rc_journal) < 0) {
+      // Could not write
+      cerr << "Journal copy failed" << endl;
+      rc = -1;
+      break;
     }
   }
 
