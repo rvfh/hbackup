@@ -310,39 +310,27 @@ int Database::getDir(
 int Database::merge() {
   bool failed = false;
 
-  if (_d->list->open("r")) {
-    failed = true;
-  } else
-  if (_d->journal->open("r")) {
-    failed = true;
-  } else
-  {
-    // Merge with existing list into new one
-    List list(_path.c_str(), "list.part");
-    if (! list.open("w")) {
-      if (list.merge(*_d->list, *_d->journal) && (errno != EBUSY)) {
-        cerr << "db: close: merge failed" << endl;
-        failed = true;
-      }
-      list.close();
-      if (! failed) {
-        if (rename((_path + "/list").c_str(), (_path + "/list~").c_str())
-        || rename((_path + "/list.part").c_str(), (_path + "/list").c_str())) {
-          cerr << "db: close: cannot rename lists" << endl;
-          failed = true;
-        }
-      }
-    } else {
-      cerr << strerror(errno) << ": failed to open temporary list" << endl;
+  // Merge with existing list into new one
+  List list(_path.c_str(), "list.part");
+  if (! list.open("w")) {
+    if (list.merge(*_d->list, *_d->journal) && (errno != EBUSY)) {
+      cerr << "db: close: merge failed" << endl;
       failed = true;
     }
+    list.close();
+    if (! failed) {
+      if (rename((_path + "/list").c_str(), (_path + "/list~").c_str())
+      || rename((_path + "/list.part").c_str(), (_path + "/list").c_str())) {
+        cerr << "db: close: cannot rename lists" << endl;
+        failed = true;
+      }
+    }
+  } else {
+    cerr << strerror(errno) << ": failed to open temporary list" << endl;
+    failed = true;
   }
-  _d->journal->close();
-  _d->list->close();
   if (failed) {
     return -1;
-  } else {
-    rename((_path + "/journal").c_str(), (_path + "/journal~").c_str());
   }
   return 0;
 }
@@ -422,10 +410,20 @@ int Database::open() {
         failed = true;
       }
       _d->journal->close();
+      _d->list->close();
+
+      if (! failed) {
+        rename((_path + "/journal").c_str(), (_path + "/journal~").c_str());
+        // Re-open list
+        if (_d->list->open("r")) {
+          cerr << "db: open: cannot re-open list" << endl;
+          failed = true;
+        }
+      }
     }
 
     // Create journal
-    if (_d->journal->open("w")) {
+    if (! failed && (_d->journal->open("w"))) {
       cerr << "db: open: cannot open journal" << endl;
       failed = true;
     }
@@ -441,8 +439,15 @@ int Database::open() {
   _d->entry = _d->active.end();
 
   if (failed) {
+      // Close lists
     _d->list->close();
     _d->journal->close();
+
+    // Delete lists
+    delete _d->journal;
+    delete _d->list;
+
+    // Unlock DB
     unlock();
     return 2;
   }
@@ -456,10 +461,24 @@ int Database::close() {
   _d->journal->close();
   _d->list->close();
 
+  // Re-open lists
+  if (_d->journal->open("r")) {
+    cerr << "db: close: cannot re-open journal" << endl;
+    failed = true;
+  }
+  if (_d->list->open("r")) {
+    cerr << "db: close: cannot re-open list" << endl;
+    failed = true;
+  }
+
   // Merge journal into list
   if (merge()) {
     failed = true;
   }
+
+  // Close lists
+  _d->journal->close();
+  _d->list->close();
 
   // Delete lists
   delete _d->journal;
@@ -469,6 +488,8 @@ int Database::close() {
   unlock();
   if (failed) {
     return -1;
+  } else {
+    rename((_path + "/journal").c_str(), (_path + "/journal~").c_str());
   }
   return 0;
 }

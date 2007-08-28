@@ -1596,3 +1596,4 @@ Journal:
 [16] file://localhost /home/User/testdir/biblio.odb      [rm]
 [16] file://localhost /home/User/testdir/evolocal.odb    [rm]
 unexpected end of file
+ --> Database list open (contents: 32 files)
