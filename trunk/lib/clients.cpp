@@ -296,8 +296,6 @@ Client::Client(string value) {
   _d            = new Private;
   _name         = value;
   _host_or_ip   = _name;
-  _listfilename = "";
-  _listfiledir  = "";
   _protocol     = "";
   _mount_point  = "";
   _mounted      = "";
@@ -324,10 +322,9 @@ void Client::setProtocol(string value) {
   _protocol = value;
 }
 
-void Client::setListfile(StrPath value) {
-  value.toUnix();
-  _listfilename = value.basename();
-  _listfiledir  = value.dirname().c_str();
+void Client::setListfile(const char* value) {
+  _listfile = value;
+  _listfile.toUnix();
 }
 
 int Client::backup(
@@ -338,7 +335,7 @@ int Client::backup(
   string  share;
   string  list_path;
 
-  if (mountPath(_listfiledir.c_str(), &list_path)) {
+  if (mountPath(_listfile.dirname().c_str(), &list_path)) {
     switch (errno) {
       case EPROTONOSUPPORT:
         cerr << "Protocol not supported: " << _protocol << endl;
@@ -355,7 +352,7 @@ int Client::backup(
   if (list_path.size() != 0) {
     list_path += "/";
   }
-  list_path += _listfilename.c_str();
+  list_path += _listfile.basename();
 
   if (verbosity() > 0) {
     cout << "Backup client '" << _name
@@ -410,7 +407,7 @@ int Client::backup(
 void Client::show() {
   cout << "Client: " << _name << endl;
   cout << "-> " << _protocol << "://" << _host_or_ip << " "
-    << _listfiledir.c_str() << "/" << _listfilename.c_str() << endl;
+    << _listfile.c_str() << endl;
   if (_options.size() > 0) {
     cout << "Options:";
     for (list<Option>::iterator i = _options.begin(); i != _options.end();

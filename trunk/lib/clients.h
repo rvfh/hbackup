@@ -44,8 +44,7 @@ class Client {
   Private*      _d;
   string        _name;
   string        _host_or_ip;
-  StrPath       _listfilename;
-  StrPath       _listfiledir;
+  StrPath       _listfile;
   string        _protocol;
   list<Option>  _options;
   //
@@ -68,7 +67,7 @@ public:
   }
   void setHostOrIp(string value);
   void setProtocol(string value);
-  void setListfile(StrPath value);
+  void setListfile(const char* value);
   //
   bool initialised() const { return _initialised; }
   void setInitialised() { _initialised = true; }
