@@ -143,7 +143,7 @@ int Path::recurse(
         } else {
           // Same file name found in DB
           if (**i != **j) {
-            bool no_data;
+            const char* checksum = NULL;
             // Metadata differ
             if (((*i)->type() == 'f')
             && ((*j)->type() == 'f')
@@ -151,13 +151,12 @@ int Path::recurse(
             && ((*i)->mtime() == (*j)->mtime())) {
               // If the file data is there, just add new metadata
               // If the checksum is missing, this shall retry too
-              no_data = true;
+              checksum = ((File*)(*j))->checksum();
               if (verbosity() > 2) {
                 cout << " --> ~ ";
               }
             } else {
               // Do it all
-              no_data = false;
               if (verbosity() > 2) {
                 cout << " --> M ";
               }
@@ -168,7 +167,7 @@ int Path::recurse(
               }
               cout << (*i)->name() << endl;
             }
-            db.modify(prefix, _path, rel_path, cur_path, *j, *i, no_data);
+            db.add(prefix, _path, rel_path, cur_path, *i, checksum);
           } else {
             // i and j have same metadata, hence same type...
             // Compare linked data
@@ -181,7 +180,7 @@ int Path::recurse(
                 }
                 cout << (*i)->name() << endl;
               }
-              db.modify(prefix, _path, rel_path, cur_path, *j, *i);
+              db.add(prefix, _path, rel_path, cur_path, *i);
             } else
             // Check that file data is present
             if (((*i)->type() == 'f')
@@ -194,7 +193,8 @@ int Path::recurse(
                 }
                 cout << (*i)->name() << endl;
               }
-              db.modify(prefix, _path, rel_path, cur_path, *j, *i, true);
+              const char* checksum = ((File*)(*j))->checksum();
+              db.add(prefix, _path, rel_path, cur_path, *i, checksum);
             } else if ((*i)->type() == 'd') {
               if (verbosity() > 3) {
                 cout << " --> D ";
