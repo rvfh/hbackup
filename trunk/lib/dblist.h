@@ -19,8 +19,6 @@
 #ifndef DBLIST_H
 #define DBLIST_H
 
-#include "dbdata.h"
-
 namespace hbackup {
 
 class DbList : public list<DbData> {
@@ -35,8 +33,8 @@ public:
 class List : public Stream {
   int copyUntil(
     List&         list,
-    const char*   prefix,
-    const char*   path,
+    StrPath&      prefix,
+    StrPath&      path,
     char**        line,
     size_t*       length,
     int*          status);

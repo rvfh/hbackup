@@ -21,6 +21,7 @@
 
 using namespace std;
 
+#include "strings.h"
 #include "files.h"
 #include "dbdata.h"
 #include "dblist.h"
