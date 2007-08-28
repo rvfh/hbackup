@@ -171,7 +171,7 @@ int HBackup::readConfig(const char* config_path) {
                 << " '" << keyword << "' takes exactly one argument" << endl;
               return -1;
             }
-            client->setListfile(*current);
+            client->setListfile(current->c_str());
           } else {
             cerr << "Unrecognised keyword '" << keyword
               << "' in configuration file, line " << line
