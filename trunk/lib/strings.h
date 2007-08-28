@@ -38,8 +38,8 @@ public:
   const char* c_str() const { return _string; }
   String& operator=(const char* string);
   String& operator=(const String& string);
-  String& operator+(const char* string);
-  String& operator+(const String& string);
+  String operator+(const char* string);
+  String operator+(const String& string);
   String& operator+=(const char* string);
   String& operator+=(const String& string);
   char& operator[](int position) const { return _string[position]; }

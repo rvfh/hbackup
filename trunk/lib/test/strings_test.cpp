@@ -142,10 +142,18 @@ int main(void) {
   }
 
   cout << endl << "7:" << endl;
+  cout << "before:" << endl;
+  cout << str1.length() << ": " << str1.c_str() << endl;
+  cout << str2.length() << ": " << str2.c_str() << endl;
   String str5 = str1 + str2;
+  cout << "after:" << endl;
+  cout << str1.length() << ": " << str1.c_str() << endl;
+  cout << str2.length() << ": " << str2.c_str() << endl;
   cout << str5.length() << ": " << str5.c_str() << endl;
 
   String str6 = str1 + "ghi";
+  cout << "after:" << endl;
+  cout << str1.length() << ": " << str1.c_str() << endl;
   cout << str6.length() << ": " << str6.c_str() << endl;
 
   cout << endl << "Test: pathCompare" << endl;
