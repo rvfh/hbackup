@@ -25,9 +25,9 @@
 using namespace hbackup;
 
 void String::alloc(size_t size) {
-  size >>= 6;
+  size >>= 5;
   size++;
-  size <<= 6;
+  size <<= 5;
   if (size > _size) {
     _size = size;
     _string = (char*) realloc(_string, _size);
@@ -61,6 +61,7 @@ String::String(const char* string, int length) {
   alloc(_length + 1);
   strncpy(_string, string, _length);
   _string[_length] = '\0';
+  _length = strlen(_string);
 }
 
 String& String::operator=(const String& string) {
@@ -107,6 +108,19 @@ String& String::operator+=(const String& string) {
 
 int String::compare(const char* string) const {
   return strcmp(_string, string);
+}
+
+StrPath::StrPath(const char* dir, const char* name) {
+  _length = strlen(dir) + strlen(name);
+  // Leave space for the '/'
+  alloc(_length + 2);
+  if (dir[0] == '\0') {
+    strcpy(_string, name);
+  } else if (name[0] == '\0') {
+    strcpy(_string, dir);
+  } else {
+    sprintf(_string, "%s/%s", dir, name);
+  }
 }
 
 int StrPath::compare(const char* string, size_t length) const {

@@ -90,10 +90,11 @@ public:
   using String::operator=;
   StrPath() :
     String::String() {}
-  StrPath(const char* string, int length = -1) :
-    String::String(string, length) {}
   StrPath(const String& string) :
     String::String(string) {}
+  StrPath(const char* string, int length = -1) :
+    String::String(string, length) {}
+  StrPath(const char* dir, const char* name);
   int compare(const char* string, size_t length = -1) const;
   int compare(const String& string, size_t length = -1) const {
     return compare(string.c_str(), length);
