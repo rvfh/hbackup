@@ -28,7 +28,10 @@ using namespace std;
 using namespace hbackup;
 
 int main(void) {
+  cout << "String test" << endl;
   cout << endl << "1:" << endl;
+  String str0("123", 10);
+  cout << str0.length() << ": " << str0.c_str() << endl;
   String str1("abcdefghi", 3);
   cout << str1.length() << ": " << str1.c_str() << endl;
   str1 = "1234567890123456789012345678901234567890123456789012345678901234567890";
@@ -156,7 +159,32 @@ int main(void) {
   cout << str1.length() << ": " << str1.c_str() << endl;
   cout << str6.length() << ": " << str6.c_str() << endl;
 
-  cout << endl << "Test: pathCompare" << endl;
+  cout << endl << endl << "StrPath test" << endl;
+  cout << endl << "constructors" << endl;
+  StrPath* pth0;
+  pth0 = new StrPath();
+  cout << pth0->length() << ": " << pth0->c_str() << endl;
+  delete pth0;
+  pth0 = new StrPath("123");
+  cout << pth0->length() << ": " << pth0->c_str() << endl;
+  delete pth0;
+  pth0 = new StrPath("123", 2);
+  cout << pth0->length() << ": " << pth0->c_str() << endl;
+  delete pth0;
+  pth0 = new StrPath("123", 20);
+  cout << pth0->length() << ": " << pth0->c_str() << endl;
+  delete pth0;
+  pth0 = new StrPath("123/456", "");
+  cout << pth0->length() << ": " << pth0->c_str() << endl;
+  delete pth0;
+  pth0 = new StrPath("", "789");
+  cout << pth0->length() << ": " << pth0->c_str() << endl;
+  delete pth0;
+  pth0 = new StrPath("123/456", "789");
+  cout << pth0->length() << ": " << pth0->c_str() << endl;
+  delete pth0;
+
+  cout << endl << "compare" << endl;
   cout << "a <> a: " << StrPath("a").compare("a") << endl;
   cout << "a <> b: " << StrPath("a").compare("b") << endl;
   cout << "b <> a: " << StrPath("b").compare("a") << endl;
