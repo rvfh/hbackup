@@ -259,12 +259,21 @@ int List::close() {
   return rc;
 }
 
+ssize_t List::currentLine() {
+  if (_line_status < 0) {
+    return -1;
+  } else {
+    _line_status = 0;
+    return _line.length();
+  }
+}
+
 ssize_t List::nextLine() {
   ssize_t length = getLine(_line);
   if (length < 0) {
     _line_status = -1;
   } else {
-    _line_status = 1;
+    _line_status = 0;
   }
   return length;
 }
@@ -303,9 +312,8 @@ int List::getEntry(
     if (_line_status == 0) {
       length = nextLine();
     } else {
-      length = _line.length();
+      length = currentLine();
     }
-    _line_status = 0;
 
     if (length == 0) {
       errno = EUCLEAN;
@@ -518,7 +526,7 @@ int List::copyUntil(
     List&         list,
     StrPath&      prefix_l,
     StrPath&      path_l,
-    int*          status) {
+    int*          prefix_cmp) {
 // status values:
 // - 0: never ran
 // - 1: prefix not found
@@ -527,17 +535,15 @@ int List::copyUntil(
 
   int   rc             = 0;
   char* exception_line = NULL;
-  int   prefix_cmp     = (*status >= 2) ? 0 : 1;
   int   path_cmp;
 
   while (true) {
     // Read list or get last data
-    if ((*status == 1) || (*status == 2)) {
-      rc = list._line.length();
+    if (list._line_status == 1) {
+      rc = list.currentLine();
     } else {
-      rc = list.getLine(list._line);
+      rc = list.nextLine();
     }
-    *status = 0;
 
     // Failed
     if (rc <= 0) {
@@ -575,8 +581,8 @@ int List::copyUntil(
     // Got a prefix
     if (list._line[0] != '\t') {
       // Compare prefixes
-      prefix_cmp = prefix_l.compare(list._line);
-      if (prefix_cmp > 0)  {
+      *prefix_cmp = prefix_l.compare(list._line);
+      if (*prefix_cmp > 0)  {
         // Our prefix is here or after, so let's copy
         if (write(list._line.c_str(), list._line.length()) < 0) {
           // Could not write
@@ -584,21 +590,20 @@ int List::copyUntil(
           break;
         }
       } else {
-        if (prefix_cmp < 0) {
+        if (*prefix_cmp < 0) {
           // Prefix not found
-          *status = 1;
+          list._line_status = 1;
           break;
         } else
         if (path_l.length() == 0) {
           // Looking for prefix, found
-          *status = 3;
           break;
         }
       }
     } else
 
     // Looking for prefix
-    if ((path_l.length() == 0) || (prefix_cmp > 0)) {
+    if ((path_l.length() == 0) || (*prefix_cmp > 0)) {
       if (write(list._line.c_str(), list._line.length()) < 0) {
         // Could not write
         rc = -1;
@@ -620,11 +625,10 @@ int List::copyUntil(
       } else {
         if (path_cmp < 0) {
           // Path not found
-          *status = 2;
+          list._line_status = 1;
           break;
         } else {
           // Looking for path, found
-          *status = 3;
           break;
         }
       }
