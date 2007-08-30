@@ -214,15 +214,6 @@ int DbList::open(
     cerr << "dblist: failed to load list: " << strerror(errno) << endl;
     return -1;
   }
-
-  if (verbosity() > 2) {
-    cout << " --> Database " << filename << " open (contents: "
-      << size() << " file";
-    if (size() != 1) {
-      cout << "s";
-    }
-    cout << ")" << endl;
-  }
   return 0;
 }
 

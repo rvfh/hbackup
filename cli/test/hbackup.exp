@@ -5,7 +5,7 @@
  --> Client: client
 Backing up
  --> Database initialized
- --> Database list open (contents: 0 files)
+ --> Database open (contents: 0 files)
 Backup client 'myhost' using protocol 'file'
  -> Reading backup list file
  --> Path: test2
@@ -46,13 +46,14 @@ Backup path 'C:/Test'
  --> A File.TXT
 Unmounted test_db/mount
 Protocol not supported: ssh
+ --> Database closed
  -> Reading configuration file
  --> Client: myClient
  --> Client: other
  --> Client: myhost
  --> Client: client
 Backing up
- --> Database list open (contents: 21 files)
+ --> Database open (contents: 21 files)
 Backup client 'myhost' using protocol 'file'
  -> Reading backup list file
  --> Path: test2
@@ -65,19 +66,22 @@ Backup client 'client' using protocol 'smb'
  --> Path: C:/Test
 Backup path 'C:/Test'
 Unmounted test_db/mount
+ --> Database closed
  -> Reading configuration file
  --> Client: myClient
  --> Client: other
  --> Client: myhost
  --> Client: client
 Scanning database
- --> Database list open (contents: 21 files)
+ --> Database open (contents: 21 files)
  --> Scanning database contents: 4 files
+ --> Database closed
  -> Reading configuration file
  --> Client: myClient
  --> Client: other
  --> Client: myhost
  --> Client: client
 Checking database
- --> Database list open (contents: 21 files)
+ --> Database open (contents: 21 files)
  --> Scanning database contents thoroughly: 4 files
+ --> Database closed

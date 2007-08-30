@@ -436,7 +436,7 @@ int Database::open() {
       failed = true;
     }
   }
-  _d->entry = _d->active.end();
+  _d->entry = _d->active.begin();
 
   if (failed) {
       // Close lists
@@ -450,6 +450,14 @@ int Database::open() {
     // Unlock DB
     unlock();
     return 2;
+  }
+  if (verbosity() > 2) {
+    cout << " --> Database open (contents: "
+      << _d->active.size() << " file";
+    if (_d->active.size() != 1) {
+      cout << "s";
+    }
+    cout << ")" << endl;
   }
   return 0;
 }
@@ -490,6 +498,9 @@ int Database::close() {
     return -1;
   } else {
     rename((_path + "/journal").c_str(), (_path + "/journal~").c_str());
+  }
+  if (verbosity() > 2) {
+    cout << " --> Database closed" << endl;
   }
   return 0;
 }
