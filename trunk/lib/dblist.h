@@ -31,11 +31,11 @@ public:
 };
 
 class List : public Stream {
+  String          _line;
   int copyUntil(
     List&         list,
     StrPath&      prefix,
     StrPath&      path,
-    String&       line,
     int*          status);
 public:
   List(
