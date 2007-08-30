@@ -49,6 +49,8 @@ public:
     const char*   req_mode);
   // Close file
   int close();
+  // Fake Loading current line from file
+  ssize_t currentLine();
   // Load next line from file
   ssize_t nextLine();
   // Skip to given prefix
