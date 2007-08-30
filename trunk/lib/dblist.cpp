@@ -240,6 +240,7 @@ int List::open(
       rc = -1;
     }
   }
+  _line_status = 0;
   return rc;
 }
 
@@ -258,23 +259,54 @@ int List::close() {
   return rc;
 }
 
+ssize_t List::nextLine() {
+  ssize_t length = getLine(_line);
+  if (length < 0) {
+    _line_status = -1;
+  } else {
+    _line_status = 1;
+  }
+  return length;
+}
+
+bool List::findPrefix(const char* prefix_in) {
+  StrPath prefix(prefix_in);
+  prefix += "\n";
+  bool    found  = false;
+  while ((nextLine() > 0) && (_line[0] != '#')) {
+    if ((_line[0] != '\t') && (_line >= prefix)) {
+      if (_line == prefix) {
+        found = true;
+      }
+      break;
+    }
+  }
+  _line_status = 1;
+  return found;
+}
+
 int List::getEntry(
     time_t*   timestamp,
     char**    prefix,
     char**    path,
     Node**    node) {
-  ssize_t length;
-
   // Initialise
-  errno   = 0;
+  errno = 0;
   free(*node);
-  *node   = NULL;
+  *node = NULL;
 
-  bool done = false;
+  bool    done = false;
+  ssize_t length;
 
   while (! done) {
     // Get line
-    length = getLine(_line);
+    if (_line_status == 0) {
+      length = nextLine();
+    } else {
+      length = _line.length();
+    }
+    _line_status = 0;
+
     if (length == 0) {
       errno = EUCLEAN;
       cerr << "unexpected end of file" << endl;
