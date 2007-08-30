@@ -32,6 +32,8 @@ public:
 
 class List : public Stream {
   String          _line;
+  // -1: error, 0: read again, 1: use current
+  int             _line_status;
   int copyUntil(
     List&         list,
     StrPath&      prefix,
@@ -47,6 +49,10 @@ public:
     const char*   req_mode);
   // Close file
   int close();
+  // Load next line from file
+  ssize_t nextLine();
+  // Skip to given prefix
+  bool findPrefix(const char* prefix);
   // Convert one 'line' of data (only works for journal atm)
   int getEntry(
     time_t*       timestamp,

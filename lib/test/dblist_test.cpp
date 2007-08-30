@@ -511,6 +511,125 @@ int main(void) {
     cout << endl;
   }
   merge.close();
+
+  cout << endl << "Test: prefix find" << endl;
+
+  merge.open("r");
+  if (! merge.findPrefix("path")) {
+    cout << "prefix 'path' not found" << endl;
+  } else {
+    cout << "prefix 'path' found" << endl;
+  }
+  while (merge.getEntry(&ts, &prefix, &path, &node) > 0) {
+    cout << "Prefix: " << prefix << endl;
+    cout << "Path:   " << path << endl;
+    cout << "TS:     " << ts << endl;
+    if (node == NULL) {
+      cout << "Type:   removed" << endl;
+    } else {
+      switch (node->type()) {
+        case 'f':
+          cout << "Type:   file" << endl;
+          break;
+        case 'l':
+          cout << "Type:   link" << endl;
+          break;
+        default:
+          cout << "Type:   other" << endl;
+      }
+      cout << "Name:   " << node->name() << endl;
+      cout << "Size:   " << node->size() << endl;
+      switch (node->type()) {
+        case 'f':
+          cout << "Chcksm: " << ((File*) node)->checksum() << endl;
+          break;
+        case 'l':
+          cout << "Link:   " << ((Link*) node)->link() << endl;
+      }
+      free(node);
+      node = NULL;
+    }
+    cout << endl;
+  }
+  merge.close();
+
+  merge.open("r");
+  if (! merge.findPrefix("silly")) {
+    cout << "prefix 'silly' not found" << endl;
+  } else {
+    cout << "prefix 'silly' found" << endl;
+  }
+  while (merge.getEntry(&ts, &prefix, &path, &node) > 0) {
+    cout << "Prefix: " << prefix << endl;
+    cout << "Path:   " << path << endl;
+    cout << "TS:     " << ts << endl;
+    if (node == NULL) {
+      cout << "Type:   removed" << endl;
+    } else {
+      switch (node->type()) {
+        case 'f':
+          cout << "Type:   file" << endl;
+          break;
+        case 'l':
+          cout << "Type:   link" << endl;
+          break;
+        default:
+          cout << "Type:   other" << endl;
+      }
+      cout << "Name:   " << node->name() << endl;
+      cout << "Size:   " << node->size() << endl;
+      switch (node->type()) {
+        case 'f':
+          cout << "Chcksm: " << ((File*) node)->checksum() << endl;
+          break;
+        case 'l':
+          cout << "Link:   " << ((Link*) node)->link() << endl;
+      }
+      free(node);
+      node = NULL;
+    }
+    cout << endl;
+  }
+  merge.close();
+
+  merge.open("r");
+  if (! merge.findPrefix("prefix2")) {
+    cout << "prefix 'prefix2' not found" << endl;
+  } else {
+    cout << "prefix 'prefix2' found" << endl;
+  }
+  while (merge.getEntry(&ts, &prefix, &path, &node) > 0) {
+    cout << "Prefix: " << prefix << endl;
+    cout << "Path:   " << path << endl;
+    cout << "TS:     " << ts << endl;
+    if (node == NULL) {
+      cout << "Type:   removed" << endl;
+    } else {
+      switch (node->type()) {
+        case 'f':
+          cout << "Type:   file" << endl;
+          break;
+        case 'l':
+          cout << "Type:   link" << endl;
+          break;
+        default:
+          cout << "Type:   other" << endl;
+      }
+      cout << "Name:   " << node->name() << endl;
+      cout << "Size:   " << node->size() << endl;
+      switch (node->type()) {
+        case 'f':
+          cout << "Chcksm: " << ((File*) node)->checksum() << endl;
+          break;
+        case 'l':
+          cout << "Link:   " << ((Link*) node)->link() << endl;
+      }
+      free(node);
+      node = NULL;
+    }
+    cout << endl;
+  }
+  merge.close();
   free(line);
 
   return 0;
