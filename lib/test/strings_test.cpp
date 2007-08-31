@@ -159,6 +159,16 @@ int main(void) {
   cout << str1.length() << ": " << str1.c_str() << endl;
   cout << str6.length() << ": " << str6.c_str() << endl;
 
+  cout << endl << "append and +=:" << endl;
+  cout << "before:" << endl;
+  cout << str1.length() << ": " << str1.c_str() << endl;
+  cout << "append(abcd, 2):" << endl;
+  str1.append("abcd", 2);
+  cout << str1.length() << ": " << str1.c_str() << endl;
+  cout << "+= efgh:" << endl;
+  str1 += "efgh";
+  cout << str1.length() << ": " << str1.c_str() << endl;
+
   cout << endl << endl << "StrPath test" << endl;
   cout << endl << "constructors" << endl;
   StrPath* pth0;

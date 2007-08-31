@@ -30,12 +30,13 @@ protected:
 public:
   String();
   String(const String& string);
-  String(const char* string, int length = -1);
+  String(const char* string, ssize_t length = -1);
   virtual ~String() {
     free(_string);
   }
   int length() const        { return _length; }
   const char* c_str() const { return _string; }
+  ssize_t append(const char* string, ssize_t length = -1);
   String& operator=(const char* string);
   String& operator=(const String& string);
   String operator+(const char* string);

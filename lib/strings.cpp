@@ -50,7 +50,7 @@ String::String(const String& string) {
   strcpy(_string, string._string);
 }
 
-String::String(const char* string, int length) {
+String::String(const char* string, ssize_t length) {
   if (length >= 0) {
     _length = length;
   } else {
@@ -62,6 +62,18 @@ String::String(const char* string, int length) {
   strncpy(_string, string, _length);
   _string[_length] = '\0';
   _length = strlen(_string);
+}
+
+ssize_t String::append(const char* string, ssize_t length) {
+  if (length < 0) {
+    length = strlen(string);
+  }
+  length += _length;
+  alloc(length + 1);
+  strncpy(&_string[_length], string, length - _length);
+  _length = length;
+  _string[_length] = '\0';
+  return _length;
 }
 
 String& String::operator=(const String& string) {
@@ -91,10 +103,7 @@ String String::operator+(const String& string) {
 }
 
 String& String::operator+=(const char* string) {
-  size_t length = _length + strlen(string);
-  alloc(length + 1);
-  strcpy(&_string[_length], string);
-  _length = length;
+  this->append(string);
   return *this;
 }
 

@@ -40,6 +40,14 @@ after:
 3: abc
 6: abcghi
 
+append and +=:
+before:
+3: abc
+append(abcd, 2):
+5: abcab
++= efgh:
+9: abcabefgh
+
 
 StrPath test
 
