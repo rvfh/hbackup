@@ -19,8 +19,6 @@
 #ifndef DBDATA_H
 #define DBDATA_H
 
-#include "files.h"
-
 namespace hbackup {
 
 class DbData {

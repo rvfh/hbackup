@@ -19,12 +19,6 @@
 #ifndef PARSERS_H
 #define PARSERS_H
 
-#include <list>
-
-using namespace std;
-
-#include "files.h"
-
 namespace hbackup {
 
 typedef enum {

@@ -37,6 +37,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <list>
 #include <sys/stat.h>
 #include <signal.h>
 #include <time.h>
@@ -48,7 +49,7 @@ using namespace std;
 #include "strings.h"
 #include "files.h"
 #include "dbdata.h"
-#include "dblist.h"
+#include "list.h"
 #include "db.h"
 #include "hbackup.h"
 

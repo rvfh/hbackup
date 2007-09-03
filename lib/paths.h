@@ -19,12 +19,6 @@
 #ifndef PATHS_H
 #define PATHS_H
 
-#include "strings.h"
-#include "files.h"
-#include "filters.h"
-#include "parsers.h"
-#include "db.h"
-
 namespace hbackup {
 
 class Path {

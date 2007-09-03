@@ -18,12 +18,14 @@
 
 #include <iostream>
 #include <fstream>
+#include <list>
 #include <errno.h>
 
 using namespace std;
 
-#include "db.h"
 #include "strings.h"
+#include "files.h"
+#include "db.h"
 #include "clients.h"
 #include "hbackup.h"
 

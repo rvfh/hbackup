@@ -19,12 +19,6 @@
 #ifndef DB_H
 #define DB_H
 
-#include "strings.h"
-// TODO remove this one by moving parsing into paths.cpp
-#include "files.h"
-// TODO remove this one by doing the data writing part in paths.cpp
-#include "dbdata.h"
-
 namespace hbackup {
 
 class Database {

@@ -17,19 +17,19 @@ check: all
 	@${MAKE} -C test
 
 # Dependencies
-libhbackup.a: interface.o clients.o db.o dblist.o filters.o paths.o files.o \
+libhbackup.a: interface.o clients.o db.o list.o filters.o paths.o files.o \
 	cvs_parser.o strings.o
 
-clients.o: files.h filters.h parsers.h cvs_parser.h paths.h dbdata.h \
-	dblist.h db.h clients.h
-cvs_parser.o: files.h parsers.h cvs_parser.h
-db.o: files.h dbdata.h dblist.h db.h
-dblist.o: files.h dbdata.h dblist.h
+clients.o: strings.h files.h filters.h parsers.h cvs_parser.h dbdata.h list.h \
+	db.h paths.h clients.h hbackup.h
+cvs_parser.o: strings.h files.h parsers.h cvs_parser.h
+db.o: strings.h files.h dbdata.h list.h db.h hbackup.h
+files.o: strings.h files.h hbackup.h
+filters.o: strings.h files.h filters.h
+interface.o: strings.h files.h db.h clients.h hbackup.h
+list.o: strings.h files.h dbdata.h list.h hbackup.h
+paths.o: strings.h files.h filters.h parsers.h cvs_parser.h dbdata.h list.h db.h paths.h hbackup.h
 strings.o: strings.h
-files.o: files.h
-filters.o: filters.h files.h
-paths.o: files.h filters.h parsers.h cvs_parser.h dbdata.h dblist.h db.h paths.h
-interface.o: hbackup.h clients.h db.h
 
 # Rules
 %o: %cpp

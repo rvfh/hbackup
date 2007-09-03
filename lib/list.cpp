@@ -17,14 +17,17 @@
 */
 
 #include <iostream>
+#include <list>
+
 #include <string.h>
 #include <errno.h>
 
 using namespace std;
 
 #include "strings.h"
+#include "files.h"
 #include "dbdata.h"
-#include "dblist.h"
+#include "list.h"
 #include "hbackup.h"
 
 using namespace hbackup;

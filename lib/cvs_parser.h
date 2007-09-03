@@ -19,8 +19,6 @@
 #ifndef CVS_PARSER_H
 #define CVS_PARSER_H
 
-#include "parsers.h"
-
 namespace hbackup {
 
 class CvsParser : public Parser {

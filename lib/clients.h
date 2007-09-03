@@ -19,8 +19,6 @@
 #ifndef CLIENT_H
 #define CLIENT_H
 
-#include "strings.h"
-
 namespace hbackup {
 
 class Option {

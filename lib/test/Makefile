@@ -1,6 +1,6 @@
 AR := ar
 RANLIB := ranlib
-CXXFLAGS := -Wall -O2 -ansi -I..
+CXXFLAGS := -Wall -g -ansi -I..
 LDFLAGS := -lssl -lz
 
 all: test
@@ -10,7 +10,7 @@ test:   strings.done \
 	filters.done \
 	parsers.done \
 	cvs_parser.done \
-	dblist.done \
+	list.done \
 	db.done \
 	paths.done \
 	clients.done
@@ -20,7 +20,7 @@ clean:
 	@../../test_tools/test_setup clean
 
 # Rules
-%_test.o: %_test.cpp
+%_test.o: %_test.cpp ../libhbackup.a
 	@echo "CXX	$<"
 	@$(CXX) $(CXXFLAGS) -c -o $@ $<
 
