@@ -39,8 +39,8 @@ public:
   ssize_t append(const char* string, ssize_t length = -1);
   String& operator=(const char* string);
   String& operator=(const String& string);
-  String operator+(const char* string);
-  String operator+(const String& string);
+  String operator+(const char* string) const;
+  String operator+(const String& string) const;
   String& operator+=(const char* string);
   String& operator+=(const String& string);
   char& operator[](int position) const { return _string[position]; }
