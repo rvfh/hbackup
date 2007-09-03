@@ -90,13 +90,13 @@ String& String::operator=(const char* string) {
   return *this;
 }
 
-String String::operator+(const char* string) {
+String String::operator+(const char* string) const {
   String lstring = *this;
   lstring += string;
   return lstring;
 }
 
-String String::operator+(const String& string) {
+String String::operator+(const String& string) const {
   String lstring = *this;
   lstring += string;
   return lstring;
