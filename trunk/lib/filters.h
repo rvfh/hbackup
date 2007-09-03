@@ -19,10 +19,6 @@
 #ifndef FILTERS_H
 #define FILTERS_H
 
-#include <list>
-
-#include "files.h"
-
 namespace hbackup {
 
 /* The filter stores a list of rules, each containing a list of conditions.

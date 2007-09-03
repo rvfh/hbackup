@@ -30,7 +30,7 @@ using namespace std;
 #include "parsers.h"
 #include "cvs_parser.h"
 #include "dbdata.h"
-#include "dblist.h"
+#include "list.h"
 #include "db.h"
 #include "paths.h"
 #include "hbackup.h"

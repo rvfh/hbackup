@@ -27,7 +27,7 @@ using namespace std;
 #include "filters.h"
 #include "parsers.h"
 #include "dbdata.h"
-#include "dblist.h"
+#include "list.h"
 #include "db.h"
 #include "paths.h"
 #include "clients.h"

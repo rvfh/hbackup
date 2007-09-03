@@ -18,8 +18,11 @@
 
 #include <iostream>
 #include <string>
+#include <list>
+
 #include <cctype>
 #include <cstdio>
+
 #include <dirent.h>
 #include <sys/types.h>
 #include <sys/stat.h>
