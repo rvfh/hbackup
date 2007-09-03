@@ -269,7 +269,8 @@ class Stream : public File {
   mode_t          _fmode;     // file open mode
   long long       _dsize;     // uncompressed data size, in bytes
   unsigned char*  _fbuffer;   // buffer for file compression during read/write
-  bool            _fempty;    // compression buffer not empty
+  unsigned char*  _freader;   // buffer read pointer
+  ssize_t         _flength;   // buffer length
   EVP_MD_CTX*     _ctx;       // openssl resources
   z_stream*       _strm;      // zlib resources
   // Convert MD5 to readable string
