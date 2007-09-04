@@ -26,10 +26,21 @@ class Database {
   Private*      _d;
   string        _path;
   list<string>  _active_checksums;
-  bool          _expire_inited;
   int  lock();
   void unlock();
   int  merge();
+protected: // So I can test them/use them in tests
+  int getDir(
+    const string&   checksum,
+    string&         path,
+    bool            create);
+  int  organise(
+    const string&   path,
+    int             number);
+  int  write(
+    const string&   path,
+    char**          checksum,
+    int             compress = 0);
 public:
   Database(const string& path);
   ~Database();
@@ -49,24 +60,11 @@ public:
     const string&   path,
     const string&   checksum);
   /* Check database for missing/corrupted data */
-  /* If local_db_path is empty, use already open database */
   /* If checksum is empty, scan all contents */
   /* If thorough is true, check for corruption */
   int  scan(
     const String&   checksum = "",
     bool            thorough = false);
-// So I can test them/use them in tests
-  int getDir(
-    const string&   checksum,
-    string&         path,
-    bool            create);
-  int  organise(
-    const string&   path,
-    int             number);
-  int  write(
-    const string&   path,
-    char**          checksum,
-    int             compress = 0);
   int add(
     const char*     prefix,           // Client
     const char*     base_path,        // Path being backed up
