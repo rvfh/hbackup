@@ -39,6 +39,29 @@ using namespace hbackup;
 
 // Most tests are done in paths test
 
+class DbTest : public Database {
+public:
+  DbTest(const string& path) :
+    Database::Database(path) {}
+  int getDir(
+      const string&   checksum,
+      string&         path,
+      bool            create) {
+    return Database::getDir(checksum, path, create);
+  }
+  int  organise(
+      const string&   path,
+      int             number) {
+    return Database::organise(path, number);
+  }
+  int  write(
+      const string&   path,
+      char**          checksum,
+      int             compress = 0) {
+    return Database::write(path, checksum, compress);
+  }
+};
+
 static int verbose = 4;
 
 int hbackup::verbosity(void) {
@@ -61,7 +84,7 @@ int main(void) {
   DbList            journal;
   int               status;
 
-  Database db("test_db");
+  DbTest db("test_db");
 
   /* Test database */
   if ((status = db.open())) {

@@ -338,7 +338,6 @@ int Database::merge() {
 
 Database::Database(const string& path) {
   _path          = path;
-  _expire_inited = false;
   _d             = new Private;
 }
 
