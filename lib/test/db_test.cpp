@@ -37,7 +37,21 @@ using namespace std;
 
 using namespace hbackup;
 
-// Most tests are done in paths test
+// Tests status:
+//   lock:      tested
+//   unlock:    tested
+//   merge:     tested in paths
+//   getDir:    tested
+//   organise:  tested
+//   write:     tested
+//   path:      tested in paths
+//   open:      FIXME not tested
+//   close:     FIXME not tested
+//   getList:   tested in paths
+//   read:      tested
+//   scan:      FIXME not tested
+//   add:       tested in paths
+//   remove:    tested in paths
 
 class DbTest : public Database {
 public:
@@ -174,6 +188,27 @@ int main(void) {
   system("find test_db/data/zz");
 
   db.close();
+
+  cout << endl << "Test: lock" << endl;
+  if (! db.open()) {
+    db.close();
+  }
+  system("echo 100000 > test_db/lock");
+  if (! db.open()) {
+    db.close();
+  }
+  system("echo 1 > test_db/lock");
+  if (! db.open()) {
+    db.close();
+  }
+  system("echo 0 > test_db/lock");
+  if (! db.open()) {
+    db.close();
+  }
+  system("touch test_db/lock");
+  if (! db.open()) {
+    db.close();
+  }
 return 0;
 
   /* Re-open database => no change */

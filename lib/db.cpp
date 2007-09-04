@@ -234,14 +234,14 @@ int Database::write(
 int Database::lock() {
   string  lock_path;
   FILE    *file;
-  int     status = 0;
+  bool    failed = false;
 
   /* Set the database path that we just locked as default */
   lock_path = _path + "/lock";
 
   /* Try to open lock file for reading: check who's holding the lock */
   if ((file = fopen(lock_path.c_str(), "r")) != NULL) {
-    pid_t pid;
+    pid_t pid = 0;
 
     /* Lock already taken */
     fscanf(file, "%d", &pid);
@@ -252,19 +252,18 @@ int Database::lock() {
       if (errno == ESRCH) {
         cerr << "db: lock: lock reset" << endl;
         std::remove(lock_path.c_str());
-        status = 1;
       } else {
         cerr << "db: lock: lock taken by process with pid " << pid << endl;
-        status = 2;
+        failed = true;
       }
     } else {
       cerr << "db: lock: lock taken by an unidentified process!" << endl;
-      status = 2;
+      failed = true;
     }
   }
 
   /* Try to open lock file for writing: lock */
-  if (status != 2) {
+  if (! failed) {
     if ((file = fopen(lock_path.c_str(), "w")) != NULL) {
       /* Lock taken */
       fprintf(file, "%u\n", getpid());
@@ -272,10 +271,13 @@ int Database::lock() {
     } else {
       /* Lock cannot be taken */
       cerr << "db: lock: cannot take lock" << endl;
-      status = 2;
+      failed = true;
     }
   }
-  return status;
+  if (failed) {
+    return -1;
+  }
+  return 0;
 }
 
 void Database::unlock() {
@@ -353,8 +355,7 @@ int Database::open() {
     return 2;
   }
   // Try to take lock
-  int lock_status = lock();
-  if (lock_status == 2) {
+  if (lock()) {
     errno = ENOLCK;
     return 2;
   }

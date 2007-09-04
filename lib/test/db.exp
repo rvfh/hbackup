@@ -35,3 +35,13 @@ test_db/data/zz/00/00/03
 test_db/data/zz/00/.nofiles
 test_db/data/zz/.nofiles
  --> Database closed
+
+Test: lock
+ --> Database open (contents: 0 files)
+ --> Database closed
+db: lock: lock reset
+ --> Database open (contents: 0 files)
+ --> Database closed
+db: lock: lock taken by process with pid 1
+db: lock: lock taken by an unidentified process!
+db: lock: lock taken by an unidentified process!
